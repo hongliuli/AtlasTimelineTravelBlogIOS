@@ -1,0 +1,314 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CE0E5302168E671F00C147FB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E5301168E671F00C147FB /* UIKit.framework */; };
+		CE0E5304168E671F00C147FB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E5303168E671F00C147FB /* Foundation.framework */; };
+		CE0E5306168E671F00C147FB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E5305168E671F00C147FB /* CoreGraphics.framework */; };
+		CE0E530C168E671F00C147FB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE0E530A168E671F00C147FB /* InfoPlist.strings */; };
+		CE0E530E168E671F00C147FB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0E530D168E671F00C147FB /* main.m */; };
+		CE0E5312168E671F00C147FB /* ATAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0E5311168E671F00C147FB /* ATAppDelegate.m */; };
+		CE0E5314168E671F00C147FB /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = CE0E5313168E671F00C147FB /* Default.png */; };
+		CE0E5316168E671F00C147FB /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE0E5315168E671F00C147FB /* Default@2x.png */; };
+		CE0E5318168E671F00C147FB /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE0E5317168E671F00C147FB /* Default-568h@2x.png */; };
+		CE0E531B168E671F00C147FB /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE0E5319168E671F00C147FB /* MainStoryboard_iPhone.storyboard */; };
+		CE0E531E168E671F00C147FB /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE0E531C168E671F00C147FB /* MainStoryboard_iPad.storyboard */; };
+		CE0E5321168E671F00C147FB /* ATViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0E5320168E671F00C147FB /* ATViewController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		CE0E52FD168E671F00C147FB /* AtlasTimelineIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AtlasTimelineIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE0E5301168E671F00C147FB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		CE0E5303168E671F00C147FB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		CE0E5305168E671F00C147FB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		CE0E5309168E671F00C147FB /* AtlasTimelineIOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AtlasTimelineIOS-Info.plist"; sourceTree = "<group>"; };
+		CE0E530B168E671F00C147FB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CE0E530D168E671F00C147FB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		CE0E530F168E671F00C147FB /* AtlasTimelineIOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AtlasTimelineIOS-Prefix.pch"; sourceTree = "<group>"; };
+		CE0E5310168E671F00C147FB /* ATAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ATAppDelegate.h; sourceTree = "<group>"; };
+		CE0E5311168E671F00C147FB /* ATAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ATAppDelegate.m; sourceTree = "<group>"; };
+		CE0E5313168E671F00C147FB /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		CE0E5315168E671F00C147FB /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		CE0E5317168E671F00C147FB /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		CE0E531A168E671F00C147FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
+		CE0E531D168E671F00C147FB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
+		CE0E531F168E671F00C147FB /* ATViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ATViewController.h; sourceTree = "<group>"; };
+		CE0E5320168E671F00C147FB /* ATViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ATViewController.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CE0E52FA168E671E00C147FB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE0E5302168E671F00C147FB /* UIKit.framework in Frameworks */,
+				CE0E5304168E671F00C147FB /* Foundation.framework in Frameworks */,
+				CE0E5306168E671F00C147FB /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CE0E52F2168E671E00C147FB = {
+			isa = PBXGroup;
+			children = (
+				CE0E5307168E671F00C147FB /* AtlasTimelineIOS */,
+				CE0E5300168E671F00C147FB /* Frameworks */,
+				CE0E52FE168E671F00C147FB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CE0E52FE168E671F00C147FB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CE0E52FD168E671F00C147FB /* AtlasTimelineIOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CE0E5300168E671F00C147FB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CE0E5301168E671F00C147FB /* UIKit.framework */,
+				CE0E5303168E671F00C147FB /* Foundation.framework */,
+				CE0E5305168E671F00C147FB /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CE0E5307168E671F00C147FB /* AtlasTimelineIOS */ = {
+			isa = PBXGroup;
+			children = (
+				CE0E5310168E671F00C147FB /* ATAppDelegate.h */,
+				CE0E5311168E671F00C147FB /* ATAppDelegate.m */,
+				CE0E5319168E671F00C147FB /* MainStoryboard_iPhone.storyboard */,
+				CE0E531C168E671F00C147FB /* MainStoryboard_iPad.storyboard */,
+				CE0E531F168E671F00C147FB /* ATViewController.h */,
+				CE0E5320168E671F00C147FB /* ATViewController.m */,
+				CE0E5308168E671F00C147FB /* Supporting Files */,
+			);
+			path = AtlasTimelineIOS;
+			sourceTree = "<group>";
+		};
+		CE0E5308168E671F00C147FB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CE0E5309168E671F00C147FB /* AtlasTimelineIOS-Info.plist */,
+				CE0E530A168E671F00C147FB /* InfoPlist.strings */,
+				CE0E530D168E671F00C147FB /* main.m */,
+				CE0E530F168E671F00C147FB /* AtlasTimelineIOS-Prefix.pch */,
+				CE0E5313168E671F00C147FB /* Default.png */,
+				CE0E5315168E671F00C147FB /* Default@2x.png */,
+				CE0E5317168E671F00C147FB /* Default-568h@2x.png */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CE0E52FC168E671E00C147FB /* AtlasTimelineIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE0E5324168E671F00C147FB /* Build configuration list for PBXNativeTarget "AtlasTimelineIOS" */;
+			buildPhases = (
+				CE0E52F9168E671E00C147FB /* Sources */,
+				CE0E52FA168E671E00C147FB /* Frameworks */,
+				CE0E52FB168E671E00C147FB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AtlasTimelineIOS;
+			productName = AtlasTimelineIOS;
+			productReference = CE0E52FD168E671F00C147FB /* AtlasTimelineIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CE0E52F4168E671E00C147FB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = AT;
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = hong;
+			};
+			buildConfigurationList = CE0E52F7168E671E00C147FB /* Build configuration list for PBXProject "AtlasTimelineIOS" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = CE0E52F2168E671E00C147FB;
+			productRefGroup = CE0E52FE168E671F00C147FB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CE0E52FC168E671E00C147FB /* AtlasTimelineIOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CE0E52FB168E671E00C147FB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE0E530C168E671F00C147FB /* InfoPlist.strings in Resources */,
+				CE0E5314168E671F00C147FB /* Default.png in Resources */,
+				CE0E5316168E671F00C147FB /* Default@2x.png in Resources */,
+				CE0E5318168E671F00C147FB /* Default-568h@2x.png in Resources */,
+				CE0E531B168E671F00C147FB /* MainStoryboard_iPhone.storyboard in Resources */,
+				CE0E531E168E671F00C147FB /* MainStoryboard_iPad.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CE0E52F9168E671E00C147FB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE0E530E168E671F00C147FB /* main.m in Sources */,
+				CE0E5312168E671F00C147FB /* ATAppDelegate.m in Sources */,
+				CE0E5321168E671F00C147FB /* ATViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		CE0E530A168E671F00C147FB /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE0E530B168E671F00C147FB /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		CE0E5319168E671F00C147FB /* MainStoryboard_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE0E531A168E671F00C147FB /* en */,
+			);
+			name = MainStoryboard_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+		CE0E531C168E671F00C147FB /* MainStoryboard_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE0E531D168E671F00C147FB /* en */,
+			);
+			name = MainStoryboard_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CE0E5322168E671F00C147FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CE0E5323168E671F00C147FB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CE0E5325168E671F00C147FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AtlasTimelineIOS/AtlasTimelineIOS-Prefix.pch";
+				INFOPLIST_FILE = "AtlasTimelineIOS/AtlasTimelineIOS-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		CE0E5326168E671F00C147FB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AtlasTimelineIOS/AtlasTimelineIOS-Prefix.pch";
+				INFOPLIST_FILE = "AtlasTimelineIOS/AtlasTimelineIOS-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CE0E52F7168E671E00C147FB /* Build configuration list for PBXProject "AtlasTimelineIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE0E5322168E671F00C147FB /* Debug */,
+				CE0E5323168E671F00C147FB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE0E5324168E671F00C147FB /* Build configuration list for PBXNativeTarget "AtlasTimelineIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE0E5325168E671F00C147FB /* Debug */,
+				CE0E5326168E671F00C147FB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CE0E52F4168E671E00C147FB /* Project object */;
+}
