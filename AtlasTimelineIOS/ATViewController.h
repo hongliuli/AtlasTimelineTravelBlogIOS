@@ -7,7 +7,52 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MapKit/MapKit.h>
+#import "ATDataController.h"
+#import "ATEventEditorTableController.h"
+#import "ATPreferenceViewController.h"
+#import <StoreKit/StoreKit.h>
+@class ATAppDelegate;
+@class ATEventAnnotation;
+@class ATTimeScrollWindowNew;
 
-@interface ATViewController : UIViewController
+@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchBarDelegate,SKProductsRequestDelegate, SKPaymentTransactionObserver, UIAlertViewDelegate>
+{
+    ATDataController *dataController;
+
+}
+
+
+@property (strong, nonatomic) IBOutlet MKMapView *mapView;
+@property (nonatomic, retain, readonly) ATDataController *dataController;
+@property (strong, nonatomic) IBOutlet CLLocationManager *locationManager;
+@property (strong, nonatomic) IBOutlet CLGeocoder *geoCoder;
+@property (strong, nonatomic) IBOutlet CLLocation *location;
+@property (strong, nonatomic) IBOutlet UIPopoverController* eventEditorPopover;
+@property (strong, nonatomic) IBOutlet ATEventEditorTableController* eventEditor;
+@property (strong, nonatomic) ATEventAnnotation* selectedAnnotation;
+@property (strong, nonatomic) UILabel* focusedEventLabel;
+//@property (strong, nonatomic) UISlider * scaleSlider;
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+
+@property (strong, nonatomic) ATTimeScrollWindowNew* timeScrollWindow;
+@property (strong, nonatomic) UIPopoverController* preferencePopover; //store it in prepareSeque, used in ATHelper to dismiss it when start user verification popover
+//following two will be changed when loaded EventListSorted and eventEditor update/deleted event with max/min dates
+@property (strong, nonatomic) NSDate* startDate;
+@property (strong, nonatomic) NSDate* endDate;
+
+
+
+- (void) prepareMapView;
+- (NSString*) getImageIdentifier:(NSDate*) eventDate;
+- (Boolean) eventInPeriodRange:(NSDate*) eventDate;
+- (float) getDistanceFromFocusedDate:(NSDate*) eventDate;
+- (void) setSelectedPeriodLabel;
+- (void) changeTimeScaleState;
+- (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent;
+- (void) setNewFocusedDateAndUpdateMapWithNewCenter:(ATEventDataStruct*) ent :(int)zoomLevel;
+- (void) refreshAnnotations;
+- (void) cleanSelectedAnnotationSet; //see comments in .m file
+
 
 @end

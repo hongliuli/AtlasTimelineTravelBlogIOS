@@ -1,0 +1,248 @@
+
+--------------------------------------------
+Full steps for submit to store:
+http://developer.apple.com/library/ios/#documentation/IDEs/Conceptual/AppDistributionGuide/SubmittingYourApp/SubmittingYourApp.html#//apple_ref/doc/uid/TP40012582-CH9-SW1
+
+
+iOS Dev Center / iTunes Connect  same login -> hongliuli@gmail.com  (pwd Cap R....3)
+
+1. Create App ID -> in Develope Center, search for "Manage your certificates, App IDs, devices, and provisioning profiles".
+   Bundle ID com.chroniclemap   detail see Develope Center
+2. iTunes:
+    - primary category: Utilities     secondary: Travel
+    - created test user lanqiuusa/Hongliu123 for test in-apps purchase. on Device, logout iTune user to test
+3. how to upload binary
+    
+--------------------------------------------
+
+3/30/13  start to design/implement event photo in Virginia Beach 3-day vacation
+---------------------------------------
+As in my email on Mar 29, 2013, I want to change a little bit:
+ - Do not consider synch photo to server, if user change device, all photo be lost.
+   if user re-install ....
+   Photo infor will be in a separate sqlite db without synch to server
+   (wish to put into current sqllige, need to see if I can get path of the 
+ - Later may have a separate version to synch photo
+
+3/6/13 - Completed first version, but find need to use horizontal table for timeScrollWindow
+--------------------
+- Follow easyTableView example, my mapView Controller will be viewController for easyTableView.
+- study UIScrollViewDelegate reference to see which event can used to decide when scroll stopped
+- after stop, use following to get visible rows:
+    NSArray *visible = [tableView indexPathsForVisibleRows];
+    NSIndexPath *indexpath = (NSIndexPath*)[visible objectAtIndex:0];
+        indexPath.row will give you index of first object displayed..Hope this help
+- then try to snap the middle visible row to the middle of the screen as focusedDate
+
+serverside has these action
+---------------------------
+ROOT: atlastimelineapi
+- downloadjsoncontents - paramenter  user_id, security_code, atlas_name
+- retreievelistofcontents  - paramenter   user_id, security_code
+- verifyusersetup - parameter  user_id
+- POST for upload: parameter user_id, security_code, json_contents
+
+
+IOS Apple Sample code http://developer.apple.com/library/ios/navigation/
+(I used WeatherMap example)
+
+1. This is a navigator based application, created in following way:
+    . create project with "Single view"
+    . select storyboard file, then Editor->Embed In->Navigator..
+    (this will change to navigator controller, now drop any view controller in storyboard will make them part of navigate)
+  . add MapKits to first view
+  . add Timeline button to first view's navigate bar
+  . add searchBar to navigate bar is tricky:
+        - new drop a view item to navigate bar, then drop searchBar
+          on the view item
+          (use search bar:  http://stackoverflow.com/questions/2281798/how-to-search-mkmapview-with-uisearchbar )
+  . drop a TableView Controller to storyboard as the Timeline view
+    (Later will new .h.m file for this table controller and associate both in Identity Inspector)
+  . create segus from "Timeline button" to the second controller so click on it will switch to Timeline view table controller automatically
+2. To see if a view item has connected with any var in code, open .h file and see if var has a filled circle. Click on the circle also will reveal the connction detail. 
+    To make a view item connect to a var, open storyboard, open .h code in Editor at right, ctrl-drag the view item to .h file and a IBOutlet var will be created with filled circle.
+    To remove a connection, in storyboard, control-click on a view item, in the popup, there is a small x, click it
+    (REMEMBER Xcode use connection, while other technology such as .NET/Swing use view item ID in code directly)
+    
+3. Create ATimelineTableViewController class in File -> New ...
+    Then in storyboard click TableViewControler and in Identity Inspector to associate it with the ATimelineTableViewController (may need restart Xcode if do not see the class in inspector)
+4. 20130101 - today spent a long time to figure out why once worked code suddenly get error on dequeueReusableCellWithIdentifier:EventCellIdentifier returns nil.
+   But when install on iPad works fine.
+   I finally clean the project again and run on simulator works now. (weired, not know why. our cell is a prototype cell, in this case need set "EventCellIdentifier" in Attrib Inspector, if not will get above nil error, but I did it)
+5. ####20130114 ##### finally solve the issue I've been working on for whole weelend: CLGeocoder object has to be initialize everytime use it. So it have to be initialized everytime in handleGesture()
+6. modify code to be able to work on iOS5:
+    . do not use NSAttributedString
+    . do not use new form of dequeueReusableCellWithIdentifier which has the second parameter
+
+
+DATE format and localize Example
+---------------------------------
+        NSString *date = [NSDateFormatter localizedStringFromDate: [NSDate date]
+                                                        dateStyle:NSDateFormatterShortStyle 
+                                                        timeStyle:NSDateFormatterShortStyle];
+                                                        
+Sync Server Chinese character issue
+------------------------------------
+At iOS side, when do JSON serilize, use NSUTF8StringEncoding (not NSACCII...)
+Most work is at MySql and Spring MVC, please refere to text document in atlasTimeline Spring MVC Eclipse project on dropbox 
+
+Use Protocal/Delegate etc to pass data btw views
+(Should use block, see IOS 6 Tutorial I bought from Raywen....)
+------------------------------------------------
+    Use UsingDelegateComplete proj to see how to pass data btw mapview and popover view. (detail at http://www.colejoplin.com/2012/09/12/ios-tutorial-combining-delegation-storyboards-popovers-and-data/ )
+    Here popover view and main view (which will be mapview in our case) will pass data to eachother:
+        From Main View to Popup View used sequs thus UIPopoverControllerDelegate is used to pass data to Popview.
+        From PopView to Main View used button action, a customized protocal is defined to pass data through a delegate.
+        
+
+    
+Debug
+----------
+http://stackoverflow.com/questions/4735156/xcode-debugger-view-value-of-variable
+
+
+
+Issues taken long time:
+------------------
+1. After migrate table section sample TVAnimationGestures, click on section does call toogleOpen handler, then found need copy carat*.png file.
+2. finally solve the issue I've been working on for whole weelend: CLGeocoder object has to be initialize everytime use it. So it have to be initialized everytime in handleGesture()
+3. What is Navigator Conroller and Push segue only works for Controller managed by NavController. Push Segue will make child controller automatically to have a NavControlBar with back button
+4. AD/BC NSDate representation take me long time. IOS has issue with it. Finally find a solution (see dateByAddingComponentsRegardingEra function I got from the internet). This save me time and made historical document possible (2013-02-05)
+5. Add searchBar on Navigator bar is very tricky:
+    . add a UIView first, then put searchBar in it. But the size is small, reason is it is put into navigator's titleView, so need make titleView size big:
+      [self.navigationItem.titleView setFrame:CGRectMake(0, 0, 300, 30)]
+6. Upload to Spring MVC failed. then find reason: "application/x-www-form-urlencoded" is used, need encode % and & sign (spend long time to figure out)
+
+Core Data
+----------
+Follow http://www.raywenderlich.com/934/core-data-on-ios-5-tutorial-getting-started
+step 1 tutor only.(Step 2 is preload date, step 3 is about NSFetchedResultsController which is a advanced feature to make table view only fetch data in the view.)
+
+But I also want to follow 2ndApp.Storyboard doc's example to have a BirdsightingDataController instead of put code in AppDelegate.
+
+Navigator/Segue/Controller etc
+------------------------------
+Use Navigator Controller as much as possible since its impl will be same for iPad and iPhone, and we can take advantage of the automatically generated back button back to parent view with Push seque.
+For iPad if sub-view is too big, then have to use popover/Modal etc to bring up smaller sub-view. but inside the smaller sub-views, use second Navigator Controller to navigate further sub-views
+(NOTE: Push segue is only for views managed by Navigator Controler)
+ 
+-- My Preference Window: follow iOS5 Tutor: (based on views managed by NavigatorController, see P136, P166)
+   My root mapView/Timeline view is managed by root Navigator.
+   For iPad, I want popover the setting view, and subsequently subview in Navigator style.
+   For iPhone, it easy, just create Push Seque from Setting Button to preference view and use Push seque for all sub-views, the will all have back button managed by root nabigatorController.
+   Here is what I do in iPad Storyboard:
+        I want my preference views in another Navigator Controller tree, so did this:
+        - drag a new Navigator Controller, make the comming TableController as Preference main view
+        - make a Popover segue from Setting button to the new NavigatorController.
+        - then use Push segue for all sub-views
+        (All view controller must set same explicit size in attribute editor)
+          
+-- Popover/Modal Event Editor
+   1. iPad has to use iPad specific UIPopoverController. This controller can wrap any View Controller such as Table View Controller. 
+      After study many posts, I finally can combine them to impl in following way without use segue 
+     (later I found iOS5 Tutor Ppage180 has a way to create seque for accessory buttons, but I still kept following way):
+        - Design a Table View Controller on storyboard to layout my event editor, gieve a id to this view on storyboard as "event_edit_id", make it to be class of ATEventEditTableViewController
+        - in CalloutAccessoryControlTapped():
+            . instance a EventEditor view controller from storyboard
+            . instance a UIPopoverControler to wrap the above EventEditor view controller instance
+            . use presentPopoverFromRect (not presentPovopverFromButton) to start display popover
+        - Dismiss popover is different to dismiss other view controller. Dismiss popover have to use delegate from main controller not from popover itself.
+            see http://stackoverflow.com/questions/5922254/how-to-dismiss-uipopover-from-a-button-in-the-popover
+   2. iPhone should be easy: just create Push segue to CalloutAccessoryControlTapped, it will be managed by root NavigatorController. (either programmally as I did for iPad, or the way I found later in iOS5 Tutor Page180 to drag segue from view itself (see iOS5 tutoron p180 last hightlight) storyboard from annotation)
+
+-- The way to get image picker (camera/cameraroll)
+(Need add MobileCoreService.framework in Build Phases -> Link Binary with ....)
+    follow http://www.techotopia.com/index.php/An_Example_iOS_4_iPad_Camera_and_UIImagePickerController_Application_(Xcode_4)
+    for ipad/iPhone do differently:
+    . iPad
+        try to start as modal view
+    
+    . iPhone
+        easy, just use main navigator
+
+-- HelpWebView should be part of main navigator, so need add extra button to main navigator bar. After iOS5, a easy way is provided to add more button to navigator bar (which only has right, title, left). 
+
+
+Use TableView Static Cell for layout, and use Group style
+------------------------------------
+see iOS5 tutor p159
+The EventEditor view I designed above is a TableViewController with Static Cell
+
+
+The beauty of the using table view's static cell for iPad/iPhone is that we can design same tableViewController on storyboard with Static cell for layout the popover view, and iPad PopoverController can wrap it in code, iPhone can create a NavigatorViewController to wrap it with Modal segue (need more study how to start from annotation view in iPone)
+
+Following is mapView related
+------------------------------------
+(#### ATViewController.h must conform to <MKMapViewDelegate> ##### for annotation)
+
+Step 1: Add Use long-press gesture to add map pin/annotation
+    http://stackoverflow.com/questions/4317810/how-to-capture-tap-gesture-on-mkmapview  
+    (Need to make a mapview outlet from Stroryboard to ATViewController)
+
+Step 2: Have a custom annotation with accessory button
+    http://blog.asolutions.com/2010/09/building-custom-map-annotation-callouts-part-2/
+    (also see project MapCallout prject)
+
+Step 3: How to show popover from accessory button
+    http://stackoverflow.com/questions/5582564/how-do-i-display-a-uipopoverview-as-a-annotation-to-the-map-view-ipad
+    Three type of annotView has been defined, implement viewForAnnotation(), which is part of MKMapViewDelegate protocol, to get right type of view to display or add accessory button.
+    Implement calloutAccessoryControlTapped if an accessory button clicked to openup popover view. post at http://stackoverflow.com/questions/8112515/using-segue-from-mapview-calloutaccessorycontroltapped help to understand how to use segue to popup the view
+    Following "Use Protocal/Delegate ..." will help to understand how to pass data btw mapviews and popover
+
+IOS Apple Sample code http://developer.apple.com/library/ios/navigation/
+  MapCallout - example to have custom pin and callout
+  WeatherMap - Core Data and Map Annotation
+  
+-- Example for GeoCoder http://jonathanfield.me/jons-blog/clgeocoder-example.html
+     The above code example also illustrate how to start for iphone/ipad in appDelegate
+-- Search on Map with SearchBar
+     http://stackoverflow.com/questions/2281798/how-to-search-mkmapview-with-uisearchbar
+     Look for Apple Map service (Skip Google service part)
+-- About Annotation and AnnotationView on map
+   Map Annotation has two components: MKAnnotation for data and MKAnnotationView for display part
+   MKPointAnnotation is a default implementation of MKAnnotation with only tile and subtitle
+   MKPinAllocationView is a default implementatin of MKAnnotationview
+   Eachtime add/update an anotation, viewForAnnotation will be called to fetch a view, this is part of <MapViewDelegate> protocol
+   Eachtime click on a pin on map, didSelectAnnotationView will be called with the clicked annotationView.
+   AnnotationView can have a button defiend to call calloutAccessoryControlTapped when tapped.
+
+
+Resources
+==========
+
+Best mobile Icon ---- http://365psd.com
+iconarchive.com 
+
+Paint.net make 3d buttons/bars: http://www.dextut.com/tutorials/paintdotnet/3dbars/index.htm
+
+IOS Apple Sample code http://developer.apple.com/library/ios/navigation/
+  MapCallout - example to have custom pin and callout
+  WeatherMap - Core Data and Map Annotation
+  
+
+1. Unitlize IOS6 MapKits, which automatically cached large amount of Vector maps:
+   http://developer.apple.com/library/ios/documentation/UserExperience/Conceptual/LocationAwarenessPG/LocationAwarenessPG.pdf 
+   or see tutorial at http://www.raywenderlich.com/21365/introduction-to-mapkit-in-ios-6-tutorial
+2. Use searchBarSearchButton and Apple map server: (skip google part) 
+    ( How to use Apple Search service:  http://stackoverflow.com/questions/2281798/how-to-search-mkmapview-with-uisearchbar )
+    ( How to use search bar/delegate:   http://stackoverflow.com/questions/6203472/designing-ios-searchbar )
+-(void)searchBarSearchButtonClicked:(UISearchBar *)theSearchBar {
+    [theSearchBar resignFirstResponder];
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    [geocoder geocodeAddressString:theSearchBar.text completionHandler:^(NSArray *placemarks, NSError *error) {
+        //Error checking
+        CLPlacemark *placemark = [placemarks objectAtIndex:0];
+        MKCoordinateRegion region;
+        region.center.latitude = placemark.region.center.latitude;
+        region.center.longitude = placemark.region.center.longitude;
+        MKCoordinateSpan span;
+        double radius = placemark.region.radius / 1000; // convert to km
+        NSLog(@"[searchBarSearchButtonClicked] Radius is %f", radius);
+        span.latitudeDelta = radius / 112.0;
+        region.span = span;
+        [theMapView setRegion:region animated:YES];
+    }];}
+ 
+
+
+ 

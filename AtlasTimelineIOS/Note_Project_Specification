@@ -1,0 +1,50 @@
+Requirement Analysis
+==================
+Considering same application with different App name:
+         - AtlasTimeline
+         - Jotatrip (jot-a-trip): a customized version of AtlasTimeline for marketing purpose
+         
+- Use Navagator style, not popover style or tab style
+- To make simple, Event Marker will always have date (default as today), allow empty description, default category,
+  allow empty address(especially when offline), 
+- The time line will be a year-sectioned table. 
+  The top most for the latest, bottom oldest. 
+  The top one should be "Most Recent and after" - thirty days before and after 
+- Initially, map should show event markers in "Most Recent and after"
+  User should be albel to checkbox on year-section to show on map. Should have a reset button to clean up checkbox???)
+- When long-press on map, a pin added. Click on pin will popup UnsavedAnnotation with an accessory button.
+  Click on accessory button will show item editor popover and can directly click save to save the marker with all default values for simplicity
+ The editor have delete, Cancel button as well
+- When search in map view, result markers will show as pin with EventAnnotation
+- New concept "Timeline-on-Map" (on 2013-01-18)
+  User can config to show all events month/year/10-Year/100-Year/1000-year around selected one with 5 gradual color level.
+  For example, if configured 10 year, then only show all events in this 10 year, centered at selected one. prior 5 years gradually on one color, past 5 years grandully on another. 
+  Timeline view also section on year/10year/100year/1000year accordingly. "Month" will not affect timeline view 
+    . year - timeline has no change, map will show 6 existing year colors
+    . month - map will show 6 existing month color grandullay. not sure if to change timeline view to expend that yar?
+    . day - map will show 6 existing day in gradulaly color, not sure if to change timeline view ...
+    (NOTE: existing year means: if next event is 10 year away, also consider it to be adjacent)  
+  Can have extra accessory button on annotation or automatically center the time when start event editor, or even add an extra button in event editor to center time on map)
+- EventAnnotation will show:
+    address if have
+    date if have
+    description if have
+    Accessory Button -> tab it to bring up Event Editor
+    Accessory button -> center timeline-on-map (or Editor will automatically do it?)
+- UnsavedAnnotation basically is samilar to EventAnnotation with different color and no data/desc fields
+- Tap on marker also  popup event editor
+  Consider another button for center timeline on map (see timeline-on-map)
+- Event Editor work flow as simple as possible: (No trip tag for simplicity and conformed to timeline concept)
+        . Description (can be empty)  //no title field
+        . Address: User entered when offline, or from map reverse look up or searched address and editable
+        . Date (default today, may not retain last entered date)
+        . have Save button, delete button, cancel button
+- Timeline windows (use navigator, not popover): 
+         . Sectioned in years for those years with items, the last one will be “Most Recent and after” if there is items, 
+      click on year will expand to list all items in date order
+         . Provide TableView search to search description and address 
+         . Provide check box on section and each item for showing on map or not (no check box for events that has no lng/lat info).
+         . Do not allow add event here, because this app is for event associate with location
+         . tab on event will go to map view centered on this event with Event Editor open. (only have this marker)
+
+

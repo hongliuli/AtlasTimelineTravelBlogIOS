@@ -7,14 +7,75 @@
 //
 
 #import "ATAppDelegate.h"
+#import "ATimelineTableViewController.h"
+#import "ATDataController.h"
+#import "ATConstants.h"
+#import "ATEventEntity.h"
+#import "ATHelper.h"
+
+
+@interface ATAppDelegate ()
+//TODO should add data store initialize here and pass data store to ATTimelineTableViewController, or the controller come to here to get data store
+@property (nonatomic, strong) NSArray *periods;
+
+@end
 
 @implementation ATAppDelegate
 
+@synthesize window=window_, periods=_periods;
+
+- (NSDateFormatter *)dateFormater {
+	
+    if (_dateFormater != nil) {
+        return _dateFormater;
+    }
+    _dateFormater = [[NSDateFormatter alloc] init];
+    //_dateFormater.dateStyle = NSDateFormatterMediumStyle;
+    [_dateFormater setDateFormat:@"MM/dd/yyyy GG"];
+    return _dateFormater;
+}
+
+//this will easy to change database file name by just set eventListSorted to null
+- (NSArray*) eventListSorted {
+    if (_eventListSorted != nil)
+        return _eventListSorted;
+    ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
+    //sort from latest to past, so it is good for timeline view to group by year (could not do inplace sort use sortUseSelector etc)
+    NSArray *sortedArray;
+    sortedArray = [[dataController fetchAllEventEntities] sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        NSDate *first = [(ATEventEntity*)a eventDate];
+        NSDate *second = [(ATEventEntity*)b eventDate];
+        return [first compare:second]== NSOrderedAscending;
+    }];
+    _eventListSorted =[[NSMutableArray alloc] initWithArray:sortedArray];
+    return _eventListSorted;
+}
+
+
+-(void) emptyEventList
+{
+    //used in ATPreferenceViewController when switch offline source
+    [_eventListSorted removeAllObjects];
+    _eventListSorted = nil;
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    ATViewController *controller;
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    {
+        self.storyBoard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPad" bundle:nil];
+    }
+    else
+    {
+        self.storyBoard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone" bundle:nil];
+    }
+    controller = [self.storyBoard instantiateInitialViewController];
+    [self.window setRootViewController:controller]; 
     return YES;
 }
+
 							
 - (void)applicationWillResignActive:(UIApplication *)application
 {

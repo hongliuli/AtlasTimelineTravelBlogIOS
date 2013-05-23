@@ -6,24 +6,1573 @@
 //  Copyright (c) 2012 hong. All rights reserved.
 //
 
-#import "ATViewController.h"
+#define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
+#define SCREEN_HEIGHT ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.height : [[UIScreen mainScreen] bounds].size.width)
+#define PURCHASE_PROD_ID @"com.chroniclemap.unlimitedevents"
 
-@interface ATViewController ()
+#import <QuartzCore/QuartzCore.h>
+
+#import "ATViewController.h"
+#import "ATDefaultAnnotation.h"
+#import "ATAnnotationSelected.h"
+#import "ATAnnotationAfter1.h"
+#import "ATAnnotationAfter2.h"
+#import "ATAnnotationAfter3.h"
+#import "ATAnnotationAfter4.h"
+#import "ATAnnotationPast1.h"
+#import "ATAnnotationPast2.h"
+#import "ATAnnotationPast3.h"
+#import "ATAnnotationPast4.h"
+#import "ATDataController.h"
+#import "ATEventEntity.h"
+#import "ATEventDataStruct.h"
+#import "ATEventEditorTableController.h"
+#import "ATAppDelegate.h"
+#import "ATConstants.h"
+#import "ATTimeZoomLine.h"
+#import "ATHelper.h"
+#import "ATPreferenceEntity.h"
+#import "ATTimeScrollWindowNew.h"
+#import "ATTutorialView.h"
+
+#define EVENT_TYPE_NO_PHOTO 0
+#define EVENT_TYPE_HAS_PHOTO 1
+
+#define MERCATOR_OFFSET 268435456
+#define MERCATOR_RADIUS 85445659.44705395
+#define ZOOM_LEVEL_TO_HIDE_DESC 4
+#define JPEG_QUALITY 0.5
+#define THUMB_JPEG_QUALITY 0.3
+#define DISTANCE_TO_HIDE 80
+
+#define RESIZE_WIDTH 600
+#define RESIZE_HEIGHT 450
+#define THUMB_WIDTH 120
+#define THUMB_HEIGHT 70
+
+#define FREE_VERSION_QUOTA 20
+#define IN_APP_PURCHASED @"IN_APP_PURCHASED"
+
+#define EDITOR_PHOTOVIEW_WIDTH 190
+#define EDITOR_PHOTOVIEW_HEIGHT 160
+
+@interface MFTopAlignedLabel : UILabel
 
 @end
 
+
+
+
 @implementation ATViewController
+{
+    NSString* selectedAnnotationIdentifier;
+    int debugCount;
+    CGRect focusedLabelFrame;
+    NSMutableArray* timeScaleArray;
+    int timelineWindowShowFlag; //1 is show, 0 is hide. Change by tap gesture
+    
+    ATTimeZoomLine* timeZoomLine;
+    NSMutableArray* selectedAnnotationNearestLocationList; //do not add to selectedAnnotationSet if too close
+    NSMutableDictionary* selectedAnnotationSet;//hold uilabels for selected annotation's description
+    NSDate* regionChangeTimeStart;
+    ATDefaultAnnotation* newAddedPin;
+    UIButton *locationbtn;
+    CGRect timeScrollWindowFrame;
+    ATTutorialView* tutorialView;
+    
+    UIAlertView *askToPurchase;
+    UILabel *purchaseStatusLabel;
+}
+
+@synthesize mapView = _mapView;
+
+- (ATDataController *)dataController { //initially I want to have a singleton of dataController here, but not good if user change database file source, instance it ever time. It is ok here because only called every time user choose to delete/insert
+    dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
+    return dataController;
+}
+
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self createPhotoDocumentoryPath];
+    self.locationManager = [[CLLocationManager alloc] init];
+    timelineWindowShowFlag = 1;
+    int searchBarHeight = [ATConstants searchBarHeight];
+    int searchBarWidth = [ATConstants searchBarWidth];
+    [self.navigationItem.titleView setFrame:CGRectMake(0, 0, searchBarWidth, searchBarHeight)];
+
+    //Find this spent me long time: searchBar used titleView place which is too short, thuse tap on searchbar right side keyboard will not show up, now it is good
+	[self calculateSearchBarFrame];
+    
+    // create a custom navigation bar button and set it to always says "Back"
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+    
+    //add two button at right (can not do in storyboard for multiple button): setting and Help, available in iOS5
+ //   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+ //   {
+        UIBarButtonItem *settringButton = [[UIBarButtonItem alloc] initWithTitle:@"Settings" style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
+        
+        //NOTE the trick to set background image for a bar buttonitem
+        UIButton *helpbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        helpbtn.frame = CGRectMake(0, 0, 30, 30);
+        [helpbtn setImage:[UIImage imageNamed:@"help.png"] forState:UIControlStateNormal];
+        [helpbtn addTarget:self action:@selector(tutorialClicked:) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithCustomView:helpbtn];
+        self.navigationItem.rightBarButtonItems = @[settringButton, helpButton];
+ //   }
+
+    
 	// Do any additional setup after loading the view, typically from a nib.
+    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
+            initWithTarget:self action:@selector(handleLongPressGesture:)];
+    lpgr.minimumPressDuration = 0.3;  //user must press for 0.5 seconds
+    [_mapView addGestureRecognizer:lpgr];
+    // tap to show/hide timeline navigator
+    UITapGestureRecognizer *tapgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
+    [_mapView addGestureRecognizer:tapgr];
+
+    selectedAnnotationSet = [[NSMutableDictionary alloc] init];
+    selectedAnnotationNearestLocationList = [[NSMutableArray alloc] init];
+    regionChangeTimeStart = [[NSDate alloc] init];
+    [self prepareMapView];
+}
+-(void) viewDidAppear:(BOOL)animated
+{
+    [self displayTimelineControls]; //MOTHER FUCKER, I struggled long time when I decide to put timescrollwindow at bottom. Finally figure out have to put this code here in viewDidAppear. If I put it in viewDidLoad, then first time timeScrollWindow will be displayed in other places if I want to display at bottom, have to put it here
+}
+-(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
+{
+    
+    UIStoryboard * storyboard;
+    ATPreferenceViewController *preference;
+    
+    //NOTE: following I have it seems strange that "preference_nav_id" is a NavagatorController not ATPreferenceViewController, but I have to do this way. When I do I phone, it will be simpler because I do not use popover, so no "preference_nav_id" navagatorController needed
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    {
+        storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPad" bundle:nil];
+        preference = [storyboard instantiateViewControllerWithIdentifier:@"preference_nav_id"];
+        self.preferencePopover = [[UIPopoverController alloc] initWithContentViewController:preference];
+        //IMPORTANT: preferenceViewController is on storyboard with specified size, so have to put 0, 0 for size, otherwise weired thing will happen. Also 700 is not idea for landscape
+        [self.preferencePopover presentPopoverFromRect:CGRectMake(800,0,0,0)
+            inView:self.mapView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    }
+    else
+    {
+        storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone" bundle:nil];
+        preference = [storyboard instantiateViewControllerWithIdentifier:@"preference_storyboard_id"];
+       
+    [self.navigationController pushViewController:preference animated:true];}
+}
+
+-(void) currentLocationClicked:(id)sender
+{
+    self.locationManager.delegate = self;
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    
+    [self.locationManager startUpdatingLocation];
+    
+    CLLocation *newLocation = [self.locationManager location];
+    CLLocationCoordinate2D centerCoordinate;
+    centerCoordinate.latitude = newLocation.coordinate.latitude;
+    centerCoordinate.longitude = newLocation.coordinate.longitude;
+    MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:14];
+    MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
+    
+    // set the region like normal
+    [self.mapView setRegion:region animated:YES];
+}
+#pragma mark - CLLocationManagerDelegate
+
+-(void) tutorialClicked:(id)sender //Only iPad come here. on iPhone will be frome inside settings and use push segue
+{
+    if (tutorialView != nil)
+    {
+        [self closeTutorialView];
+    }
+    else
+    {
+        tutorialView = [[ATTutorialView alloc] initWithFrame:CGRectMake(940,0,0,0)];
+        [UIView transitionWithView:self.mapView
+                          duration:0.5
+                           options:UIViewAnimationTransitionFlipFromRight //any animation
+                        animations:^ {
+                            [tutorialView setFrame:self.view.frame];
+                            tutorialView.backgroundColor=[UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+                            [self.mapView addSubview:tutorialView];
+                        }
+                        completion:nil];
+        
+        // Do any additional setup after loading the view, typically from a nib.
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
+                                              initWithTarget:self action:@selector(handleTapOnTutorial:)];
+        [tutorialView addGestureRecognizer:tap];
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = CGRectMake([ATConstants screenWidth] - 120, 20, 110, 30);
+        
+        [button.layer setCornerRadius:7.0f];
+        //[button.layer:YES];
+        [button setTitle:@"Online Help" forState:UIControlStateNormal];
+        button.titleLabel.backgroundColor = [UIColor blueColor];
+        button.backgroundColor = [UIColor blueColor];
+        [button addTarget:self action:@selector(onlineHelpClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [tutorialView addSubview: button];
+        
+    }
+}
+
+- (void) closeTutorialView
+{
+    if (tutorialView != nil)
+    {
+        [UIView transitionWithView:self.mapView
+                          duration:0.5
+                           options:UIViewAnimationTransitionCurlDown
+                        animations:^ {
+                            [tutorialView setFrame:CGRectMake(940,0,0,0)];
+                        }
+                        completion:^(BOOL finished) {
+                            [tutorialView removeFromSuperview];
+                            tutorialView = nil;
+                        }];
+    }
+}
+
+-(void) onlineHelpClicked:(id)sender
+{
+    NSURL *url = [NSURL URLWithString:@"http://www.chroniclemap.com/onlinehelp"];
+    
+    if (![[UIApplication sharedApplication] openURL:url])
+        
+        NSLog(@"%@%@",@"Failed to open url:",[url description]);
+}
+
+- (void)handleTapOnTutorial:(UIGestureRecognizer *)gestureRecognizer
+{
+    [self closeTutorialView];
+}
+//// called it after switch database
+- (void) prepareMapView
+{
+    //remove annotation is for switch db scenario
+    NSArray * annotationsToRemove =  self.mapView.annotations;
+    [ self.mapView removeAnnotations:annotationsToRemove ] ;
+    
+
+    NSLog(@"=============== Map View loaded");
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    self.searchBar.delegate = self;
+    self.mapView.delegate = self; //##### HONG #####: without this, vewForAnnotation() will not be called, google it
+        
+    //get data from core data and added annotation to mapview
+    // currently start from the first one, later change to start with latest one
+    NSArray * eventList = appDelegate.eventListSorted;
+    if ([eventList count] > 0)
+    {
+        ATEventEntity* ent = eventList[0];
+        ATEventDataStruct* entStruct = [[ATEventDataStruct alloc] init];
+        entStruct.lat = [ent.lat doubleValue];
+        entStruct.lng = [ent.lng doubleValue];
+
+        [self setMapCenter:entStruct :[ATConstants defaultZoomLevel]];
+    }
+
+    NSMutableArray* newEventList = [[NSMutableArray alloc] init];
+    //add annotation. ### this is the loop where we can adding NSLog to print individual items
+    for (ATEventEntity* ent in eventList) {
+        CLLocationCoordinate2D coord = CLLocationCoordinate2DMake((CLLocationDegrees)[ent.lat doubleValue], (CLLocationDegrees)[ent.lng doubleValue]);
+        ATAnnotationSelected *eventAnnotation = [[ATAnnotationSelected alloc] initWithLocation:coord];
+        eventAnnotation.uniqueId = ent.uniqueId;
+        
+        eventAnnotation.address = ent.address;
+        eventAnnotation.description=ent.eventDesc;
+        eventAnnotation.eventDate=ent.eventDate;
+        eventAnnotation.eventType = [ent.eventType integerValue];
+        [self.mapView addAnnotation:eventAnnotation];
+        ATEventDataStruct* entData = [[ATEventDataStruct alloc] init];
+        entData.address = ent.address;
+        entData.eventDate = ent.eventDate;
+        entData.eventDesc = ent.eventDesc;
+        if ([ent.eventType intValue] == EVENT_TYPE_HAS_PHOTO)
+            entData.eventType = EVENT_TYPE_HAS_PHOTO;
+//NSLog(@"event date=%@   eventType=%i",entData.eventDate, entData.eventType);
+        entData.uniqueId = ent.uniqueId;
+        entData.lat = [ent.lat doubleValue];
+        entData.lng = [ent.lng doubleValue];
+        [newEventList addObject:entData];
+    }
+    //IMPORTANT: replace appDelegate's managed obj with pure object. Also without this this list's item is lost value some how
+    //           For example, in Timeline View, when I get event from the list, the data is gone
+    [appDelegate.eventListSorted removeAllObjects];
+    appDelegate.eventListSorted = newEventList;
+    appDelegate.mapViewController = self; //my way of share object, used in ATHelper
+    [self setTimeScrollConfiguration]; //I misplaced before above loop and get strange error
+    [self displayTimelineControls]; //put it here so change db source will call it, but have to put in viewDidAppear as well somehow
+}
+
+
+//should be called when app start, add/delete ends events, zooming time
+//Need change zoom level if need, focused date no change
+- (void) setTimeScrollConfiguration
+{
+    NSDateComponents *dayComponent = [[NSDateComponents alloc] init];
+    
+    NSCalendar *theCalendar = [NSCalendar currentCalendar];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    NSArray * eventList = appDelegate.eventListSorted;
+    int eventCount = [eventList count];
+    //IMPORTANT  startDate's date part should always start as year's start day 01/01,so event count in each bucket will be accurate
+    if (eventCount == 0) //startDate be this year's start date, end day is today
+    {
+        NSDate* today = [[NSDate alloc] init];
+        self.startDate = [ATHelper getYearStartDate:today];
+        dayComponent.day=15;
+        self.endDate = [theCalendar dateByAddingComponents:dayComponent toDate:today options:0];
+        appDelegate.focusedDate = today;
+        appDelegate.selectedPeriodInDays = 30; 
+    }
+    else if (eventCount == 1) //start date is that year's start day, end day is that day
+    {
+        ATEventDataStruct* event = eventList[0];
+        NSDate* curentDate = event.eventDate;
+        self.startDate = [ATHelper getYearStartDate:curentDate];
+        dayComponent.day=15;
+        self.endDate = [theCalendar dateByAddingComponents:dayComponent toDate:curentDate options:0];
+        appDelegate.focusedDate = curentDate;
+        appDelegate.selectedPeriodInDays = 30; 
+    }
+    else
+    {
+        
+        ATEventDataStruct* eventStart = eventList[eventCount -1];
+        ATEventDataStruct* eventEnd = eventList[0];
+        self.startDate = [ATHelper getYearStartDate: eventStart.eventDate];
+        self.endDate = eventEnd.eventDate;
+
+       // following is to set intial time period based on event distribution after app start or updated edge events, but has exception, need more study (Studied and may found the bug need test)
+        NSDateComponents *components = [theCalendar components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit
+                                                   fromDate:self.startDate
+                                                     toDate:self.endDate
+                                                    options:0];
+        if (appDelegate.selectedPeriodInDays == 0) //for add/delete ending events, do not change time zoom level, following is for when app start
+        {
+        if (components.year > 10)
+            appDelegate.selectedPeriodInDays = 36500;
+        else if (components.year > 1)
+            appDelegate.selectedPeriodInDays = 3650;
+        else if (components.month > 1)
+            appDelegate.selectedPeriodInDays = 365;
+        }
+
+    }
+    if (timeZoomLine != nil)
+        [timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
+        //NSLog(@"   ############## setConfigu startDate=%@    endDate=%@   startDateFormated=%@", self.startDate, self.endDate, [appDelegate.dateFormater stringFromDate:self.startDate]);
+}
+
+- (void) cleanSelectedAnnotationSet
+{
+    if (selectedAnnotationSet != nil)
+    {
+        for (id key in selectedAnnotationSet) {
+            UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+            [tmpLbl removeFromSuperview];
+        }
+        [selectedAnnotationSet removeAllObjects];
+        [selectedAnnotationNearestLocationList removeAllObjects];
+    }
+}
+- (void)setMapCenter:(ATEventDataStruct*)ent :(int)zoomLevel
+{
+    // clamp large numbers to 28
+    CLLocationCoordinate2D centerCoordinate;
+    centerCoordinate.latitude=ent.lat;
+    centerCoordinate.longitude=ent.lng;
+    zoomLevel = MIN(zoomLevel, 28);
+    
+    // use the zoom level to compute the region
+    MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:zoomLevel];
+    MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
+    
+    // set the region like normal
+    [self.mapView setRegion:region animated:YES];
+}
+
+//orientation change will call following, need to removeFromSuperview when call addSubview
+- (void)displayTimelineControls
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSDate* existingFocusedDate = appDelegate.focusedDate;
+    
+    CGRect timeZoomLineFrame;
+
+
+    int timeWindowWidth = [ATConstants timeScrollWindowWidth];
+    int timeWindowX = [ATConstants timeScrollWindowX];
+
+    int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
+
+    focusedLabelFrame = CGRectMake(timeWindowX - 43 + timeWindowWidth/2, timeWindowY, 50, 30);
+    
+    timeScrollWindowFrame = CGRectMake(timeWindowX,timeWindowY, timeWindowWidth,[ATConstants timeScrollWindowHeight]);
+    timeZoomLineFrame = CGRectMake(timeWindowX - 15,self.view.bounds.size.height - [ATConstants timeScrollWindowHeight] - 18, timeWindowWidth + 30,10);
+    
+    //Add scrollable time window
+    [self addTimeScrollWindow];
+
+    if (timeZoomLine != nil)
+        [timeZoomLine removeFromSuperview]; //incase orientation change
+    timeZoomLine = [[ATTimeZoomLine alloc] initWithFrame:timeZoomLineFrame];
+    timeZoomLine.backgroundColor = [UIColor clearColor];
+    [self.view addSubview:timeZoomLine];
+
+    [self changeTimeScaleState];
+    //add focused Label. it is invisible most time, only used for animation effect when click left callout on annotation
+    if (appDelegate.focusedDate == nil)
+        appDelegate.focusedDate = [[NSDate alloc] init];
+    if (self.focusedEventLabel != nil)
+        [self.focusedEventLabel removeFromSuperview];
+    self.focusedEventLabel = [[UILabel alloc] initWithFrame:focusedLabelFrame];
+    self.focusedEventLabel.text = [NSString stringWithFormat:@" %@",[appDelegate.dateFormater stringFromDate: appDelegate.focusedDate]];
+    NSLog(@"%@",self.focusedEventLabel.text);
+    [self.focusedEventLabel setFont:[UIFont fontWithName:@"Arial" size:13]];
+    self.focusedEventLabel.textColor = [UIColor blackColor];
+    self.focusedEventLabel.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:1.0f];
+    self.focusedEventLabel.layer.cornerRadius=5;
+    [self.focusedEventLabel setHidden:true];
+    [self.view addSubview:self.focusedEventLabel];
+    
+    //Following is to focused on today when start the apps
+    if (existingFocusedDate != nil)
+        appDelegate.focusedDate = existingFocusedDate;
+    else
+        appDelegate.focusedDate = [[NSDate alloc] init];
+    [self.timeScrollWindow setNewFocusedDateFromAnnotation:appDelegate.focusedDate];
+    
+    //NOTE the trick to set background image for a bar buttonitem
+    if (locationbtn == nil)
+        locationbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    else
+        [locationbtn removeFromSuperview];
+    locationbtn.frame = CGRectMake([ATConstants screenWidth] - 50, 20, 30, 30);
+    [locationbtn setImage:[UIImage imageNamed:@"currentLocation.jpg"] forState:UIControlStateNormal];
+    [locationbtn addTarget:self action:@selector(currentLocationClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [self.mapView addSubview:locationbtn];
+    [timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
+}
+
+
+- (void) addTimeScrollWindow
+{
+    if (self.timeScrollWindow != nil)
+        [self.timeScrollWindow removeFromSuperview];
+    self.timeScrollWindow = [[ATTimeScrollWindowNew alloc] initWithFrame:timeScrollWindowFrame];
+    self.timeScrollWindow.parent = self;
+    [self.view addSubview:self.timeScrollWindow];
+    if (timeZoomLine != nil)
+    {
+        timeZoomLine.hidden = false;
+    }
+}
+
+- (void) changeTimeScaleState
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    [self setSelectedPeriodLabel];
+    [timeZoomLine changeTimeScaleState:self.startDate :self.endDate :appDelegate.selectedPeriodInDays :appDelegate.focusedDate];
+}
+
+- (void) setSelectedPeriodLabel
+{
+    
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    if (appDelegate.selectedPeriodInDays == 7)
+    {
+        if (timeZoomLine.scaleLenForDisplay > 150)
+            [timeZoomLine changeScaleText:@"1 week window"];
+        else
+            [timeZoomLine changeScaleText: @"1w"];
+    }
+    else if (appDelegate.selectedPeriodInDays == 30)
+    {
+        if (timeZoomLine.scaleLenForDisplay > 150)
+            [timeZoomLine changeScaleText:@"1 month window"];
+        else
+        [timeZoomLine changeScaleText: @"1m"];
+    }
+    else if (appDelegate.selectedPeriodInDays == 365)
+    {
+        if (timeZoomLine.scaleLenForDisplay > 150)
+            [timeZoomLine changeScaleText:@"1 year window"];
+        else
+        [timeZoomLine changeScaleText: @"1y"];
+    }
+    else if (appDelegate.selectedPeriodInDays == 3650)
+    {
+        if (timeZoomLine.scaleLenForDisplay > 150)
+            [timeZoomLine changeScaleText:@"10 years window"];
+        else
+        [timeZoomLine changeScaleText: @"10y"];
+    }
+    else if (appDelegate.selectedPeriodInDays == 36500)
+    {
+        if (timeZoomLine.scaleLenForDisplay > 150)
+            [timeZoomLine changeScaleText:@"100 years window"];
+        else
+        [timeZoomLine changeScaleText:@"100y"];
+    }
+    else if (appDelegate.selectedPeriodInDays == 365000)
+    {
+        if (timeZoomLine.scaleLenForDisplay > 150)
+            [timeZoomLine changeScaleText:@"1000 years window"];
+        else
+        [timeZoomLine changeScaleText: @"1000y"];
+    }
+}
+
+- (void) flipTimelineWindowDisplay
+{
+    if (timelineWindowShowFlag == 1)
+    {
+        timelineWindowShowFlag = 0;
+        self.timeScrollWindow.hidden = true;
+        timeZoomLine.hidden = true;
+        [self hideDescriptionLabelViews];
+    }
+    else
+    {
+        timelineWindowShowFlag = 1;
+        self.timeScrollWindow.hidden=false;
+        timeZoomLine.hidden = false;
+        [self showDescriptionLabelViews:self.mapView];
+    }
+}
+- (void)handleTapGesture:(UIGestureRecognizer *)gestureRecognizer
+{
+    NSTimeInterval interval = [[[NSDate alloc] init] timeIntervalSinceDate:regionChangeTimeStart];
+   // NSLog(@"my tap ------regionElapsed=%f", interval);
+    if (interval < 0.5)  //When scroll map, tap to stop scrolling should not flip the display of timeScrollWindow and description views
+        return;
+    if ([gestureRecognizer numberOfTouches] == 1)
+    {
+        [self flipTimelineWindowDisplay];
+    }
+}
+
+- (void)handleLongPressGesture:(UIGestureRecognizer *)gestureRecognizer
+{
+    
+    if (gestureRecognizer.state != UIGestureRecognizerStateBegan)   // UIGestureRecognizerStateEnded)
+        return;
+    
+     //NSLog(@"--- to be processed State is %d", gestureRecognizer.state);
+    CGPoint touchPoint = [gestureRecognizer locationInView:_mapView];
+    
+    //Following is to do not create annotation when tuch upper part of the map because of the timeline related controls.
+    if ((UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation) && touchPoint.y <= 120 && touchPoint.x > 300 && touchPoint.x < 650)
+        ||
+        (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation) && touchPoint.y <=105))
+        return;
+    
+    CLLocationCoordinate2D touchMapCoordinate =
+    [_mapView convertPoint:touchPoint toCoordinateFromView:_mapView];
+    double lat = touchMapCoordinate.latitude;
+    double lng = touchMapCoordinate.longitude;
+
+    self.location = [[CLLocation alloc] initWithLatitude:lat longitude:lng];
+    //NSLog(@" inside gesture lat is %f", self.location.coordinate.latitude);
+    
+    //Have to initialize locally here, this is the requirement of CLGeocode
+    //######## I have spend many days to figure it out on Jan 11, 2013 weekend
+    self.geoCoder = [[CLGeocoder alloc] init];
+    
+    [self.geoCoder reverseGeocodeLocation: self.location completionHandler:
+    ^(NSArray *placemarks, NSError *error) {
+        //NSLog(@"reverseGeocoder:completionHandler: called lat=%f",self.location.coordinate.latitude);
+        if (error) {
+            NSLog(@"Geocoder failed with error: %@", error);
+        }
+        NSString *locatedAt = @"Unknown";
+        if (placemarks && placemarks.count > 0)
+        {
+            //Get nearby address
+            CLPlacemark *placemark = [placemarks objectAtIndex:0];
+         
+            //String to hold address
+            locatedAt = [[placemark.addressDictionary valueForKey:@"FormattedAddressLines"] componentsJoinedByString:@", "];
+
+        }
+        ATDefaultAnnotation *pa = [[ATDefaultAnnotation alloc] initWithLocation:touchMapCoordinate];
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        pa.eventDate = appDelegate.focusedDate;
+        pa.description=@"New";//@"add by touch";
+        pa.address = locatedAt;
+        [_mapView addAnnotation:pa];
+        if (newAddedPin != nil)
+        {
+            [_mapView removeAnnotation:newAddedPin];
+            newAddedPin = pa;
+        }
+        else
+            newAddedPin = pa;
+        
+        [self flipTimelineWindowDisplay]; //select annotation will flip it, so double flip
+        
+      //  /*** following is for testing add to db for each longpress xxxxxxxx TODO
+       // [self.dataController addEventEntityAddress:locatedAt description:@"desc by touch" date:[NSDate date] lat:touchMapCoordinate.latitude lng:touchMapCoordinate.longitude];
+     //    */
+        
+     }];
+
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
+{
+    ATDefaultAnnotation* ann = (ATDefaultAnnotation*)annotation;
+
+    
+    // Following will filter out MKUserLocation annotation
+    if ([annotation isKindOfClass:[ATDefaultAnnotation class]]) //ATDefaultAnnotation is when longPress
+    {
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate]; //keep this line here, do not move inside 
+        // try to dequeue an existing pin view first
+        MKPinAnnotationView* pinView = (MKPinAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier:[ATConstants DefaultAnnotationIdentifier]];
+        if (!pinView)
+        {
+            // if an existing pin view was not available, create one
+            MKPinAnnotationView* customPinView = [[MKPinAnnotationView alloc]
+                                                   initWithAnnotation:annotation reuseIdentifier:[ATConstants DefaultAnnotationIdentifier]];
+            customPinView.pinColor = MKPinAnnotationColorPurple;
+            customPinView.animatesDrop = YES;
+            customPinView.canShowCallout = YES;
+
+            UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+            rightButton.accessibilityLabel=@"right";
+            customPinView.rightCalloutAccessoryView = rightButton;
+            UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
+            [leftButton setImage:[UIImage imageNamed:@"focusedIcon.png"] forState:UIControlStateNormal];
+            leftButton.accessibilityLabel=@"left";
+            customPinView.leftCalloutAccessoryView = leftButton;
+            
+            return customPinView;
+            
+        }
+        else
+        {
+            //NSLog(@"+++++++++ reused default annotation +++++ at address %@", [annotation title]);
+            pinView.annotation = annotation;
+        }
+        return pinView;
+    }
+    else if ([annotation isKindOfClass:[ATAnnotationSelected class]]) //all that read from db will be ATAnnotationSelected type
+    {
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate]; //keep this line here
+        MKAnnotationView* annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
+        annView.annotation = annotation;
+        NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
+        //keey list of red  annotations
+        if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]])
+        {
+            UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+            if (tmpLbl == nil)
+            {
+                //CGPoint windowPoint = [annView convertPoint:[annView center] toView:self.mapView];
+                CGPoint annotationViewPoint = [theMapView convertCoordinate:annView.annotation.coordinate
+                                                       toPointToView:theMapView];
+                
+                //NSLog(@"x=%f  y=%f",annotationViewPoint.x, annotationViewPoint.y);
+                tmpLbl = [[UILabel alloc] initWithFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, THUMB_WIDTH, THUMB_HEIGHT)]; //todo MFTopAlignedLabel
+                if (ann.eventType == EVENT_TYPE_HAS_PHOTO) //somehow it is a big number before save to db, need more study why not 1
+                {
+                    UIImage* img = [self readPhotoThumbFromFile:ann.uniqueId];
+                    if (img != nil)
+                    {
+                        UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
+                        imgView.tag = 100; //later used to get subview
+                        /*
+                        imgView.contentMode = UIViewContentModeScaleAspectFill;
+                        imgView.clipsToBounds = YES;
+                        imgView.layer.cornerRadius = 8;
+                        imgView.layer.borderColor = [UIColor brownColor].CGColor;
+                        imgView.layer.borderWidth = 1;
+                         */
+                        
+                        //[imgView setFrame:CGRectMake(-30, -25, 100, 80)];
+                        tmpLbl.text = @"                             \r\r\r\r\r\r";
+                        tmpLbl.backgroundColor = [UIColor clearColor];
+                        imgView.frame = CGRectMake(imgView.frame.origin.x, imgView.frame.origin.y, tmpLbl.frame.size.width, tmpLbl.frame.size.height);
+                        //[tmpLbl setAutoresizesSubviews:true];
+                        [tmpLbl addSubview: imgView];
+                        //[tmpLbl setClipsToBounds:true];
+                        //imgView.center = CGPointMake(tmpLbl.frame.size.width/2, tmpLbl.frame.size.height/2);
+                    
+                    }
+                    else
+                    {
+                        //xxxxxx TODO if user switch source from server, photo may not be in local yet, then
+                        //             should display text only and add download request in download queue
+                        // ########## This is a important lazy download concept #############
+                        tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
+                        tmpLbl.text = [NSString stringWithFormat:@" %@", ann.description ];
+                        tmpLbl.layer.cornerRadius = 8;
+                        tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
+                        tmpLbl.layer.borderWidth = 1;
+                    }
+                }
+                else
+                {
+                    tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
+                    tmpLbl.text = [NSString stringWithFormat:@" %@", ann.description ];
+                    tmpLbl.layer.cornerRadius = 8;
+                    tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
+                    tmpLbl.layer.borderWidth = 1;
+                }
+                
+                //tmpLbl.textAlignment = UITextAlignmentCenter;
+                tmpLbl.lineBreakMode = UILineBreakModeWordWrap;
+
+                
+                [self setDescLabelSizeByZoomLevel:tmpLbl];
+                if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
+                    tmpLbl.hidden = true;
+                else
+                    tmpLbl.hidden=false;
+                
+                [selectedAnnotationSet setObject:tmpLbl forKey:key];
+                [self.view addSubview:tmpLbl];
+                
+            }
+            else //if already in the set, need make sure it will be shown
+            {
+                if (ann.eventType == EVENT_TYPE_NO_PHOTO)
+                    tmpLbl.text = ann.description; //need to change to take care of if user updated description in event editor
+                
+                if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
+                    tmpLbl.hidden = true;
+                else
+                    tmpLbl.hidden=false;
+            }
+        }
+        else
+        {
+            UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+            if ( tmpLbl != nil)
+            {
+                [selectedAnnotationSet removeObjectForKey:key];
+                [tmpLbl removeFromSuperview];
+            }
+        }
+        return annView;
+    }
+    
+    return nil;
+}
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
+{
+    //NSLog(@"regione willChange size: %i", [selectedAnnotationSet count]);
+    for (id key in selectedAnnotationSet) {
+        UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+       // ATEventAnnotation* eventAnn = (ATEventAnnotation*)key;
+        tmpLbl.hidden=true;
+    }
+}
+- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
+{
+
+    //NSLog(@"retion didChange, zoom level is %i", [self zoomLevel]);
+    [self showDescriptionLabelViews:mapView];
+    regionChangeTimeStart = [[NSDate alloc] init];
+    
+}
+- (void) showDescriptionLabelViews:(MKMapView*)mapView
+{
+    if (timelineWindowShowFlag == 0)
+        return;
+    for (id key in selectedAnnotationSet) {
+        NSArray *splitArray = [key componentsSeparatedByString:@"|"];
+        UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+        CLLocationCoordinate2D coordinate;
+        coordinate.latitude=[splitArray[0] doubleValue];
+        coordinate.longitude = [splitArray[1] doubleValue];
+        CGPoint annotationViewPoint = [mapView convertCoordinate:coordinate
+                                                   toPointToView:mapView];
+        bool tooCloseToShowFlag = false;
+        
+        for (NSValue* val in selectedAnnotationNearestLocationList)
+        {
+            CGPoint p = [val CGPointValue];
+            CGFloat xDist = (annotationViewPoint.x - p.x);
+            CGFloat yDist = (annotationViewPoint.y - p.y);
+            CGFloat distance = sqrt((xDist * xDist) + (yDist * yDist));
+            if (distance < DISTANCE_TO_HIDE)
+            {
+                tooCloseToShowFlag = true;
+                break;
+            }
+        }
+        if (tooCloseToShowFlag)
+        {
+            tmpLbl.hidden = true;
+            continue;
+        }
+        else
+        {
+            [selectedAnnotationNearestLocationList addObject: [NSValue valueWithCGPoint:annotationViewPoint]];
+        }
+
+        [self setDescLabelSizeByZoomLevel:tmpLbl];
+        CGSize size = tmpLbl.frame.size;
+        [tmpLbl setFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, size.width, size.height)];
+        if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
+            tmpLbl.hidden = true;
+        else
+            tmpLbl.hidden=false;
+    }
+    [selectedAnnotationNearestLocationList removeAllObjects];
+}
+- (void) hideDescriptionLabelViews
+{
+    for (id key in selectedAnnotationSet) {
+        UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+        tmpLbl.hidden=true;
+    }
+}
+-(void) setDescLabelSizeByZoomLevel:(UILabel*)tmpLbl
+{
+    int zoomLevel = [self zoomLevel];
+    CGSize expectedLabelSize = [tmpLbl.text sizeWithFont:tmpLbl.font
+            constrainedToSize:tmpLbl.frame.size lineBreakMode:UILineBreakModeWordWrap];
+    tmpLbl.numberOfLines = 0;
+    tmpLbl.font = [UIFont fontWithName:@"Arial" size:11];
+    int labelWidth = 60;
+    if (zoomLevel <= ZOOM_LEVEL_TO_HIDE_DESC)
+    {
+        tmpLbl.hidden = true; //do nothing, caller already hidden the label;
+    }
+    else if (zoomLevel <= 8)
+    {
+        tmpLbl.numberOfLines=4;
+    }
+    else if (zoomLevel <= 10)
+    {
+        tmpLbl.numberOfLines=4;
+        labelWidth = 100;
+    }
+    else if (zoomLevel <= 13)
+    {
+        tmpLbl.font = [UIFont fontWithName:@"Arial" size:13];
+        tmpLbl.numberOfLines=5;
+        labelWidth = 100;
+    }
+    else
+    {
+        tmpLbl.font = [UIFont fontWithName:@"Arial" size:14];
+        tmpLbl.numberOfLines=5;
+        labelWidth = 120;
+    }
+
+    //HONG if height > CONSTANT, then do not change, I do not like biggerImage unless in a big zooing
+    CGRect newFrame = tmpLbl.frame;
+    newFrame.size.height = expectedLabelSize.height;
+    newFrame.size.width=labelWidth;
+    tmpLbl.frame = newFrame;
+    //if (!CGColorGetPattern(tmpLbl.backgroundColor.CGColor))
+        [tmpLbl sizeToFit];
+    UIImageView* imgView = (UIImageView*)[tmpLbl viewWithTag:100];
+    if (imgView != nil)
+    {
+        imgView.frame = CGRectMake(imgView.frame.origin.x, imgView.frame.origin.y, tmpLbl.frame.size.width, tmpLbl.frame.size.height);
+    }
+        
+}
+
+- (NSUInteger) zoomLevel {
+    MKCoordinateRegion region = self.mapView.region;
+    
+    double centerPixelX = [self longitudeToPixelSpaceX: region.center.longitude];
+    double topLeftPixelX = [self longitudeToPixelSpaceX: region.center.longitude - region.span.longitudeDelta / 2];
+    
+    double scaledMapWidth = (centerPixelX - topLeftPixelX) * 2;
+    CGSize mapSizeInPixels = self.mapView.bounds.size;
+    double zoomScale = scaledMapWidth / mapSizeInPixels.width;
+    double zoomExponent = log(zoomScale) / log(2);
+    double zoomLevel = 21 - zoomExponent;
+    
+    return zoomLevel;
+}
+- (MKAnnotationView*) getImageAnnotationView:(NSString*)annotationIdentifier :(id <MKAnnotation>)annotation
+{
+    {
+        MKAnnotationView* annView = (MKAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier:annotationIdentifier];
+        if (!annView)
+        {
+            MKAnnotationView* customPinView = [[MKAnnotationView alloc]
+                                               initWithAnnotation:annotation reuseIdentifier:annotationIdentifier];
+           // NSLog(@"========= img %@",annotationIdentifier);
+            UIImage *markerImage = [UIImage imageNamed:annotationIdentifier];
+            customPinView.image = markerImage;
+            customPinView.canShowCallout = YES;
+            
+            UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+            rightButton.accessibilityLabel=@"right";
+            customPinView.rightCalloutAccessoryView = rightButton;
+            UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
+            [leftButton setImage:[UIImage imageNamed:@"focusedIcon.png"] forState:UIControlStateNormal];
+            leftButton.accessibilityLabel=@"left";
+            customPinView.leftCalloutAccessoryView = leftButton;
+            
+            return customPinView;
+        }
+        else
+            //NSLog(@"+++++++++ resuse %@ annotation at %@",annotationIdentifier, [annotation title]);
+        
+        return annView;
+    }
+}
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    //need use base class ATEventAnnotation here to handle call out for all type of annotation
+    ATEventAnnotation* ann = [view annotation];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    UIStoryboard* storyboard = appDelegate.storyBoard;
+    NSDateFormatter *dateFormater = appDelegate.dateFormater;
+    self.selectedAnnotation = (ATEventAnnotation*)[view annotation];
+    //TODO need to see if it is run on iPad or iPhone
+
+    if ([control.accessibilityLabel isEqualToString: @"right"]){
+        if (self.eventEditor == nil) {
+            //I just learned from iOS5 tutor pdf, there is a way to create segue for accessory buttons, I do not want to change, Will use it in iPhone storyboard
+            self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
+            self.eventEditor.delegate = self;
+        }
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
+            self.eventEditorPopover.popoverContentSize = CGSizeMake(320,400);
+            [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        }
+        else {
+            //[self performSegueWithIdentifier:@"eventeditor_segue_id" sender:nil];
+            [self.navigationController presentModalViewController:self.eventEditor animated:YES]; //pushViewController: self.eventEditor animated:YES];
+        }
+        //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
+        self.eventEditor.coordinate = ann.coordinate;
+        self.eventEditor.description.text = ann.description;
+        self.eventEditor.address.text=ann.address;
+        self.eventEditor.dateTxt.text = [NSString stringWithFormat:@"%@",
+                                         [dateFormater stringFromDate:ann.eventDate]];
+        self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
+        if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
+        {
+            //read photo file with uniqueId as file nae, atlasName as directory
+            UIImage* photoImage = [self readPhotoFromFile:ann.uniqueId];
+            [self.eventEditor.photoButton setImage:photoImage forState:UIControlStateNormal];
+            [self.eventEditor.photoButton imageView ].contentMode = UIViewContentModeScaleAspectFit;
+            [self.eventEditor.photoButton imageView ].clipsToBounds = YES;
+            self.eventEditor.eventType = EVENT_TYPE_HAS_PHOTO;
+            UIView *infoView = [[UIView alloc] initWithFrame:CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 20, 30, 15, 15)];
+            [infoView setBackgroundColor:[[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"info.png"]]];
+            infoView.tag = 1001;
+            [self.eventEditor.photoButton.imageView addSubview:infoView];
+
+        }
+        else
+        {
+            [self.eventEditor.photoButton setImage:[UIImage imageNamed:@"no_photo.png"] forState:UIControlStateNormal];
+            [self.eventEditor.photoButton imageView ].contentMode = UIViewContentModeScaleAspectFit;
+            [self.eventEditor.photoButton imageView ].clipsToBounds = YES;
+            self.eventEditor.eventType = EVENT_TYPE_NO_PHOTO;
+            UIView *infoView = [self.eventEditor.photoButton.imageView viewWithTag:1001];
+            if (infoView != nil)
+                [infoView removeFromSuperview];
+        }
+        //keep it for callback to update the annotation/delete annotation etc
+    }
+    else if ([control.accessibilityLabel isEqualToString: @"left"]){
+        //NSLog(@"left button clicked");
+        
+        //get view location of an annotation
+        CGPoint annotationViewPoint = [mapView convertCoordinate:view.annotation.coordinate
+                                               toPointToView:mapView];
+
+        
+        CGRect newFrame = CGRectMake(annotationViewPoint.x,annotationViewPoint.y,0,0);//self.focusedEventLabel.frame;
+        self.focusedEventLabel.frame = newFrame;
+        self.focusedEventLabel.text = [NSString stringWithFormat:@" %@",[appDelegate.dateFormater stringFromDate: ann.eventDate]];
+        [self.focusedEventLabel setHidden:false];
+        [UIView transitionWithView:self.focusedEventLabel
+                          duration:0.5f
+                           options:UIViewAnimationCurveEaseInOut
+                        animations:^(void) {
+                            self.focusedEventLabel.frame = focusedLabelFrame;
+                        }
+                        completion:^(BOOL finished) {
+                            // Do nothing
+                            [self.focusedEventLabel setHidden:true];
+                        }];
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate];
+        ATEventDataStruct* ent = [[ATEventDataStruct alloc] init];
+        ent.address = ann.address;
+        ent.lat = ann.coordinate.latitude;
+        ent.lng = ann.coordinate.longitude;
+        ent.eventDate = ann.eventDate;
+        ent.eventType = ann.eventType;
+        ent.eventDesc = ann.description;
+        
+        [self setNewFocusedDateAndUpdateMap:ent];
+        timelineWindowShowFlag = 1;
+        self.timeScrollWindow.hidden=false;
+        timeZoomLine.hidden = false;
+
+    }
+}
+
+- (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    appDelegate.focusedDate = ent.eventDate;
+    [self.timeScrollWindow setNewFocusedDateFromAnnotation:ent.eventDate];
+    [self refreshAnnotations];
+    //[self setMapCenter:ent];
+}
+- (void) setNewFocusedDateAndUpdateMapWithNewCenter:(ATEventDataStruct*) ent :(int)zoomLevel
+{
+    [self setNewFocusedDateAndUpdateMap:ent];
+    [self setMapCenter:ent :zoomLevel];
+}
+- (void) refreshAnnotations //Refresh based on new forcusedDate / selectedPeriodInDays
+{
+    //NSLog(@"refreshAnnotation called");
+    NSMutableArray * annotationsToRemove = [ self.mapView.annotations mutableCopy ] ;
+    //TODO filter out those annotation outside the periodRange ...
+    [ annotationsToRemove removeObject:self.mapView.userLocation ] ;
+    [ self.mapView removeAnnotations:annotationsToRemove ] ;
+    [self.mapView addAnnotations:annotationsToRemove];
+    [self showDescriptionLabelViews:self.mapView];
+}
+
+- (NSString*)getImageIdentifier:(NSDate *)eventDate
+{
+   // NSLog(@"  --------------- %u", debugCount);
+    //debugCount = debugCount + 1;
+     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (appDelegate.focusedDate == nil) //set in annotation Left button click
+        appDelegate.focusedDate = [[NSDate alloc] init];
+    float segmentDistance = [self getDistanceFromFocusedDate:eventDate];
+
+   // NSLog(@"--- dist=%f",segmentDistance);
+    if (segmentDistance >= -1 && segmentDistance <= 1)
+        return [ATConstants SelectedAnnotationIdentifier];
+    if (segmentDistance > 1 && segmentDistance <=2)
+        return [ATConstants After1AnnotationIdentifier];
+    if (segmentDistance > 2 && segmentDistance <=3)
+        return [ATConstants After2AnnotationIdentifier];
+    if (segmentDistance > 3 && segmentDistance <= 4)
+        return [ATConstants After3AnnotationIdentifier];
+    if (segmentDistance > 4 && segmentDistance <=5)
+        return [ATConstants After4AnnotationIdentifier];
+    if (segmentDistance > 5)
+        return @"small-white-flag.png"; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
+    if (segmentDistance >= -2 && segmentDistance < -1)
+        return [ATConstants Past1AnnotationIdentifier];
+    if (segmentDistance >= -3 && segmentDistance < -2)
+        return [ATConstants Past2AnnotationIdentifier];
+    if (segmentDistance >= -4 && segmentDistance < -3)
+        return [ATConstants Past3AnnotationIdentifier];
+    if (segmentDistance>= - 5 && segmentDistance < -4 )
+        return [ATConstants Past4AnnotationIdentifier];
+    if (segmentDistance < -5 )
+        return @"small-white-flag.png"; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
+    return nil;
+}
+
+- (float)getDistanceFromFocusedDate:(NSDate*)eventDate
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSTimeInterval interval = [eventDate timeIntervalSinceDate:appDelegate.focusedDate];
+    float dayInterval = interval/86400;
+    float segmentInDays = appDelegate.selectedPeriodInDays;
+    /** These logic is for my previouse thining that all point be shown, and color phase depends on selectedPeriodInDays
+    float segmentDistance = dayInterval/segmentInDays;
+     ***/
+    
+    //Here, only show events withing selectedPeriodInDays, color phase will be selectedPeriodInDays/8
+    float lenthOfEachSegment = segmentInDays/10 ; //or 8?
+    return dayInterval / lenthOfEachSegment;  //if return value is greate than segmentInDays, then it beyong date rante
+}
+
+- (Boolean)eventInPeriodRange:(NSDate*)eventDate
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    float segmentInDays = appDelegate.selectedPeriodInDays;
+    float distanceFromForcusedDate = [self getDistanceFromFocusedDate:eventDate];
+    if (fabsf(distanceFromForcusedDate) > segmentInDays)
+        return false;
+    else
+        return true;
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+    NSLog(@"=============== Memory warning");
     // Dispose of any resources that can be recreated.
 }
 
+//delegate required implementation
+- (void)deleteEvent{
+    [self flipTimelineWindowDisplay]; //de-select annotation will flip it, so double flip
+    //delete the selectedAnnotation, also delete from db if has uniqueId in the selectedAnnotation
+    [self.dataController deleteEvent:self.selectedAnnotation.uniqueId];
+    [self.mapView removeAnnotation:self.selectedAnnotation];
+    ATEventDataStruct* tmp = [[ATEventDataStruct alloc] init];
+    tmp.uniqueId = self.selectedAnnotation.uniqueId;
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSMutableArray* list  = appDelegate.eventListSorted;
+
+    NSString *key=[NSString stringWithFormat:@"%f|%f",self.selectedAnnotation.coordinate.latitude, self.selectedAnnotation.coordinate.longitude];
+    [selectedAnnotationSet removeObjectForKey:key];//in case this is
+    int index = [list indexOfObject:tmp]; //implemented isEqual
+    if (index != NSNotFound)
+        [list removeObjectAtIndex:index];
+    NSLog(@"   delete object at index %i",index);
+
+    [self deletePhotoToFile:tmp.uniqueId];
+    if (index == 0 || index == [list count]) //do not -1 since it already removed the element
+    {
+        [self setTimeScrollConfiguration];
+        [self displayTimelineControls];
+    }
+    if (self.eventEditorPopover != nil)
+        [self.eventEditorPopover dismissPopoverAnimated:true];
+}
+- (void)cancelEvent{
+    if (self.eventEditorPopover != nil)
+        [self.eventEditorPopover dismissPopoverAnimated:true];
+}
+
+- (void)updateEvent:(ATEventDataStruct*)newData image:(UIImage *)image{
+    //update annotation by remove/add, then update database or added to database depends on if have id field in selectedAnnotation
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSMutableArray* list  = appDelegate.eventListSorted;
+    //For add event, check if the app has been purchased
+    if (self.selectedAnnotation.uniqueId == nil && [list count] >= FREE_VERSION_QUOTA )
+    {
+        //solution in yahoo email, search"non-consumable"
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
+            [self processInAppPurchase];
+    }
+    [self flipTimelineWindowDisplay]; //de-select annotation will flip it, so double flip
+    newData.lat = self.selectedAnnotation.coordinate.latitude;
+    newData.lng = self.selectedAnnotation.coordinate.longitude;
+    ATEventEntity* newEntity = [self.dataController updateEvent:self.selectedAnnotation.uniqueId EventData:newData];
+    if (newEntity == nil)
+        newData.uniqueId = self.selectedAnnotation.uniqueId;
+    else
+        newData.uniqueId = newEntity.uniqueId;
+    if (image != nil)
+    {
+        [self writePhotoToFile:newData.uniqueId image:image];//write file before add nodes to map, otherwise will have black photo on map
+    }
+    NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
+    UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+    if (tmpLbl != nil)
+        [selectedAnnotationSet removeObjectForKey:key]; //so when update a event with new photo or text, the new photo/text will occure immediately because all annotations will be redraw for possible date change
+    
+    //Need remove/add annotation or following will work?
+    [self.selectedAnnotation setDescription:newData.eventDesc];
+    [self.selectedAnnotation setAddress:newData.address];
+    [self.selectedAnnotation setEventDate:newData.eventDate];
+    [self.selectedAnnotation setEventType:newData.eventType];
+    //---I want to update info in annotation pop, but following will drop a new pin and no popup
+    //---Following always add pin annotation because selectedAnnotation does not what type of annotation
+    [self.mapView removeAnnotation:self.selectedAnnotation];
+    ATAnnotationSelected *ann = [[ATAnnotationSelected alloc] init];
+    ann.uniqueId = newData.uniqueId;
+    [ann setCoordinate:self.selectedAnnotation.coordinate];
+    ann.address = newData.address;
+    ann.description=newData.eventDesc;
+    ann.eventDate=newData.eventDate;
+    ann.eventType=newData.eventType;
+    [self.mapView addAnnotation:ann];
+    
+    int newIndex  = NSNotFound;
+    if (newEntity != nil) //we can  modify the logic, should use if selectedAnnotation.UniqueId == null to decide it is add action
+    {
+        //add in sorted order so timeline view can generate sections
+        [list insertObject:newData atIndex:0];
+        [list sortUsingComparator:^NSComparisonResult(id a, id b) {
+            NSDate *first = [(ATEventEntity*)a eventDate];
+            NSDate *second = [(ATEventEntity*)b eventDate];
+            return [first compare:second]== NSOrderedAscending;
+        }];
+    }
+    else //for update, still need to remove and add incase  date is updated
+    {
+        newIndex = [list indexOfObject:newData]; //implemented isEqual
+        if (newIndex != NSNotFound)
+            [list replaceObjectAtIndex:newIndex withObject:newData];
+        [list sortUsingComparator:^NSComparisonResult(id a, id b) {
+            NSDate *first = [(ATEventEntity*)a eventDate];
+            NSDate *second = [(ATEventEntity*)b eventDate];
+            return [first compare:second]== NSOrderedAscending;
+        }];
+    }
+    
+    appDelegate.focusedDate = ann.eventDate;
+    [self setNewFocusedDateAndUpdateMap:newData];
+    
+    //following check if new date is out of range when add.  or if it is update, then check if update on ends event
+    if ( (newIndex != NSNotFound && (newIndex == 0 || newIndex == [list count] -1))
+          || [self.startDate compare:newData.eventDate]==NSOrderedDescending || [self.endDate compare:newData.eventDate]==NSOrderedAscending)
+    {
+        [self setTimeScrollConfiguration];
+        [self displayTimelineControls];
+    }
+    if (self.eventEditorPopover != nil)
+        [self.eventEditorPopover dismissPopoverAnimated:true];
+}
+
+//I should put image process functions such as resize/convert to JPEG etc in ImagePickerController
+//put it here is because we have to save image here since we only have uniqueId and some other info here
+-(void)writePhotoToFile:(NSString*)fileName image:(UIImage*)image
+{
+    if (image == nil)
+        return;
+    //Resize image
+    int imageWidth = RESIZE_WIDTH;
+    int imageHeight = RESIZE_HEIGHT;
+    NSString* thumbFileName = [NSString stringWithFormat:@"%@_Thumb",fileName];
+    if (image.size.height > image.size.width)
+    {
+        imageWidth = RESIZE_HEIGHT;
+        imageHeight = RESIZE_WIDTH;
+    }
+    UIImage* newImage = [self imageResizeWithImage:image scaledToSize:CGSizeMake(imageWidth, imageHeight)];
+    NSData *imageData = UIImageJPEGRepresentation(newImage, JPEG_QUALITY); //quality should be configurable?
+    // Find the path to the documents directory
+    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
+    BOOL ret = [imageData writeToFile:fullPathToFile atomically:NO];
+    
+    NSString* thumbPath = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:thumbFileName];
+    UIImage* thumbImage = [self imageResizeWithImage:image scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
+    imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
+    NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
+    [imageData writeToFile:thumbPath atomically:NO];
+}
+
+//not thread safe
+- (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
+{
+    // Create a graphics image context
+    UIGraphicsBeginImageContext(newSize);
+    
+    // Tell the old image to draw in this new context, with the desired
+    // new size
+    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
+    
+    // Get the new image from the context
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    // End the context
+    UIGraphicsEndImageContext();
+    
+    // Return the new image.
+    return newImage;
+}
+-(void)deletePhotoToFile:(NSString*)fileName
+{
+    // Find the path to the documents directory
+    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
+    NSError *error;
+    NSString* thumbFileName = [NSString stringWithFormat:@"%@_Thumb",fileName];
+    NSString *thumbPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:thumbFileName];
+    BOOL success = [[NSFileManager defaultManager] removeItemAtPath:fullPathToFile error:&error];
+    if (!success) {
+        NSLog(@"Error removing document path: %@", error.localizedDescription);
+    }
+    success = [[NSFileManager defaultManager] removeItemAtPath:thumbPathToFile error:&error];
+    if (!success) {
+        NSLog(@"Error removing thumb path: %@", error.localizedDescription);
+    }
+}
+
+-(UIImage*)readPhotoFromFile:(NSString*)fileName
+{
+    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
+    return [UIImage imageWithContentsOfFile:fullPathToFile];
+}
+-(UIImage*)readPhotoThumbFromFile:(NSString*)fileName
+{
+    NSString* thumbFileName = [NSString stringWithFormat:@"%@_Thumb",fileName];
+    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:thumbFileName];
+    return [UIImage imageWithContentsOfFile:fullPathToFile];
+}
+
+
+//call when app start and switch download source. call everytime startup is ok even the path already exists
+- (void) createPhotoDocumentoryPath
+{
+    NSString* documentsDirectory = [ATHelper getPhotoDocummentoryPath];
+    NSError *error;
+    [[NSFileManager defaultManager] createDirectoryAtPath:documentsDirectory withIntermediateDirectories:YES attributes:nil error:&error];
+}
+-(void)calculateSearchBarFrame
+{
+    int searchBarHeight = [ATConstants searchBarHeight];
+    int searchBarWidth = [ATConstants searchBarWidth];
+    //[self.navigationItem.titleView setFrame:CGRectMake(0, 0, searchBarWidth, searchBarHeight)];
+    //searchBar size on storyboard could not adjust according ipad/iPhone/Orientation
+    [self.searchBar setBounds:CGRectMake(0, 0, searchBarWidth, searchBarHeight)];
+}
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    NSLog(@"Rodation detected");
+    [self displayTimelineControls];
+    [self calculateSearchBarFrame]; //in iPhone, make search bar wider in landscape
+    [self closeTutorialView];
+}
+
+-(void)searchBarSearchButtonClicked:(UISearchBar *)theSearchBar
+{
+    [theSearchBar resignFirstResponder];
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    [geocoder geocodeAddressString:theSearchBar.text completionHandler:^(NSArray *placemarks, NSError *error) {
+        //Error checking
+        
+        CLPlacemark *placemark = [placemarks objectAtIndex:0];
+        if (placemark == nil)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Search address failed!"
+                                                            message:@"Either network is not available or can't find the address!"
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            [alert show];
+            return;
+        }
+        MKCoordinateRegion region;
+        region.center.latitude = placemark.region.center.latitude;
+        region.center.longitude = placemark.region.center.longitude;
+        
+        CLLocationCoordinate2D searchPoint = CLLocationCoordinate2DMake(region.center.latitude, region.center.longitude);
+        ATDefaultAnnotation *pa = [[ATDefaultAnnotation alloc] initWithLocation:searchPoint];
+        pa.eventDate = [NSDate date];
+        pa.description=@"New";//@"add by search";
+        pa.address = theSearchBar.text; //TODO should get from placemarker
+        [_mapView addAnnotation:pa];
+        
+        MKCoordinateSpan span;
+        double radius = placemark.region.radius / 1000; // convert to km
+        
+        NSLog(@"[searchBarSearchButtonClicked] Radius is %f", radius);
+        span.latitudeDelta = radius / 112.0;
+        
+        region.span = span;
+        
+        [self.mapView setRegion:region animated:YES];
+    }];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue
+                 sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"preference_id"]) {
+        self.preferencePopover = [(UIStoryboardPopoverSegue *)segue popoverController];
+    }
+    if ([segue.identifier isEqualToString:@"iphone_settings"]) {
+        [self performSegueWithIdentifier:@"iphone_settings" sender:self];
+    }
+}
+
+//select/deselect tap will interfare my tap gesture handler, so try to resume timeline window original show/hide status
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
+{
+    //NSLog(@"selected anno");
+    if (timelineWindowShowFlag == 0) //always show timewindow when select
+        [self flipTimelineWindowDisplay];
+}
+- (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
+{
+   //NSLog(@"de-selected anno");
+    if (timelineWindowShowFlag == 1) //since select will always show it, deselect will do opposit always
+        [self flipTimelineWindowDisplay];
+}
+- (double)longitudeToPixelSpaceX:(double)longitude
+{
+    return round(MERCATOR_OFFSET + MERCATOR_RADIUS * longitude * M_PI / 180.0);
+}
+
+- (double)latitudeToPixelSpaceY:(double)latitude
+{
+    return round(MERCATOR_OFFSET - MERCATOR_RADIUS * logf((1 + sinf(latitude * M_PI / 180.0)) / (1 - sinf(latitude * M_PI / 180.0))) / 2.0);
+}
+
+- (double)pixelSpaceXToLongitude:(double)pixelX
+{
+    return ((round(pixelX) - MERCATOR_OFFSET) / MERCATOR_RADIUS) * 180.0 / M_PI;
+}
+
+- (double)pixelSpaceYToLatitude:(double)pixelY
+{
+    return (M_PI / 2.0 - 2.0 * atan(exp((round(pixelY) - MERCATOR_OFFSET) / MERCATOR_RADIUS))) * 180.0 / M_PI;
+}
+- (MKCoordinateSpan)coordinateSpanWithMapView:(MKMapView *)mapView
+                             centerCoordinate:(CLLocationCoordinate2D)centerCoordinate
+                                 andZoomLevel:(NSUInteger)zoomLevel
+{
+    // convert center coordiate to pixel space
+    double centerPixelX = [self longitudeToPixelSpaceX:centerCoordinate.longitude];
+    double centerPixelY = [self latitudeToPixelSpaceY:centerCoordinate.latitude];
+    
+    // determine the scale value from the zoom level
+    NSInteger zoomExponent = 20 - zoomLevel;
+    double zoomScale = pow(2, zoomExponent);
+    
+    // scale the map’s size in pixel space
+    CGSize mapSizeInPixels = mapView.bounds.size;
+    double scaledMapWidth = mapSizeInPixels.width * zoomScale;
+    double scaledMapHeight = mapSizeInPixels.height * zoomScale;
+    
+    // figure out the position of the top-left pixel
+    double topLeftPixelX = centerPixelX - (scaledMapWidth / 2);
+    double topLeftPixelY = centerPixelY - (scaledMapHeight / 2);
+    
+    // find delta between left and right longitudes
+    CLLocationDegrees minLng = [self pixelSpaceXToLongitude:topLeftPixelX];
+    CLLocationDegrees maxLng = [self pixelSpaceXToLongitude:topLeftPixelX + scaledMapWidth];
+    CLLocationDegrees longitudeDelta = maxLng - minLng;
+    
+    // find delta between top and bottom latitudes
+    CLLocationDegrees minLat = [self pixelSpaceYToLatitude:topLeftPixelY];
+    CLLocationDegrees maxLat = [self pixelSpaceYToLatitude:topLeftPixelY + scaledMapHeight];
+    CLLocationDegrees latitudeDelta = -1 * (maxLat - minLat);
+    
+    // create and return the lat/lng span
+    MKCoordinateSpan span = MKCoordinateSpanMake(latitudeDelta, longitudeDelta);
+    return span;
+}
+
+- (void) processInAppPurchase
+{
+    askToPurchase = [[UIAlertView alloc]
+                     initWithTitle:@"Purchase Full Version"
+                     message:@"Free version alows create up to 20 events only, do you want to purchase full version for USD$2.99?"
+                     delegate:self
+                     cancelButtonTitle:nil
+                     otherButtonTitles:@"Yes", @"No", nil];
+    askToPurchase.delegate = self;
+    [askToPurchase show];
+}
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (alertView == askToPurchase)
+    {
+        if (buttonIndex == 0)
+        {
+            NSLog(@"user want to by");
+            if ([SKPaymentQueue canMakePayments]) {
+                SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:PURCHASE_PROD_ID]];
+                request.delegate = self;
+                [request start];
+            } else {
+                UIAlertView *tmp = [[UIAlertView alloc]
+                                initWithTitle:@"Prohibited"
+                                message:@"Parental Control is enabled, cannot make a purchase!"
+                                delegate:self
+                                cancelButtonTitle:nil
+                                otherButtonTitles:@"Ok", nil];
+                [tmp show];
+            }
+        }
+        else
+        {
+            NSLog(@"user deny to by");
+        }
+    }
+}
+//callback in inApp Purchase
+-(void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
+{
+    if (purchaseStatusLabel != nil)
+        [purchaseStatusLabel removeFromSuperview];
+    SKProduct *validProduct = nil;
+    int count = [response.products count];
+    if (count>0) {
+        validProduct = [response.products objectAtIndex:0];
+        SKPayment *payment = [SKPayment paymentWithProductIdentifier:PURCHASE_PROD_ID];
+        [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+        [[SKPaymentQueue defaultQueue] addPayment:payment]; // <-- KA CHING!
+    } else {
+        UIAlertView *tmp = [[UIAlertView alloc]
+                            initWithTitle:@"Not Available"
+                            message:@"No products to purchase"
+                            delegate:self
+                            cancelButtonTitle:nil
+                            otherButtonTitles:@"Ok", nil];  
+        [tmp show];  
+    }
+}
+-(void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
+    for (SKPaymentTransaction *transaction in transactions) {
+        NSString* alertMsg = nil;
+        switch (transaction.transactionState) {
+            case SKPaymentTransactionStatePurchasing:
+                // show wait view here
+                if (purchaseStatusLabel == nil)
+                {
+                    purchaseStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/2 - 80, SCREEN_HEIGHT - 30, 160, 60)];
+                    purchaseStatusLabel.backgroundColor = [UIColor lightGrayColor];
+                    purchaseStatusLabel.textAlignment = UITextAlignmentCenter;
+                    purchaseStatusLabel.text = @"Processing...";
+                }
+                [self.mapView addSubview:purchaseStatusLabel];
+                break;
+            case SKPaymentTransactionStatePurchased:
+                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+                [purchaseStatusLabel removeFromSuperview];
+                alertMsg = @"Purchased, Thanks!";
+                [self setPurchasedInLocal];
+                
+                break;
+            case SKPaymentTransactionStateRestored:
+                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+                [purchaseStatusLabel removeFromSuperview];
+                alertMsg = @"The product restored, no charge is applied";
+                [self setPurchasedInLocal];
+                break;
+                
+            case SKPaymentTransactionStateFailed:
+                
+                if (transaction.error.code != SKErrorPaymentCancelled) {
+                    NSLog(@"Error payment cancelled");
+                }
+                alertMsg = @"Purchased Failed, please try later!";
+                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+                [purchaseStatusLabel removeFromSuperview];
+                break;
+                
+            default:
+                break;
+        }
+        if (alertMsg != nil)
+        {
+            UIAlertView *tmp1 = [[UIAlertView alloc]
+                             initWithTitle:@"Complete"
+                             message:alertMsg
+                             delegate:self
+                             cancelButtonTitle:nil
+                             otherButtonTitles:@"Ok", nil];
+            [tmp1 show];
+        }
+    }
+}
+- (void) setPurchasedInLocal
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    [userDefault setObject:@"purchased" forKey:IN_APP_PURCHASED];
+}
 @end
