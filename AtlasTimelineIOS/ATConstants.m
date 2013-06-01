@@ -85,6 +85,10 @@
 {
     return @"marker-af-4.png";
 }
++ (NSString*)WhiteFlagAnnotationIdentifier
+{
+    return @"small-white-flag.png";
+}
 + (int) screenWidth
 {
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
