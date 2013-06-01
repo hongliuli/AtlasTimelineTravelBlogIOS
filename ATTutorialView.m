@@ -213,7 +213,7 @@ UILabel* timeWindowLabel;
     CGRect lblFrame = CGRectMake(initialX, initialY + 3 * itemHeight + 50*iPhoneSizeYFactor, itemWidth*iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, initialY + 3 * itemHeight, itemWidth * iphoneSizeSpecialFactor, itemHeight)];
 
-    lbl.text = @"Change time zoom levels:";
+    lbl.text = @"Zoom to change timescale:";
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
@@ -223,10 +223,10 @@ UILabel* timeWindowLabel;
 }
 - (void) addTimeZoomLevelSection2 //level wordings
 {
-    CGRect lblFrame = CGRectMake(initialX+310*iPhoneSizeXFactor, initialY + 3 * itemHeight + 52*iPhoneSizeYFactor, itemWidth, itemHeight);
+    CGRect lblFrame = CGRectMake(initialX+320*iPhoneSizeXFactor, initialY + 3 * itemHeight + 52*iPhoneSizeYFactor, itemWidth, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(1000*iPhoneSizeXFactor, initialY + 3 * itemHeight + 2, 0, 0)];
 
-    lbl.text = @"1week / 1month / 1year / 10y / 100y / 1000y.";
+    lbl.text = @"day / month / year / 10 yrs / 100 yrs ";
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall-2];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
