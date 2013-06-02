@@ -62,3 +62,7 @@
 - (void)cancelEvent;
 
 @end
+
+@interface APActivityProvider : UIActivityItemProvider <UIActivityItemSource>
+@property ATEventEditorTableController* eventEditor;
+@end
