@@ -155,13 +155,16 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     BOOL isAtLeast6 = [version compare:@"6.0" options:NSNumericSearch] != NSOrderedAscending;
     if (isAtLeast6)
     {
-        //how to send html email
-        
-        //customize UIActivityItemProvider
+        //how to send html email, or how to send different items depends on selected service Facebook/twitter/email etc
+        //this one is the best: http://www.albertopasca.it/whiletrue/2012/10/objective-c-custom-uiactivityviewcontroller-icons-text/
+        // In above, ignore UIActivities, we do not need, just need Provider to reutn items based on type of service. Following is
+        //   another exact sample to have customized provide for items:
         //http://stackoverflow.com/questions/12639982/uiactivityviewcontroller-customize-text-based-on-selected-activity
+        //But how to give email subject? this does not help: http://stackoverflow.com/questions/12769499/override-uiactivityviewcontroller-default-behaviour
         
-        //  http://stackoverflow.com/questions/12769499/override-uiactivityviewcontroller-default-behaviour
-        //http://www.albertopasca.it/whiletrue/2012/10/objective-c-custom-uiactivityviewcontroller-icons-text/
+        //Aggregated Questions http://stackoverflow.com/questions/tagged/uiactivityviewcontroller
+
+        //I need have provider to send HTMl for email and text for tweeter
         
         if (![SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook] && ![SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter])
         {
@@ -171,14 +174,18 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             [alertView show];
         }
         NSArray *activityItems;
-        NSString *googleMap = [NSString stringWithFormat:@"\n\n Google map location: https://maps.google.com/maps?q=%f,%f&spn=65.61535,79.013672",self.coordinate.latitude, self.coordinate.longitude ];
-        NSString* appStoreUrl= @"\n\n By ChronicleMap.com at https://itunes.apple.com/us/app/chroniclemap-events-itinerary/id649653093?ls=1&mt=8";
         
+        
+        
+        
+        APActivityProvider *ActivityProvider = [[APActivityProvider alloc] init];
+        ActivityProvider.eventEditor = self;
+                
         UIImageView *eventImage = [self.photoButton imageView];
         if (self.eventType == EVENT_TYPE_HAS_PHOTO &&  eventImage.image != nil) {
-            activityItems = @[eventImage.image, self.description.text, googleMap, appStoreUrl];
+            activityItems = @[eventImage.image, ActivityProvider];
         } else {
-            activityItems = @[self.description.text, googleMap, appStoreUrl];
+            activityItems = @[ActivityProvider];
         }
     
         UIActivityViewController *activityController =
@@ -368,4 +375,28 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     [self setDateTxt:nil];
     [super viewDidUnload];
 }
+@end
+
+@implementation APActivityProvider
+- (id) activityViewController:(UIActivityViewController *)activityViewController
+          itemForActivityType:(NSString *)activityType
+{
+    NSString* dateStr = self.eventEditor.dateTxt.text;
+    if ([dateStr rangeOfString:@"AD"].location != NSNotFound)
+        dateStr = [dateStr substringWithRange:NSMakeRange(0, 10)];
+        
+    NSString *googleMap = [NSString stringWithFormat:@"https://maps.google.com/maps?q=%f,%f&spn=65.61535,79.013672",self.eventEditor.coordinate.latitude, self.eventEditor.coordinate.longitude ];
+    NSString* appStoreUrl= @"https://itunes.apple.com/us/app/chroniclemap-events-itinerary/id649653093?ls=1&mt=8";
+
+    if ( [activityType isEqualToString:UIActivityTypeMail] )
+    {
+        
+        return [NSString stringWithFormat:@"<html><body>[%@] %@<br><a href='%@'>Map Location</a>&nbsp;&nbsp;&nbsp;<br><br>Organized with <a href='%@'>ChronicleMap</a>.",dateStr, self.eventEditor.description.text,googleMap,appStoreUrl];;
+    }
+    else
+    {
+        return [NSString stringWithFormat:@"[%@] %@\n\n Map Location:%@      (Organized with ChronicleMap.com)",dateStr, self.eventEditor.description.text,googleMap];
+    }
+}
+- (id) activityViewControllerPlaceholderItem:(UIActivityViewController *)activityViewController { return @""; }
 @end
