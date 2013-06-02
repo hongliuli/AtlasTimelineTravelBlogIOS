@@ -82,6 +82,7 @@
     
     UIAlertView *askToPurchase;
     UILabel *purchaseStatusLabel;
+    NSMutableArray* selectedAnnotationBringToFrontList;
 }
 
 @synthesize mapView = _mapView;
@@ -95,6 +96,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    selectedAnnotationBringToFrontList = [[NSMutableArray alloc] init];
     [self createPhotoDocumentoryPath];
     self.locationManager = [[CLLocationManager alloc] init];
     timelineWindowShowFlag = 1;
@@ -590,44 +592,53 @@
     //######## I have spend many days to figure it out on Jan 11, 2013 weekend
     self.geoCoder = [[CLGeocoder alloc] init];
     
-    [self.geoCoder reverseGeocodeLocation: self.location completionHandler:
-    ^(NSArray *placemarks, NSError *error) {
-        //NSLog(@"reverseGeocoder:completionHandler: called lat=%f",self.location.coordinate.latitude);
-        if (error) {
-            NSLog(@"Geocoder failed with error: %@", error);
-        }
-        NSString *locatedAt = @"Unknown";
-        if (placemarks && placemarks.count > 0)
-        {
-            //Get nearby address
-            CLPlacemark *placemark = [placemarks objectAtIndex:0];
-         
-            //String to hold address
-            locatedAt = [[placemark.addressDictionary valueForKey:@"FormattedAddressLines"] componentsJoinedByString:@", "];
-
-        }
-        ATDefaultAnnotation *pa = [[ATDefaultAnnotation alloc] initWithLocation:touchMapCoordinate];
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        pa.eventDate = appDelegate.focusedDate;
-        pa.description=@"New";//@"add by touch";
-        pa.address = locatedAt;
-        [_mapView addAnnotation:pa];
-        if (newAddedPin != nil)
-        {
-            [_mapView removeAnnotation:newAddedPin];
-            newAddedPin = pa;
-        }
-        else
-            newAddedPin = pa;
-        
-        [self flipTimelineWindowDisplay]; //select annotation will flip it, so double flip
-        
+    
+    //reverseGeocodeLocation will take long time in very special case, such as when FreedomPop up/down, so use following stupid way to check network first, need more test on train
+    NSError* urlError = nil;
+    NSString *URLString = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"http://www.google.com"] encoding:NSASCIIStringEncoding error:&urlError];
+    
+    if(URLString == nil)
+        [self addPinToMap:@"Unknow" :touchMapCoordinate];
+    else 
+        [self.geoCoder reverseGeocodeLocation: self.location completionHandler:
+         ^(NSArray *placemarks, NSError *error) {
+             //NSLog(@"reverseGeocoder:completionHandler: called lat=%f",self.location.coordinate.latitude);
+             if (error) {
+                 NSLog(@"Geocoder failed with error: %@", error);
+             }
+             NSString *locatedAt = @"Unknown";
+             if (placemarks && placemarks.count > 0)
+             {
+                 //Get nearby address
+                 CLPlacemark *placemark = [placemarks objectAtIndex:0];
+                 //String to hold address
+                 locatedAt = [[placemark.addressDictionary valueForKey:@"FormattedAddressLines"] componentsJoinedByString:@", "];
+             }
+            [self addPinToMap:locatedAt :touchMapCoordinate];
       //  /*** following is for testing add to db for each longpress xxxxxxxx TODO
        // [self.dataController addEventEntityAddress:locatedAt description:@"desc by touch" date:[NSDate date] lat:touchMapCoordinate.latitude lng:touchMapCoordinate.longitude];
      //    */
-        
-     }];
+         }];
 
+}
+
+- (void) addPinToMap:(NSString*)locatedAt :(CLLocationCoordinate2D) touchMapCoordinate
+{
+    ATDefaultAnnotation *pa = [[ATDefaultAnnotation alloc] initWithLocation:touchMapCoordinate];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    pa.eventDate = appDelegate.focusedDate;
+    pa.description=@"New";//@"add by touch";
+    pa.address = locatedAt;
+    [_mapView addAnnotation:pa];
+    if (newAddedPin != nil)
+    {
+        [_mapView removeAnnotation:newAddedPin];
+        newAddedPin = pa;
+    }
+    else
+        newAddedPin = pa;
+    
+    [self flipTimelineWindowDisplay]; //select annotation will flip it, so double flip
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
@@ -677,6 +688,7 @@
         //keey list of red  annotations
         if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]])
         {
+            [selectedAnnotationBringToFrontList addObject:annView];
             UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
             if (tmpLbl == nil)
             {
@@ -771,6 +783,19 @@
     
     return nil;
 }
+
+
+//to put those white annotation behind the darkest annotation
+- (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
+{
+    for (MKAnnotationView *view in selectedAnnotationBringToFrontList)
+    {
+        [[view superview] bringSubviewToFront:view];
+    }
+    [selectedAnnotationBringToFrontList removeAllObjects];
+}
+
+
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
     //NSLog(@"regione willChange size: %i", [selectedAnnotationSet count]);
@@ -1075,7 +1100,7 @@
     if (segmentDistance > 4 && segmentDistance <=5)
         return [ATConstants After4AnnotationIdentifier];
     if (segmentDistance > 5)
-        return @"small-white-flag.png"; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
+        return [ATConstants WhiteFlagAnnotationIdentifier]; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
     if (segmentDistance >= -2 && segmentDistance < -1)
         return [ATConstants Past1AnnotationIdentifier];
     if (segmentDistance >= -3 && segmentDistance < -2)
@@ -1165,7 +1190,11 @@
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
             [self processInAppPurchase];
+        //Check again if purchase has really done
+        if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
+            return;
     }
+
     [self flipTimelineWindowDisplay]; //de-select annotation will flip it, so double flip
     newData.lat = self.selectedAnnotation.coordinate.latitude;
     newData.lng = self.selectedAnnotation.coordinate.longitude;
@@ -1287,6 +1316,8 @@
 -(void)deletePhotoToFile:(NSString*)fileName
 {
     // Find the path to the documents directory
+    if (fileName == nil)
+        return;  //Bug fix. This bug is in ver1.0. When remove dropping, fileName is empty,so it will remove whole document directory such as myEvents, very bad bug
     NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
     NSError *error;
     NSString* thumbFileName = [NSString stringWithFormat:@"%@_Thumb",fileName];
@@ -1460,7 +1491,7 @@
 {
     askToPurchase = [[UIAlertView alloc]
                      initWithTitle:@"Purchase Full Version"
-                     message:@"Free version alows create up to 20 events only, do you want to purchase full version for USD$2.99?"
+                     message:@"Free version allows to create up to 20 events only, do you want to purchase full version for USD$2.99?"
                      delegate:self
                      cancelButtonTitle:nil
                      otherButtonTitles:@"Yes", @"No", nil];
