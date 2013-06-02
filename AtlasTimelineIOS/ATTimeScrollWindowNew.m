@@ -24,8 +24,7 @@
     NSDateFormatter *dateLiterFormat;
     NSDate* startDate;
     NSDate* endDate;
-
-    NSString* prevBackgroundImg;
+    
     int focusedRow; //set in cellForRow, used in zoom etc to scroll to focused date
     int prevRow;
     int currentNumberOfRow;
@@ -55,7 +54,6 @@
         [self.horizontalTableView setFrame:CGRectMake(0, 0, tableLength, tableWith)];
         
         self.horizontalTableView.rowHeight = [ATConstants timeScrollCellWidth];
-        self.horizontalTableView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.2];
         
         self.horizontalTableView.dataSource = self;
         self.horizontalTableView.delegate = self;
@@ -81,7 +79,7 @@
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
         tap.numberOfTapsRequired =1;
         [self addGestureRecognizer:tap];
-    
+        
         UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
         doubleTap.numberOfTapsRequired = 2;
         [self addGestureRecognizer:doubleTap];
@@ -99,7 +97,6 @@
         
         //NSDateFormatter* format = appDelegate.dateFormater;
         //startDate3000BC = [format dateFromString:@"01/01/3000 BC"]; //remember 6000 year is allowed start from -3000. otherwise calendar may not work
-        prevBackgroundImg = @"";
         prevRow = -1;
         dateLiterFormat=[[NSDateFormatter alloc] init];
         [dateLiterFormat setDateFormat:@"EEEE MMMM dd"];
@@ -118,7 +115,7 @@
                                                  toDate:endDate
                                                 options:0];
     int selectedPeriodInDay = appDelegate.selectedPeriodInDays;
-
+    
     //patch: somehow forcused date will go out of range after remove/update edge event (date at index 0 or count-1, make adjustment here
     if ([appDelegate.focusedDate compare:startDate]==NSOrderedAscending || [appDelegate.focusedDate compare:endDate]==NSOrderedDescending)
         appDelegate.focusedDate = endDate;
@@ -172,20 +169,20 @@
     else if (prevRow < currentRow)
         increaseDirection = 1;
     prevRow = currentRow;
-
+    
     focusedRow = currentRow - 4*increaseDirection; //this is to select center row as focusedRow because timeScrollWindow has 9 dates
     
     static NSString *CellIdentifier = @"ATTimeScrollCell";
     
     __block ATTimeScrollCell *cell = (ATTimeScrollCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-
+    
     int daysInPeriod = appDelegate.selectedPeriodInDays;
     if (cell == nil)
     {
         cell = [[ATTimeScrollCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants timeScrollCellWidth], [ATConstants timeScrollCellHeight])];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-
+    
     NSDateFormatter* format = appDelegate.dateFormater;
     NSDate* displayDate;
     NSDateComponents *periodToAddForFocusedDate = [[NSDateComponents alloc] init];
@@ -250,7 +247,7 @@
         appDelegate.focusedDate = [calendar dateByAddingComponents:addOldDateToNewFocusedDate toDate:appDelegate.focusedDate options:0];
         appDelegate.focusedDate = [calendar dateByAddingComponents:addOldMonthToNewFocusedDate toDate:appDelegate.focusedDate options:0];
     }
-
+    
     NSString* yearPart;
     yearPart = [ATHelper getYearPartSmart:displayDate];
     NSString* dateString = [NSString stringWithFormat:@" %@", [format stringFromDate:displayDate]];
@@ -274,7 +271,7 @@
     idx = range.location + range.length;
     NSString* dayString = [monthDateString substringFromIndex:idx];
     NSString* shortMonthDateString = [NSString stringWithFormat:@"%@ %@",month3Letter,dayString];
-
+    
     if (daysInPeriod == 7)
     {
         cell.titleLabel.text = shortMonthDateString;
@@ -297,12 +294,12 @@
     }
     cell.titleLabel.textColor = [UIColor whiteColor];
     cell.date = displayDate;
-
+    
     int index1 = [self getIndexOfClosestDate:displayDate :0 :FIRST_TIME_CALL];
     NSDate* nextExpectedDate= [ATHelper dateByAddingComponentsRegardingEra:nextTimePeriodCompponent toDate:displayDate options:0];
     int index2 = [self getIndexOfClosestDate:nextExpectedDate :0 :FIRST_TIME_CALL];
     //if (index1 - index2 != 0)
-     //   NSLog(@"    has events bellow:");
+    //   NSLog(@"    has events bellow:");
     //NSLog(@"--Recurs dDate %@ | nDate=%@  idx1=%i  idx2=%i diff=%i", [format stringFromDate: displayDate], [format stringFromDate: nextExpectedDate], index1, index2, index1-index2);
     if (abs(index1 - index2) > 0)
     {
@@ -312,7 +309,7 @@
     }
     [self changeBackgroundImage:self year:yearForImages];
     [self displayTimeElapseinSearchBar];
-
+    
     [self.parent changeTimeScaleState];
     return cell;
 }
@@ -390,7 +387,7 @@
         else if (pinchVelocity > 0 )  //from 365 to 30
         {
             appDelegate.selectedPeriodInDays = 30;
-
+            
         }
     }
     else if (selectedPeriodInDay == 3650)
@@ -455,7 +452,7 @@
         rect.origin.x=9999;
     else
         rect = [self.horizontalTableView convertRect:[self.horizontalTableView rectForRowAtIndexPath:index] toView:[self.horizontalTableView superview]];
-
+    
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int windowWidth = [ATConstants timeScrollWindowWidth];
     int leftPosition = windowWidth/3;
@@ -599,7 +596,7 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int selectedPeriodInDay = appDelegate.selectedPeriodInDays;
     NSDateComponents *components = [calendar components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit fromDate:newFocusedDate toDate:startDate options:0];
-
+    
     if (selectedPeriodInDay == 30 || selectedPeriodInDay == 7)
     {
         //For day, use timeInterval is more accurate
@@ -739,7 +736,7 @@
 
 #pragma mark - Memory Management
 
-- (NSString *) reuseIdentifier 
+- (NSString *) reuseIdentifier
 {
     return @"HorizontalCell";
 }
@@ -747,6 +744,7 @@
 - (void) changeBackgroundImage:(UIView*)view year:(int)year
 {
     NSString* tmpImg = nil;
+    self.horizontalTableView.backgroundColor = [UIColor clearColor];
     if (year <-2500)
         tmpImg=@"3000BCSumer.png";
     else if (year < -2000)
@@ -783,18 +781,31 @@
         tmpImg = @"1800AD.png";
     else if (year < 1945)
         tmpImg = @"1914ADWar1.png";
-    else
-    { //no picture for after 1945
-        view.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.2];
-    }
-        
-    if (tmpImg != nil && ![prevBackgroundImg isEqualToString:tmpImg])
-    {
-        self.horizontalTableView.backgroundColor = [UIColor clearColor];
-        self.backgroundColor=[UIColor colorWithPatternImage:[UIImage imageNamed:tmpImg]];
-        prevBackgroundImg = tmpImg;
-    }
+    else //no picture
+    { //added on 2013-06-01 when first version is in wait for review
+        //self.horizontalTableView.backgroundColor=[UIColor colorWithRed:0 green:0 blue:0 alpha:0.2];
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        int selectedPeriod = appDelegate.selectedPeriodInDays;
+        if (selectedPeriod == 30)
+            tmpImg = @"scaleBkg_25.png";
+        else if (selectedPeriod == 365)
+            tmpImg = @"scaleBkg_20.png";
+        else if (selectedPeriod == 3650)
+            tmpImg = @"scaleBkg_15.png";
+        else if (selectedPeriod == 36500)
+            tmpImg = @"scaleBkg_10.png";
+        else if (selectedPeriod == 365000)
+            tmpImg = @"scaleBkg_5.png";
+        else if (selectedPeriod == 7)
+            tmpImg = @"scaleBkg_60.png";
 
+    }
+    
+    if (tmpImg != nil )
+    {
+        self.backgroundColor=[UIColor colorWithPatternImage:[UIImage imageNamed:tmpImg]];
+    }
+    
 }
 
 -(void) setNewFocusedDateFromAnnotation:(NSDate *)newFocusedDate
@@ -820,7 +831,7 @@
         //if ([currDate compare:inDate] == NSOrderedSame ) return middlePos;
         if ([currDate compare:inDate] == NSOrderedAscending) // if currDate < inDate . remember the sort is from latest to earlist
         {
-             if (currDate == inDate ) size = size/2 -1; 
+            if (currDate == inDate ) size = size/2 -1;
             return [self getIndexOfClosestDate:inDate :startPos :size/2];
         }
         else
