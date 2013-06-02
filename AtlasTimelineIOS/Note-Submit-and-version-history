@@ -1,0 +1,20 @@
+
+iTunes Connect / Develop Center  hongliuli@gmail.com/R...3
+
+Keywords/Description is on iPad notes
+
+
+Version History
+---------------
+Version 1.0: still in review after second submit
+    
+[6/2/2013] More important changes, need to submit again:
+    1. A big bug fix: remove pin will remove all photos because fileName is nil, so it will remove whole myEvents directory
+       (this bug exist always, that is why I lost my pictures before)
+    2. A fix: A bug that user can add events even without purchase in purchase alert window
+    3. Hide white flag icon behind dark red marker
+    4. Add scale-grid background in Time Window
+    5. Spell check "Alows" change to "Allows"
+    6. Implement customized provider to send HTML to email and text to twitter/facebook
+    
+
