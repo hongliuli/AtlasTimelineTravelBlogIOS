@@ -26,6 +26,7 @@ UILabel* labelSeg2;
 UILabel* labelSeg3;
 UILabel* labelSeg4;
 
+UILabel* labelScaleText;
 
 NSCalendar *calendar;
 NSDateFormatter *dateLiterFormat;
@@ -43,17 +44,7 @@ double frameWidth;
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
         timeScaleImageView.contentMode = UIViewContentModeScaleToFill; // UIViewContentModeScaleAspectFill;
         timeScaleImageView.clipsToBounds = YES;
-        
-        /*
-        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 200, MOVABLE_VIEW_HEIGHT)];
-        labelScaleText.font=[UIFont fontWithName:@"Helvetica-Bold" size:13];
-        labelScaleText.backgroundColor = [UIColor clearColor];
-        labelScaleText.textColor = [UIColor whiteColor];
-        labelScaleText.textAlignment = UITextAlignmentCenter;
-        [timeScaleImageView addSubview:labelScaleText];
-        labelScaleText.center = timeScaleImageView.center;
-        */
-        
+                
         /*
         self.zoomLabel.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ];
         self.zoomLabel.font=[UIFont fontWithName:@"Helvetica" size:13];
@@ -109,13 +100,49 @@ double frameWidth;
         
         dateLiterFormat=[[NSDateFormatter alloc] init];
         [dateLiterFormat setDateFormat:@"EEEE MMMM dd"];
+        
+        //add the at front
+        
+        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-6,23, 80, 16)];
+        labelScaleText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ];
+        labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:13];
+        labelScaleText.layer.borderColor=[UIColor orangeColor].CGColor;
+        labelScaleText.layer.borderWidth=1;
+        labelScaleText.layer.cornerRadius = 8;
+        labelScaleText.textAlignment = UITextAlignmentCenter;
+        [self addSubview:labelScaleText];
+        labelScaleText.hidden=true;
+        labelScaleText.center = timeScaleImageView.center;
+        
     }
     return self;
 }
 
+//called in ATViewController
 - (void) changeScaleText:(NSString *)text
 {
-   // labelScaleText.text = text;
+    labelScaleText.text = text;
+}
+//called by outside when scrollWindow start/stop, or when change time zoom
+- (void)showHideScaleText:(BOOL)showFlag
+{
+    labelScaleText.hidden = !showFlag;
+}
+- (void)showHideInAnimation
+{
+    labelScaleText.hidden = false;
+    CGRect frame = labelScaleText.frame;
+    labelScaleText.frame = CGRectMake(frame.origin.x,-20, 70,15);
+    [UIView transitionWithView:labelScaleText
+                      duration:2.5f
+                       options:UIViewAnimationCurveEaseInOut
+                    animations:^(void) {
+                        labelScaleText.frame = frame;
+                    }
+                    completion:^(BOOL finished) {
+                        // Do nothing
+                        [labelScaleText setHidden:true];
+                    }];
 }
 
 //have to call this after set text otherwise sizeToFit will not work
@@ -417,10 +444,14 @@ double frameWidth;
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar400.png"]];
     else //if over 500
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
-    //labelScaleText.center = timeScaleImageView.center;
+    CGPoint center = timeScaleImageView.center;
+    center.y = 0;//labelScaleText.center.y;
+
+    labelScaleText.center = center;
+
     //[labelScaleText setFrame:CGRectMake(
-                                   // floorf((timeScaleImageView.frame.size.width - labelScaleText.frame.size.width) / 2.0), 0,
-                                   // labelScaleText.frame.size.width, labelScaleText.frame.size.height)];
+                                  //  floorf((timeScaleImageView.frame.size.width - labelScaleText.frame.size.width) / 2.0), 0,
+                                  //  labelScaleText.frame.size.width, labelScaleText.frame.size.height)];
     
 }
 
