@@ -13,6 +13,7 @@
 #import "ATConstants.h"
 #import "ATHelper.h"
 #import "ATEventDataStruct.h"
+#import "ATTimeZoomLine.h"
 
 #define FIRST_TIME_CALL -999
 
@@ -148,6 +149,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [self.parent.timeZoomLine showHideScaleText:true];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     
     NSDate* oldFocusedDate = appDelegate.focusedDate;
@@ -339,6 +341,7 @@
         
         [self.parent changeTimeScaleState];
         [self.parent refreshAnnotations];
+        [self.parent.timeZoomLine showHideInAnimation];
     }
 }
 
@@ -463,6 +466,7 @@
         [self performSettingFocusedRowForPinch:(NSDate*) appDelegate.focusedDate];
         [self.parent changeTimeScaleState];
         [self.parent refreshAnnotations];
+        [self.parent.timeZoomLine showHideInAnimation];
     }
     else if (rect.origin.x > leftPosition && rect.origin.x <= middlePosition) //middle position
     {
@@ -471,6 +475,7 @@
         appDelegate.focusedDate = today;
         [self performSettingFocusedRowForDate:today];
         [self.parent refreshAnnotations];
+        [self.parent.timeZoomLine showHideScaleText:false]; //have to do this else scale label will show
     }
     else //touched right side, zoom in the time window
     {
@@ -478,6 +483,7 @@
         [self performSettingFocusedRowForPinch:(NSDate*) appDelegate.focusedDate];
         [self.parent changeTimeScaleState];
         [self.parent refreshAnnotations];
+        [self.parent.timeZoomLine showHideInAnimation];
     }
 }
 
@@ -575,7 +581,7 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     //NSLog(@"end move");
-    
+    [self.parent.timeZoomLine showHideScaleText: false];
     [self.parent refreshAnnotations];
     [self changeFocusedCellColorToRed ];
 }
@@ -587,6 +593,7 @@
     appDelegate.focusedDate = cell.date;
     focusedRow = indexPath.row;
     //NSLog(@" ------ horizontal row didselected  cell date is %@", appDelegate.focusedDate);
+    [self.parent.timeZoomLine showHideScaleText:false];
     [self displayTimeElapseinSearchBar];
     [self.parent refreshAnnotations];
     [self changeFocusedCellColorToRed ];
