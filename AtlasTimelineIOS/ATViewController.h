@@ -15,6 +15,7 @@
 @class ATAppDelegate;
 @class ATEventAnnotation;
 @class ATTimeScrollWindowNew;
+@class ATTimeZoomLine;
 
 @interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchBarDelegate,SKProductsRequestDelegate, SKPaymentTransactionObserver, UIAlertViewDelegate>
 {
@@ -40,7 +41,7 @@
 //following two will be changed when loaded EventListSorted and eventEditor update/deleted event with max/min dates
 @property (strong, nonatomic) NSDate* startDate;
 @property (strong, nonatomic) NSDate* endDate;
-
+@property (strong, nonatomic) ATTimeZoomLine* timeZoomLine;
 
 
 - (void) prepareMapView;

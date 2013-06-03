@@ -70,8 +70,7 @@
     CGRect focusedLabelFrame;
     NSMutableArray* timeScaleArray;
     int timelineWindowShowFlag; //1 is show, 0 is hide. Change by tap gesture
-    
-    ATTimeZoomLine* timeZoomLine;
+
     NSMutableArray* selectedAnnotationNearestLocationList; //do not add to selectedAnnotationSet if too close
     NSMutableDictionary* selectedAnnotationSet;//hold uilabels for selected annotation's description
     NSDate* regionChangeTimeStart;
@@ -144,6 +143,7 @@
 -(void) viewDidAppear:(BOOL)animated
 {
     [self displayTimelineControls]; //MOTHER FUCKER, I struggled long time when I decide to put timescrollwindow at bottom. Finally figure out have to put this code here in viewDidAppear. If I put it in viewDidLoad, then first time timeScrollWindow will be displayed in other places if I want to display at bottom, have to put it here
+    [self.timeZoomLine showHideScaleText:false];
 }
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
@@ -370,8 +370,8 @@
         }
 
     }
-    if (timeZoomLine != nil)
-        [timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
+    if (self.timeZoomLine != nil)
+        [self.timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
         //NSLog(@"   ############## setConfigu startDate=%@    endDate=%@   startDateFormated=%@", self.startDate, self.endDate, [appDelegate.dateFormater stringFromDate:self.startDate]);
 }
 
@@ -425,11 +425,11 @@
     //Add scrollable time window
     [self addTimeScrollWindow];
 
-    if (timeZoomLine != nil)
-        [timeZoomLine removeFromSuperview]; //incase orientation change
-    timeZoomLine = [[ATTimeZoomLine alloc] initWithFrame:timeZoomLineFrame];
-    timeZoomLine.backgroundColor = [UIColor clearColor];
-    [self.view addSubview:timeZoomLine];
+    if (self.timeZoomLine != nil)
+        [self.timeZoomLine removeFromSuperview]; //incase orientation change
+    self.timeZoomLine = [[ATTimeZoomLine alloc] initWithFrame:timeZoomLineFrame];
+    self.timeZoomLine.backgroundColor = [UIColor clearColor];
+    [self.view addSubview:self.timeZoomLine];
 
     [self changeTimeScaleState];
     //add focused Label. it is invisible most time, only used for animation effect when click left callout on annotation
@@ -463,7 +463,7 @@
     [locationbtn setImage:[UIImage imageNamed:@"currentLocation.jpg"] forState:UIControlStateNormal];
     [locationbtn addTarget:self action:@selector(currentLocationClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.mapView addSubview:locationbtn];
-    [timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
+    [self.timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
 }
 
 
@@ -474,9 +474,9 @@
     self.timeScrollWindow = [[ATTimeScrollWindowNew alloc] initWithFrame:timeScrollWindowFrame];
     self.timeScrollWindow.parent = self;
     [self.view addSubview:self.timeScrollWindow];
-    if (timeZoomLine != nil)
+    if (self.timeZoomLine != nil)
     {
-        timeZoomLine.hidden = false;
+        self.timeZoomLine.hidden = false;
     }
 }
 
@@ -484,7 +484,7 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     [self setSelectedPeriodLabel];
-    [timeZoomLine changeTimeScaleState:self.startDate :self.endDate :appDelegate.selectedPeriodInDays :appDelegate.focusedDate];
+    [self.timeZoomLine changeTimeScaleState:self.startDate :self.endDate :appDelegate.selectedPeriodInDays :appDelegate.focusedDate];
 }
 
 - (void) setSelectedPeriodLabel
@@ -494,45 +494,27 @@
 
     if (appDelegate.selectedPeriodInDays == 7)
     {
-        if (timeZoomLine.scaleLenForDisplay > 150)
-            [timeZoomLine changeScaleText:@"1 week window"];
-        else
-            [timeZoomLine changeScaleText: @"1w"];
+        [self.timeZoomLine changeScaleText:@"7 days"];
     }
     else if (appDelegate.selectedPeriodInDays == 30)
     {
-        if (timeZoomLine.scaleLenForDisplay > 150)
-            [timeZoomLine changeScaleText:@"1 month window"];
-        else
-        [timeZoomLine changeScaleText: @"1m"];
+        [self.timeZoomLine changeScaleText:@"30 days"];
     }
     else if (appDelegate.selectedPeriodInDays == 365)
     {
-        if (timeZoomLine.scaleLenForDisplay > 150)
-            [timeZoomLine changeScaleText:@"1 year window"];
-        else
-        [timeZoomLine changeScaleText: @"1y"];
+        [self.timeZoomLine changeScaleText:@"10 months"];
     }
     else if (appDelegate.selectedPeriodInDays == 3650)
     {
-        if (timeZoomLine.scaleLenForDisplay > 150)
-            [timeZoomLine changeScaleText:@"10 years window"];
-        else
-        [timeZoomLine changeScaleText: @"10y"];
+        [self.timeZoomLine changeScaleText:@"10 years"];
     }
     else if (appDelegate.selectedPeriodInDays == 36500)
     {
-        if (timeZoomLine.scaleLenForDisplay > 150)
-            [timeZoomLine changeScaleText:@"100 years window"];
-        else
-        [timeZoomLine changeScaleText:@"100y"];
+        [self.timeZoomLine changeScaleText:@"100 years"];
     }
     else if (appDelegate.selectedPeriodInDays == 365000)
     {
-        if (timeZoomLine.scaleLenForDisplay > 150)
-            [timeZoomLine changeScaleText:@"1000 years window"];
-        else
-        [timeZoomLine changeScaleText: @"1000y"];
+        [self.timeZoomLine changeScaleText:@"1000 years"];
     }
 }
 
@@ -542,14 +524,14 @@
     {
         timelineWindowShowFlag = 0;
         self.timeScrollWindow.hidden = true;
-        timeZoomLine.hidden = true;
+        self.timeZoomLine.hidden = true;
         [self hideDescriptionLabelViews];
     }
     else
     {
         timelineWindowShowFlag = 1;
         self.timeScrollWindow.hidden=false;
-        timeZoomLine.hidden = false;
+        self.timeZoomLine.hidden = false;
         [self showDescriptionLabelViews:self.mapView];
     }
 }
@@ -1050,7 +1032,7 @@
         [self setNewFocusedDateAndUpdateMap:ent];
         timelineWindowShowFlag = 1;
         self.timeScrollWindow.hidden=false;
-        timeZoomLine.hidden = false;
+        self.timeZoomLine.hidden = false;
 
     }
 }
@@ -1316,7 +1298,7 @@
 -(void)deletePhotoToFile:(NSString*)fileName
 {
     // Find the path to the documents directory
-    if (fileName == nil)
+    if (fileName == nil || [fileName length] == 0)
         return;  //Bug fix. This bug is in ver1.0. When remove dropping, fileName is empty,so it will remove whole document directory such as myEvents, very bad bug
     NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
     NSError *error;
