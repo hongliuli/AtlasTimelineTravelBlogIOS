@@ -16,5 +16,8 @@ Version 1.0: still in review after second submit
     4. Add scale-grid background in Time Window
     5. Spell check "Alows" change to "Allows"
     6. Implement customized provider to send HTML to email and text to twitter/facebook
-    
+    7. Added labelScale when zoom time and move time
+[6/4/2013]
+    1. fixed event count in Time Window bucket, need more test, but seems good
+    2. change TimeWindow to group upper label by background color, make scroll window see time movement easily
 
