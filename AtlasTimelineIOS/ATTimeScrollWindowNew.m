@@ -16,6 +16,8 @@
 #import "ATTimeZoomLine.h"
 
 #define FIRST_TIME_CALL -999
+#define GROUP_BACKGROUND_COLOR_1 0.0
+#define GROUP_BACKGROUND_COLOR_2 0.4
 
 @implementation ATTimeScrollWindowNew
 {
@@ -29,6 +31,9 @@
     int focusedRow; //set in cellForRow, used in zoom etc to scroll to focused date
     int prevRow;
     int currentNumberOfRow;
+    
+    NSString* prevGroupLabelText;
+    float groupLabelBackgroundAlpha;
 }
 
 @synthesize horizontalTableView = _horizontalTableView;
@@ -38,6 +43,8 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
+    groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_1;
+    prevGroupLabelText = nil;
     if ((self = [super initWithFrame:frame]))
     {
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -253,6 +260,7 @@
     NSString* yearPart;
     yearPart = [ATHelper getYearPartSmart:displayDate];
     NSString* dateString = [NSString stringWithFormat:@" %@", [format stringFromDate:displayDate]];
+    NSString* shortYear = [dateString substringWithRange:NSMakeRange(7, 4)];
     
     if ([dateString rangeOfString:@"AD"].location == NSNotFound )
     {
@@ -260,7 +268,7 @@
         yearForImages = -yearForImages ;
     }
     else
-        cell.titleLabel.text = [dateString substringWithRange:NSMakeRange(7, 4)];
+        cell.titleLabel.text = shortYear;
     
     NSString *dateLiterString=[dateLiterFormat stringFromDate:displayDate];
     cell.titleLabel.font = [UIFont boldSystemFontOfSize:12];
@@ -272,17 +280,18 @@
     range = [monthDateString rangeOfString:@" "];
     idx = range.location + range.length;
     NSString* dayString = [monthDateString substringFromIndex:idx];
-    NSString* shortMonthDateString = [NSString stringWithFormat:@"%@ %@",month3Letter,dayString];
-    
+    NSString* weekDay3Letter = [dateLiterString substringToIndex:3];
+
     if (daysInPeriod == 7)
     {
-        cell.titleLabel.text = shortMonthDateString;
-        cell.subLabel.text = [dateLiterString substringToIndex:3];
+        cell.titleLabel.text = [NSString stringWithFormat:@"%@ %@",month3Letter,shortYear];
+        cell.subLabel.text = [NSString stringWithFormat:@"%@ %@",weekDay3Letter,dayString];
     }
     else if (daysInPeriod == 30)
     {
+        cell.titleLabel.text = [NSString stringWithFormat:@"%@ %@",month3Letter,shortYear];
         cell.titleLabel.font = [UIFont boldSystemFontOfSize:12];
-        cell.subLabel.text =shortMonthDateString;
+        cell.subLabel.text =dayString;
     }
     else if (daysInPeriod == 365)
     {
@@ -296,6 +305,37 @@
     }
     cell.titleLabel.textColor = [UIColor whiteColor];
     cell.date = displayDate;
+    
+    if (daysInPeriod == 30 || daysInPeriod == 365)
+    {
+        NSString* labelTxt = cell.titleLabel.text;
+        if (prevGroupLabelText == nil)
+            prevGroupLabelText = labelTxt;
+        if (![prevGroupLabelText isEqualToString:labelTxt])
+        {
+            if (groupLabelBackgroundAlpha == GROUP_BACKGROUND_COLOR_1)
+                groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_2;
+            else
+                groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_1;
+            prevGroupLabelText = labelTxt;
+        }
+        cell.titleLabel.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:groupLabelBackgroundAlpha];
+    }
+    if (daysInPeriod == 7) //flip background color each week
+    {
+        NSString* compareToTxt = @"Sun";
+        if (increaseDirection == -1)
+            compareToTxt = @"Sat";
+        if ([weekDay3Letter isEqualToString:compareToTxt])
+        {
+            if (groupLabelBackgroundAlpha == GROUP_BACKGROUND_COLOR_1)
+                groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_2;
+            else
+                groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_1;
+        }
+        cell.titleLabel.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:groupLabelBackgroundAlpha];
+    }
+    
     
     int index1 = [self getIndexOfClosestDate:displayDate :0 :FIRST_TIME_CALL];
     NSDate* nextExpectedDate= [ATHelper dateByAddingComponentsRegardingEra:nextTimePeriodCompponent toDate:displayDate options:0];
@@ -539,7 +579,7 @@
             }
             else
             {
-                cell.titleLabel.backgroundColor = [UIColor clearColor];
+                //cell.titleLabel.backgroundColor = [UIColor clearColor];
                 cell.subLabel.textColor=[UIColor redColor];
                 cell.subLabel.backgroundColor=[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
                 cell.subLabel.layer.cornerRadius = 8;
@@ -549,8 +589,10 @@
         else
         {
             cell.titleLabel.textColor = [UIColor whiteColor];
+            cell.titleLabel.layer.cornerRadius=0;
             cell.subLabel.textColor = [UIColor whiteColor];
-            cell.titleLabel.backgroundColor=[UIColor clearColor];
+            if (appDelegate.selectedPeriodInDays > 365)
+                cell.titleLabel.backgroundColor=[UIColor clearColor];
             cell.subLabel.backgroundColor=[UIColor clearColor];
             
             float colorDivider = rowDistance + 2;
@@ -825,7 +867,9 @@
 //recursive function to get index of a event
 -(int) getIndexOfClosestDate:(NSDate*)inDate :(int)startPos :(int)size
 {
-    if (size > 1 || size == FIRST_TIME_CALL)
+    //if (size == FIRST_TIME_CALL)
+        //NSLog(@"===== FIRST TIME: inDate=%@, startPos=%i, size=%i",inDate, startPos,size);
+    if (size > 2 || size == FIRST_TIME_CALL)
     {
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         NSArray* sortedEventList = appDelegate.eventListSorted;
@@ -833,17 +877,21 @@
             size = [sortedEventList count];
         if (size == 0) return 0;
         int middlePos = startPos + size/2;
-        ATEventDataStruct *eventEntity = sortedEventList[middlePos];
-        NSDate* currDate = eventEntity.eventDate;
-        //if ([currDate compare:inDate] == NSOrderedSame ) return middlePos;
-        if ([currDate compare:inDate] == NSOrderedAscending) // if currDate < inDate . remember the sort is from latest to earlist
+        //NSLog(@"         inDate=%@, startPos=%i, middle=%i, size=%i",inDate, startPos, middlePos, size);;
+        ATEventDataStruct *middleEntity = sortedEventList[middlePos];
+        NSDate* middleDate = middleEntity.eventDate;
+        //if ([middleDate compare:inDate] == NSOrderedSame ) return middlePos;
+        if ([middleDate compare:inDate] == NSOrderedAscending) // if middleDate < inDate . remember the sort is from latest to earlist
         {
-            if (currDate == inDate ) size = size/2 -1;
-            return [self getIndexOfClosestDate:inDate :startPos :size/2];
+            if ([middleDate compare: inDate ]  == NSOrderedSame) size = size/2 -1;
+            return [self getIndexOfClosestDate:inDate :startPos :size/2 + 1];
         }
         else
         {
-            return [self getIndexOfClosestDate:inDate :middlePos :size/2 ];
+            int newSize = size/2;
+            if (2*newSize < size)
+                newSize = newSize + 1;
+            return [self getIndexOfClosestDate:inDate :middlePos :newSize];
         }
     }
     else
