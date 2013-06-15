@@ -350,7 +350,7 @@
         cell.scallLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:12.0];
     }
     [self changeBackgroundImage:self year:yearForImages];
-    [self displayTimeElapseinSearchBar];
+    //[self displayTimeElapseinSearchBar];
     
     [self.parent changeTimeScaleState];
     return cell;
@@ -636,7 +636,7 @@
     focusedRow = indexPath.row;
     //NSLog(@" ------ horizontal row didselected  cell date is %@", appDelegate.focusedDate);
     [self.parent.timeZoomLine showHideScaleText:false];
-    [self displayTimeElapseinSearchBar];
+    //[self displayTimeElapseinSearchBar]; //from Yixing suggestion, do not confuse people
     [self.parent refreshAnnotations];
     [self changeFocusedCellColorToRed ];
 }
