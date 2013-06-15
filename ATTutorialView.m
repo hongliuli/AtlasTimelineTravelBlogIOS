@@ -129,11 +129,32 @@ UILabel* timeWindowLabel;
     lbl.textColor = [UIColor whiteColor];
     [self addSubview:lbl];
     
-    UIImageView* imgView = [[UIImageView alloc] initWithFrame:CGRectMake(frm.origin.x + 150*iPhoneSizeXFactor, frm.origin.y, imageSize, imageSize) ];
+    UILabel* lblSearchAddress = [[UILabel alloc] initWithFrame:CGRectMake(frm.origin.x + 150*iPhoneSizeXFactor, frm.origin.y, 220*iPhoneSizeXFactor, 80*iPhoneSizeYFactor)];
+    lblSearchAddress.text = @"Search Address     OR  ";
+    lblSearchAddress.font = [UIFont fontWithName:@"Arial" size:20];
+    lblSearchAddress.backgroundColor = [UIColor clearColor];
+    lblSearchAddress.textColor = [UIColor whiteColor];
+    [self addSubview:lblSearchAddress];
+    
+    //draw line
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextSetLineWidth(context, 1.0);
+    //Draw lines point to address box
+    CGContextMoveToPoint(context, frm.origin.x + 220 *iPhoneSizeXFactor, frm.origin.y + 30);
+    CGContextAddLineToPoint(context, [ATConstants screenWidth]/2 - 20, 0);
+    CGContextMoveToPoint(context, [ATConstants screenWidth]/2 - 20, 0);
+    CGContextAddLineToPoint(context, [ATConstants screenWidth]/2 - 40, 10);
+    CGContextMoveToPoint(context, [ATConstants screenWidth]/2 - 20, 0);
+    CGContextAddLineToPoint(context, [ATConstants screenWidth]/2 - 26, 15);
+    CGContextStrokePath(context);
+
+    
+    UIImageView* imgView = [[UIImageView alloc] initWithFrame:CGRectMake(frm.origin.x + 350*iPhoneSizeXFactor, frm.origin.y, imageSize, imageSize) ];
     [imgView setImage:[UIImage imageNamed:@"gesture-longpress.png"]]; //long press image
     [self addSubview:imgView];
     
-    UILabel* lblLongPress = [[UILabel alloc] initWithFrame:CGRectMake(frm.origin.x + 250*iPhoneSizeXFactor, frm.origin.y, 250*iPhoneSizeXFactor, 80*iPhoneSizeYFactor)];
+    UILabel* lblLongPress = [[UILabel alloc] initWithFrame:CGRectMake(frm.origin.x + 410*iPhoneSizeXFactor, frm.origin.y, 250*iPhoneSizeXFactor, 80*iPhoneSizeYFactor)];
     lblLongPress.text = @"Long-press on a map location to record an event.";
     lblLongPress.font = [UIFont fontWithName:@"Arial" size:fontSmall];
     lblLongPress.backgroundColor = [UIColor clearColor];
