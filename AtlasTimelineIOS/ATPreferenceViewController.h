@@ -8,9 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "ATSourceChooseViewController.h"
+#import "ATViewController.h"
 
 @interface ATPreferenceViewController : UITableViewController <SourceChooseViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *detailLabel;
+@property (weak, nonatomic) ATViewController* mapViewParent;
 
 -(void) changeSelectedSource:(NSString*)selectedAtlasName;
 @end
