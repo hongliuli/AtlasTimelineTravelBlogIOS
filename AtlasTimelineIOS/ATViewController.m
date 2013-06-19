@@ -8,7 +8,8 @@
 
 #define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
 #define SCREEN_HEIGHT ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.height : [[UIScreen mainScreen] bounds].size.width)
-#define PURCHASE_PROD_ID @"com.chroniclemap.unlimitedevents"
+
+#define IN_APP_PURCHASED @"IN_APP_PURCHASED"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -34,6 +35,7 @@
 #import "ATPreferenceEntity.h"
 #import "ATTimeScrollWindowNew.h"
 #import "ATTutorialView.h"
+#import "ATInAppPurchaseViewController.h"
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
@@ -50,8 +52,7 @@
 #define THUMB_WIDTH 120
 #define THUMB_HEIGHT 70
 
-#define FREE_VERSION_QUOTA 20
-#define IN_APP_PURCHASED @"IN_APP_PURCHASED"
+#define FREE_VERSION_QUOTA 50
 
 #define EDITOR_PHOTOVIEW_WIDTH 190
 #define EDITOR_PHOTOVIEW_HEIGHT 160
@@ -78,10 +79,9 @@
     UIButton *locationbtn;
     CGRect timeScrollWindowFrame;
     ATTutorialView* tutorialView;
-    
-    UIAlertView *askToPurchase;
-    UILabel *purchaseStatusLabel;
+
     NSMutableArray* selectedAnnotationBringToFrontList;
+    ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
 }
 
 @synthesize mapView = _mapView;
@@ -165,8 +165,8 @@
     {
         storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone" bundle:nil];
         preference = [storyboard instantiateViewControllerWithIdentifier:@"preference_storyboard_id"];
-       
-    [self.navigationController pushViewController:preference animated:true];}
+        [self.navigationController pushViewController:preference animated:true];
+    }
 }
 
 -(void) currentLocationClicked:(id)sender
@@ -1168,10 +1168,14 @@
     //For add event, check if the app has been purchased
     if (self.selectedAnnotation.uniqueId == nil && [list count] >= FREE_VERSION_QUOTA )
     {
+        
         //solution in yahoo email, search"non-consumable"
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
-            [self processInAppPurchase];
+        {
+            purchase = [[ATInAppPurchaseViewController alloc] init];
+            [purchase processInAppPurchase];
+        }
         //Check again if purchase has really done
         if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
             return;
@@ -1469,123 +1473,4 @@
     return span;
 }
 
-- (void) processInAppPurchase
-{
-    askToPurchase = [[UIAlertView alloc]
-                     initWithTitle:@"Purchase Full Version"
-                     message:@"Free version allows to create up to 20 events only, do you want to purchase full version for USD$2.99?"
-                     delegate:self
-                     cancelButtonTitle:nil
-                     otherButtonTitles:@"Yes", @"No", nil];
-    askToPurchase.delegate = self;
-    [askToPurchase show];
-}
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (alertView == askToPurchase)
-    {
-        if (buttonIndex == 0)
-        {
-            NSLog(@"user want to by");
-            if ([SKPaymentQueue canMakePayments]) {
-                SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:PURCHASE_PROD_ID]];
-                request.delegate = self;
-                [request start];
-            } else {
-                UIAlertView *tmp = [[UIAlertView alloc]
-                                initWithTitle:@"Prohibited"
-                                message:@"Parental Control is enabled, cannot make a purchase!"
-                                delegate:self
-                                cancelButtonTitle:nil
-                                otherButtonTitles:@"Ok", nil];
-                [tmp show];
-            }
-        }
-        else
-        {
-            NSLog(@"user deny to by");
-        }
-    }
-}
-//callback in inApp Purchase
--(void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
-{
-    if (purchaseStatusLabel != nil)
-        [purchaseStatusLabel removeFromSuperview];
-    SKProduct *validProduct = nil;
-    int count = [response.products count];
-    if (count>0) {
-        validProduct = [response.products objectAtIndex:0];
-        SKPayment *payment = [SKPayment paymentWithProductIdentifier:PURCHASE_PROD_ID];
-        [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
-        [[SKPaymentQueue defaultQueue] addPayment:payment]; // <-- KA CHING!
-    } else {
-        UIAlertView *tmp = [[UIAlertView alloc]
-                            initWithTitle:@"Not Available"
-                            message:@"No products to purchase"
-                            delegate:self
-                            cancelButtonTitle:nil
-                            otherButtonTitles:@"Ok", nil];  
-        [tmp show];  
-    }
-}
--(void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
-    for (SKPaymentTransaction *transaction in transactions) {
-        NSString* alertMsg = nil;
-        switch (transaction.transactionState) {
-            case SKPaymentTransactionStatePurchasing:
-                // show wait view here
-                if (purchaseStatusLabel == nil)
-                {
-                    purchaseStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/2 - 80, SCREEN_HEIGHT - 30, 160, 60)];
-                    purchaseStatusLabel.backgroundColor = [UIColor lightGrayColor];
-                    purchaseStatusLabel.textAlignment = UITextAlignmentCenter;
-                    purchaseStatusLabel.text = @"Processing...";
-                }
-                [self.mapView addSubview:purchaseStatusLabel];
-                break;
-            case SKPaymentTransactionStatePurchased:
-                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
-                [purchaseStatusLabel removeFromSuperview];
-                alertMsg = @"Purchased, Thanks!";
-                [self setPurchasedInLocal];
-                
-                break;
-            case SKPaymentTransactionStateRestored:
-                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
-                [purchaseStatusLabel removeFromSuperview];
-                alertMsg = @"The product restored, no charge is applied";
-                [self setPurchasedInLocal];
-                break;
-                
-            case SKPaymentTransactionStateFailed:
-                
-                if (transaction.error.code != SKErrorPaymentCancelled) {
-                    NSLog(@"Error payment cancelled");
-                }
-                alertMsg = @"Purchased Failed, please try later!";
-                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
-                [purchaseStatusLabel removeFromSuperview];
-                break;
-                
-            default:
-                break;
-        }
-        if (alertMsg != nil)
-        {
-            UIAlertView *tmp1 = [[UIAlertView alloc]
-                             initWithTitle:@"Complete"
-                             message:alertMsg
-                             delegate:self
-                             cancelButtonTitle:nil
-                             otherButtonTitles:@"Ok", nil];
-            [tmp1 show];
-        }
-    }
-}
-- (void) setPurchasedInLocal
-{
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    [userDefault setObject:@"purchased" forKey:IN_APP_PURCHASED];
-}
 @end
