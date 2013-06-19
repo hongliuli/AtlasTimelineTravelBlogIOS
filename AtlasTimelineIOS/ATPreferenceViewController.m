@@ -14,9 +14,15 @@
 #import "ATAppDelegate.h"
 #import "ATEventDataStruct.h"
 #import "ATHelpWebView.h"
+#import "ATInAppPurchaseViewController.h"
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
+#define SECTION_LOGIN_EMAIL 1
+#define SECTION_THREE 3
+#define ROW_VIDEO_TUTORIAL 0
+#define ROW_PURCHASE 1
+#define IN_APP_PURCHASED @"IN_APP_PURCHASED"
 
 @interface ATPreferenceViewController ()
 
@@ -25,6 +31,7 @@
 @implementation ATPreferenceViewController
 {
     NSString* _source;
+    ATInAppPurchaseViewController* purchase; //have to be "global", otherwise error
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -236,7 +243,7 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if (section == 1)
+    if (section == SECTION_LOGIN_EMAIL)
     {
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         NSString* userEmail = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
@@ -248,15 +255,49 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
 }
 #pragma mark - Table view delegate
 
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+    //for static tableView's cellFor.. works, have to use super tableView here, do not know why
+    UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
+    int section = indexPath.section;
+    int row = indexPath.row;
+    if (section == SECTION_THREE)
+    {
+        if (row == ROW_PURCHASE)
+        {
+            NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+            if ([userDefault objectForKey:IN_APP_PURCHASED] != nil)
+            {
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.textLabel.textColor = [UIColor lightGrayColor];
+            }
+        }
+    }
+    return cell;
+}
+ 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
+    int section = indexPath.section;
+    int row = indexPath.row;
+    if (section == SECTION_THREE)
+    {
+        if (row == ROW_VIDEO_TUTORIAL)
+        {
+            NSURL *url = [NSURL URLWithString:@"http://www.chroniclemap.com/onlinehelp"];
+            if (![[UIApplication sharedApplication] openURL:url])
+                NSLog(@"%@%@",@"Failed to open url:",[url description]);
+        }
+        if (row == ROW_PURCHASE)
+        {
+            NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+            if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
+            {
+                purchase = [[ATInAppPurchaseViewController alloc] init];
+                [purchase processInAppPurchase];
+            }
+        }
+    }
 }
 
 -(void) helpClicked:(id)sender //Only iPad come here. on iPhone will be frome inside settings and use push segue
