@@ -1,13 +1,40 @@
 
+TEST app archive:
+http://developer.apple.com/library/ios/#documentation/ToolsLanguages/Conceptual/YourFirstAppStoreSubmission/TestYourApponManyDevicesandiOSVersions/TestYourApponManyDevicesandiOSVersions.html
+
 iTunes Connect / Develop Center  hongliuli@gmail.com/R...3
 
-Keywords/Description is on iPad notes
+See yahoo email on 6/5/2013 on Release test and create Targets for varirty release such as Free version, Paid version for share code
+
+I SET RELEASE MODE Optimun to NONE, otherwise app will crash. See [6/5/2013] change
+Should always test AdHoc Distribution, or at leaset to set Release mode for Product->Scheme->Edit Scheme->Run AtlasTim..."
 
 
 Version History
 ---------------
-Version 1.0: still in review after second submit
-    
+[6/13/2013] Submit Ver1.2:
+  1. submit process to include In App purchase on iTune
+  2. Address Search bar now do not show time elapsed
+     Tutorial emphasis add event by search address
+  3. Change 20 free to 50 free
+  4. Settings added two more items: Video Tutorial/FAQ AND In-App purchase
+  5. Make zoom time label animation shorter and bounce animated when zooming.
+  
+     
+[6/5/2013] Submit Ver1.1 for all important changes after V1.0
+Downloaded from App Store crashed if added at least one note. Crash report does not help.
+Then find my case is same as: http://www.mindjuice.net/2011/11/30/how-to-fix-an-app-that-crashes-in-release-but-not-debug/
+The crash happens like this: ATViewController call following:
+        NSArray * eventList = appDelegate.eventListSorted;
+and the array has correct size, but the event inside has null eventDate/eventDesc etc. Have to set Compiler Optimise none as in debug mode
+
+Changed Release Mode Optimization Level to None (same as Debug mode) and submitted as Ver1.1:
+   Target -> Build Settings -> Search for Optimiz.., expand it to show debug and release
+To run with Release mode: Product -> Scheme Editor -> Run .....
+
+[6/4/2013]
+    1. fixed event count in Time Window bucket, need more test, but seems good
+    2. change TimeWindow to group upper label by background color, make scroll window see time movement easilytill in review after second submit
 [6/2/2013] More important changes, need to submit again:
     1. A big bug fix: remove pin will remove all photos because fileName is nil, so it will remove whole myEvents directory
        (this bug exist always, that is why I lost my pictures before)
@@ -17,7 +44,5 @@ Version 1.0: still in review after second submit
     5. Spell check "Alows" change to "Allows"
     6. Implement customized provider to send HTML to email and text to twitter/facebook
     7. Added labelScale when zoom time and move time
-[6/4/2013]
-    1. fixed event count in Time Window bucket, need more test, but seems good
-    2. change TimeWindow to group upper label by background color, make scroll window see time movement easily
 
+[5/16/2013] V1.0 with new Logo submitted (6/4/2013 approved, but this version will crash)
