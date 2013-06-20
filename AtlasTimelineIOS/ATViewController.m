@@ -494,11 +494,11 @@
 
     if (appDelegate.selectedPeriodInDays == 7)
     {
-        [self.timeZoomLine changeScaleText:@"7 days"];
+        [self.timeZoomLine changeScaleText:@"1 week"];
     }
     else if (appDelegate.selectedPeriodInDays == 30)
     {
-        [self.timeZoomLine changeScaleText:@"30 days"];
+        [self.timeZoomLine changeScaleText:@"1 month"];
     }
     else if (appDelegate.selectedPeriodInDays == 365)
     {
