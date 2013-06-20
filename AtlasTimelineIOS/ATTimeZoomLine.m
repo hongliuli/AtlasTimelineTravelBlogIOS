@@ -104,7 +104,7 @@ double frameWidth;
         //add the at front
         
         labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-6,23, 80, 16)];
-        labelScaleText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ];
+        labelScaleText.backgroundColor = [UIColor yellowColor] ; //]colorWithRed:1 green:1 blue:0.8 alpha:1 ];
         labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:13];
         labelScaleText.layer.borderColor=[UIColor orangeColor].CGColor;
         labelScaleText.layer.borderWidth=1;
@@ -132,16 +132,16 @@ double frameWidth;
 {
     labelScaleText.hidden = false;
     CGRect frame = labelScaleText.frame;
-    labelScaleText.frame = CGRectMake(frame.origin.x,-20, 70,15);
+    labelScaleText.frame = CGRectMake(frame.origin.x,-90, 70,15);
     [UIView transitionWithView:labelScaleText
-                      duration:2.5f
+                      duration:0.5f
                        options:UIViewAnimationCurveEaseInOut
                     animations:^(void) {
                         labelScaleText.frame = frame;
                     }
                     completion:^(BOOL finished) {
                         // Do nothing
-                        [labelScaleText setHidden:true];
+                        //[labelScaleText setHidden:true];
                     }];
 }
 
