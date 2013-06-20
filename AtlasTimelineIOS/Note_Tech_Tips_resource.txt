@@ -1,19 +1,36 @@
 
 --------------------------------------------
-Full steps for submit to store:
-http://developer.apple.com/library/ios/#documentation/IDEs/Conceptual/AppDistributionGuide/SubmittingYourApp/SubmittingYourApp.html#//apple_ref/doc/uid/TP40012582-CH9-SW1
-
+test archive
+http://developer.apple.com/library/ios/#documentation/ToolsLanguages/Conceptual/YourFirstAppStoreSubmission/TestYourApponManyDevicesandiOSVersions/TestYourApponManyDevicesandiOSVersions.html
 
 iOS Dev Center / iTunes Connect  same login -> hongliuli@gmail.com  (pwd Cap R....3)
 
 1. Create App ID -> in Develope Center, search for "Manage your certificates, App IDs, devices, and provisioning profiles".
    Bundle ID com.chroniclemap   detail see Develope Center
-2. iTunes:
-    - primary category: Utilities     secondary: Travel
-    - created test user lanqiuusa/Hongliu123 for test in-apps purchase. on Device, logout iTune user to test
-3. how to upload binary
+
+
+
+Add existing xcode project to local GIT
+---------------------------------------
+Open the project directory in a terminal and type the following:
+git init
+git add .
+git commit -m "Initial commit"
+
+branch with xcode in organizer:
+http://useyourloaf.com/blog/2012/02/29/git-branch-management-with-xcode.html
     
 --------------------------------------------
+
+Third Party API
+-----------------
+Form design, good for my setting window: http://escoz.com/open-source/quickdialog
+
+Social Framework 
+----------------
+Use 
+http://www.albertopasca.it/whiletrue/2012/10/objective-c-custom-uiactivityviewcontroller-icons-text/
+
 
 3/30/13  start to design/implement event photo in Virginia Beach 3-day vacation
 ---------------------------------------
@@ -86,7 +103,11 @@ Sync Server Chinese character issue
 At iOS side, when do JSON serilize, use NSUTF8StringEncoding (not NSACCII...)
 Most work is at MySql and Spring MVC, please refere to text document in atlasTimeline Spring MVC Eclipse project on dropbox 
 
-Use Protocal/Delegate etc to pass data btw views
+Use Protocal/Delegate etc to pass data btw views. If a view is in storyborder, then definitly have to use delegate, can not use member. For example, EventEditor access ATViewController members through delegate, could not do following:
+        - EventEditory.h   ATViewController* parent
+        - ATViewController.m   eventEditor = .....;
+        
+                               eventEditor.parent = self;
 (Should use block, see IOS 6 Tutorial I bought from Raywen....)
 ------------------------------------------------
     Use UsingDelegateComplete proj to see how to pass data btw mapview and popover view. (detail at http://www.colejoplin.com/2012/09/12/ios-tutorial-combining-delegation-storyboards-popovers-and-data/ )
