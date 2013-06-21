@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "649"
-         endingLineNumber = "649"
+         startingLineNumber = "664"
+         endingLineNumber = "664"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -34,11 +34,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "650"
-         endingLineNumber = "650"
+         startingLineNumber = "665"
+         endingLineNumber = "665"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "642"
-         endingLineNumber = "642"
+         startingLineNumber = "657"
+         endingLineNumber = "657"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -73,11 +73,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "576"
-         endingLineNumber = "576"
+         startingLineNumber = "582"
+         endingLineNumber = "582"
          landmarkName = "-handleLongPressGesture:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -112,11 +112,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "586"
-         endingLineNumber = "586"
+         startingLineNumber = "592"
+         endingLineNumber = "592"
          landmarkName = "-handleLongPressGesture:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -125,11 +125,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "938"
-         endingLineNumber = "938"
+         startingLineNumber = "967"
+         endingLineNumber = "967"
          landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -164,11 +164,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1171"
-         endingLineNumber = "1171"
+         startingLineNumber = "1208"
+         endingLineNumber = "1208"
          landmarkName = "-updateEvent:image:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -177,11 +177,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1168"
-         endingLineNumber = "1168"
+         startingLineNumber = "1204"
+         endingLineNumber = "1204"
          landmarkName = "-updateEvent:image:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -190,11 +190,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "659"
-         endingLineNumber = "659"
+         startingLineNumber = "674"
+         endingLineNumber = "674"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -214,11 +214,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATEventEditorTableController.m"
-         timestampString = "390670977.477592"
+         timestampString = "391564534.227238"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "196"
-         endingLineNumber = "196"
+         startingLineNumber = "203"
+         endingLineNumber = "203"
          landmarkName = "-shareButtonAction:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -240,11 +240,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATEventEditorTableController.m"
-         timestampString = "390670977.477592"
+         timestampString = "391564534.227238"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "215"
-         endingLineNumber = "215"
+         startingLineNumber = "222"
+         endingLineNumber = "222"
          landmarkName = "-textFieldDidBeginEditing:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -253,11 +253,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATEventEditorTableController.m"
-         timestampString = "390670977.477592"
+         timestampString = "391564534.227238"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "227"
-         endingLineNumber = "227"
+         startingLineNumber = "234"
+         endingLineNumber = "234"
          landmarkName = "-textFieldDidBeginEditing:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -305,11 +305,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
-         timestampString = "389966166.479116"
+         timestampString = "393295244.867897"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "63"
-         endingLineNumber = "63"
+         startingLineNumber = "70"
+         endingLineNumber = "70"
          landmarkName = "-sourceChooseViewController:didSelectSource:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -318,12 +318,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1016"
-         endingLineNumber = "1016"
-         landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
+         startingLineNumber = "1045"
+         endingLineNumber = "1045"
+         landmarkName = "-setNewFocusedDateAndUpdateMap:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -331,11 +331,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1063"
-         endingLineNumber = "1063"
+         startingLineNumber = "1092"
+         endingLineNumber = "1092"
          landmarkName = "-getImageIdentifier:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -344,11 +344,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1066"
-         endingLineNumber = "1066"
+         startingLineNumber = "1095"
+         endingLineNumber = "1095"
          landmarkName = "-getImageIdentifier:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -357,11 +357,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "910"
-         endingLineNumber = "910"
+         startingLineNumber = "939"
+         endingLineNumber = "939"
          landmarkName = "-getImageAnnotationView::"
          landmarkType = "5">
       </FileBreakpoint>
@@ -370,11 +370,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "678"
-         endingLineNumber = "678"
+         startingLineNumber = "693"
+         endingLineNumber = "693"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -565,11 +565,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1349"
-         endingLineNumber = "1349"
+         startingLineNumber = "1388"
+         endingLineNumber = "1388"
          landmarkName = "-searchBarSearchButtonClicked:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -591,11 +591,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
-         timestampString = "389966166.479116"
+         timestampString = "393295244.867897"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "140"
-         endingLineNumber = "140"
+         startingLineNumber = "147"
+         endingLineNumber = "147"
          landmarkName = "-alertView:clickedButtonAtIndex:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -760,11 +760,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
-         timestampString = "389966166.479116"
+         timestampString = "393295244.867897"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "44"
-         endingLineNumber = "44"
+         startingLineNumber = "51"
+         endingLineNumber = "51"
          landmarkName = "-viewDidLoad"
          landmarkType = "5">
       </FileBreakpoint>
@@ -773,11 +773,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
-         timestampString = "389966166.479116"
+         timestampString = "393295244.867897"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "86"
-         endingLineNumber = "86"
+         startingLineNumber = "93"
+         endingLineNumber = "93"
          landmarkName = "-prepareForSegue:sender:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -812,11 +812,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
-         timestampString = "390580483.379889"
+         timestampString = "393295244.867897"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "208"
-         endingLineNumber = "208"
+         startingLineNumber = "215"
+         endingLineNumber = "215"
          landmarkName = "-startUpload"
          landmarkType = "5">
       </FileBreakpoint>
@@ -851,11 +851,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "427"
-         endingLineNumber = "427"
+         startingLineNumber = "433"
+         endingLineNumber = "433"
          landmarkName = "-displayTimelineControls"
          landmarkType = "5">
       </FileBreakpoint>
@@ -863,116 +863,12 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "188"
-         endingLineNumber = "188"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "225"
-         endingLineNumber = "225"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "336"
-         endingLineNumber = "336"
-         landmarkName = "-handlePinch:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "340"
-         endingLineNumber = "340"
-         landmarkName = "-handlePinch:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "156"
-         endingLineNumber = "156"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "472"
-         endingLineNumber = "472"
-         landmarkName = "-handleDoubleTap:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "243"
-         endingLineNumber = "243"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "262"
-         endingLineNumber = "262"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "682"
-         endingLineNumber = "682"
+         startingLineNumber = "698"
+         endingLineNumber = "698"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -981,11 +877,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "640"
-         endingLineNumber = "640"
+         startingLineNumber = "655"
+         endingLineNumber = "655"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -994,11 +890,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "677"
-         endingLineNumber = "677"
+         startingLineNumber = "692"
+         endingLineNumber = "692"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1007,12 +903,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "775"
-         endingLineNumber = "775"
-         landmarkName = "-mapView:regionWillChangeAnimated:"
+         startingLineNumber = "804"
+         endingLineNumber = "804"
+         landmarkName = "-showDescriptionLabelViews:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -1020,12 +916,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "784"
-         endingLineNumber = "784"
-         landmarkName = "-mapView:regionDidChangeAnimated:"
+         startingLineNumber = "813"
+         endingLineNumber = "813"
+         landmarkName = "-showDescriptionLabelViews:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -1033,11 +929,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "679"
-         endingLineNumber = "679"
+         startingLineNumber = "694"
+         endingLineNumber = "694"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1046,11 +942,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "681"
-         endingLineNumber = "681"
+         startingLineNumber = "697"
+         endingLineNumber = "697"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1058,38 +954,12 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "586"
-         endingLineNumber = "586"
-         landmarkName = "-didSelectRowAtIndexPath:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "493"
-         endingLineNumber = "493"
-         landmarkName = "-handleTapGesture:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "494"
-         endingLineNumber = "494"
+         startingLineNumber = "500"
+         endingLineNumber = "500"
          landmarkName = "-setSelectedPeriodLabel"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1098,11 +968,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "851"
-         endingLineNumber = "851"
+         startingLineNumber = "880"
+         endingLineNumber = "880"
          landmarkName = "-setDescLabelSizeByZoomLevel:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1111,11 +981,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1002"
-         endingLineNumber = "1002"
+         startingLineNumber = "1031"
+         endingLineNumber = "1031"
          landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1124,11 +994,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "672"
-         endingLineNumber = "672"
+         startingLineNumber = "687"
+         endingLineNumber = "687"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1137,11 +1007,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATEventEditorTableController.m"
-         timestampString = "390670977.477592"
+         timestampString = "391564534.227238"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "301"
-         endingLineNumber = "301"
+         startingLineNumber = "308"
+         endingLineNumber = "308"
          landmarkName = "-deleteAction:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1155,20 +1025,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "248"
          endingLineNumber = "248"
-         landmarkName = "+timeScrollWindowY"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "597"
-         endingLineNumber = "597"
-         landmarkName = "-performSettingFocusedRowForDate:"
+         landmarkName = "+searchBarWidth"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -1176,38 +1033,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1094"
-         endingLineNumber = "1094"
-         landmarkName = "-getDistanceFromFocusedDate:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "189"
-         endingLineNumber = "189"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "279"
-         endingLineNumber = "279"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
+         startingLineNumber = "1123"
+         endingLineNumber = "1123"
+         landmarkName = "-eventInPeriodRange:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -1215,26 +1046,26 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "313"
-         endingLineNumber = "313"
-         landmarkName = "-prepareMapView"
-         landmarkType = "5">
+         startingLineNumber = "316"
+         endingLineNumber = "316"
+         landmarkName = "@implementation ATViewController"
+         landmarkType = "3">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "313"
-         endingLineNumber = "313"
-         landmarkName = "-prepareMapView"
-         landmarkType = "5">
+         startingLineNumber = "316"
+         endingLineNumber = "316"
+         landmarkName = "@implementation ATViewController"
+         landmarkType = "3">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -1254,11 +1085,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
-         timestampString = "389966166.479116"
+         timestampString = "393295244.867897"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "67"
-         endingLineNumber = "67"
+         startingLineNumber = "74"
+         endingLineNumber = "74"
          landmarkName = "-sourceChooseViewController:didSelectSource:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1267,11 +1098,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "143"
-         endingLineNumber = "143"
+         startingLineNumber = "144"
+         endingLineNumber = "144"
          landmarkName = "-viewDidAppear:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1280,11 +1111,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "744"
-         endingLineNumber = "744"
+         startingLineNumber = "760"
+         endingLineNumber = "760"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1293,11 +1124,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "745"
-         endingLineNumber = "745"
+         startingLineNumber = "761"
+         endingLineNumber = "761"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1306,11 +1137,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "381"
-         endingLineNumber = "381"
+         startingLineNumber = "387"
+         endingLineNumber = "387"
          landmarkName = "-cleanSelectedAnnotationSet"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1319,11 +1150,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "412"
-         endingLineNumber = "412"
+         startingLineNumber = "418"
+         endingLineNumber = "418"
          landmarkName = "-displayTimelineControls"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1332,25 +1163,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "473"
-         endingLineNumber = "473"
+         startingLineNumber = "479"
+         endingLineNumber = "479"
          landmarkName = "-addTimeScrollWindow"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "615"
-         endingLineNumber = "615"
-         landmarkName = "-handleLongPressGesture:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -1527,7 +1345,7 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "175"
@@ -1540,11 +1358,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "966"
-         endingLineNumber = "966"
+         startingLineNumber = "995"
+         endingLineNumber = "995"
          landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1553,11 +1371,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "970"
-         endingLineNumber = "970"
+         startingLineNumber = "999"
+         endingLineNumber = "999"
          landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1566,12 +1384,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1255"
-         endingLineNumber = "1255"
-         landmarkName = "-writePhotoToFile:image:"
+         startingLineNumber = "1292"
+         endingLineNumber = "1292"
+         landmarkName = "-imageResizeWithImage:scaledToSize:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -1592,11 +1410,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "971"
-         endingLineNumber = "971"
+         startingLineNumber = "1000"
+         endingLineNumber = "1000"
          landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1605,11 +1423,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATEventEditorTableController.m"
-         timestampString = "390670977.477592"
+         timestampString = "391564534.227238"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "280"
-         endingLineNumber = "280"
+         startingLineNumber = "287"
+         endingLineNumber = "287"
          landmarkName = "-saveAction:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1631,11 +1449,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "806"
-         endingLineNumber = "806"
+         startingLineNumber = "835"
+         endingLineNumber = "835"
          landmarkName = "-showDescriptionLabelViews:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1644,163 +1462,7 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1192"
-         endingLineNumber = "1192"
-         landmarkName = "-updateEvent:image:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1200"
-         endingLineNumber = "1200"
-         landmarkName = "-updateEvent:image:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "694"
-         endingLineNumber = "694"
-         landmarkName = "-mapView:viewForAnnotation:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1310"
-         endingLineNumber = "1310"
-         landmarkName = "-readPhotoThumbFromFile:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1305"
-         endingLineNumber = "1305"
-         landmarkName = "-readPhotoFromFile:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "120"
-         endingLineNumber = "120"
-         landmarkName = "-tableView:numberOfRowsInSection:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "388765059.068618"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "47"
-         endingLineNumber = "47"
-         landmarkName = "-initWithFrame:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "388765059.068618"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "103"
-         endingLineNumber = "103"
-         landmarkName = "-initWithFrame:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "508"
-         endingLineNumber = "508"
-         landmarkName = "-scrollToFocusedRow"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "284"
-         endingLineNumber = "284"
-         landmarkName = "-prepareMapView"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "311"
-         endingLineNumber = "311"
-         landmarkName = "-prepareMapView"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "115"
-         endingLineNumber = "115"
-         landmarkName = "-tableView:numberOfRowsInSection:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "1229"
@@ -1813,77 +1475,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1143"
-         endingLineNumber = "1143"
-         landmarkName = "-deleteEvent"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "352"
-         endingLineNumber = "352"
-         landmarkName = "-performSettingFocusedRowForPinch:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "324"
-         endingLineNumber = "324"
-         landmarkName = "-handlePinch:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "598"
-         endingLineNumber = "598"
-         landmarkName = "-performSettingFocusedRowForDate:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "327"
-         endingLineNumber = "327"
-         landmarkName = "-handlePinch:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "328"
-         endingLineNumber = "328"
-         landmarkName = "-handlePinch:"
+         startingLineNumber = "1237"
+         endingLineNumber = "1237"
+         landmarkName = "-updateEvent:image:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -1891,11 +1488,102 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1127"
-         endingLineNumber = "1127"
+         startingLineNumber = "710"
+         endingLineNumber = "710"
+         landmarkName = "-mapView:viewForAnnotation:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "1349"
+         endingLineNumber = "1349"
+         landmarkName = "-didRotateFromInterfaceOrientation:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "1344"
+         endingLineNumber = "1344"
+         landmarkName = "-calculateSearchBarFrame"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "286"
+         endingLineNumber = "286"
+         landmarkName = "-prepareMapView"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "314"
+         endingLineNumber = "314"
+         landmarkName = "-prepareMapView"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "1266"
+         endingLineNumber = "1266"
+         landmarkName = "-writePhotoToFile:image:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "1173"
+         endingLineNumber = "1173"
+         landmarkName = "-updateEvent:image:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "1156"
+         endingLineNumber = "1156"
          landmarkName = "-deleteEvent"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1904,11 +1592,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "323"
-         endingLineNumber = "323"
+         startingLineNumber = "326"
+         endingLineNumber = "326"
          landmarkName = "-setTimeScrollConfiguration"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1917,11 +1605,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "488"
-         endingLineNumber = "488"
+         startingLineNumber = "494"
+         endingLineNumber = "494"
          landmarkName = "-setSelectedPeriodLabel"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1930,11 +1618,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATTimeZoomLine.m"
-         timestampString = "389931404.548026"
+         timestampString = "393380977.823562"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "330"
-         endingLineNumber = "330"
+         startingLineNumber = "347"
+         endingLineNumber = "347"
          landmarkName = "-changeTimeScaleState::::"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1943,11 +1631,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATTimeZoomLine.m"
-         timestampString = "389931404.548026"
+         timestampString = "393380977.823562"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "386"
-         endingLineNumber = "386"
+         startingLineNumber = "403"
+         endingLineNumber = "403"
          landmarkName = "-changeTimeScaleState::::"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1956,11 +1644,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATTimeZoomLine.m"
-         timestampString = "389931404.548026"
+         timestampString = "393380977.823562"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "206"
-         endingLineNumber = "206"
+         startingLineNumber = "223"
+         endingLineNumber = "223"
          landmarkName = "-changeScaleLabelsDateFormat::"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1969,38 +1657,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "375"
-         endingLineNumber = "375"
-         landmarkName = "@implementation ATViewController"
-         landmarkType = "3">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "467"
-         endingLineNumber = "467"
-         landmarkName = "@implementation ATViewController"
-         landmarkType = "3">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "157"
-         endingLineNumber = "157"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
+         startingLineNumber = "381"
+         endingLineNumber = "381"
+         landmarkName = "-cleanSelectedAnnotationSet"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -2008,25 +1670,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "356"
-         endingLineNumber = "356"
-         landmarkName = "-setTimeScrollConfiguration"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "195"
-         endingLineNumber = "195"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
+         startingLineNumber = "473"
+         endingLineNumber = "473"
+         landmarkName = "-addTimeScrollWindow"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -2034,11 +1683,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "353"
-         endingLineNumber = "353"
+         startingLineNumber = "362"
+         endingLineNumber = "362"
          landmarkName = "-setTimeScrollConfiguration"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2047,51 +1696,25 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1032"
-         endingLineNumber = "1032"
-         landmarkName = "@implementation ATViewController"
-         landmarkType = "3">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "459"
-         endingLineNumber = "459"
-         landmarkName = "-handleDoubleTap:"
+         startingLineNumber = "359"
+         endingLineNumber = "359"
+         landmarkName = "-setTimeScrollConfiguration"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "463"
-         endingLineNumber = "463"
-         landmarkName = "-handleDoubleTap:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "452"
-         endingLineNumber = "452"
-         landmarkName = "-handleDoubleTap:"
+         startingLineNumber = "1061"
+         endingLineNumber = "1061"
+         landmarkName = "-refreshAnnotations"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -2099,11 +1722,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ATTutorialView.m"
-         timestampString = "389154111.916355"
+         timestampString = "393012847.756523"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "270"
-         endingLineNumber = "270"
+         startingLineNumber = "291"
+         endingLineNumber = "291"
          landmarkName = "-addTimeZoomLevelSection:::"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2112,12 +1735,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1021"
-         endingLineNumber = "1021"
-         landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
+         startingLineNumber = "1050"
+         endingLineNumber = "1050"
+         landmarkName = "-setNewFocusedDateAndUpdateMapWithNewCenter::"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -2125,11 +1748,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
+         timestampString = "392095125.878649"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "808"
-         endingLineNumber = "808"
+         startingLineNumber = "868"
+         endingLineNumber = "868"
          landmarkName = "-getIndexOfClosestDate:::"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2138,12 +1761,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1378"
-         endingLineNumber = "1378"
-         landmarkName = "-searchBarSearchButtonClicked:"
+         startingLineNumber = "1417"
+         endingLineNumber = "1417"
+         landmarkName = "-mapView:didDeselectAnnotationView:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -2151,25 +1774,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1379"
-         endingLineNumber = "1379"
-         landmarkName = "-searchBarSearchButtonClicked:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "297"
-         endingLineNumber = "297"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
+         startingLineNumber = "1418"
+         endingLineNumber = "1418"
+         landmarkName = "-mapView:didDeselectAnnotationView:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -2177,11 +1787,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "968"
-         endingLineNumber = "968"
+         startingLineNumber = "997"
+         endingLineNumber = "997"
          landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2190,11 +1800,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1169"
-         endingLineNumber = "1169"
+         startingLineNumber = "1206"
+         endingLineNumber = "1206"
          landmarkName = "-updateEvent:image:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2203,11 +1813,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1177"
-         endingLineNumber = "1177"
+         startingLineNumber = "1214"
+         endingLineNumber = "1214"
          landmarkName = "-updateEvent:image:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2216,11 +1826,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATEventEditorTableController.m"
-         timestampString = "390670977.477592"
+         timestampString = "391564534.227238"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "289"
-         endingLineNumber = "289"
+         startingLineNumber = "296"
+         endingLineNumber = "296"
          landmarkName = "-saveAction:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2229,11 +1839,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "969"
-         endingLineNumber = "969"
+         startingLineNumber = "998"
+         endingLineNumber = "998"
          landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2242,11 +1852,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "690"
-         endingLineNumber = "690"
+         startingLineNumber = "706"
+         endingLineNumber = "706"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2255,11 +1865,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "689"
-         endingLineNumber = "689"
+         startingLineNumber = "705"
+         endingLineNumber = "705"
          landmarkName = "-mapView:viewForAnnotation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2268,11 +1878,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1178"
-         endingLineNumber = "1178"
+         startingLineNumber = "1215"
+         endingLineNumber = "1215"
          landmarkName = "-updateEvent:image:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2294,11 +1904,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
-         timestampString = "390580483.379889"
+         timestampString = "393295244.867897"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "183"
-         endingLineNumber = "183"
+         startingLineNumber = "190"
+         endingLineNumber = "190"
          landmarkName = "-startUpload"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2320,11 +1930,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATViewController.m"
-         timestampString = "390598206.275103"
+         timestampString = "393296458.202225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "967"
-         endingLineNumber = "967"
+         startingLineNumber = "996"
+         endingLineNumber = "996"
          landmarkName = "-mapView:annotationView:calloutAccessoryControlTapped:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -2332,13 +1942,234 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
-         timestampString = "390094087.16412"
+         filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
+         timestampString = "393295244.867897"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "505"
-         endingLineNumber = "505"
-         landmarkName = "-scrollToFocusedRow"
+         startingLineNumber = "121"
+         endingLineNumber = "121"
+         landmarkName = "-tableView:accessoryButtonTappedForRowWithIndexPath:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATEventEditorTableController.m"
+         timestampString = "391807591.620673"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "395"
+         endingLineNumber = "395"
+         landmarkName = "-activityViewController:itemForActivityType:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "602"
+         endingLineNumber = "602"
+         landmarkName = "-handleLongPressGesture:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "1359"
+         endingLineNumber = "1359"
+         landmarkName = "-searchBarSearchButtonClicked:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "1329"
+         endingLineNumber = "1329"
+         landmarkName = "-readPhotoThumbFromFile:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATTimeZoomLine.m"
+         timestampString = "393380977.823562"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "442"
+         endingLineNumber = "442"
+         landmarkName = "-changeTimeScaleState::::"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATTimeZoomLine.m"
+         timestampString = "393380977.823562"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "138"
+         endingLineNumber = "138"
+         landmarkName = "-showHideInAnimation"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
+         timestampString = "392094862.764721"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "502"
+         endingLineNumber = "502"
+         landmarkName = "-handleDoubleTap:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATTimeScrollWindowNew.m"
+         timestampString = "392094862.764721"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "35"
+         endingLineNumber = "35"
+         landmarkName = "@implementation ATTimeScrollWindowNew"
+         landmarkType = "3">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATTimeZoomLine.m"
+         timestampString = "393380977.823562"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "430"
+         endingLineNumber = "430"
+         landmarkName = "-changeTimeScaleState::::"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATTimeZoomLine.m"
+         timestampString = "393380977.823562"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "418"
+         endingLineNumber = "418"
+         landmarkName = "-changeTimeScaleState::::"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "1172"
+         endingLineNumber = "1172"
+         landmarkName = "-updateEvent:image:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "264"
+         endingLineNumber = "264"
+         landmarkName = "-prepareMapView"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "309"
+         endingLineNumber = "309"
+         landmarkName = "-prepareMapView"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "312"
+         endingLineNumber = "312"
+         landmarkName = "-prepareMapView"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "375"
+         endingLineNumber = "375"
+         landmarkName = "-setTimeScrollConfiguration"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "342"
+         endingLineNumber = "342"
+         landmarkName = "-setTimeScrollConfiguration"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "347"
+         endingLineNumber = "347"
+         landmarkName = "-setTimeScrollConfiguration"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -2346,12 +2177,64 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
-         timestampString = "390580642.771798"
+         timestampString = "393302314.999813"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "114"
-         endingLineNumber = "114"
-         landmarkName = "-tableView:accessoryButtonTappedForRowWithIndexPath:"
+         startingLineNumber = "295"
+         endingLineNumber = "295"
+         landmarkName = "-tableView:didSelectRowAtIndexPath:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATViewController.m"
+         timestampString = "393296458.202225"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "158"
+         endingLineNumber = "158"
+         landmarkName = "-settingsClicked:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATInAppPurchaseViewController.m"
+         timestampString = "393292472.633033"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "39"
+         endingLineNumber = "39"
+         landmarkName = "-alertView:clickedButtonAtIndex:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATInAppPurchaseViewController.m"
+         timestampString = "393292876.7427"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "41"
+         endingLineNumber = "41"
+         landmarkName = "-alertView:clickedButtonAtIndex:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "AtlasTimelineIOS/ATPreferenceViewController.m"
+         timestampString = "393378071.793045"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "282"
+         endingLineNumber = "282"
+         landmarkName = "-tableView:didSelectRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
