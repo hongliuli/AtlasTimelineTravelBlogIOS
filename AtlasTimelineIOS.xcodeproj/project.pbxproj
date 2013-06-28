@@ -48,6 +48,8 @@
 		CE2A1D2816ADC407004476E8 /* ATDefaultAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2A1D2716ADC407004476E8 /* ATDefaultAnnotation.m */; };
 		CE397EE816AB3E1800C4AD18 /* ATEventDataStruct.m in Sources */ = {isa = PBXBuildFile; fileRef = CE397EE716AB3E1800C4AD18 /* ATEventDataStruct.m */; };
 		CE4DDC1016A7AC2300911CE2 /* ATEventEditorTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE4DDC0F16A7AC2300911CE2 /* ATEventEditorTableController.m */; };
+		CE56B1AD1775217700DB9FB7 /* ATPhotoScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE56B1AC1775217700DB9FB7 /* ATPhotoScrollView.m */; };
+		CE56B1B0177522AD00DB9FB7 /* ATPhotoScrollCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CE56B1AF177522AD00DB9FB7 /* ATPhotoScrollCell.m */; };
 		CE5B308216B8E19600D943EB /* small-white-flag.png in Resources */ = {isa = PBXBuildFile; fileRef = CE5B308116B8E19600D943EB /* small-white-flag.png */; };
 		CE5B308616BA20A400D943EB /* ATTimeScrollWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5B308516BA20A400D943EB /* ATTimeScrollWindow.m */; };
 		CE6053C6168E9D660006F110 /* Note_Tech_Tips_resource.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE6053C5168E9D660006F110 /* Note_Tech_Tips_resource.txt */; };
@@ -201,6 +203,10 @@
 		CE397EE716AB3E1800C4AD18 /* ATEventDataStruct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATEventDataStruct.m; sourceTree = "<group>"; };
 		CE4DDC0E16A7AC2300911CE2 /* ATEventEditorTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATEventEditorTableController.h; sourceTree = "<group>"; };
 		CE4DDC0F16A7AC2300911CE2 /* ATEventEditorTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATEventEditorTableController.m; sourceTree = "<group>"; };
+		CE56B1AB1775217700DB9FB7 /* ATPhotoScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATPhotoScrollView.h; sourceTree = "<group>"; };
+		CE56B1AC1775217700DB9FB7 /* ATPhotoScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATPhotoScrollView.m; sourceTree = "<group>"; };
+		CE56B1AE177522AD00DB9FB7 /* ATPhotoScrollCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATPhotoScrollCell.h; sourceTree = "<group>"; };
+		CE56B1AF177522AD00DB9FB7 /* ATPhotoScrollCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATPhotoScrollCell.m; sourceTree = "<group>"; };
 		CE5B308116B8E19600D943EB /* small-white-flag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "small-white-flag.png"; path = "images/small-white-flag.png"; sourceTree = "<group>"; };
 		CE5B308416BA20A400D943EB /* ATTimeScrollWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATTimeScrollWindow.h; sourceTree = "<group>"; };
 		CE5B308516BA20A400D943EB /* ATTimeScrollWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATTimeScrollWindow.m; sourceTree = "<group>"; };
@@ -423,9 +429,9 @@
 				CECECE3616B3031100FD7C17 /* ATSourceChooseViewController.m */,
 				CEBDE7BD16B348A9006EE545 /* ATConstants.h */,
 				CEBDE7BE16B348A9006EE545 /* ATConstants.m */,
-				CE75886816C352AB00AEE4AF /* ATHelper.h */,
 				CE70BF47176FFC8C00DB1B3C /* ATInAppPurchaseViewController.h */,
 				CE70BF48176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m */,
+				CE75886816C352AB00AEE4AF /* ATHelper.h */,
 				CE75886916C352AB00AEE4AF /* ATHelper.m */,
 				CE6053C9168F2CD30006F110 /* Model Classes */,
 				CE0E5319168E671F00C147FB /* MainStoryboard_iPhone.storyboard */,
@@ -531,6 +537,10 @@
 				CE0E5320168E671F00C147FB /* ATViewController.m */,
 				CE4DDC0E16A7AC2300911CE2 /* ATEventEditorTableController.h */,
 				CE4DDC0F16A7AC2300911CE2 /* ATEventEditorTableController.m */,
+				CE56B1AB1775217700DB9FB7 /* ATPhotoScrollView.h */,
+				CE56B1AC1775217700DB9FB7 /* ATPhotoScrollView.m */,
+				CE56B1AE177522AD00DB9FB7 /* ATPhotoScrollCell.h */,
+				CE56B1AF177522AD00DB9FB7 /* ATPhotoScrollCell.m */,
 				CEE4E832171A70AC00628F76 /* ATPhotoViewController.h */,
 				CEE4E833171A70AC00628F76 /* ATPhotoViewController.m */,
 				CEE3F0ED1708C362004A1BEA /* ATViewImagePickerController.h */,
@@ -793,6 +803,8 @@
 				CEBD4EB7172757C4001B3798 /* ATUserVerifyViewController.m in Sources */,
 				CEBD4EBA17277D46001B3798 /* ATTutorialView.m in Sources */,
 				CE70BF49176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m in Sources */,
+				CE56B1AD1775217700DB9FB7 /* ATPhotoScrollView.m in Sources */,
+				CE56B1B0177522AD00DB9FB7 /* ATPhotoScrollCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
