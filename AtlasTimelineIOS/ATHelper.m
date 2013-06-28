@@ -218,6 +218,11 @@ UIPopoverController *verifyViewPopover;
     return documentsDirectory;
 }
 
++ (NSString*)getNewUnsavedEventPhotoPath
+{
+    return  [[self getPhotoDocummentoryPath] stringByAppendingPathComponent:@"newPhotosTmp"];
+}
+
 + (UIColor *)darkerColorForColor:(UIColor *)c
 {
     float r, g, b, a;
@@ -227,6 +232,26 @@ UIPopoverController *verifyViewPopover;
                                 blue:MAX(b - 0.2, 0.0)
                                alpha:a];
     return nil;
+}
+
+//not thread safe
++ (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize
+{
+    // Create a graphics image context
+    UIGraphicsBeginImageContext(newSize);
+    
+    // Tell the old image to draw in this new context, with the desired
+    // new size
+    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
+    
+    // Get the new image from the context
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    // End the context
+    UIGraphicsEndImageContext();
+    
+    // Return the new image.
+    return newImage;
 }
 
 @end

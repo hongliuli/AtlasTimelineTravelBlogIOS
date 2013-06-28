@@ -31,6 +31,14 @@ Social Framework
 Use 
 http://www.albertopasca.it/whiletrue/2012/10/objective-c-custom-uiactivityviewcontroller-icons-text/
 
+6/23/2013  display multiple photo in EventEditor with Horizontal table
+----------
+. When done with photo picker, save to tmp file and added to photoList/photoNewAddedList
+. PhotoViewerController should have a delete button, in deleteAction, remove entry from photolist/photoNewAddedList, and added entry to photoDeleteList
+  Also should have a set default button so to generate a thumbnail for map view to show. The thumbnail photo is in event directory with name "thumbnail"
+. pass photoNewAdded/delete list to mapView UpdateEvent, and iew UpdateEvent will save event first to get eventId (for new event), then save or remove files based on passed in email.
+. Previously set photo to eventEditor's photoButton is in mapView, now removed it, instead let eventEditor to initialize photoList and show it in horizontal 
+
 
 3/30/13  start to design/implement event photo in Virginia Beach 3-day vacation
 ---------------------------------------
@@ -50,6 +58,7 @@ As in my email on Mar 29, 2013, I want to change a little bit:
     NSIndexPath *indexpath = (NSIndexPath*)[visible objectAtIndex:0];
         indexPath.row will give you index of first object displayed..Hope this help
 - then try to snap the middle visible row to the middle of the screen as focusedDate
+
 
 serverside has these action
 ---------------------------
@@ -264,6 +273,8 @@ IOS Apple Sample code http://developer.apple.com/library/ios/navigation/
         [theMapView setRegion:region animated:YES];
     }];}
  
-
+ 3. manually add table view, navagator, view controller:
+ http://www.aboveground.com/tutorials/adding-a-uitoolbar-on-a-uitableviewcontroller
+ 
 
  

@@ -23,4 +23,6 @@
 + (NSDate *)getYearStartDate:(NSDate*)date;
 + (void) createPhotoDocumentoryPath;
 + (NSString*)getPhotoDocummentoryPath;
++ (NSString*)getNewUnsavedEventPhotoPath;
++ (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
 @end
