@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ATEventAnnotation.h"
 #import "ATViewImagePickerController.h"
+#import "ATPhotoScrollView.h"
 
 @protocol EventEditorDelegate ;
 
@@ -23,15 +24,14 @@
 }
 @property int hasPhotoFlag;
 @property int eventType;
-@property UIButton* photoButton;
+@property ATPhotoScrollView* photoScrollView;
+@property (strong, nonatomic) UIImageView* selectedPhoto; //set by ATPhotoScrollView didRowSelected
 @property CLLocationCoordinate2D coordinate;
+@property (strong, nonatomic) NSString* eventId;
 
 @property (weak, nonatomic) IBOutlet UITextView *description;
 @property (weak, nonatomic) IBOutlet UITextView *address;
 @property (weak, nonatomic) IBOutlet UITextField *dateTxt;
-
-
-
 
 @property(strong, nonatomic) UIDatePicker *datePicker;
 @property(strong, nonatomic) UIToolbar *toolbar;
@@ -51,6 +51,10 @@
 
 - (void)changeDateInLabel:(id)sender;
 - (void)datePicked:(id)sender;
+- (void)createPhotoScrollView:(NSString*) photoDirName;
+- (void)showPhotoView:(int)photoFileName image:(UIImage*)image;
+- (void)addToPhotoDeletedList:(NSString*)photoFileName;
+- (void) resetEventEditor;
 
 @end
 
@@ -58,7 +62,7 @@
 @protocol EventEditorDelegate <NSObject>
 @required
 - (void)deleteEvent; //ATViewController will delete the selectedAnnotation, so no need to pass parameter
-- (void)updateEvent:(ATEventDataStruct*)newData image:(UIImage*)imageData;
+- (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList thumbnailFileName:(NSString*)thumbNailFileName;
 - (void)cancelEvent;
 
 @end

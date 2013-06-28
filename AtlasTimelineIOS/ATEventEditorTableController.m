@@ -12,18 +12,29 @@
 #import "ATAppDelegate.h"
 #import "ATViewImagePickerController.h"
 #import "ATPhotoViewController.h"
+#import "ATPhotoScrollView.h"
+#import "ATHelper.h"
 #import <QuartzCore/QuartzCore.h>
 #import <Social/Social.h>
+
+#define JPEG_QUALITY 0.6
+#define THUMB_JPEG_QUALITY 0.3
+#define RESIZE_WIDTH 1024
+#define RESIZE_HEIGHT 768
+#define THUMB_WIDTH 120
+#define THUMB_HEIGHT 70
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
 
 //iPad mini size as standard
-#define EDITOR_PHOTOVIEW_WIDTH 190
+#define EDITOR_PHOTOVIEW_WIDTH 400
 #define EDITOR_PHOTOVIEW_HEIGHT 160
 
 #define PHOTOVIEW_WIDTH 1024
 #define PHOTOVIEW_HEIGHT 768
+
+#define NOT_THUMBNAIL -1
 
 @implementation ATEventEditorTableController
 
@@ -33,6 +44,10 @@ ATViewImagePickerController* imagePicker;
 @synthesize description;
 @synthesize address;
 @synthesize dateTxt;
+NSMutableArray *photoNewAddedList; //add after come back from photo picker
+NSMutableArray *photoDeletedList; //add to this list if user click Remove in photoViewController
+UIView* customViewForPhoto;
+NSString* selectedPhotoForThumbnail;
 
 #pragma mark UITableViewDelegate
 /*
@@ -53,6 +68,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     tapper.cancelsTouchesInView = FALSE;
     [self.view addGestureRecognizer:tapper];
     self.dateTxt.delegate = self;
+    selectedPhotoForThumbnail = nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -65,24 +81,29 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
     return cell;
 }
+-(void) resetEventEditor //called by mapview whenever bring up event editor
+{
+    if (photoNewAddedList != nil)
+        [photoNewAddedList removeAllObjects];
+    if (photoDeletedList != nil)
+        [photoDeletedList removeAllObjects];
+        
+    //customViewForPhoto = nil;
+    selectedPhotoForThumbnail = nil;
+    
+}
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UIView* customView = nil;
     // create the parent view that will hold header Label
     if (section == 0)
     {
-        //view for this section
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 300.0, 60.0)];
-        
-        //Label in the view
-        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 60, 60, 40)];
-        label.backgroundColor = [UIColor clearColor];
-        label.text = @"Date:";
-        [customView addSubview:label];
+        //view for this section. Please refer to heightForHeaderInSection() function
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, EDITOR_PHOTOVIEW_WIDTH,EDITOR_PHOTOVIEW_HEIGHT)];
         
         // create the button object
         UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        photoBtn.frame = CGRectMake(10, 20, 100, 30);
+        photoBtn.frame = CGRectMake(170, EDITOR_PHOTOVIEW_HEIGHT + 10, 100, 30);
         [photoBtn.layer setCornerRadius:7.0f];
         photoBtn.backgroundColor = [UIColor lightGrayColor];
         photoBtn.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:13];
@@ -90,15 +111,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [photoBtn setTitle:@"Add Photo" forState:UIControlStateNormal];
         [photoBtn addTarget:self action:@selector(takePicutureAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:photoBtn];
-        
-        //get photo into button image if this event has one is done before come here in ATViewController
-        if (self.photoButton == nil) //viewForHeader.. may called again if scroll eventEditor, if do not check here, small photo will gone if scroll, especially in iPhone version
-        {
-            self.photoButton = [[UIButton alloc] initWithFrame:CGRectMake(120,5,EDITOR_PHOTOVIEW_WIDTH,EDITOR_PHOTOVIEW_WIDTH)];
-            
-            [self.photoButton addTarget:self action:@selector(showPhotoView:) forControlEvents:UIControlEventTouchUpInside];
-        }
-        [customView addSubview:self.photoButton];
+        customViewForPhoto = customView;
 
  
     }
@@ -120,21 +133,60 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     return customView;
 }
+
+ 
+//called by mapView after know eventId
+- (void) createPhotoScrollView:(NSString *)photoDirName
+{
+    self.photoScrollView = [[ATPhotoScrollView alloc] initWithFrame:CGRectMake(0,5,EDITOR_PHOTOVIEW_WIDTH,EDITOR_PHOTOVIEW_HEIGHT)];
+    
+    if (self.photoScrollView.photoList == nil && photoDirName != nil) //photoDirName==nil if first drop pin in map
+    {
+
+        self.photoScrollView.photoList = [[NSMutableArray alloc] init];
+        //read photo list and save tophotoScrollView
+        NSError *error = nil;
+        
+        NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:photoDirName];
+            
+        NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
+        if (tmpFileList != nil && [tmpFileList count] > 0)
+        {
+            self.photoScrollView.photoList = [NSMutableArray arrayWithArray:tmpFileList];
+            //remove thumbnail file title
+            [self.photoScrollView.photoList removeObject:@"thumbnail"];
+        }
+    }
+    
+    [customViewForPhoto addSubview:self.photoScrollView];
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     
     if (section == 0)
-        return 94;
+        return EDITOR_PHOTOVIEW_HEIGHT + 10; //IMPORTANT, this will decide where is clickable for my photoScrollView
+    else if (section == 1)
+        return 0;
     else
         return [super tableView:tableView heightForHeaderInSection:section];
 }
--(void)showPhotoView:(id)sender
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    
+    if (section == 0)
+        return 0; //IMPORTANT, this will decide where is clickable for my photoScrollView
+    else
+        return [super tableView:tableView heightForFooterInSection:section];
+}
+//called by photoScrollView's didSelect...
+-(void)showPhotoView:(int)photoFileName image:image
 {
     //use Modal with Done button is good both iPad/iPhone
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
-    ATPhotoViewController* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_view"];
+    ATPhotoViewController* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_scroll"];
     [self presentModalViewController:ctr animated:YES];
-    [[ctr imageView] setImage:self.photoButton.imageView.image];
+    ctr.eventEditor = self;
+    [[ctr imageView] setImage:image];
     [ctr imageView].contentMode = UIViewContentModeScaleAspectFit;
     [ctr imageView].clipsToBounds = YES;
 }
@@ -181,7 +233,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         APActivityProvider *ActivityProvider = [[APActivityProvider alloc] init];
         ActivityProvider.eventEditor = self;
                 
-        UIImageView *eventImage = [self.photoButton imageView];
+        UIImageView *eventImage = self.selectedPhoto;
         if (self.eventType == EVENT_TYPE_HAS_PHOTO &&  eventImage.image != nil) {
             activityItems = @[eventImage.image, ActivityProvider];
         } else {
@@ -293,15 +345,22 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         return;
     }
     ent.eventDate = dt;
-    UIImage *imageToBeWritten = [[self.photoButton imageView] image];
+
     ent.eventType = self.eventType;
     //see doneSelectPicture() which will set if there is a picture
     if (self.hasPhotoFlag == 1) //alwasys initialized to 0 in ATViewController. 1 means taken photo this time, has to write to file 
         ent.eventType = self.hasPhotoFlag;
-    else
-        imageToBeWritten = nil; //if no photo taken this time, no need write to file again
+    //else
+        //imageToBeWritten = nil; //if no photo taken this time, no need write to file again
+    
+    //have to ask ATViewController to write photo files, because for new event, we do not have id for photo directory names yet
+    //photoViewController will write which to delete and wihich to set as thumbnail etc
+    NSString* thumbNailFileName = nil;
+    int thumbNailIndex = self.photoScrollView.selectedAsThumbnailIndex;
+    if (thumbNailIndex >= 0 && thumbNailIndex < [self.photoScrollView.photoList count])
+        thumbNailFileName = self.photoScrollView.photoList[thumbNailIndex];
         
-    [self.delegate updateEvent:ent image:imageToBeWritten];
+    [self.delegate updateEvent:ent newAddedList:photoNewAddedList deletedList:photoDeletedList thumbnailFileName:thumbNailFileName];
     [self dismissModalViewControllerAnimated:true]; //for iPhone case
 }
 
@@ -358,11 +417,36 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 {
     if (newPhoto == nil)
         return;
+    NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyyMMdd_hh_mm_ss"];
+    //save to a temparay file
+    NSString* timeStampPhotoName = [formatter stringFromDate:[NSDate date]];
+    NSLog(@"  photo file name is %@", timeStampPhotoName);
+    NSString* photoFileName = [NSString stringWithFormat:@"%@", timeStampPhotoName];
 
-    [self.photoButton setImage:newPhoto forState:UIControlStateNormal];
-    [self.photoButton imageView].contentMode = UIViewContentModeScaleAspectFit;
-    [self.photoButton imageView].clipsToBounds = YES;
+    NSString* tmpFileNameForNewPhoto =  [timeStampPhotoName substringFromIndex:[timeStampPhotoName length]-8];
+    [self.photoScrollView.photoList addObject:tmpFileNameForNewPhoto];//Note tmpFile.. is add, later in cellForTableview will check if file lenght is 8 then get file from temp directory
+    if (photoNewAddedList == nil)
+        photoNewAddedList = [NSMutableArray arrayWithObjects:photoFileName, nil];
+    else
+        [photoNewAddedList addObject:photoFileName]; //so later mapView will move above new added file to real location
+    //Save new photo to a temp location, so when user really tap save event, mapview will copy these temp photos to perment place
     self.hasPhotoFlag = EVENT_TYPE_HAS_PHOTO; //saveAction will write this to eventType. save image file will be in ATViewController's updateEvent because only there we can get uniqueId as filename
+    //Write file to temp location before user tap event save button
+    int imageWidth = RESIZE_WIDTH;
+    int imageHeight = RESIZE_HEIGHT;
+    
+    if (newPhoto.size.height > newPhoto.size.width)
+    {
+        imageWidth = RESIZE_HEIGHT;
+        imageHeight = RESIZE_WIDTH;
+    }
+    UIImage* newImage = [ATHelper imageResizeWithImage:newPhoto scaledToSize:CGSizeMake(imageWidth, imageHeight)];
+    NSData *imageData = UIImageJPEGRepresentation(newImage, JPEG_QUALITY); //quality should be configurable?
+    // Find the path to the documents directory
+    NSString *fullPathToNewTmpPhotoFile = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:tmpFileNameForNewPhoto];
+    [imageData writeToFile:fullPathToNewTmpPhotoFile atomically:NO];
+    [self.photoScrollView.horizontalTableView reloadData];
 }
 
 //especially add this for iPhone to dismiss keyboard when touch any where eolse
@@ -399,4 +483,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
 }
 - (id) activityViewControllerPlaceholderItem:(UIActivityViewController *)activityViewController { return @""; }
+- (void)addToPhotoDeletedList:(NSString*)photoFileName{
+    if (photoDeletedList == nil)
+        photoDeletedList = [NSMutableArray arrayWithObjects:photoFileName, nil];
+    else
+        [photoDeletedList addObject:photoFileName];
+}
 @end

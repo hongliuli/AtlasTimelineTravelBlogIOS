@@ -7,7 +7,7 @@
 //
 
 #import "ATPhotoViewController.h"
-
+#define NOT_THUMBNAIL -1;
 @interface ATPhotoViewController ()
 
 @end
@@ -28,13 +28,33 @@
 
     UIBarButtonItem* doneButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem: UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
-    NSArray *items = [NSArray arrayWithObjects: doneButton,nil];
+    UIBarButtonItem* deleteAction = [[UIBarButtonItem alloc]
+                                   initWithBarButtonSystemItem: UIBarButtonSystemItemTrash target:self action:@selector(deleteAction:)];
+    UIBarButtonItem* setThumbnailAction = [[UIBarButtonItem alloc] initWithTitle:@"Use it on map" style:UIBarButtonItemStyleBordered target:self action:@selector(setDefaultAction:)];
+    
+    NSArray *items = [NSArray arrayWithObjects: deleteAction, setThumbnailAction, doneButton,nil];
     [self.toolbar setItems:items animated:NO];
     [super viewDidLoad];
 }
 
 - (void) doneAction: (id)sender
 {
+    [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
+}
+
+- (void) deleteAction: (id)sender
+{
+    int selectedPhotoIdx = self.eventEditor.photoScrollView.selectedPhotoIndex;
+    if (self.eventEditor.photoScrollView.selectedAsThumbnailIndex == selectedPhotoIdx)
+        self.eventEditor.photoScrollView.selectedAsThumbnailIndex = NOT_THUMBNAIL;
+    //add to deletedList xxxxx
+    [self.eventEditor addToPhotoDeletedList: self.eventEditor.photoScrollView.photoList[selectedPhotoIdx]];
+    
+    [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
+}
+- (void) setDefaultAction: (id)sender
+{
+    self.eventEditor.photoScrollView.selectedAsThumbnailIndex = self.eventEditor.photoScrollView.selectedPhotoIndex;
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
 

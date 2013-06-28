@@ -241,7 +241,7 @@
                         }];
     }
 }
-
+/*
 -(void) onlineHelpClicked:(id)sender
 {
     NSURL *url = [NSURL URLWithString:@"http://www.chroniclemap.com/onlinehelp"];
@@ -250,7 +250,7 @@
         
         NSLog(@"%@%@",@"Failed to open url:",[url description]);
 }
-
+ */
 - (void)handleTapOnTutorial:(UIGestureRecognizer *)gestureRecognizer
 {
     [self closeTutorialView];
@@ -609,7 +609,7 @@
     ATDefaultAnnotation *pa = [[ATDefaultAnnotation alloc] initWithLocation:touchMapCoordinate];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     pa.eventDate = appDelegate.focusedDate;
-    pa.description=@"New";//@"add by touch";
+    //pa.description=@"New";//@"add by touch";
     pa.address = locatedAt;
     [_mapView addAnnotation:pa];
     if (newAddedPin != nil)
@@ -966,37 +966,18 @@
             [self.navigationController presentModalViewController:self.eventEditor animated:YES]; //pushViewController: self.eventEditor animated:YES];
         }
         //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
+        [self.eventEditor resetEventEditor];
         self.eventEditor.coordinate = ann.coordinate;
         self.eventEditor.description.text = ann.description;
         self.eventEditor.address.text=ann.address;
         self.eventEditor.dateTxt.text = [NSString stringWithFormat:@"%@",
                                          [dateFormater stringFromDate:ann.eventDate]];
+        self.eventEditor.eventType = ann.eventType;
         self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
-        if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
-        {
-            //read photo file with uniqueId as file nae, atlasName as directory
-            UIImage* photoImage = [self readPhotoFromFile:ann.uniqueId];
-            [self.eventEditor.photoButton setImage:photoImage forState:UIControlStateNormal];
-            [self.eventEditor.photoButton imageView ].contentMode = UIViewContentModeScaleAspectFit;
-            [self.eventEditor.photoButton imageView ].clipsToBounds = YES;
-            self.eventEditor.eventType = EVENT_TYPE_HAS_PHOTO;
-            UIView *infoView = [[UIView alloc] initWithFrame:CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 20, 30, 15, 15)];
-            [infoView setBackgroundColor:[[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"info.png"]]];
-            infoView.tag = 1001;
-            [self.eventEditor.photoButton.imageView addSubview:infoView];
-
-        }
-        else
-        {
-            [self.eventEditor.photoButton setImage:[UIImage imageNamed:@"no_photo.png"] forState:UIControlStateNormal];
-            [self.eventEditor.photoButton imageView ].contentMode = UIViewContentModeScaleAspectFit;
-            [self.eventEditor.photoButton imageView ].clipsToBounds = YES;
-            self.eventEditor.eventType = EVENT_TYPE_NO_PHOTO;
-            UIView *infoView = [self.eventEditor.photoButton.imageView viewWithTag:1001];
-            if (infoView != nil)
-                [infoView removeFromSuperview];
-        }
-        //keep it for callback to update the annotation/delete annotation etc
+        self.eventEditor.eventId = ann.uniqueId;
+        //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
+        [self.eventEditor createPhotoScrollView: ann.uniqueId ];
+        
     }
     else if ([control.accessibilityLabel isEqualToString: @"left"]){
         //NSLog(@"left button clicked");
@@ -1161,7 +1142,7 @@
         [self.eventEditorPopover dismissPopoverAnimated:true];
 }
 
-- (void)updateEvent:(ATEventDataStruct*)newData image:(UIImage *)image{
+- (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList thumbnailFileName:(NSString*)thumbNailFileName{
     //update annotation by remove/add, then update database or added to database depends on if have id field in selectedAnnotation
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSMutableArray* list  = appDelegate.eventListSorted;
@@ -1189,10 +1170,9 @@
         newData.uniqueId = self.selectedAnnotation.uniqueId;
     else
         newData.uniqueId = newEntity.uniqueId;
-    if (image != nil)
-    {
-        [self writePhotoToFile:newData.uniqueId image:image];//write file before add nodes to map, otherwise will have black photo on map
-    }
+
+    [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
+    
     NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
     UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
     if (tmpLbl != nil)
@@ -1252,69 +1232,66 @@
         [self.eventEditorPopover dismissPopoverAnimated:true];
 }
 
+//Save photo to file. Called by updateEvent after write event to db
 //I should put image process functions such as resize/convert to JPEG etc in ImagePickerController
 //put it here is because we have to save image here since we only have uniqueId and some other info here
--(void)writePhotoToFile:(NSString*)fileName image:(UIImage*)image
+-(void)writePhotoToFile:(NSString*)eventId newAddedList:(NSArray*)newAddedList deletedList:(NSArray*)deletedList photoForThumbNail:(NSString*)photoForThumbnail
 {
-    if (image == nil)
-        return;
-    //Resize image
-    int imageWidth = RESIZE_WIDTH;
-    int imageHeight = RESIZE_HEIGHT;
-    NSString* thumbFileName = [NSString stringWithFormat:@"%@_Thumb",fileName];
-    if (image.size.height > image.size.width)
+    NSString *newPhotoTmpDir = [ATHelper getNewUnsavedEventPhotoPath];
+    NSString *photoFinalDir = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
+    if (newAddedList != nil && [newAddedList count] > 0)
     {
-        imageWidth = RESIZE_HEIGHT;
-        imageHeight = RESIZE_WIDTH;
+        for (NSString* fileName in newAddedList)
+        {
+            NSString* tmp1 = [fileName substringFromIndex:[fileName length]-8];
+            NSString* newPhotoTmpFile = [newPhotoTmpDir stringByAppendingPathComponent:tmp1];
+            NSString* newPhotoFinalFileName = [photoFinalDir stringByAppendingPathComponent:fileName];
+            NSError *error;
+            [[NSFileManager defaultManager] moveItemAtPath:newPhotoTmpFile toPath:newPhotoFinalFileName error:&error];
+            //get newPhotoTemp path
+            //copy to real location
+        }
     }
-    UIImage* newImage = [self imageResizeWithImage:image scaledToSize:CGSizeMake(imageWidth, imageHeight)];
-    NSData *imageData = UIImageJPEGRepresentation(newImage, JPEG_QUALITY); //quality should be configurable?
-    // Find the path to the documents directory
-    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
-    BOOL ret = [imageData writeToFile:fullPathToFile atomically:NO];
-    
-    NSString* thumbPath = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:thumbFileName];
-    UIImage* thumbImage = [self imageResizeWithImage:image scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
-    imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
-    NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
-    [imageData writeToFile:thumbPath atomically:NO];
+    NSString* thumbPath = [photoFinalDir stringByAppendingPathComponent:@"thumbnail"];
+    if (photoForThumbnail == nil)
+    {
+        //check if thumbnail exist or not, if not write first photo as thumbnail. This is to make sure there is a thumbnail, for example added the first photo but not select any as a thumbnail yet
+        
+        BOOL isDir;
+        BOOL fileExist = [[NSFileManager defaultManager] fileExistsAtPath:thumbPath isDirectory:&isDir];
+        if (!fileExist && newAddedList != nil && [newAddedList count] > 0)
+            photoForThumbnail = newAddedList[0];
+    }
+    if (photoForThumbnail != nil ) //EventEditor must make sure indexForThmbnail is < 0 if no change to thumbNail
+    {
+        UIImage* photo = [self readPhotoFromFile: [photoFinalDir stringByAppendingPathComponent:photoForThumbnail ]];
+        UIImage* thumbImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
+        NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
+       // NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
+        [imageData writeToFile:thumbPath atomically:NO];
+    }
+    if (deletedList != nil && [deletedList count] > 0)
+    {
+        NSError *error;
+        for (NSString* fileName in deletedList)
+        {
+            NSString* deletePhotoFinalFileName = [photoFinalDir stringByAppendingPathComponent:fileName];
+            [[NSFileManager defaultManager] removeItemAtPath:deletePhotoFinalFileName error:&error];
+        }
+    }
 }
 
-//not thread safe
-- (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
-{
-    // Create a graphics image context
-    UIGraphicsBeginImageContext(newSize);
-    
-    // Tell the old image to draw in this new context, with the desired
-    // new size
-    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
-    
-    // Get the new image from the context
-    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
-    
-    // End the context
-    UIGraphicsEndImageContext();
-    
-    // Return the new image.
-    return newImage;
-}
 -(void)deletePhotoToFile:(NSString*)fileName
 {
     // Find the path to the documents directory
     if (fileName == nil || [fileName length] == 0)
-        return;  //Bug fix. This bug is in ver1.0. When remove dropping, fileName is empty,so it will remove whole document directory such as myEvents, very bad bug
+        return;  //Bug fix. This bug is in ver1.0. When remove drop-pin, fileName is empty,so it will remove whole document directory such as myEvents, very bad bug
     NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
     NSError *error;
-    NSString* thumbFileName = [NSString stringWithFormat:@"%@_Thumb",fileName];
-    NSString *thumbPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:thumbFileName];
+    //all photo files under this event id directory should be removed
     BOOL success = [[NSFileManager defaultManager] removeItemAtPath:fullPathToFile error:&error];
     if (!success) {
         NSLog(@"Error removing document path: %@", error.localizedDescription);
-    }
-    success = [[NSFileManager defaultManager] removeItemAtPath:thumbPathToFile error:&error];
-    if (!success) {
-        NSLog(@"Error removing thumb path: %@", error.localizedDescription);
     }
 }
 
@@ -1325,8 +1302,8 @@
 }
 -(UIImage*)readPhotoThumbFromFile:(NSString*)fileName
 {
-    NSString* thumbFileName = [NSString stringWithFormat:@"%@_Thumb",fileName];
-    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:thumbFileName];
+    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
+    fullPathToFile = [fullPathToFile stringByAppendingPathComponent:@"thumbnail"];
     return [UIImage imageWithContentsOfFile:fullPathToFile];
 }
 

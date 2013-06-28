@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "ATEventEditorTableController.h"
 
 @interface ATPhotoViewController : UIViewController<UINavigationControllerDelegate>
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
+@property (weak, nonatomic) ATEventEditorTableController* eventEditor;
 
 @end
 
