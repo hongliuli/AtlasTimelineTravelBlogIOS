@@ -43,7 +43,6 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *deleteButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *saveButton;
 
-
 - (IBAction)saveAction:(id)sender;
 - (IBAction)deleteAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
@@ -53,8 +52,8 @@
 - (void)datePicked:(id)sender;
 - (void)createPhotoScrollView:(NSString*) photoDirName;
 - (void)showPhotoView:(int)photoFileName image:(UIImage*)image;
-- (void)addToPhotoDeletedList:(NSString*)photoFileName;
-- (void) resetEventEditor;
+- (void)deleteCallback:(NSString*) photoFileName;
+- (void)resetEventEditor;
 
 @end
 

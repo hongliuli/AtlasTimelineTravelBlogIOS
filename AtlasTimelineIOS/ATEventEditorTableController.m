@@ -35,6 +35,12 @@
 #define PHOTOVIEW_HEIGHT 768
 
 #define NOT_THUMBNAIL -1
+#define NEWEVENT_DESC_PLACEHOLD @"\n\nNew\n\n"
+#define ADD_PHOTO_BUTTON_TAG_777 777
+#define DESC_TEXT_TAG_FROM_STORYBOARD_888 888
+#define DATE_TEXT_FROM_STORYBOARD_999 999
+#define ADDED_PHOTOSCROLL_TAG_900 900
+#define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
 @implementation ATEventEditorTableController
 
@@ -48,6 +54,9 @@ NSMutableArray *photoNewAddedList; //add after come back from photo picker
 NSMutableArray *photoDeletedList; //add to this list if user click Remove in photoViewController
 UIView* customViewForPhoto;
 NSString* selectedPhotoForThumbnail;
+
+UILabel *lblTotalCount;
+UILabel *lblNewAddedCount;
 
 #pragma mark UITableViewDelegate
 /*
@@ -78,7 +87,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
        // ### IMPORTANT tick to remove cell background for the section 0's row 0
         cell.backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     }
-
+    
     return cell;
 }
 -(void) resetEventEditor //called by mapview whenever bring up event editor
@@ -87,7 +96,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [photoNewAddedList removeAllObjects];
     if (photoDeletedList != nil)
         [photoDeletedList removeAllObjects];
-        
+    if (self.photoScrollView != nil)
+    {
+        [self.photoScrollView removeFromSuperview];
+        self.photoScrollView = nil;
+    }
+    
     //customViewForPhoto = nil;
     selectedPhotoForThumbnail = nil;
     
@@ -99,21 +113,35 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     if (section == 0)
     {
         //view for this section. Please refer to heightForHeaderInSection() function
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, EDITOR_PHOTOVIEW_WIDTH,EDITOR_PHOTOVIEW_HEIGHT)];
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, EDITOR_PHOTOVIEW_WIDTH, EDITOR_PHOTOVIEW_HEIGHT)];
+        
+        // create photo count display
+        lblTotalCount = [[UILabel alloc] initWithFrame:CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 180, EDITOR_PHOTOVIEW_HEIGHT + 15, 20, 20)];
+        lblNewAddedCount = [[UILabel alloc] initWithFrame:CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 160, EDITOR_PHOTOVIEW_HEIGHT + 15, 100, 20)];
+        lblTotalCount.backgroundColor = [UIColor clearColor];
+        lblNewAddedCount.backgroundColor = [UIColor clearColor];
+        lblTotalCount.font = [UIFont fontWithName:@"Helvetica" size:13];
+        lblNewAddedCount.font = [UIFont fontWithName:@"Helvetica" size:13];
+        lblNewAddedCount.textColor = [UIColor redColor];
+        [customView addSubview:lblTotalCount];
+        [customView addSubview:lblNewAddedCount];
         
         // create the button object
-        UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        photoBtn.frame = CGRectMake(170, EDITOR_PHOTOVIEW_HEIGHT + 10, 100, 30);
-        [photoBtn.layer setCornerRadius:7.0f];
-        photoBtn.backgroundColor = [UIColor lightGrayColor];
-        photoBtn.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:13];
-        //headerBtn.opaque = NO;
-        [photoBtn setTitle:@"Add Photo" forState:UIControlStateNormal];
-        [photoBtn addTarget:self action:@selector(takePicutureAction:) forControlEvents:UIControlEventTouchUpInside];
+        UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeContactAdd];
+        photoBtn.frame = CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 110, EDITOR_PHOTOVIEW_HEIGHT - 25, 30, 30);
+        [photoBtn addTarget:self action:@selector(takePictureAction:) forControlEvents:UIControlEventTouchUpInside];
+        photoBtn.tag = ADD_PHOTO_BUTTON_TAG_777;
         [customView addSubview:photoBtn];
         customViewForPhoto = customView;
-
- 
+        //tricky, see another comments with word "tricky"
+        if (self.photoScrollView != nil && nil == [customViewForPhoto viewWithTag:ADDED_PHOTOSCROLL_TAG_900])
+        {
+            [customViewForPhoto addSubview:self.photoScrollView];
+            [self.photoScrollView.horizontalTableView reloadData];
+            UIView* addPhotoBtn = (UIButton*)[customViewForPhoto viewWithTag:ADD_PHOTO_BUTTON_TAG_777];
+            [customViewForPhoto bringSubviewToFront:addPhotoBtn];
+            [self updatePhotoCountLabel];
+        }
     }
     else if (section == 2)
     {
@@ -139,7 +167,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 - (void) createPhotoScrollView:(NSString *)photoDirName
 {
     self.photoScrollView = [[ATPhotoScrollView alloc] initWithFrame:CGRectMake(0,5,EDITOR_PHOTOVIEW_WIDTH,EDITOR_PHOTOVIEW_HEIGHT)];
-    
+    self.photoScrollView.tag = ADDED_PHOTOSCROLL_TAG_900;
+    self.photoScrollView.eventEditor = self;
     if (self.photoScrollView.photoList == nil && photoDirName != nil) //photoDirName==nil if first drop pin in map
     {
 
@@ -157,14 +186,21 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             [self.photoScrollView.photoList removeObject:@"thumbnail"];
         }
     }
-    
-    [customViewForPhoto addSubview:self.photoScrollView];
+    //tricky: in iPod, here will be called before viewForSectionHeader, so customViewForPhoto is nil
+    if (customViewForPhoto != nil && nil == [customViewForPhoto viewWithTag:ADDED_PHOTOSCROLL_TAG_900]) 
+    {
+        [customViewForPhoto addSubview:self.photoScrollView];
+        [self.photoScrollView.horizontalTableView reloadData];
+        UIView* addPhotoBtn = (UIButton*)[customViewForPhoto viewWithTag:ADD_PHOTO_BUTTON_TAG_777];
+        [customViewForPhoto bringSubviewToFront:addPhotoBtn];
+        [self updatePhotoCountLabel];
+    } //else it will process in viewForSectionHeader
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     
     if (section == 0)
-        return EDITOR_PHOTOVIEW_HEIGHT + 10; //IMPORTANT, this will decide where is clickable for my photoScrollView
+        return EDITOR_PHOTOVIEW_HEIGHT + 15; //IMPORTANT, this will decide where is clickable for my photoScrollView and Add Photo button. 15 is the gap between Date and photo scroll
     else if (section == 1)
         return 0;
     else
@@ -183,7 +219,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     //use Modal with Done button is good both iPad/iPhone
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
-    ATPhotoViewController* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_scroll"];
+    ATPhotoViewController* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_view"];
     [self presentModalViewController:ctr animated:YES];
     ctr.eventEditor = self;
     [[ctr imageView] setImage:image];
@@ -191,7 +227,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     [ctr imageView].clipsToBounds = YES;
 }
 
--(void)takePicutureAction:(id)sender
+-(void)takePictureAction:(id)sender
 {
     NSLog(@"   ----- take picture action");
     self.hasPhotoFlag = EVENT_TYPE_NO_PHOTO;
@@ -261,7 +297,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 -(void)textFieldDidBeginEditing:(UITextField*)textField
 {
-    if (textField.tag == 999) { //999 is for date textField in storyboard
+    if (textField.tag == DATE_TEXT_FROM_STORYBOARD_999) { //999 is for date textField in storyboard
         NSString* bcDate = self.dateTxt.text;
         //if date is already a a BC date, datePicker will crash, so do not show date picker if is a BC date
         if (bcDate != nil && [bcDate rangeOfString:@"BC"].location!=NSNotFound)
@@ -314,7 +350,21 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         self.address.backgroundColor = [UIColor darkGrayColor];//do not know why this does not work, however it does not mappter
     }
 }
+- (BOOL) textViewShouldBeginEditing:(UITextView *)textView
+{
+    if (textView.tag == DESC_TEXT_TAG_FROM_STORYBOARD_888) //this is description text, emilate placehold situation
+    {
+        if (self.description.textColor == [UIColor lightGrayColor])
+        {
+            self.description.textColor = [UIColor blackColor];
+            self.description.text=@"";
+        }
+    }
+    return YES;
+}
 
+- (IBAction)addPhoto:(id)sender {
+}
 
 - (IBAction)saveAction:(id)sender {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -424,8 +474,11 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     NSLog(@"  photo file name is %@", timeStampPhotoName);
     NSString* photoFileName = [NSString stringWithFormat:@"%@", timeStampPhotoName];
 
-    NSString* tmpFileNameForNewPhoto =  [timeStampPhotoName substringFromIndex:[timeStampPhotoName length]-8];
-    [self.photoScrollView.photoList addObject:tmpFileNameForNewPhoto];//Note tmpFile.. is add, later in cellForTableview will check if file lenght is 8 then get file from temp directory
+    NSString* tmpFileNameForNewPhoto = [NSString stringWithFormat:@"%@%@", NEW_NOT_SAVED_FILE_PREFIX,timeStampPhotoName];
+    if (self.photoScrollView.photoList == nil)
+        self.photoScrollView.photoList = [NSMutableArray arrayWithObjects:tmpFileNameForNewPhoto, nil];
+    else
+        [self.photoScrollView.photoList addObject:tmpFileNameForNewPhoto];//Note tmpFile.. is add, later in cellForTableview will check if file lenght is 8 then get file from temp directory
     if (photoNewAddedList == nil)
         photoNewAddedList = [NSMutableArray arrayWithObjects:photoFileName, nil];
     else
@@ -444,8 +497,15 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     UIImage* newImage = [ATHelper imageResizeWithImage:newPhoto scaledToSize:CGSizeMake(imageWidth, imageHeight)];
     NSData *imageData = UIImageJPEGRepresentation(newImage, JPEG_QUALITY); //quality should be configurable?
     // Find the path to the documents directory
+
     NSString *fullPathToNewTmpPhotoFile = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:tmpFileNameForNewPhoto];
-    [imageData writeToFile:fullPathToNewTmpPhotoFile atomically:NO];
+    NSError *error;
+    BOOL writeFlag = [imageData writeToFile:fullPathToNewTmpPhotoFile options:nil error:&error];
+    NSLog(@"%@",[error localizedDescription]);
+    NSLog(@"write to file success or not: %d", writeFlag);
+    
+    [self updatePhotoCountLabel];
+    
     [self.photoScrollView.horizontalTableView reloadData];
 }
 
@@ -454,6 +514,34 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 {
     [self.view endEditing:YES];
 }
+- (void)deleteCallback:(NSString*)photoFileName
+{
+    if (photoDeletedList == nil)
+        photoDeletedList = [NSMutableArray arrayWithObjects:photoFileName, nil];
+    else
+        [photoDeletedList addObject:photoFileName];
+    //For new added photo, the name in photoNewAddedList is still in final format, so need to do something special
+    if ([photoFileName hasPrefix:NEW_NOT_SAVED_FILE_PREFIX])
+    {
+        NSString* finalFileName = [photoFileName substringFromIndex:3];
+        [photoNewAddedList removeObject:finalFileName];
+        [photoDeletedList removeObject:photoFileName]; //do not add new-created file to delete list
+    }
+    [self.photoScrollView.photoList removeObject:photoFileName];
+    [self.photoScrollView.horizontalTableView reloadData];
+    [self updatePhotoCountLabel];
+}
+
+- (void)updatePhotoCountLabel
+{
+    //Change total/new added photos count
+    lblTotalCount.text = [NSString stringWithFormat:@"%d", [self.photoScrollView.photoList count] ];
+    lblNewAddedCount.text = [NSString stringWithFormat:@"[+%d/-%d unsaved!]", [photoNewAddedList count], [photoDeletedList count] ];//color is red so use separate lbl
+    if ([photoNewAddedList count] == 0 && [photoDeletedList count] == 0)
+        lblNewAddedCount.hidden = true;
+    else
+        lblNewAddedCount.hidden = false;
+}
 
 - (void)viewDidUnload {
     [self setDateTxt:nil];
@@ -461,6 +549,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 @end
 
+
+
+
+//-------------------------------------------------   APActivityProvider Interface ------------
 @implementation APActivityProvider
 - (id) activityViewController:(UIActivityViewController *)activityViewController
           itemForActivityType:(NSString *)activityType
@@ -483,10 +575,5 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
 }
 - (id) activityViewControllerPlaceholderItem:(UIActivityViewController *)activityViewController { return @""; }
-- (void)addToPhotoDeletedList:(NSString*)photoFileName{
-    if (photoDeletedList == nil)
-        photoDeletedList = [NSMutableArray arrayWithObjects:photoFileName, nil];
-    else
-        [photoDeletedList addObject:photoFileName];
-}
+
 @end

@@ -48,8 +48,9 @@
     if (self.eventEditor.photoScrollView.selectedAsThumbnailIndex == selectedPhotoIdx)
         self.eventEditor.photoScrollView.selectedAsThumbnailIndex = NOT_THUMBNAIL;
     //add to deletedList xxxxx
-    [self.eventEditor addToPhotoDeletedList: self.eventEditor.photoScrollView.photoList[selectedPhotoIdx]];
-    
+    NSString* deletedFileName =self.eventEditor.photoScrollView.photoList[selectedPhotoIdx];
+    NSLog(@" deleted file = %@",deletedFileName);
+    [self.eventEditor deleteCallback: deletedFileName];
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
 - (void) setDefaultAction: (id)sender

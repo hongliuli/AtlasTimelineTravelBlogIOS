@@ -24,11 +24,8 @@
     self=[super initWithFrame:frame];
     if (self)
     {
-
-        self.image = [[UIImageView alloc] initWithFrame:frame];
-
-        [self.contentView addSubview:self.image];
-        
+        self.photo = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, [ATConstants photoScrollCellWidth], [ATConstants photoScrollCellHeight])];
+        [self.contentView addSubview:self.photo];
         self.transform = CGAffineTransformMakeRotation(M_PI * 0.5);
     }
     return self;

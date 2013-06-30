@@ -10,5 +10,5 @@
 
 
 @interface ATPhotoScrollCell : UITableViewCell
-
+@property(strong, nonatomic) UIImageView* photo;
 @end

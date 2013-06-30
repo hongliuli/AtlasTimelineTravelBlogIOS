@@ -45,6 +45,8 @@
 
 + (int) timeScrollCellWidth;
 + (int) timeScrollCellHeight;
++ (int) photoScrollCellWidth;
++ (int) photoScrollCellHeight;
 + (int) defaultZoomLevel;
 + (int) timeScrollBigDateFont;
 

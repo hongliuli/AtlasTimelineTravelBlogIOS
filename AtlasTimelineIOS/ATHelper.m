@@ -199,6 +199,8 @@ UIPopoverController *verifyViewPopover;
     NSString* documentsDirectory = [self getPhotoDocummentoryPath];
     NSError *error;
     [[NSFileManager defaultManager] createDirectoryAtPath:documentsDirectory withIntermediateDirectories:YES attributes:nil error:&error];
+    [[NSFileManager defaultManager] createDirectoryAtPath:[ATHelper getNewUnsavedEventPhotoPath] withIntermediateDirectories:YES attributes:nil error:&error];
+    NSLog(@"Error in createPhotoDocumentoryPath  %@",[error localizedDescription]);
 }
 
 + (NSString*)getPhotoDocummentoryPath

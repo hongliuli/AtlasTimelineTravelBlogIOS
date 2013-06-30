@@ -193,6 +193,14 @@
 {
     return [self timeScrollWindowHeight];
 }
++ (int) photoScrollCellWidth
+{
+    return 180;
+}
++ (int) photoScrollCellHeight
+{
+    return 180;
+}
 + (int)sliderWidth
 {
     return 250;
