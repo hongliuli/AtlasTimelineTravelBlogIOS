@@ -35,7 +35,7 @@
 #define PHOTOVIEW_HEIGHT 768
 
 #define NOT_THUMBNAIL -1
-#define NEWEVENT_DESC_PLACEHOLD @"\n\nNew\n\n"
+#define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
 #define ADD_PHOTO_BUTTON_TAG_777 777
 #define DESC_TEXT_TAG_FROM_STORYBOARD_888 888
 #define DATE_TEXT_FROM_STORYBOARD_999 999
@@ -53,10 +53,12 @@ ATViewImagePickerController* imagePicker;
 NSMutableArray *photoNewAddedList; //add after come back from photo picker
 NSMutableArray *photoDeletedList; //add to this list if user click Remove in photoViewController
 UIView* customViewForPhoto;
-NSString* selectedPhotoForThumbnail;
 
 UILabel *lblTotalCount;
 UILabel *lblNewAddedCount;
+
+UIAlertView *alertDelete;
+UIAlertView *alertCancel;
 
 #pragma mark UITableViewDelegate
 /*
@@ -77,7 +79,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     tapper.cancelsTouchesInView = FALSE;
     [self.view addGestureRecognizer:tapper];
     self.dateTxt.delegate = self;
-    selectedPhotoForThumbnail = nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -103,7 +104,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     
     //customViewForPhoto = nil;
-    selectedPhotoForThumbnail = nil;
     
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
@@ -263,15 +263,18 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         }
         NSArray *activityItems;
         
-        
-        
-        
         APActivityProvider *ActivityProvider = [[APActivityProvider alloc] init];
         ActivityProvider.eventEditor = self;
-                
-        UIImageView *eventImage = self.selectedPhoto;
-        if (self.eventType == EVENT_TYPE_HAS_PHOTO &&  eventImage.image != nil) {
-            activityItems = @[eventImage.image, ActivityProvider];
+
+        int selectedIndex = self.photoScrollView.selectedAsShareIndex;
+        if (self.photoScrollView.photoList != nil && [self.photoScrollView.photoList count] > 0)
+        {
+            NSString* photoForShareName = self.photoScrollView.photoList[selectedIndex];
+            NSString* photoFullPath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:self.eventId] stringByAppendingPathComponent:photoForShareName];
+            if ([photoForShareName hasPrefix:NEW_NOT_SAVED_FILE_PREFIX]) //in case selected a unsaved image for share
+                photoFullPath = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:photoForShareName];
+            UIImage* img = [UIImage imageWithContentsOfFile:photoFullPath];
+            activityItems = @[img, ActivityProvider];
         } else {
             activityItems = @[ActivityProvider];
         }
@@ -363,8 +366,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     return YES;
 }
 
-- (IBAction)addPhoto:(id)sender {
-}
 
 - (IBAction)saveAction:(id)sender {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -398,8 +399,11 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
     ent.eventType = self.eventType;
     //see doneSelectPicture() which will set if there is a picture
-    if (self.hasPhotoFlag == 1) //alwasys initialized to 0 in ATViewController. 1 means taken photo this time, has to write to file 
-        ent.eventType = self.hasPhotoFlag;
+    if ([self.photoScrollView.photoList count] > 0 || [photoNewAddedList count] > 0) //1 means has photo so mapView will show thumbnail
+        ent.eventType = 1;
+    else
+        ent.eventType = 0;
+    
     //else
         //imageToBeWritten = nil; //if no photo taken this time, no need write to file again
     
@@ -415,14 +419,68 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 
 - (IBAction)deleteAction:(id)sender {
-    //will delete selected event from annotation/db
-    [self.delegate deleteEvent];
+    int cnt = [self.photoScrollView.photoList count] ;
+    if (cnt > 0)
+    {
+        alertDelete = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"%d photo(s) will be deleted",cnt]
+                                                       message: [NSString stringWithFormat:@"Delete the event will remove all photo(s) belong to it."]
+                                                      delegate: self
+                                             cancelButtonTitle:@"Cancel"
+                                             otherButtonTitles:@"Delete",nil];
+        
+        
+        [alertDelete show];
+    }
     [self dismissModalViewControllerAnimated:true]; //for iPhone case
+}
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (alertView == alertDelete)
+    {
+        if (buttonIndex == 0)
+        {
+            NSLog(@"user canceled upload");
+            // Any action can be performed here
+        }
+        else if (buttonIndex == 1)
+        {
+            NSLog(@"user want continues to delete the events");
+            //will delete selected event from annotation/db
+            [self.delegate deleteEvent];
+        }
+    }
+    if (alertView == alertCancel)
+    {
+        if (buttonIndex == 0)
+        {
+            NSLog(@"user canceled upload");
+            // Any action can be performed here
+        }
+        else if (buttonIndex == 1)
+        {
+            NSLog(@"user want continues to cancel the events");
+            //will delete selected event from annotation/db
+            [self.delegate cancelEvent];
+        }
+    }
 }
 
 - (IBAction)cancelAction:(id)sender {
+    int cnt = [photoNewAddedList count] ;
+    if (cnt > 0)
+    {
+        alertCancel = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"%d new photo(s) are not saved",cnt]
+                                                message: [NSString stringWithFormat:@"Cancel will lose your new photos."]
+                                               delegate: self
+                                      cancelButtonTitle:@"Do not cancel"
+                                      otherButtonTitles:@"Quit w/o save",nil];
+        
+        
+        [alertCancel show];
+    }
+    else
+        [self.delegate cancelEvent];
 
-    [self.delegate cancelEvent];
     [self dismissModalViewControllerAnimated:true]; //for iPhone case
 }
 
@@ -494,19 +552,27 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         imageWidth = RESIZE_HEIGHT;
         imageHeight = RESIZE_WIDTH;
     }
-    UIImage* newImage = [ATHelper imageResizeWithImage:newPhoto scaledToSize:CGSizeMake(imageWidth, imageHeight)];
-    NSData *imageData = UIImageJPEGRepresentation(newImage, JPEG_QUALITY); //quality should be configurable?
-    // Find the path to the documents directory
-
+    UIImage *newImage = newPhoto;
+    NSData* imageData = nil;
+    if (newPhoto.size.height > imageHeight || newPhoto.size.width > imageWidth)
+    {
+        newImage = [ATHelper imageResizeWithImage:newPhoto scaledToSize:CGSizeMake(imageWidth, imageHeight)];
+    }
+    NSLog(@"widh=%f, height=%f",newPhoto.size.width, newPhoto.size.height);
+    imageData = UIImageJPEGRepresentation(newImage, JPEG_QUALITY); //quality should be configurable?
     NSString *fullPathToNewTmpPhotoFile = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:tmpFileNameForNewPhoto];
     NSError *error;
-    BOOL writeFlag = [imageData writeToFile:fullPathToNewTmpPhotoFile options:nil error:&error];
-    NSLog(@"%@",[error localizedDescription]);
-    NSLog(@"write to file success or not: %d", writeFlag);
-    
+    [imageData writeToFile:fullPathToNewTmpPhotoFile options:nil error:&error];
+   // NSLog(@"%@",[error localizedDescription]);
+   // NSLog(@"write to file success or not: %d", writeFlag);
+
     [self updatePhotoCountLabel];
     
     [self.photoScrollView.horizontalTableView reloadData];
+    
+    NSIndexPath* ipath = [NSIndexPath indexPathForRow: [self.photoScrollView.photoList count]-1 inSection: 0];
+    [self.photoScrollView.horizontalTableView scrollToRowAtIndexPath: ipath atScrollPosition: UITableViewScrollPositionTop animated: YES];
+
 }
 
 //especially add this for iPhone to dismiss keyboard when touch any where eolse
@@ -523,7 +589,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     //For new added photo, the name in photoNewAddedList is still in final format, so need to do something special
     if ([photoFileName hasPrefix:NEW_NOT_SAVED_FILE_PREFIX])
     {
-        NSString* finalFileName = [photoFileName substringFromIndex:3];
+        NSString* finalFileName = [photoFileName substringFromIndex:[NEW_NOT_SAVED_FILE_PREFIX length]];
         [photoNewAddedList removeObject:finalFileName];
         [photoDeletedList removeObject:photoFileName]; //do not add new-created file to delete list
     }

@@ -24,6 +24,9 @@
     self=[super initWithFrame:frame];
     if (self)
     {
+        self.contentView.backgroundColor = [UIColor blackColor];
+        [self.contentView.layer setBorderColor:[UIColor blackColor].CGColor];
+        [self.contentView.layer setBorderWidth:5.0f];
         self.photo = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, [ATConstants photoScrollCellWidth], [ATConstants photoScrollCellHeight])];
         [self.contentView addSubview:self.photo];
         self.transform = CGAffineTransformMakeRotation(M_PI * 0.5);

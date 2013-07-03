@@ -56,7 +56,7 @@
 
 #define EDITOR_PHOTOVIEW_WIDTH 190
 #define EDITOR_PHOTOVIEW_HEIGHT 160
-#define NEWEVENT_DESC_PLACEHOLD @"\n\nNew\n\n"
+#define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
 @interface MFTopAlignedLabel : UILabel
@@ -960,7 +960,7 @@
         }
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
-            self.eventEditorPopover.popoverContentSize = CGSizeMake(320,480);
+            self.eventEditorPopover.popoverContentSize = CGSizeMake(380,480);
             [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
         }
         else {
@@ -973,10 +973,9 @@
         if ([ann.description isEqualToString:NEWEVENT_DESC_PLACEHOLD])
         {
             self.eventEditor.description.textColor = [UIColor lightGrayColor];
-            self.eventEditor.description.text = @"Write notes here";
         }
-        else
-            self.eventEditor.description.text = ann.description;
+
+        self.eventEditor.description.text = ann.description;
         self.eventEditor.address.text=ann.address;
         self.eventEditor.dateTxt.text = [NSString stringWithFormat:@"%@",
                                          [dateFormater stringFromDate:ann.eventDate]];
@@ -1260,11 +1259,12 @@
             if (!eventPhotoDirExistFlag)
                 [[NSFileManager defaultManager] createDirectoryAtPath:photoFinalDir withIntermediateDirectories:YES attributes:nil error:&error];
             [[NSFileManager defaultManager] moveItemAtPath:newPhotoTmpFile toPath:newPhotoFinalFileName error:&error];
-            NSLog(@"move file to: %@", newPhotoFinalFileName);
-            NSLog(@" move file error: %@", [error debugDescription]);
-            //get newPhotoTemp path
-            //copy to real location
         }
+        NSError* error;
+        //remove the dir then recreate to clean up this temp dir
+        [[NSFileManager defaultManager] removeItemAtPath:newPhotoTmpDir error:&error];
+        if (error == nil)
+            [[NSFileManager defaultManager] createDirectoryAtPath:newPhotoTmpDir withIntermediateDirectories:YES attributes:nil error:&error];
     }
     NSString* thumbPath = [photoFinalDir stringByAppendingPathComponent:@"thumbnail"];
     if (photoForThumbnail == nil)
@@ -1278,6 +1278,8 @@
     }
     if (photoForThumbnail != nil ) //EventEditor must make sure indexForThmbnail is < 0 if no change to thumbNail
     {
+        if ([photoForThumbnail hasPrefix:NEW_NOT_SAVED_FILE_PREFIX])
+            photoForThumbnail = [photoForThumbnail substringFromIndex:[NEW_NOT_SAVED_FILE_PREFIX length]];//This is the case when user select new added photo as icon
         UIImage* photo = [self readPhotoFromFile: [photoFinalDir stringByAppendingPathComponent:photoForThumbnail ]];
         UIImage* thumbImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
         NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
@@ -1293,10 +1295,6 @@
             [[NSFileManager defaultManager] removeItemAtPath:deletePhotoFinalFileName error:&error];
         }
     }
-    //final cleanup tmp files (in case that some new files added and deleted before save etc
-    NSError* error;
-    NSString* allTmpFiles = [newPhotoTmpDir stringByAppendingPathComponent:@"*"];
-    [[NSFileManager defaultManager] removeItemAtPath:allTmpFiles error:&error];
 }
 
 -(void)deletePhotoToFile:(NSString*)fileName

@@ -28,11 +28,11 @@
 
     UIBarButtonItem* doneButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem: UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
-    UIBarButtonItem* deleteAction = [[UIBarButtonItem alloc]
-                                   initWithBarButtonSystemItem: UIBarButtonSystemItemTrash target:self action:@selector(deleteAction:)];
-    UIBarButtonItem* setThumbnailAction = [[UIBarButtonItem alloc] initWithTitle:@"Use it on map" style:UIBarButtonItemStyleBordered target:self action:@selector(setDefaultAction:)];
-    
-    NSArray *items = [NSArray arrayWithObjects: deleteAction, setThumbnailAction, doneButton,nil];
+    UIBarButtonItem* setThumbnailButton = [[UIBarButtonItem alloc] initWithTitle:@"Set on Map" style:UIBarButtonItemStyleBordered target:self action:@selector(setDefaultAction:)];
+    UIBarButtonItem* setShareButton = [[UIBarButtonItem alloc] initWithTitle:@"Set to share" style:UIBarButtonItemStyleBordered target:self action:@selector(setShareAction:)];
+    UIBarButtonItem* deleteButton = [[UIBarButtonItem alloc]
+                                     initWithBarButtonSystemItem: UIBarButtonSystemItemTrash target:self action:@selector(deleteAction:)];
+    NSArray *items = [NSArray arrayWithObjects: doneButton, setThumbnailButton, setShareButton,deleteButton, nil];
     [self.toolbar setItems:items animated:NO];
     [super viewDidLoad];
 }
@@ -47,7 +47,9 @@
     int selectedPhotoIdx = self.eventEditor.photoScrollView.selectedPhotoIndex;
     if (self.eventEditor.photoScrollView.selectedAsThumbnailIndex == selectedPhotoIdx)
         self.eventEditor.photoScrollView.selectedAsThumbnailIndex = NOT_THUMBNAIL;
-    //add to deletedList xxxxx
+    if (self.eventEditor.photoScrollView.selectedAsShareIndex == selectedPhotoIdx)
+        self.eventEditor.photoScrollView.selectedAsShareIndex = 0;
+
     NSString* deletedFileName =self.eventEditor.photoScrollView.photoList[selectedPhotoIdx];
     NSLog(@" deleted file = %@",deletedFileName);
     [self.eventEditor deleteCallback: deletedFileName];
@@ -56,6 +58,13 @@
 - (void) setDefaultAction: (id)sender
 {
     self.eventEditor.photoScrollView.selectedAsThumbnailIndex = self.eventEditor.photoScrollView.selectedPhotoIndex;
+    [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //so map marker icon will display on new cell
+    [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
+}
+- (void) setShareAction: (id)sender
+{
+    self.eventEditor.photoScrollView.selectedAsShareIndex = self.eventEditor.photoScrollView.selectedPhotoIndex;
+    [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new selected cell
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
 

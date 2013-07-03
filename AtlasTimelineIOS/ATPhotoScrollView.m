@@ -18,6 +18,8 @@
 #define FIRST_TIME_CALL -999
 #define GROUP_BACKGROUND_COLOR_1 0.0
 #define GROUP_BACKGROUND_COLOR_2 0.4
+#define SHARE_ICON_TAG 100
+#define MAP_MARKER_TAG 200
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
 @implementation ATPhotoScrollView
@@ -33,8 +35,6 @@
 {
     if ((self = [super initWithFrame:frame]))
     {
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-       
         //NSLog(@"-------------ATTimeScrollWindowNew  initWithFrame called");
         float tableLength = frame.size.width;
         float tableWith = frame.size.height;
@@ -99,10 +99,38 @@
         {
             photoName = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:photoFileDir] stringByAppendingPathComponent:photoName];
         }
-        BOOL xxxxx1 = [[NSFileManager defaultManager] fileExistsAtPath:photoName isDirectory:FALSE];
-        
-        NSLog(@" exist Flag %d,  file name=%@", xxxxx1, photoName);
         cell.photo.image = [self readPhotoFromFile:photoName];
+
+        cell.photo.contentMode = UIViewContentModeScaleAspectFit;
+        cell.photo.clipsToBounds = YES;
+        UIImageView* iconShare = (UIImageView*)[cell.photo viewWithTag:SHARE_ICON_TAG];
+        UIImageView* iconMapMarker = (UIImageView*)[cell.photo viewWithTag:MAP_MARKER_TAG];
+        if (indexPath.row == self.selectedAsShareIndex)
+        {
+            if (iconShare == nil)
+            {
+                UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 30, 30)];
+                imgView.image = [UIImage imageNamed:@"share.png"];
+                imgView.tag = SHARE_ICON_TAG;
+                [cell.photo addSubview:imgView];
+            }
+        }
+        else if (iconShare != nil)
+            [iconShare removeFromSuperview];
+        
+        if (indexPath.row == self.selectedAsThumbnailIndex)
+        {
+            if (iconMapMarker == nil)
+            {
+                UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(60, 10, 30, 30)];
+                imgView.image = [UIImage imageNamed:@"marker-selected.png"];
+                imgView.tag = MAP_MARKER_TAG;
+                [cell.photo addSubview:imgView];
+            }
+        }
+        else if (iconMapMarker != nil)
+            [iconMapMarker removeFromSuperview];
+        //[cell setNeedsDisplay];
     }
     return cell;
 }
@@ -122,8 +150,9 @@
     if ([gestureRecognizer numberOfTouches] == 1)
     {
         NSIndexPath *index = [self.horizontalTableView indexPathForRowAtPoint: [gestureRecognizer locationInView:self.horizontalTableView]];
-        //NSLog(@"   row clicked on is %i", index.row);
-        [self didSelectRowAtIndexPath:index];
+        //Following check is to make sure if "No Photo" displayed, do not select
+        if ([self.photoList count] > 0 && index != nil)
+            [self didSelectRowAtIndexPath:index];
     }
 }
 
