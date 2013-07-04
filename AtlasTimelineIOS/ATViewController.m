@@ -703,6 +703,9 @@
                         imgView.frame = CGRectMake(imgView.frame.origin.x, imgView.frame.origin.y, tmpLbl.frame.size.width, tmpLbl.frame.size.height);
                         //[tmpLbl setAutoresizesSubviews:true];
                         [tmpLbl addSubview: imgView];
+                        tmpLbl.layer.cornerRadius = 8;
+                        tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
+                        tmpLbl.layer.borderWidth = 1;
                         //[tmpLbl setClipsToBounds:true];
                         //imgView.center = CGPointMake(tmpLbl.frame.size.width/2, tmpLbl.frame.size.height/2);
                     
@@ -969,6 +972,36 @@
         }
         //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
         [self.eventEditor resetEventEditor];
+        
+        //***********************************************
+        //TODO xxxxxx THIS PART is for from ver1.2 to ver3, that is from single photo to multiple photo, to copy old version photo to directory structure
+        //     Should remove this part in later version
+        if (ann.uniqueId != nil)
+        {
+            NSString *photoPath = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:ann.uniqueId];
+            NSString *photoTmpPath = [NSString stringWithFormat:@"%@_tmp",photoPath];
+            NSString *photoNewPath = [photoPath stringByAppendingPathComponent:@"movedFromSinglePhotoVersion"]; //file name does not matter
+            NSString *thumbPath = [photoPath stringByAppendingPathComponent:@"thumbnail"]; //file name does not matter
+            NSError *error;
+            BOOL isDir;
+            NSFileManager *fileMgr = [NSFileManager defaultManager];
+            BOOL eventPhotoExistFlag = [fileMgr fileExistsAtPath:photoPath isDirectory:&isDir];
+            if (eventPhotoExistFlag && !isDir )
+            {
+                [fileMgr moveItemAtPath:photoPath toPath:photoTmpPath error:&error];
+                [fileMgr createDirectoryAtPath:photoPath withIntermediateDirectories:YES attributes:nil error:&error];
+                [fileMgr moveItemAtPath:photoTmpPath toPath:photoNewPath error:&error];
+                
+                UIImage* photo = [self readPhotoFromFile: photoNewPath];
+                UIImage* thumbImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
+                NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
+                // NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
+                [imageData writeToFile:thumbPath atomically:NO];
+            }
+        }
+        //*************************************************
+        
+        
         self.eventEditor.coordinate = ann.coordinate;
         if ([ann.description isEqualToString:NEWEVENT_DESC_PLACEHOLD])
         {

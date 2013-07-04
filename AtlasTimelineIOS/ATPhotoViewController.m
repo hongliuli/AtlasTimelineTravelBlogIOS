@@ -28,11 +28,29 @@
 
     UIBarButtonItem* doneButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem: UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
-    UIBarButtonItem* setThumbnailButton = [[UIBarButtonItem alloc] initWithTitle:@"Set on Map" style:UIBarButtonItemStyleBordered target:self action:@selector(setDefaultAction:)];
-    UIBarButtonItem* setShareButton = [[UIBarButtonItem alloc] initWithTitle:@"Set to share" style:UIBarButtonItemStyleBordered target:self action:@selector(setShareAction:)];
+    
+    
+    UIImage *markerIcon = [UIImage imageNamed:@"marker-selected.png"];
+    UIButton *markerButton = [UIButton buttonWithType:UIButtonTypeCustom ];
+    [markerButton setBackgroundImage:markerIcon forState:UIControlStateNormal];
+    [markerButton addTarget:self action:@selector(setDefaultAction:) forControlEvents:UIControlEventTouchUpInside];
+    markerButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
+    UIBarButtonItem* setThumbnailButton = [[UIBarButtonItem alloc] initWithCustomView:markerButton ];
+    
+    UIImage *shareIcon = [UIImage imageNamed:@"share.png"];
+    UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom ];
+    [shareButton setBackgroundImage:shareIcon forState:UIControlStateNormal];
+    [shareButton addTarget:self action:@selector(setShareAction:) forControlEvents:UIControlEventTouchUpInside];
+    shareButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
+    UIBarButtonItem* setShareButton = [[UIBarButtonItem alloc] initWithCustomView:shareButton ];
+    
     UIBarButtonItem* deleteButton = [[UIBarButtonItem alloc]
                                      initWithBarButtonSystemItem: UIBarButtonSystemItemTrash target:self action:@selector(deleteAction:)];
-    NSArray *items = [NSArray arrayWithObjects: doneButton, setThumbnailButton, setShareButton,deleteButton, nil];
+    
+    UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    fixedSpace.width = 10;
+    
+    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
     [self.toolbar setItems:items animated:NO];
     [super viewDidLoad];
 }
