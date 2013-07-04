@@ -138,6 +138,7 @@
 		CEE72EFC16E4051200403802 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE72EFA16E4051200403802 /* settings.png */; };
 		CEE72F0416E598B600403802 /* Note-Submit-and-version-history in Resources */ = {isa = PBXBuildFile; fileRef = CEE72F0316E598B600403802 /* Note-Submit-and-version-history */; };
 		CEF522E9175661530074321E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEF522E8175661530074321E /* Default-568h@2x.png */; };
+		CEFE78801783BA5D00BC027D /* share.png in Resources */ = {isa = PBXBuildFile; fileRef = CEFE787F1783BA5D00BC027D /* share.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -323,6 +324,7 @@
 		CEE72EFA16E4051200403802 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = settings.png; path = images/settings.png; sourceTree = "<group>"; };
 		CEE72F0316E598B600403802 /* Note-Submit-and-version-history */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Note-Submit-and-version-history"; sourceTree = "<group>"; };
 		CEF522E8175661530074321E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		CEFE787F1783BA5D00BC027D /* share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = share.png; path = images/share.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -459,6 +461,7 @@
 		CE2A1CF216AD9882004476E8 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CEFE787F1783BA5D00BC027D /* share.png */,
 				CE1A7468175A6E65009DE741 /* scaleBkg_60.png */,
 				CE1A745E175A2516009DE741 /* scaleBkg_5.png */,
 				CE1A745F175A2516009DE741 /* scaleBkg_10.png */,
@@ -751,6 +754,7 @@
 				CE1A7466175A2516009DE741 /* scaleBkg_20.png in Resources */,
 				CE1A7467175A2516009DE741 /* scaleBkg_25.png in Resources */,
 				CE1A7469175A6E65009DE741 /* scaleBkg_60.png in Resources */,
+				CEFE78801783BA5D00BC027D /* share.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
