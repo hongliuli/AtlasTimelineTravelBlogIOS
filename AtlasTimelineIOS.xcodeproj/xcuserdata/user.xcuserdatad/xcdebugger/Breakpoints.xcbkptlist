@@ -307,9 +307,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "70"
-         endingLineNumber = "70"
-         landmarkName = "-sourceChooseViewController:didSelectSource:"
-         landmarkType = "5">
+         endingLineNumber = "70">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -593,9 +591,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "147"
-         endingLineNumber = "147"
-         landmarkName = "-alertView:clickedButtonAtIndex:"
-         landmarkType = "5">
+         endingLineNumber = "147">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -762,9 +758,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "51"
-         endingLineNumber = "51"
-         landmarkName = "-viewDidLoad"
-         landmarkType = "5">
+         endingLineNumber = "51">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -775,9 +769,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "93"
-         endingLineNumber = "93"
-         landmarkName = "-prepareForSegue:sender:"
-         landmarkType = "5">
+         endingLineNumber = "93">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -814,9 +806,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "215"
-         endingLineNumber = "215"
-         landmarkName = "-startUpload"
-         landmarkType = "5">
+         endingLineNumber = "215">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -1087,9 +1077,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "74"
-         endingLineNumber = "74"
-         landmarkName = "-sourceChooseViewController:didSelectSource:"
-         landmarkType = "5">
+         endingLineNumber = "74">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -1841,9 +1829,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "190"
-         endingLineNumber = "190"
-         landmarkName = "-startUpload"
-         landmarkType = "5">
+         endingLineNumber = "190">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -1867,9 +1853,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "121"
-         endingLineNumber = "121"
-         landmarkName = "-tableView:accessoryButtonTappedForRowWithIndexPath:"
-         landmarkType = "5">
+         endingLineNumber = "121">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -2101,9 +2085,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "295"
-         endingLineNumber = "295"
-         landmarkName = "-tableView:didSelectRowAtIndexPath:"
-         landmarkType = "5">
+         endingLineNumber = "295">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -2127,9 +2109,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "39"
-         endingLineNumber = "39"
-         landmarkName = "-alertView:clickedButtonAtIndex:"
-         landmarkType = "5">
+         endingLineNumber = "39">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -2140,9 +2120,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "41"
-         endingLineNumber = "41"
-         landmarkName = "-alertView:clickedButtonAtIndex:"
-         landmarkType = "5">
+         endingLineNumber = "41">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -2153,9 +2131,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "282"
-         endingLineNumber = "282"
-         landmarkName = "-tableView:didSelectRowAtIndexPath:"
-         landmarkType = "5">
+         endingLineNumber = "282">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
