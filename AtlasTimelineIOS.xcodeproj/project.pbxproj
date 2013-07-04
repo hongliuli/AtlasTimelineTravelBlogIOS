@@ -139,6 +139,7 @@
 		CEE72F0416E598B600403802 /* Note-Submit-and-version-history in Resources */ = {isa = PBXBuildFile; fileRef = CEE72F0316E598B600403802 /* Note-Submit-and-version-history */; };
 		CEF522E9175661530074321E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEF522E8175661530074321E /* Default-568h@2x.png */; };
 		CEFE78801783BA5D00BC027D /* share.png in Resources */ = {isa = PBXBuildFile; fileRef = CEFE787F1783BA5D00BC027D /* share.png */; };
+		CEFE788217859BF800BC027D /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = CEFE788117859BF800BC027D /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -325,6 +326,7 @@
 		CEE72F0316E598B600403802 /* Note-Submit-and-version-history */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Note-Submit-and-version-history"; sourceTree = "<group>"; };
 		CEF522E8175661530074321E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		CEFE787F1783BA5D00BC027D /* share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = share.png; path = images/share.png; sourceTree = "<group>"; };
+		CEFE788117859BF800BC027D /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -370,6 +372,7 @@
 		CE0E52F2168E671E00C147FB = {
 			isa = PBXGroup;
 			children = (
+				CEFE788117859BF800BC027D /* .gitignore */,
 				CEF522E8175661530074321E /* Default-568h@2x.png */,
 				CE1D4E4C173890FA00AA603C /* Social.framework */,
 				CE1D4E461731EF5400AA603C /* StoreKit.framework */,
@@ -755,6 +758,7 @@
 				CE1A7467175A2516009DE741 /* scaleBkg_25.png in Resources */,
 				CE1A7469175A6E65009DE741 /* scaleBkg_60.png in Resources */,
 				CEFE78801783BA5D00BC027D /* share.png in Resources */,
+				CEFE788217859BF800BC027D /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
