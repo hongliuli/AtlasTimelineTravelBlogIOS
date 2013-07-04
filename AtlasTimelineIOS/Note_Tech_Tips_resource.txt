@@ -27,7 +27,7 @@ Third Party API
 Form design, good for my setting window: http://escoz.com/open-source/quickdialog
 
 Social Framework 
-----------------
+---------------- 
 Use 
 http://www.albertopasca.it/whiletrue/2012/10/objective-c-custom-uiactivityviewcontroller-icons-text/
 
