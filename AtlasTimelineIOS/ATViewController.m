@@ -149,6 +149,22 @@
 }
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
+    NSString* currentVer = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+    currentVer = [NSString stringWithFormat:@"Current Version: %@",currentVer ];
+    NSError* urlError = nil;
+    NSString *returnStr = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"http://www.chroniclemap.com/"] encoding:NSASCIIStringEncoding error:&urlError];
+    if(urlError == nil && returnStr != nil && [returnStr rangeOfString:@"Current Version:"].length > 0)
+    {
+        if ([returnStr rangeOfString:currentVer].length == 0)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"There is a new version!"
+                                                        message:@"Please update from App Store"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+            [alert show];
+        }
+    }
     
     UIStoryboard * storyboard;
     ATPreferenceViewController *preference;
@@ -992,7 +1008,7 @@
                 [fileMgr createDirectoryAtPath:photoPath withIntermediateDirectories:YES attributes:nil error:&error];
                 [fileMgr moveItemAtPath:photoTmpPath toPath:photoNewPath error:&error];
                 
-                UIImage* photo = [self readPhotoFromFile: photoNewPath];
+                UIImage* photo = [UIImage imageWithContentsOfFile: photoNewPath];
                 UIImage* thumbImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
                 NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
                 // NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
@@ -1313,7 +1329,7 @@
     {
         if ([photoForThumbnail hasPrefix:NEW_NOT_SAVED_FILE_PREFIX])
             photoForThumbnail = [photoForThumbnail substringFromIndex:[NEW_NOT_SAVED_FILE_PREFIX length]];//This is the case when user select new added photo as icon
-        UIImage* photo = [self readPhotoFromFile: [photoFinalDir stringByAppendingPathComponent:photoForThumbnail ]];
+        UIImage* photo = [UIImage imageWithContentsOfFile: [photoFinalDir stringByAppendingPathComponent:photoForThumbnail ]];
         UIImage* thumbImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
         NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
        // NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
@@ -1344,11 +1360,6 @@
     }
 }
 
--(UIImage*)readPhotoFromFile:(NSString*)fileName
-{
-    //NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
-    return [UIImage imageWithContentsOfFile:fileName];
-}
 -(UIImage*)readPhotoThumbFromFile:(NSString*)fileName
 {
     NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
