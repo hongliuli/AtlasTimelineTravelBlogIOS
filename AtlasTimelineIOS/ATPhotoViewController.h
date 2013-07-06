@@ -14,6 +14,9 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 @property (weak, nonatomic) ATEventEditorTableController* eventEditor;
+@property int currentIndex;
+
+- (void) showCount;
 
 @end
 
