@@ -22,6 +22,7 @@
 #define SECTION_THREE 2
 #define ROW_VIDEO_TUTORIAL 0
 #define ROW_PURCHASE 1
+#define ROW_RESTORE_PURCHASE 2
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
 
 @interface ATPreferenceViewController ()
@@ -49,13 +50,13 @@
     self.detailLabel.text = _source;
     
     //if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-   // {
-   //     UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"Help" style:UIBarButtonItemStyleBordered target:self action:@selector(helpClicked:)];
-   //     self.navigationItem.rightBarButtonItems = @[helpButton];
-   // }
+    // {
+    //     UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"Help" style:UIBarButtonItemStyleBordered target:self action:@selector(helpClicked:)];
+    //     self.navigationItem.rightBarButtonItems = @[helpButton];
+    // }
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
- 
+    
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
@@ -120,7 +121,7 @@
 {
     NSLog(@"upload clicked view clicked row is %i" , indexPath.row);
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-
+    
     int cnt = [appDelegate.eventListSorted count];
     
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Sync %i events to %@ on server",cnt, [ATHelper getSelectedDbFileName]]
@@ -156,7 +157,7 @@
 
 -(void)startUpload
 {
-   // [self dismissViewControllerAnimated:true completion:nil]; does not dismiss preference itself here
+    // [self dismissViewControllerAnimated:true completion:nil]; does not dismiss preference itself here
     
     Boolean successFlag = [ATHelper checkUserEmailAndSecurityCode:self];
     if (!successFlag)
@@ -179,7 +180,7 @@
     int eventCount = [myAtlasList count];
     NSMutableArray* dictArray = [[NSMutableArray alloc] initWithCapacity:eventCount];
     for (ATEventDataStruct* item in myAtlasList)
-    {        
+    {
         NSNumber* eventType = [NSNumber numberWithInt: item.eventType]; //not initialized in code, need fix
         if (eventType == nil)
             eventType = [NSNumber numberWithInt:EVENT_TYPE_NO_PHOTO];
@@ -207,11 +208,11 @@
     //NSString* eventStr= @"百科 abc 2012/02/34";//test post chinese
     NSString* postStr = [NSString stringWithFormat:@"user_id=%@&security_code=%@&atlas_name=%@&json_contents=%@", userEmail, securityCode
                          ,[ATHelper getSelectedDbFileName], longStr];
-//NSLog(@"============post body = %@", postStr);
+    //NSLog(@"============post body = %@", postStr);
     NSData *postData = [postStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
     NSURL* serviceUrl = [NSURL URLWithString: [ATConstants ServerURL]];
-NSLog(@"============post url = %@", serviceUrl.absoluteString);
+    NSLog(@"============post url = %@", serviceUrl.absoluteString);
     NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:serviceUrl];
     [request setHTTPMethod:@"POST"];
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
@@ -220,10 +221,10 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
     
     //Get Responce hear----------------------
     NSURLResponse *response;
-
+    
     NSData *urlData=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     NSString* returnStatus = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
-//NSLog(@"upload response  urlData = %@", returnStatus);
+    //NSLog(@"upload response  urlData = %@", returnStatus);
     //Event Editor should exclude & char which will cause partial upload until &
     if (![returnStatus isEqual:@"SUCCESS"])
     {
@@ -234,8 +235,8 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
     else
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Upload Success!"
-            message: [NSString stringWithFormat:@"%i %@ events has been uploaded to server successfully!",eventCount,[ATHelper getSelectedDbFileName]]
-            delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                                                        message: [NSString stringWithFormat:@"%i %@ events has been uploaded to server successfully!",eventCount,[ATHelper getSelectedDbFileName]]
+                                                       delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         return;
     }
@@ -250,12 +251,12 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
         if (userEmail != nil)
             return userEmail;
     }
- 
+    
     return @"";
 }
 #pragma mark - Table view delegate
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     //for static tableView's cellFor.. works, have to use super tableView here, do not know why
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
@@ -263,7 +264,7 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
     int row = indexPath.row;
     if (section == SECTION_THREE)
     {
-        if (row == ROW_PURCHASE)
+        if (row == ROW_PURCHASE || row == ROW_RESTORE_PURCHASE)
         {
             NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
             if ([userDefault objectForKey:IN_APP_PURCHASED] != nil)
@@ -275,7 +276,7 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
     }
     return cell;
 }
- 
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     int section = indexPath.section;
@@ -296,6 +297,16 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
                 purchase = [[ATInAppPurchaseViewController alloc] init];
                 [purchase processInAppPurchase];
             }
+        }
+        if (row == ROW_RESTORE_PURCHASE)
+        {
+            NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+            if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
+            {
+                purchase = [[ATInAppPurchaseViewController alloc] init];
+                [purchase restorePreviousPurchases];
+            }
+            
         }
     }
 }
