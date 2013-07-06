@@ -83,7 +83,6 @@
         cell = [[ATPhotoScrollCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants photoScrollCellWidth], [ATConstants photoScrollCellHeight])];
         //cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    NSString* photoFileDir = self.eventEditor.eventId;
     if (self.photoList == nil || [self.photoList count] == 0)
     {
         cell.photo.image = [UIImage imageNamed:@"no_photo.png"] ;
@@ -91,15 +90,8 @@
     else
     {
         NSString* photoName = self.photoList[indexPath.row];
-        if ([photoName hasPrefix: NEW_NOT_SAVED_FILE_PREFIX]) //see EventEditor doneSelectPicture: where new added photos are temparirayly saved
-        {
-            photoName = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:photoName];
-        }
-        else
-        {
-            photoName = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:photoFileDir] stringByAppendingPathComponent:photoName];
-        }
-        cell.photo.image = [self readPhotoFromFile:photoName];
+
+        cell.photo.image = [ATHelper readPhotoFromFile:photoName eventId:self.eventEditor.eventId];
 
         cell.photo.contentMode = UIViewContentModeScaleAspectFit;
         cell.photo.clipsToBounds = YES;
@@ -136,12 +128,6 @@
 }
 - (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath: (NSIndexPath *) indexPath {
     return [ATConstants photoScrollCellHeight];
-}
-
--(UIImage*)readPhotoFromFile:(NSString*)fileName
-{
-   // NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
-    return [UIImage imageWithContentsOfFile:fileName];
 }
 
 //have tap gesture achive two thing: prevent call tapGesture on parent mapView and process select a row action without a TableViewController
