@@ -253,13 +253,31 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="UP8-ie-yVy" style="IBUITableViewCellStyleDefault" id="rme-ml-1vE">
-                                        <rect key="frame" x="0.0" y="282" width="768" height="45"/>
+                                        <rect key="frame" x="0.0" y="282" width="768" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="45" y="0.0" width="678" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Purchase Full Version" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="UP8-ie-yVy">
+                                                    <rect key="frame" x="10" y="0.0" width="658" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="syB-xa-1BW" style="IBUITableViewCellStyleDefault" id="nky-Iw-e71">
+                                        <rect key="frame" x="0.0" y="326" width="768" height="45"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="45" y="0.0" width="678" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Restore Purchase" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="syB-xa-1BW">
                                                     <rect key="frame" x="10" y="0.0" width="658" height="43"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -679,94 +697,6 @@
             <point key="canvasLocation" x="4714" y="-2231"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="ATCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="addressLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="descLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="ATDownloadTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATDownloadTableViewController.h"/>
-        </class>
-        <class className="ATEventEditorTableController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATEventEditorTableController.h"/>
-            <relationships>
-                <relationship kind="action" name="cancelAction:"/>
-                <relationship kind="action" name="deleteAction:"/>
-                <relationship kind="action" name="saveAction:"/>
-                <relationship kind="action" name="shareButtonAction:"/>
-                <relationship kind="outlet" name="address" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="cancelButton" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="dateTxt" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="deleteButton" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="description" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="saveButton" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="ATPhotoViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATPhotoViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="toolbar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ATPreferenceViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATPreferenceViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="detailLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="ATSourceChooseViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATSourceChooseViewController.h"/>
-        </class>
-        <class className="ATUserVerifyViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATUserVerifyViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="getEmailAction:"/>
-                <relationship kind="action" name="verifySecurityCodeAction:"/>
-                <relationship kind="outlet" name="securityCodeText" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="userEmailText" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="verifyButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="ATViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="eventEditor" candidateClass="ATEventEditorTableController"/>
-                <relationship kind="outlet" name="eventEditorPopover" candidateClass="UIPopoverController"/>
-                <relationship kind="outlet" name="geoCoder" candidateClass="CLGeocoder"/>
-                <relationship kind="outlet" name="location" candidateClass="CLLocation"/>
-                <relationship kind="outlet" name="locationManager" candidateClass="CLLocationManager"/>
-                <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
-                <relationship kind="outlet" name="searchBar" candidateClass="UISearchBar"/>
-            </relationships>
-        </class>
-        <class className="ATViewImagePickerController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATViewImagePickerController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="toolbar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="ATimelineTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ATimelineTableViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="atCell" candidateClass="ATCell"/>
-            </relationships>
-        </class>
-        <class className="CLGeocoder" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CLGeocoder.h"/>
-        </class>
-        <class className="CLLocation" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CLLocation.h"/>
-        </class>
-        <class className="CLLocationManager" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CLLocationManager.h"/>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

@@ -137,6 +137,11 @@ UILabel *purchaseStatusLabel;
         }
     }
 }
+- (void)restorePreviousPurchases { //needs account info to be entered
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self]; //so delegate updateTransactions will be called with SKPaymentTransactionStateRestored
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+}
+
 - (void) setPurchasedInLocal
 {
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];

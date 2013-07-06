@@ -12,5 +12,6 @@
 @interface ATInAppPurchaseViewController : NSObject<SKProductsRequestDelegate, SKPaymentTransactionObserver, UIAlertViewDelegate>
 
 - (void) processInAppPurchase;
+- (void)restorePreviousPurchases;
 
 @end

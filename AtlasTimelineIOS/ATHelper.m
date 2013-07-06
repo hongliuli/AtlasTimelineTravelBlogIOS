@@ -12,6 +12,8 @@
 #import "ATUserVerifyViewController.h"
 #import "ATViewController.h"
 
+#define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
+
 @implementation ATHelper
 
 NSDateFormatter* dateFormaterForMonth;
@@ -234,6 +236,20 @@ UIPopoverController *verifyViewPopover;
                                 blue:MAX(b - 0.2, 0.0)
                                alpha:a];
     return nil;
+}
+
++(UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir
+{
+    if ([photoFileName hasPrefix: NEW_NOT_SAVED_FILE_PREFIX]) //see EventEditor doneSelectPicture: where new added photos are temparirayly saved
+    {
+        photoFileName = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:photoFileName];
+    }
+    else
+    {
+        photoFileName = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:photoDir] stringByAppendingPathComponent:photoFileName];
+    }
+    return [UIImage imageWithContentsOfFile:photoFileName];
+    
 }
 
 //not thread safe
