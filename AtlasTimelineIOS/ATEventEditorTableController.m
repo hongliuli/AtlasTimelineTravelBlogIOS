@@ -128,7 +128,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         
         // create the button object
         UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeContactAdd];
-        photoBtn.frame = CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 110, EDITOR_PHOTOVIEW_HEIGHT - 25, 30, 30);
+        photoBtn.frame = CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 110, EDITOR_PHOTOVIEW_HEIGHT - 25, 35, 35);
         [photoBtn addTarget:self action:@selector(takePictureAction:) forControlEvents:UIControlEventTouchUpInside];
         photoBtn.tag = ADD_PHOTO_BUTTON_TAG_777;
         [customView addSubview:photoBtn];
@@ -222,9 +222,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     ATPhotoViewController* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_view"];
     [self presentModalViewController:ctr animated:YES];
     ctr.eventEditor = self;
-    [[ctr imageView] setImage:image];
+    ctr.currentIndex = self.photoScrollView.selectedPhotoIndex;
+
     [ctr imageView].contentMode = UIViewContentModeScaleAspectFit;
     [ctr imageView].clipsToBounds = YES;
+    [[ctr imageView] setImage:image];
+    [ctr showCount];
 }
 
 -(void)takePictureAction:(id)sender
@@ -430,6 +433,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         
         
         [alertDelete show];
+    }
+    else
+    {
+        [self.delegate deleteEvent];
     }
     [self dismissModalViewControllerAnimated:true]; //for iPhone case
 }
