@@ -6,13 +6,19 @@
 //  Copyright (c) 2013 hong. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import "ATPhotoViewController.h"
+#import "ATHelper.h"
+#import "ATConstants.h"
+
 #define NOT_THUMBNAIL -1;
 @interface ATPhotoViewController ()
 
 @end
 
 @implementation ATPhotoViewController
+
+UILabel * lblCount = nil;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -52,8 +58,75 @@
     
     NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
     [self.toolbar setItems:items animated:NO];
+    
+    //swipe gesture
+    UISwipeGestureRecognizer* recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
+    [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
+    [[self view] addGestureRecognizer:recognizer];
+    recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
+    [recognizer setDirection:( UISwipeGestureRecognizerDirectionLeft)];
+    [[self view] addGestureRecognizer:recognizer];
+    
+    lblCount = [[UILabel alloc] initWithFrame:CGRectMake([ATConstants screenWidth]/2 - 30, [ATConstants screenHeight] - 100, 60, 30)];
+    lblCount.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.4 ];
+    lblCount.textColor = [UIColor whiteColor];
+    lblCount.textAlignment = UITextAlignmentCenter;
+    lblCount.layer.cornerRadius = 5;
+    [self.view addSubview:lblCount];
+    
     [super viewDidLoad];
 }
+
+-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer {
+    NSLog(@"Swipe received.");
+    int totalPhotoCount = [self.eventEditor.photoScrollView.photoList count];
+    if(recognizer.direction == UISwipeGestureRecognizerDirectionRight)
+    {
+        if (self.currentIndex == 0 )
+        {
+            //shake current image
+        }
+        else
+        {
+            self.currentIndex --;
+            NSString* photoName = self.eventEditor.photoScrollView.photoList[self.currentIndex];
+            NSString* eventId = self.eventEditor.eventId;
+            [self.imageView setImage:[ATHelper readPhotoFromFile:photoName eventId:eventId]];
+           /***
+            UIImageView* newView = [[UIImageView alloc] initWithImage:[ATHelper readPhotoFromFile:photoName eventId:eventId]];
+            UIImageView* existingImageView = self.imageView;
+            newView.contentMode = UIViewContentModeScaleAspectFit;
+            newView.clipsToBounds = YES;
+            
+            [UIView transitionFromView:self.imageView
+                                toView:self.imageView
+                              duration:1.0f
+                               options:UIViewAnimationOptionTransitionFlipFromLeft
+                            completion:nil];
+           // [existingImageView setImage:newView.image];
+           // self.imageView = existingImageView; //so guesture actions etc still work
+            */
+        }
+    }
+    else if(recognizer.direction == UISwipeGestureRecognizerDirectionLeft)
+    {
+        if (self.currentIndex == totalPhotoCount -1)
+        {
+            //share current image
+        }
+        else
+        {
+            self.currentIndex ++;
+            NSString* photoName = self.eventEditor.photoScrollView.photoList[self.currentIndex];
+            NSString* eventId = self.eventEditor.eventId;
+            [self.imageView setImage:[ATHelper readPhotoFromFile:photoName eventId:eventId]];
+        }
+    }
+    [self showCount];
+    [self.view bringSubviewToFront:lblCount];
+    
+}
+
 
 - (void) doneAction: (id)sender
 {
@@ -62,7 +135,7 @@
 
 - (void) deleteAction: (id)sender
 {
-    int selectedPhotoIdx = self.eventEditor.photoScrollView.selectedPhotoIndex;
+    int selectedPhotoIdx = self.currentIndex;
     if (self.eventEditor.photoScrollView.selectedAsThumbnailIndex == selectedPhotoIdx)
         self.eventEditor.photoScrollView.selectedAsThumbnailIndex = NOT_THUMBNAIL;
     if (self.eventEditor.photoScrollView.selectedAsShareIndex == selectedPhotoIdx)
@@ -75,13 +148,13 @@
 }
 - (void) setDefaultAction: (id)sender
 {
-    self.eventEditor.photoScrollView.selectedAsThumbnailIndex = self.eventEditor.photoScrollView.selectedPhotoIndex;
+    self.eventEditor.photoScrollView.selectedAsThumbnailIndex = self.currentIndex;
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //so map marker icon will display on new cell
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
 - (void) setShareAction: (id)sender
 {
-    self.eventEditor.photoScrollView.selectedAsShareIndex = self.eventEditor.photoScrollView.selectedPhotoIndex;
+    self.eventEditor.photoScrollView.selectedAsShareIndex = self.currentIndex;
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new selected cell
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
@@ -101,6 +174,23 @@
     self.imageView = nil;
     self.toolbar = nil;
     
+    [self setImageView:nil];
     [super viewDidUnload];
+}
+- (void) showCount
+{
+    lblCount.text = [NSString stringWithFormat:@"%d/%d",self.currentIndex + 1, [self.eventEditor.photoScrollView.photoList count] ];
+    [self.view bringSubviewToFront:lblCount];
+    int deltaHeight;
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
+        deltaHeight = 110;
+    }
+    else{
+        deltaHeight =100;
+    }
+    CGRect frame = CGRectMake([ATConstants screenWidth]/2 - 30, [ATConstants screenHeight] - deltaHeight, 60, 30);
+    [lblCount setFrame:frame];
+    
 }
 @end
