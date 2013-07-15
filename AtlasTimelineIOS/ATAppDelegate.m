@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 hong. All rights reserved.
 //
 
+#import <DropboxSDK/DropboxSDK.h>
 #import "ATAppDelegate.h"
 #import "ATimelineTableViewController.h"
 #import "ATDataController.h"
@@ -72,10 +73,25 @@
         self.storyBoard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone" bundle:nil];
     }
     controller = [self.storyBoard instantiateInitialViewController];
-    [self.window setRootViewController:controller]; 
+    [self.window setRootViewController:controller];
+    NSLog(@" -------dropbox root is %@", kDBRootDropbox);
+    DBSession* dbSession =[[DBSession alloc] initWithAppKey:@"vmngs8cprefdyi3"
+                                                  appSecret:@"o9ct42rr0696dzq" root:kDBRootDropbox]; // either kDBRootAppFolder or kDBRootDropbox;
+    [DBSession setSharedSession:dbSession];
+    
     return YES;
 }
-
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    if ([[DBSession sharedSession] handleOpenURL:url]) {
+        if ([[DBSession sharedSession] isLinked]) {
+            NSLog(@"App linked successfully!");
+            // At this point you can start making API calls
+        }
+        return YES;
+    }
+    // Add whatever other url handling code your app requires here
+    return NO;
+}
 							
 - (void)applicationWillResignActive:(UIApplication *)application
 {
