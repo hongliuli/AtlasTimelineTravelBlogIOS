@@ -552,9 +552,11 @@
         focusedRow = currentNumberOfRow -1;
     
     int scrollToRow = focusedRow;
-    //very weired, my iPad touch have to add by 1, need more test
+    //TODO xxxxxx very weired, my iPod touch have to add by 1, while iPad need decrease by 1 need more test
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && focusedRow + 1 > currentNumberOfRow)
         scrollToRow = focusedRow + 1;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && focusedRow - 1 > 0)
+        scrollToRow = focusedRow - 1;
     
     [self.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:scrollToRow inSection:0]
                                     atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
