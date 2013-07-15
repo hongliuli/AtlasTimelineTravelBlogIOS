@@ -8,7 +8,11 @@ iOS Dev Center / iTunes Connect  same login -> hongliuli@gmail.com  (pwd Cap R..
 1. Create App ID -> in Develope Center, search for "Manage your certificates, App IDs, devices, and provisioning profiles".
    Bundle ID com.chroniclemap   detail see Develope Center
 
-
+Dropbox api key (app name ChronicleMap)
+--------------
+App key - vmngs8cprefdyi3
+App secret - o9ct42rr0696dzq
+step by step: https://www.dropbox.com/developers/core/start/ios
 
 Add existing xcode project to local GIT
 ---------------------------------------
