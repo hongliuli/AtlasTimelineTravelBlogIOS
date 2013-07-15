@@ -151,9 +151,15 @@
 {
     NSString* currentVer = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
     currentVer = [NSString stringWithFormat:@"Current Version: %@",currentVer ];
-    NSError* urlError = nil;
-    NSString *returnStr = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"http://www.chroniclemap.com/"] encoding:NSASCIIStringEncoding error:&urlError];
-    if(urlError == nil && returnStr != nil && [returnStr rangeOfString:@"Current Version:"].length > 0)
+    
+    NSString* link = @"http://www.chroniclemap.com/";
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
+    NSURLResponse* response=nil;
+    NSError* error=nil;
+    NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    NSString* returnStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+
+    if(error == nil && returnStr != nil && [returnStr rangeOfString:@"Current Version:"].length > 0)
     {
         if ([returnStr rangeOfString:currentVer].length == 0)
         {
@@ -594,8 +600,13 @@
     
     
     //reverseGeocodeLocation will take long time in very special case, such as when FreedomPop up/down, so use following stupid way to check network first, need more test on train
-    NSError* urlError = nil;
-    NSString *URLString = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"http://www.google.com"] encoding:NSASCIIStringEncoding error:&urlError];
+
+    NSString* link = @"http://www.google.com";
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
+    NSURLResponse* response=nil;
+    NSError* error=nil;
+    NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    NSString* URLString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
     if(URLString == nil)
         [self addPinToMap:@"Unknow" :touchMapCoordinate];
@@ -1013,6 +1024,7 @@
                 NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
                 // NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
                 [imageData writeToFile:thumbPath atomically:NO];
+                [self.dataController insertNewPhotoQueue:[ann.uniqueId stringByAppendingPathComponent:@"movedFromSinglePhotoVersion"]];
             }
         }
         //*************************************************
@@ -1184,7 +1196,7 @@
         [list removeObjectAtIndex:index];
     NSLog(@"   delete object at index %i",index);
 
-    [self deletePhotoToFile:tmp.uniqueId];
+    [self deletePhotoFilesByEventId:tmp.uniqueId];
     if (index == 0 || index == [list count]) //do not -1 since it already removed the element
     {
         [self setTimeScrollConfiguration];
@@ -1308,6 +1320,8 @@
             if (!eventPhotoDirExistFlag)
                 [[NSFileManager defaultManager] createDirectoryAtPath:photoFinalDir withIntermediateDirectories:YES attributes:nil error:&error];
             [[NSFileManager defaultManager] moveItemAtPath:newPhotoTmpFile toPath:newPhotoFinalFileName error:&error];
+            //Add to newPhotoQueue for sync to dropbox
+            [[self dataController] insertNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
         }
         NSError* error;
         //remove the dir then recreate to clean up this temp dir
@@ -1342,20 +1356,31 @@
         {
             NSString* deletePhotoFinalFileName = [photoFinalDir stringByAppendingPathComponent:fileName];
             [[NSFileManager defaultManager] removeItemAtPath:deletePhotoFinalFileName error:&error];
+            if (error == nil)
+                [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
         }
     }
 }
 
--(void)deletePhotoToFile:(NSString*)fileName
+-(void)deletePhotoFilesByEventId:(NSString*)eventId
 {
     // Find the path to the documents directory
-    if (fileName == nil || [fileName length] == 0)
+    if (eventId == nil || [eventId length] == 0)
         return;  //Bug fix. This bug is in ver1.0. When remove drop-pin, fileName is empty,so it will remove whole document directory such as myEvents, very bad bug
-    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
+    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
     NSError *error;
+    NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
     //all photo files under this event id directory should be removed
     BOOL success = [[NSFileManager defaultManager] removeItemAtPath:fullPathToFile error:&error];
-    if (!success) {
+    if (success) {
+        if (tmpFileList != nil && [tmpFileList count] > 0)
+        {
+            for (NSString* file in tmpFileList)
+            {
+                [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:file]];
+                [[NSFileManager defaultManager] removeItemAtPath:[fullPathToFile stringByAppendingPathComponent:file] error:&error];
+            }
+        }
         NSLog(@"Error removing document path: %@", error.localizedDescription);
     }
 }
