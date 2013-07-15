@@ -30,5 +30,15 @@
 - (void) deleteEvent:(NSString*)uniqueId;
 - (void) deleteAllEvent;
 
+- (void) insertNewPhotoQueue:(NSString*)eventIdPhotoNamePath;
+- (void) insertDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath;
+- (void) emptyNewPhotoQueue:(NSString*)eventIdPhotoNamePath;
+- (void) emptyDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath;
+- (NSString*) popNewPhotoQueue;
+- (NSString*) popDeletedPhototQueue;
+- (int) getNewPhotoQueueSize;
+- (int) getDeletedPhotoQueueSize;
+
+
 
 @end

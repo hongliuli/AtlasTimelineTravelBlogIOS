@@ -218,5 +218,105 @@
     return uuidString;
 }
 
+//------ photo queue. ATxxxPhotoQueue entity is so simple, I do not have strong type for them
+- (void) insertPhotoQueue:(NSString*)queueEntityName :(NSString*)eventIdPhotoNamePath
+{
+    NSManagedObjectContext* context = self.managedObjectContext;
+    NSEntityDescription *newPhotoQueue = [NSEntityDescription
+                                       insertNewObjectForEntityForName:queueEntityName
+                                       inManagedObjectContext:context];
+    [newPhotoQueue setValue:eventIdPhotoNamePath forKey:@"eventIdPhotoPath"];
+    
+    NSError *error;
+    if (![context save:&error]) {
+        NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]); }
+}
+
+- (void) emptyPhotoQueue:(NSString*)queueEntityName :(NSString*)eventIdPhotoNamePath
+{
+    NSManagedObjectContext* context = self.managedObjectContext;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:queueEntityName inManagedObjectContext:context];
+    [fetchRequest setEntity:entity];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(eventIdPhotoPath == %@)", eventIdPhotoNamePath];
+    [fetchRequest setPredicate:predicate];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
+    
+    if (fetchedObjects != nil && [fetchedObjects count] >0)
+    {
+        ATEventEntity *evt = fetchedObjects[0];
+        [managedObjectContext deleteObject:evt];
+        
+        if (![context save:&error]) {
+            NSLog(@" ----- Whoops, couldn't delete: %@", [error localizedDescription]); }
+    }
+    else
+    {
+        NSLog(@"------- delete fail because could not find key %@",eventIdPhotoNamePath);
+    }
+}
+- (NSString*) popPhotoQueue:(NSString*)queueEntityName
+{
+    NSManagedObjectContext* context = self.managedObjectContext;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:queueEntityName inManagedObjectContext:context];
+    [fetchRequest setEntity:entity];
+    [fetchRequest setFetchLimit:1];
+    NSError *error;
+    NSArray *results = [context executeFetchRequest:fetchRequest error:&error];
+    if (results!= nil && [results count] > 0)
+    {
+        NSManagedObject* entity = (NSManagedObject*)results[0];
+        return [entity valueForKey:@"eventIdPhotoPath"];
+    }
+    return nil;
+}
+
+- (int) getQueueSize:(NSString*) queueEntityName
+{
+    NSManagedObjectContext* context = self.managedObjectContext;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:queueEntityName inManagedObjectContext:context];
+    [fetchRequest setEntity:entity];
+    NSError* error;
+    return [context countForFetchRequest:fetchRequest error:&error];
+}
+- (void) insertNewPhotoQueue:(NSString*)eventIdPhotoNamePath
+{
+    [self insertPhotoQueue:@"ATNewPhotoQueue" :eventIdPhotoNamePath ];
+}
+- (void) insertDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath{
+    [self insertPhotoQueue:@"ATDeletedPhotoQueue" :eventIdPhotoNamePath ];
+}
+- (void) emptyNewPhotoQueue:(NSString*)eventIdPhotoNamePath
+{
+    [self emptyPhotoQueue:@"ATNewPhotoQueue" :eventIdPhotoNamePath ];
+}
+- (void) emptyDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath
+{
+    [self emptyPhotoQueue:@"ATDeletedPhotoQueue" :eventIdPhotoNamePath ];
+}
+- (NSString*) popNewPhotoQueue
+{
+    return [self popPhotoQueue:@"ATNewPhotoQueue" ];
+}
+- (NSString*) popDeletedPhototQueue
+{
+    return [self popPhotoQueue:@"ATDeletedPhotoQueue" ];
+}
+- (int) getNewPhotoQueueSize
+{
+    return [self getQueueSize:@"ATNewPhotoQueue" ];
+}
+- (int) getDeletedPhotoQueueSize
+{
+    return [self getQueueSize:@"ATDeletedPhotoQueue"  ];
+}
 
 @end
