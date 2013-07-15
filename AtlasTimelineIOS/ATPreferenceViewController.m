@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 hong. All rights reserved.
 //
 
+#import <DropboxSDK/DropboxSDK.h>
 #import "ATDataController.h"
 #import "ATPreferenceViewController.h"
 #import "ATDownloadTableViewController.h"
@@ -19,6 +20,7 @@
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
 #define SECTION_LOGIN_EMAIL 1
+#define ROW_SYNC_TO_DROPBOX 2
 #define SECTION_THREE 2
 #define ROW_VIDEO_TUTORIAL 0
 #define ROW_PURCHASE 1
@@ -33,6 +35,12 @@
 {
     NSString* _source;
     ATInAppPurchaseViewController* purchase; //have to be "global", otherwise error
+    NSString* deleteEventIdPhotoName;
+    ATDataController* privateDataController;
+    NSString* currentEventId;
+    NSString* currentPhotoName;
+    int copyCount;
+    int deleteCount;
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -145,7 +153,7 @@
     else if (buttonIndex == 1)
     {
         NSLog(@"user want continues to upload");
-        [self startUpload];
+        [self startUploadJson];
     }
     else
     {
@@ -155,7 +163,7 @@
     }
 }
 
--(void)startUpload
+-(void)startUploadJson
 {
     // [self dismissViewControllerAnimated:true completion:nil]; does not dismiss preference itself here
     
@@ -274,7 +282,24 @@
             }
         }
     }
+    else if (section == SECTION_LOGIN_EMAIL)
+    {
+        if (row == ROW_SYNC_TO_DROPBOX )
+        {
+            ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
+            int numberOfNewPhotos = [dataController getNewPhotoQueueSize];
+            int numberOfDeletedPhoto = [dataController getDeletedPhotoQueueSize];
+            cell.textLabel.text = [NSString stringWithFormat:@"%@  New:%d  Del:%d", cell.textLabel.text,numberOfNewPhotos,numberOfDeletedPhoto ];
+        }
+    }
     return cell;
+}
+
+- (ATDataController*)getDataController
+{
+    if (privateDataController == nil)
+        privateDataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
+    return privateDataController;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -309,6 +334,181 @@
             
         }
     }
+    if (section == SECTION_LOGIN_EMAIL)
+    {
+        if (row == ROW_SYNC_TO_DROPBOX)
+        {
+            if (![[DBSession sharedSession] isLinked]) {
+                [[DBSession sharedSession] linkFromController:self];
+            }
+            [[self myRestClient] createFolder:@"/ChronicleMap"]; //createFolder success/alreadyExist delegate will do the chain action
+        }
+    }
+}
+//Because of the DBRestClient's asynch nature, I have to implement a synchronous way:
+/*
+ * 1. create /ChronicleMap fold. if success of fail with already-exists then create Source Folder (such as myEvents)
+ * 2. if detected create Source success or already exist, then call createPhotoEventDir(), which will pop one photo entry
+ * 3. in createPhotoEventDir() do:
+ *      . popup one photo entry, save to a global var currentPhotoEventPath
+ *      . create event dir. In createFolder delegate, if success or already exist, call restClient uploadFile(currentPhotoEnventPath)
+ * 4. in uploadFile success delegate:
+ *      . delete from sqlite queue
+ *      . call createPhotoEventDir() which loops back to popup next photo from newAddedPhotoQueue table
+ *
+ * For delete should be simpler: delete next only
+ */
+
+//this is createFolder delegate, important of my chain action
+- (void)restClient:(DBRestClient*)client createdFolder:(DBMetadata*)folder{
+    //NSLog(@"+++++ Folder success Meta Data Path %@; filename %@; hasDirectory %d;",[folder path], [folder filename], [folder isDirectory]);
+    if ( [@"/ChronicleMap" isEqualToString:[folder path]]) 
+    {
+        NSString *destDir = [ NSString stringWithFormat:@"/ChronicleMap/%@",  [ATHelper getSelectedDbFileName] ];
+        [[self myRestClient ] createFolder:destDir]; //chain action 1: create "source" directory if not so
+    }
+    else if ([[folder filename] isEqualToString:[ATHelper getSelectedDbFileName]])
+    {
+        [self startProcessNewPhotoQueueChainAction ];
+    }
+    else //Part of chain: come here if created eventId directory
+    {
+        NSString *localPhotoPath = [ATHelper getPhotoDocummentoryPath];
+        localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:currentPhotoName];
+        //Following gives me rediculourse errors where Dropbox did not document
+        // 1. get 1003 error with no description, the find fromPath must also include filename part
+        // 2. then get 403 Forbidden error, then realize I have to ask dropbox to enable production mode
+        if ([[NSFileManager defaultManager] fileExistsAtPath:localPhotoPath])
+        {
+            [[self myRestClient] uploadFile: currentPhotoName toPath:[folder path] withParentRev:nil fromPath:localPhotoPath];
+        }
+    }
+}
+
+// Folder is the metadata for the newly created folder
+- (void)restClient:(DBRestClient*)client createFolderFailedWithError:(NSError*)error{
+    //if error is folder alrady exist, then continues our chain action
+    if ([self dropboxFolderAlreadyExist:error])
+    {
+        NSLog(@"   ------ Folder Fail Error %@",error);
+        if ( [@"/ChronicleMap" isEqualToString:(NSString*)[error.userInfo objectForKey:@"path"]]) //TODO
+        {
+            NSString *destDir = [ NSString stringWithFormat:@"/ChronicleMap/%@",  [ATHelper getSelectedDbFileName] ];
+            [[self myRestClient ] createFolder:destDir]; //delegate come back with following if
+        }
+        else if ([[NSString stringWithFormat:@"/ChronicleMap/%@", [ATHelper getSelectedDbFileName] ] isEqualToString:(NSString*)[error.userInfo objectForKey:@"path"]])
+        {
+            [self startProcessNewPhotoQueueChainAction ]; //start upload the 1st file
+        }
+        else //Part of chain: come here if created eventId directory
+        {
+            NSString *localPhotoPath = [ATHelper getPhotoDocummentoryPath];
+            localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:currentPhotoName];
+            if ([[NSFileManager defaultManager] fileExistsAtPath:localPhotoPath])
+            {
+                [[self myRestClient] uploadFile:currentPhotoName toPath:(NSString*)[error.userInfo objectForKey:@"path"] withParentRev:nil fromPath:localPhotoPath];
+            }
+        }
+    }
+    else
+    {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not copy to Dropbox"
+                                                       message: @"May be the network is not available"
+                                                      delegate: self
+                                             cancelButtonTitle:@"OK"
+                                             otherButtonTitles:nil,nil];
+        
+        
+        [alert show];
+    }
+}
+
+
+- (void) startProcessNewPhotoQueueChainAction
+{
+    if (![[DBSession sharedSession] isLinked]) {
+        [[DBSession sharedSession] linkFromController:self];
+    }
+    //When this is called, destDir is already successfully created on dropbox before
+    NSString *destDir = [ NSString stringWithFormat:@"/ChronicleMap/%@",  [ATHelper getSelectedDbFileName]];
+
+    NSString* file = [[self getDataController] popNewPhotoQueue];
+    if (file != nil )
+    {
+        NSArray* tmpArray = [file componentsSeparatedByString:@"/"];
+        currentEventId = tmpArray[0];
+        currentPhotoName = tmpArray[1];
+        //part of chain action: createFolder delegate will do uploadFile to dropbox when success or fail with 403 (folder already exist
+        [[self myRestClient] createFolder:[ NSString stringWithFormat:@"%@/%@", destDir, tmpArray[0] ]];
+    }
+    else
+    {
+        [self processEmptyDeletedPhotoQueue]; //start process deletedPhotoQueue chain action after finish process newPhotoQueue
+    }
+}
+//will be a implicit loop by delete success delegate
+- (void) processEmptyDeletedPhotoQueue
+{
+    if (![[DBSession sharedSession] isLinked]) {
+        [[DBSession sharedSession] linkFromController:self];
+    }
+    //When this is called, destDir is already successfully created on dropbox before
+    NSString *destDir = [ NSString stringWithFormat:@"/ChronicleMap/%@",  [ATHelper getSelectedDbFileName]];
+    
+    NSString* file = [[self getDataController] popDeletedPhototQueue];
+    if (file != nil )
+    {
+        NSArray* tmpArray = [file componentsSeparatedByString:@"/"];
+        currentEventId = tmpArray[0];
+        currentPhotoName = tmpArray[1];
+        //part of chain action: createFolder delegate will do uploadFile to dropbox when success or fail with 403 (folder already exist
+        [[self myRestClient] deletePath:[ NSString stringWithFormat:@"%@/%@/%@", destDir, tmpArray[0], tmpArray[1] ]];
+    }
+    else if (copyCount > 0 || deleteCount > 0)
+    {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Copy to Dropbox completed!"
+                                                       message: [NSString stringWithFormat:@"Add:%d/Delete:%d files in Dropbox succesfully.",copyCount,deleteCount]
+                                                      delegate: self
+                                             cancelButtonTitle:@"OK"
+                                             otherButtonTitles:nil,nil];
+        
+        
+        [alert show];
+    }
+}
+
+//delegate called by upload to dropbox
+- (void)restClient:(DBRestClient*)client uploadedFile:(NSString*)destPath
+              from:(NSString*)srcPath metadata:(DBMetadata*)metadata {
+    [[self getDataController] emptyNewPhotoQueue:[NSString stringWithFormat:@"%@/%@" ,currentEventId, currentPhotoName]];
+    copyCount++;
+    [self startProcessNewPhotoQueueChainAction]; //start upload next file until 
+    NSLog(@"====File uploaded successfully to path: %@", metadata.path);
+}
+- (void)restClient:(DBRestClient*)client deletedPath:(NSString *)path
+{
+    deleteCount++;
+    [[self getDataController] emptyDeletedPhotoQueue:[NSString stringWithFormat:@"%@/%@", currentEventId, currentPhotoName]];
+    [self processEmptyDeletedPhotoQueue];
+}
+
+- (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error {
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not copy file to Dropbox"
+                                                   message: @"May be the network is not available"
+                                                  delegate: self
+                                         cancelButtonTitle:@"OK"
+                                         otherButtonTitles:nil,nil];
+    
+    
+    [alert show];
+}
+
+- (BOOL) dropboxFolderAlreadyExist:(NSError*)error
+{
+    if (error.code == 403 && [(NSString*)[error.userInfo objectForKey:@"error"] rangeOfString:@"already exists" options:NSCaseInsensitiveSearch].location != NSNotFound)
+        return true;
+    else
+        return false;
 }
 
 -(void) helpClicked:(id)sender //Only iPad come here. on iPhone will be frome inside settings and use push segue
@@ -318,4 +518,12 @@
     [self.navigationController pushViewController:helpView animated:true];
 }
 
+- (DBRestClient *)myRestClient {
+    if (!self._restClient) {
+        self._restClient =
+        [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
+        self._restClient.delegate = self;
+    }
+    return self._restClient;
+}
 @end
