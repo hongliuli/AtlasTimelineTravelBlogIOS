@@ -25,6 +25,7 @@ NSMutableArray* filteredList;
 NSMutableArray* localList;
 NSString* selectedAtlasName;
 NSArray* downloadedJson;
+UIActivityIndicatorView* spinner;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -80,6 +81,11 @@ NSArray* downloadedJson;
         if (item != nil && [item length]>0)
             [filteredList addObject:libraryList[i]];
     }
+    spinner = [[UIActivityIndicatorView alloc]
+               initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    spinner.center = CGPointMake(160, 200);
+    spinner.hidesWhenStopped = YES;
+    [[self  view] addSubview:spinner];
    
 }
 
@@ -183,6 +189,7 @@ NSArray* downloadedJson;
 //NOTE at serverside, if do not find user own this, it means user first time selected a public_share file, server will first copy it to user's row, then download, so user can modify its own copy
 -(void) startDownload
 {
+    [spinner startAnimating];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int localListCnt = [appDelegate.eventListSorted count];
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
@@ -209,12 +216,14 @@ NSArray* downloadedJson;
                                 cancelButtonTitle:@"Cancel"
                                 otherButtonTitles:@"Replace",nil];
     alert.tag = DOWNLOAD_REPLACE_MY_SOURCE_ALERT;
+    [spinner stopAnimating];
     [alert show];
 }
 
 -(void)startReplaceDb
 {
     NSLog(@"Start replace db called");
+    [spinner startAnimating];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int cnt = [downloadedJson count];
     NSMutableArray* newEventList = [[NSMutableArray alloc] initWithCapacity:cnt];
@@ -247,6 +256,7 @@ NSArray* downloadedJson;
     [appDelegate.mapViewController cleanSelectedAnnotationSet];
     [appDelegate.mapViewController prepareMapView];
     downloadedJson = nil;
+    [spinner stopAnimating];
 }
 
 @end

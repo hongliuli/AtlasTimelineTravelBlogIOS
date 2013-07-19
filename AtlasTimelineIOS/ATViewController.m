@@ -1196,7 +1196,7 @@
         [list removeObjectAtIndex:index];
     NSLog(@"   delete object at index %i",index);
 
-    [self deletePhotoFilesByEventId:tmp.uniqueId];
+    [self deletePhotoFilesByEventId:tmp.uniqueId];//put all phot into deletedPhotoQueue
     if (index == 0 || index == [list count]) //do not -1 since it already removed the element
     {
         [self setTimeScrollConfiguration];
@@ -1380,6 +1380,7 @@
                 [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:file]];
                 [[NSFileManager defaultManager] removeItemAtPath:[fullPathToFile stringByAppendingPathComponent:file] error:&error];
             }
+            [[self dataController] insertDeletedEventPhotoQueue:eventId];
         }
         NSLog(@"Error removing document path: %@", error.localizedDescription);
     }

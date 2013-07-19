@@ -22,6 +22,7 @@
 + (NSDate *)dateByAddingComponentsRegardingEra:(NSDateComponents *)comps toDate:(NSDate *)date options:(NSUInteger)opts;
 + (NSDate *)getYearStartDate:(NSDate*)date;
 + (void) createPhotoDocumentoryPath;
++ (NSString*) getRootDocumentoryPath;
 + (NSString*)getPhotoDocummentoryPath;
 + (NSString*)getNewUnsavedEventPhotoPath;
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;

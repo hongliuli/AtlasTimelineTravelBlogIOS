@@ -32,12 +32,17 @@
 
 - (void) insertNewPhotoQueue:(NSString*)eventIdPhotoNamePath;
 - (void) insertDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath;
-- (void) emptyNewPhotoQueue:(NSString*)eventIdPhotoNamePath;
-- (void) emptyDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath;
+- (void) insertDeletedEventPhotoQueue:(NSString*)eventId;
+- (int) emptyNewPhotoQueue:(NSString*)eventIdPhotoNamePath;
+- (int) emptyDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath;
+- (int) emptyDeletedEventPhotoQueue:(NSString*)eventId;
 - (NSString*) popNewPhotoQueue;
 - (NSString*) popDeletedPhototQueue;
+- (NSString*) popDeletedEventPhototQueue;
 - (int) getNewPhotoQueueSize;
+- (int) getNewPhotoQueueSizeExcludeThumbNail;
 - (int) getDeletedPhotoQueueSize;
+- (int) getDeletedEventPhotoQueueSize;
 
 
 

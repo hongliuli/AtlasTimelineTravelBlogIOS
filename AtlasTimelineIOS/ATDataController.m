@@ -232,7 +232,7 @@
         NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]); }
 }
 
-- (void) emptyPhotoQueue:(NSString*)queueEntityName :(NSString*)eventIdPhotoNamePath
+- (int) emptyPhotoQueue:(NSString*)queueEntityName :(NSString*)eventIdPhotoNamePath
 {
     NSManagedObjectContext* context = self.managedObjectContext;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -245,19 +245,23 @@
     
     NSError *error = nil;
     NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
-    
+    int deletedCount = 0;
     if (fetchedObjects != nil && [fetchedObjects count] >0)
     {
         ATEventEntity *evt = fetchedObjects[0];
         [managedObjectContext deleteObject:evt];
         
         if (![context save:&error]) {
-            NSLog(@" ----- Whoops, couldn't delete: %@", [error localizedDescription]); }
+            NSLog(@" ----- Whoops, couldn't delete: %@", [error localizedDescription]);
+        }
+        else
+            deletedCount = 1;
     }
     else
     {
-        NSLog(@"------- delete fail because could not find key %@",eventIdPhotoNamePath);
+        NSLog(@"------- delete %@ fail because could not find key %@",queueEntityName,eventIdPhotoNamePath);
     }
+    return deletedCount;
 }
 - (NSString*) popPhotoQueue:(NSString*)queueEntityName
 {
@@ -287,20 +291,42 @@
     NSError* error;
     return [context countForFetchRequest:fetchRequest error:&error];
 }
+- (int) getNewPhotoQueueSizeExcludeThumbNail
+{
+    NSManagedObjectContext* context = self.managedObjectContext;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"ATNewPhotoQueue" inManagedObjectContext:context];
+    [fetchRequest setEntity:entity];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT (eventIdPhotoPath ENDSWITH %@)", @"thumbnail"];
+    [fetchRequest setPredicate:predicate];
+    NSError* error;
+    return [context countForFetchRequest:fetchRequest error:&error];
+}
 - (void) insertNewPhotoQueue:(NSString*)eventIdPhotoNamePath
 {
     [self insertPhotoQueue:@"ATNewPhotoQueue" :eventIdPhotoNamePath ];
 }
 - (void) insertDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath{
-    [self insertPhotoQueue:@"ATDeletedPhotoQueue" :eventIdPhotoNamePath ];
+    //following is important: before synch to dropbox, any delete newly-added photo should only delete for newPhotoQueue without add to deletedPhotoQueue, otherwise chain action will be broken as well
+    if (0 == [self emptyNewPhotoQueue:eventIdPhotoNamePath])
+        [self insertPhotoQueue:@"ATDeletedPhotoQueue" :eventIdPhotoNamePath ];
 }
-- (void) emptyNewPhotoQueue:(NSString*)eventIdPhotoNamePath
-{
-    [self emptyPhotoQueue:@"ATNewPhotoQueue" :eventIdPhotoNamePath ];
+- (void) insertDeletedEventPhotoQueue:(NSString*)eventId{
+    [self insertPhotoQueue:@"ATDeletedEventPhotoQueue" :eventId ];
 }
-- (void) emptyDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath
+
+- (int) emptyNewPhotoQueue:(NSString*)eventIdPhotoNamePath
 {
-    [self emptyPhotoQueue:@"ATDeletedPhotoQueue" :eventIdPhotoNamePath ];
+    return [self emptyPhotoQueue:@"ATNewPhotoQueue" :eventIdPhotoNamePath ];
+}
+- (int) emptyDeletedPhotoQueue:(NSString*)eventIdPhotoNamePath
+{
+    return [self emptyPhotoQueue:@"ATDeletedPhotoQueue" :eventIdPhotoNamePath ];
+}
+- (int) emptyDeletedEventPhotoQueue:(NSString*)eventId
+{
+    return [self emptyPhotoQueue:@"ATDeletedEventPhotoQueue" :eventId ];
 }
 - (NSString*) popNewPhotoQueue
 {
@@ -310,6 +336,10 @@
 {
     return [self popPhotoQueue:@"ATDeletedPhotoQueue" ];
 }
+- (NSString*) popDeletedEventPhototQueue
+{
+    return [self popPhotoQueue:@"ATDeletedEventPhotoQueue" ];
+}
 - (int) getNewPhotoQueueSize
 {
     return [self getQueueSize:@"ATNewPhotoQueue" ];
@@ -317,6 +347,10 @@
 - (int) getDeletedPhotoQueueSize
 {
     return [self getQueueSize:@"ATDeletedPhotoQueue"  ];
+}
+- (int) getDeletedEventPhotoQueueSize
+{
+    return [self getQueueSize:@"ATDeletedEventPhotoQueue"  ];
 }
 
 @end

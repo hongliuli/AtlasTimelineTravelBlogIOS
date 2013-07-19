@@ -204,7 +204,11 @@ UIPopoverController *verifyViewPopover;
     [[NSFileManager defaultManager] createDirectoryAtPath:[ATHelper getNewUnsavedEventPhotoPath] withIntermediateDirectories:YES attributes:nil error:&error];
     NSLog(@"Error in createPhotoDocumentoryPath  %@",[error localizedDescription]);
 }
-
++ (NSString*)getRootDocumentoryPath
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    return [paths objectAtIndex:0];
+}
 + (NSString*)getPhotoDocummentoryPath
 {
     //TODO save to private libray or public document should be configurable?  No I put it in private
@@ -215,11 +219,7 @@ UIPopoverController *verifyViewPopover;
         sourceName = [ATHelper getSelectedDbFileName];
         appDelegate.sourceName = sourceName;
     }
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    documentsDirectory = [documentsDirectory stringByAppendingPathComponent:sourceName];
-    
-    return documentsDirectory;
+    return [[self getRootDocumentoryPath] stringByAppendingPathComponent:sourceName];
 }
 
 + (NSString*)getNewUnsavedEventPhotoPath
