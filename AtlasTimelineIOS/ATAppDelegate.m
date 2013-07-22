@@ -13,6 +13,7 @@
 #import "ATConstants.h"
 #import "ATEventEntity.h"
 #import "ATHelper.h"
+#import "iRate.h"
 
 
 @interface ATAppDelegate ()
@@ -34,6 +35,28 @@
     //_dateFormater.dateStyle = NSDateFormatterMediumStyle;
     [_dateFormater setDateFormat:@"MM/dd/yyyy GG"];
     return _dateFormater;
+}
+
++ (void)initialize
+{
+    //configure iRate
+    [iRate sharedInstance].daysUntilPrompt = 5;
+    [iRate sharedInstance].usesUntilPrompt = 15;
+    
+    //For testing
+    //[iRate sharedInstance].previewMode = YES;
+    
+    /*
+     //These ivars have the following meaning: wait 5 days before asking a review from the user and wait for at least 10 application usage. If the user tap Remind me later, then wait 3 days before asking a review again. Very nice.
+    [iRate sharedInstance].appStoreID = 3333333;
+    [iRate sharedInstance].applicationName=@"xxxx";
+    [iRate sharedInstance].daysUntilPrompt = 5;
+    [iRate sharedInstance].usesUntilPrompt = 10;
+    [iRate sharedInstance].remindPeriod = 3;
+    [iRate sharedInstance].message = NSLocalizedString(@"striRateMessage_KEY", striRateMessage);
+    [iRate sharedInstance].NSLocalizedString(@"strrateButtonLabel_KEY", strrateButtonLabel);
+    */
+    
 }
 
 //this will easy to change database file name by just set eventListSorted to null
@@ -74,7 +97,7 @@
     }
     controller = [self.storyBoard instantiateInitialViewController];
     [self.window setRootViewController:controller];
-    NSLog(@" -------dropbox root is %@", kDBRootDropbox);
+    //NSLog(@" -------dropbox root is %@", kDBRootDropbox);
     DBSession* dbSession =[[DBSession alloc] initWithAppKey:@"vmngs8cprefdyi3"
                                                   appSecret:@"o9ct42rr0696dzq" root:kDBRootDropbox]; // either kDBRootAppFolder or kDBRootDropbox;
     [DBSession setSharedSession:dbSession];
