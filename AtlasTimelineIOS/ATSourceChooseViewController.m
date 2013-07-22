@@ -9,6 +9,10 @@
 #import "ATSourceChooseViewController.h"
 #import "ATConstants.h"
 #import "ATHelper.h"
+#import "ATAppDelegate.h"
+#import "ATEventDataStruct.h"
+
+#define EVENT_TYPE_HAS_PHOTO 1
 
 @interface ATSourceChooseViewController ()
 
@@ -76,19 +80,51 @@
     cell.textLabel.text = source;
     
     if (indexPath.row == _selectedIndex)
+    {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
-    else
-        cell.accessoryType = UITableViewCellAccessoryNone;
-    
-    if ([source isEqualToString:[ATConstants defaultSourceName]])
         cell.textLabel.textColor = [UIColor blueColor];
+        [self getStatsForEvent:source tableCell:cell];
+    }
     else
+    {
+        cell.accessoryType = UITableViewCellAccessoryNone;
         cell.textLabel.textColor = [UIColor blackColor];
+        cell.detailTextLabel.text = @"";
+    }
     
     return cell;
 
 }
-
+-(void) getStatsForEvent:(NSString*)sourceName tableCell:(UITableViewCell*)cell
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSArray* eventList = appDelegate.eventListSorted;
+    NSError *error;
+    int totalPhotoCount = 0;
+    double totalPhotoSize = 0;
+    for (ATEventDataStruct* evt in eventList)
+    {
+        if (evt.eventType == EVENT_TYPE_HAS_PHOTO)
+        {
+            NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:evt.uniqueId];
+            NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
+            if (tmpFileList != nil && [tmpFileList count] > 0)
+            {
+                for (NSString* file in tmpFileList)
+                {
+                    NSDictionary *dict = [[NSFileManager defaultManager] attributesOfItemAtPath:[fullPathToFile stringByAppendingPathComponent:file] error: &error];
+                    NSNumber* fileSize = [dict valueForKey:@"NSFileSize"];
+                    totalPhotoSize = totalPhotoSize + [fileSize doubleValue];
+                    if (![file isEqualToString:@"thumbnail"])
+                        totalPhotoCount++;
+                }
+            }
+            
+        }
+    }
+    int totalSizeInM = totalPhotoSize / 1048576;
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"%d events, %d photos, %dMB ",[eventList count], totalPhotoCount, totalSizeInM ];
+}
 /*
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath

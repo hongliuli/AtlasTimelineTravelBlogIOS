@@ -12,7 +12,19 @@ Should always test AdHoc Distribution, or at leaset to set Release mode for Prod
 
 Version History
 ---------------
-[6/13/2013] Submit Ver1.2:
+Version 2.0 prepare:
+1. Add multiple photos to a event
+2. Save/restore photos to dropbox account
+3. New version notification when click Settings
+4. Rate using iRate https://github.com/nicklockwood/iRate
+5. Add more links to Help View
+6. Fix iPad add/edit event will shift date unit by one. see TimeScrollWindowNiew line 555
+7. changed "Purchase Full Version" to "Support Us" and purchase prompt wording.
+8. Added event number, photo number, space used in "Offline Contents"
+
+
+[6/13/2013] Submit Ver1.2: [became available on 7/5/2013]
+(Re-submit by add Restore Purchase)
   1. submit process to include In App purchase on iTune
   2. Address Search bar now do not show time elapsed
      Tutorial emphasis add event by search address

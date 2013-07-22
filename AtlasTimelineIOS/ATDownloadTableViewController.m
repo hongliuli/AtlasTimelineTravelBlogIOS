@@ -155,9 +155,6 @@ UIActivityIndicatorView* spinner;
     }
     else
     {
-        
-        
-        NSLog(@"  selected to download %@", cell.textLabel.text);
         selectedAtlasName = cell.textLabel.text;
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Download %@",selectedAtlasName]
                                                        message: @"Download may take a few minutes, continue?."
@@ -200,8 +197,7 @@ UIActivityIndicatorView* spinner;
 
     NSString* atlasName = [selectedAtlasName stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
     NSURL* serviceUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@/downloadjsoncontents?user_id=%@&security_code=%@&atlas_name=%@",[ATConstants ServerURL], userId, securityCode, atlasName]];
-    
-    NSLog(@"download url is %@",[serviceUrl absoluteString]);
+
     NSData* downloadedData = [NSData dataWithContentsOfURL:serviceUrl];
     NSString* displayLocalCnt = @"";
     if ([[ATHelper getSelectedDbFileName] isEqualToString :selectedAtlasName])
@@ -211,7 +207,7 @@ UIActivityIndicatorView* spinner;
     downloadedJson = [NSJSONSerialization JSONObjectWithData:downloadedData options:kNilOptions error:&error];
     
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Downloaded %@ has %i events",selectedAtlasName,[downloadedJson count]]
-                                message: [NSString stringWithFormat:@"Local %@'s %@ events will be replaced!",selectedAtlasName,displayLocalCnt]
+                                message: [NSString stringWithFormat:@"WARNING: Local %@'s %@ events will be replaced!",selectedAtlasName,displayLocalCnt]
                                 delegate: self
                                 cancelButtonTitle:@"Cancel"
                                 otherButtonTitles:@"Replace",nil];

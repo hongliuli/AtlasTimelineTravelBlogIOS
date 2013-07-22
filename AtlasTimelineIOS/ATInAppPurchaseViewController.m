@@ -27,7 +27,7 @@ UILabel *purchaseStatusLabel;
 {
     askToPurchase = [[UIAlertView alloc]
                      initWithTitle:@"Purchase Full Version"
-                     message:@"Free version allows to create up to 50 events only, do you want to purchase full version for USD$2.99?"
+                     message:@"Free version allows you to store as many as 50 events and unlimited photos, do you want to support us by purchasing unlimited version for USD$2.99 now?"
                      delegate:self
                      cancelButtonTitle:nil
                      otherButtonTitles:@"Yes", @"No", nil];

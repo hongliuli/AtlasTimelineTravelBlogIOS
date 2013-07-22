@@ -43,6 +43,7 @@
 - (int) getNewPhotoQueueSizeExcludeThumbNail;
 - (int) getDeletedPhotoQueueSize;
 - (int) getDeletedEventPhotoQueueSize;
+- (BOOL) isItInNewPhotoQueue:(NSString*)eventIdOrPhotoName;
 
 
 

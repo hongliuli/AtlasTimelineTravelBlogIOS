@@ -113,7 +113,7 @@
     NSError *error = nil;
     NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
 
-    NSLog(@"  ----- fetchAllEvents number is %u",[fetchedObjects count]);
+    //NSLog(@"  ----- fetchAllEvents number is %u",[fetchedObjects count]);
     return fetchedObjects;
 }
 
@@ -164,7 +164,7 @@
     }
     else
     {
-        NSLog(@"------- update fail, now add new");
+        //NSLog(@"------- update fail, now add new");
         newEntity = [self addEventEntityAddress:data.address description:data.eventDesc date: data.eventDate lat:data.lat lng:data.lng type:data.eventType uniqueId:nil];
     }
     return newEntity; //for update, newUniqueId will be nil so caller know this is new event
@@ -352,5 +352,17 @@
 {
     return [self getQueueSize:@"ATDeletedEventPhotoQueue"  ];
 }
+- (BOOL) isItInNewPhotoQueue:(NSString*)eventIdOrPhotoName
+{
+    NSManagedObjectContext* context = self.managedObjectContext;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"ATNewPhotoQueue" inManagedObjectContext:context];
+    [fetchRequest setEntity:entity];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(eventIdPhotoPath CONTAINS %@)", eventIdOrPhotoName];
+    [fetchRequest setPredicate:predicate];
+    NSError* error;
+    return ([context countForFetchRequest:fetchRequest error:&error] > 0);
 
+}
 @end

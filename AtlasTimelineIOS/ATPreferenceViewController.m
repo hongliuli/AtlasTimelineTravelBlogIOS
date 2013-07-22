@@ -46,16 +46,20 @@
     int downloadFromDropboxStartCount;
     int downloadFromDropboxSuccessCount;
     int downloadFromDropboxFailCount;
+    int downloadFromDropboxLoadMedadataFailCount;
+    BOOL onlyShowOnceForIssueWithDropbox;
     int totalPhotoCountInDevice;
     BOOL isEventDir;
     BOOL isRemoveSourceForUploadAll;
-    BOOL showLoadMetadataErrorAlert;
+    BOOL showDownloadAllLoadMetadataErrorAlert;
     NSMutableArray* eventListToCopyPhotoFromDropbox;
     UIActivityIndicatorView* spinner;
     
     UIAlertView* uploadAlertView;
     UIAlertView* uploadAllToDropboxAlert;
     UIAlertView* downloadAllFromDropboxAlert;
+    UIAlertView* confirmUploadAllPhotoAlertView;
+    UIAlertView* confirmUploadContentAlertView;
     
     UITableViewCell* PhotoToDropboxCell;
     UITableViewCell* photoFromDropboxCell;
@@ -112,7 +116,7 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    if ([segue.identifier isEqualToString:@"PeriodPick"]) {
+    if ([segue.identifier isEqualToString:@"choose_offline_content"]) {
         ATSourceChooseViewController *sourceChooseViewController = segue.destinationViewController;
         sourceChooseViewController.delegate = self;
         sourceChooseViewController.source = _source;
@@ -126,13 +130,11 @@
         }
         ATDownloadTableViewController *downloadTableViewController = segue.destinationViewController;
         downloadTableViewController.parent = self;
-        NSLog(@"download segue clicked");
     }
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     if ((self = [super initWithCoder:aDecoder])) {
-        NSLog(@"init PreferenceViewController");
         _source = [ATHelper getSelectedDbFileName];
     }
     return self;
@@ -141,7 +143,6 @@
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"upload clicked view clicked row is %i" , indexPath.row);
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     
     int cnt = [appDelegate.eventListSorted count];
@@ -168,14 +169,31 @@
         }
         else if (buttonIndex == 1)
         {
-            NSLog(@"user want continues to upload");
-            [self startUploadJson];
+            confirmUploadContentAlertView  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Confirm to replace %@ content on server!",[ATHelper getSelectedDbFileName]]
+                message:@"Enter agree to continue:" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [confirmUploadContentAlertView setAlertViewStyle:UIAlertViewStylePlainTextInput];
+            UITextField * aa = [confirmUploadContentAlertView textFieldAtIndex:0];
+            aa.placeholder = @"agree";
+            [confirmUploadContentAlertView show];
         }
         else
         {
             NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
             [userDefault removeObjectForKey:[ATConstants UserEmailKeyName]];
             [userDefault removeObjectForKey:[ATConstants UserSecurityCodeKeyName]];
+        }
+    }
+    if (alertView == confirmUploadContentAlertView)
+    {
+        UITextField *agree = [alertView textFieldAtIndex:0];
+        if ([agree.text caseInsensitiveCompare:@"agree"] == NSOrderedSame)
+        {
+            [self startUploadJson];
+        }
+        else
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled uploading the content to server" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
         }
     }
     if (alertView == uploadAllToDropboxAlert)
@@ -187,9 +205,27 @@
         }
         else if (buttonIndex == 1)
         {
+            confirmUploadAllPhotoAlertView  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Confirm to replace all %@ photos on Dropbox!",[ATHelper getSelectedDbFileName]]
+                message:@"Enter agree to continue:" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [confirmUploadAllPhotoAlertView setAlertViewStyle:UIAlertViewStylePlainTextInput];
+            UITextField * aa = [confirmUploadAllPhotoAlertView textFieldAtIndex:0];
+            aa.placeholder = @"agree";
+            [confirmUploadAllPhotoAlertView show];
+        }
+    }
+    if (alertView == confirmUploadAllPhotoAlertView)
+    {
+        UITextField *agree = [alertView textFieldAtIndex:0];
+        if ([agree.text caseInsensitiveCompare:@"agree"] == NSOrderedSame)
+        {
             [spinner startAnimating];
             isRemoveSourceForUploadAll = true; //so if /ChronicleMap/myEvent not on dropbox yet, delete fail will know the case
             [[self myRestClient] deletePath:[NSString stringWithFormat:@"/ChronicleMap/%@", [ATHelper getSelectedDbFileName]]];
+        }
+        else
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled uploading all photos to Dropbox" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
         }
     }
     if (alertView == downloadAllFromDropboxAlert)
@@ -200,7 +236,12 @@
             [[NSFileManager defaultManager] createDirectoryAtPath:localFullPath withIntermediateDirectories:YES attributes:nil error:nil];
         downloadFromDropboxStartCount = 0;
         downloadFromDropboxSuccessCount = 0;
-        showLoadMetadataErrorAlert = true;
+        downloadFromDropboxFailCount = 0;
+        downloadFromDropboxLoadMedadataFailCount = 0;
+        onlyShowOnceForIssueWithDropbox = true;
+        showDownloadAllLoadMetadataErrorAlert = true;
+        if ([eventListToCopyPhotoFromDropbox count] > 0)
+            [spinner startAnimating];
         for(NSString* eventId in eventListToCopyPhotoFromDropbox)
         {
             //local path has to exist for loadFile to save. But local path may not exist after re-install app so need do it here
@@ -269,7 +310,7 @@
     NSData *postData = [postStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
     NSURL* serviceUrl = [NSURL URLWithString: [ATConstants ServerURL]];
-    NSLog(@"============post url = %@", serviceUrl.absoluteString);
+    //NSLog(@"============post url = %@", serviceUrl.absoluteString);
     NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:serviceUrl];
     [request setHTTPMethod:@"POST"];
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
@@ -293,7 +334,7 @@
     else
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Upload Success!"
-                                                        message: [NSString stringWithFormat:@"%i %@ events has been uploaded to server successfully!",eventCount,[ATHelper getSelectedDbFileName]]
+                                                        message: [NSString stringWithFormat:@"%i %@ events have been uploaded to server successfully!",eventCount,[ATHelper getSelectedDbFileName]]
                                                        delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         return;
@@ -437,13 +478,26 @@
                     
                 }
             }
-            
-            uploadAllToDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Replace photos on Dropbox for %@", [ATHelper getSelectedDbFileName]]
+            if (totalPhotoCountInDevice == 0)
+            {
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"No photos to upload to your Dropbox!"
+                                                               message: @""
+                                                              delegate: self
+                                                     cancelButtonTitle:@"OK"
+                                                     otherButtonTitles:nil,nil];
+                
+                
+                [alert show];
+            }
+            else
+            {
+                uploadAllToDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Replace photos on Dropbox for %@", [ATHelper getSelectedDbFileName]]
                             message: [NSString stringWithFormat:@"WARNING: All photoes on your dropbox:/ChoronicleMap/%@ will be replaced with %d photos on this device!",_source, totalPhotoCountInDevice]
                             delegate: self
                             cancelButtonTitle:@"Cancel"
                             otherButtonTitles:@"Yes, Continue",nil];
-            [uploadAllToDropboxAlert show];
+                [uploadAllToDropboxAlert show];
+            }
         }
         else if (row == ROW_SYNC_FROM_DROPBOX)
         {
@@ -466,13 +520,26 @@
                     
                 }
             }
-            
-            downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Download photos from Dropbox:/ChronicleMap/%@", [ATHelper getSelectedDbFileName]]
-                        message: @"Find all photos in the above mentioned folder and save to the corresponding events in your device. This operation is safe, it will not remove existing photos in your device."
+            if (totalEventWithPhoto == 0)
+            {
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Content %@ is empty or do not have photos to download.", [ATHelper getSelectedDbFileName]]
+                            message: @"This content may not have photos."
+                            delegate: self
+                        cancelButtonTitle:@"OK"
+                        otherButtonTitles:nil,nil];
+                
+                
+                [alert show];
+            }
+            else
+            {
+                downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Download photos from Dropbox:/ChronicleMap/%@", [ATHelper getSelectedDbFileName]]
+                        message: @"Find all photos in the above Dropbox folder and save to the corresponding events in your device. This operation is safe, it will not remove existing photos in your device."
                         delegate: self
                         cancelButtonTitle:@"Cancel"
                         otherButtonTitles:@"Yes, Continue",nil];
-            [downloadAllFromDropboxAlert show];
+                [downloadAllFromDropboxAlert show];
+            }
         }
     }
 }
@@ -522,7 +589,6 @@
     [spinner stopAnimating];
     if ([self dropboxFolderAlreadyExist:error])
     {
-        NSLog(@"   ------ Folder Fail Error %@",error);
         if ( [@"/ChronicleMap" isEqualToString:(NSString*)[error.userInfo objectForKey:@"path"]]) //TODO
         {
             NSString *destDir = [ NSString stringWithFormat:@"/ChronicleMap/%@",  [ATHelper getSelectedDbFileName]];
@@ -638,7 +704,6 @@
         PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo to Dropbox - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
     }
     [self startProcessNewPhotoQueueChainAction]; //start upload next file until
-    NSLog(@"====File uploaded successfully to path: %@", metadata.path);
 }
 
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error {
@@ -652,8 +717,9 @@
     
     [alert show];
 }
-- (void) prepareUploadAllToDropbox //call this after remove ChronicleMap/myEvent on dropbox successfully
+- (BOOL) prepareUploadAllToDropbox //call this after remove ChronicleMap/myEvent on dropbox successfully
 {
+    BOOL hasFileToUpload = false;
     //empty queues
     NSString* file = [[self getDataController] popNewPhotoQueue];
     while (file != nil)
@@ -689,25 +755,34 @@
                 for (NSString* file in tmpFileList)
                 {
                     [[self getDataController] insertNewPhotoQueue:[evt.uniqueId stringByAppendingPathComponent:file]];
+                    hasFileToUpload = true;
                 }
             }
             
         }
     }
+    return hasFileToUpload;
 }
 - (void)restClient:(DBRestClient*)client deletedPath:(NSString *)path
 {
     if (isRemoveSourceForUploadAll)
     {
-        [self prepareUploadAllToDropbox];
+        if (![self prepareUploadAllToDropbox])
+            return; //return if no file to upload
         NSString *destDir = [ NSString stringWithFormat:@"/ChronicleMap/%@",  [ATHelper getSelectedDbFileName] ];
         [[self myRestClient ] createFolder:destDir]; //this will start chain action for copy all in the queue to dropbox
         isRemoveSourceForUploadAll = false;
         return;
     }
     
-    deleteCount++;
     [[self getDataController] emptyDeletedPhotoQueue:[NSString stringWithFormat:@"%@/%@", currentEventId, currentPhotoName]];
+    int dbNewPhotoCount = [[self getDataController] getNewPhotoQueueSizeExcludeThumbNail];
+    int dbDeletedPhotoCount = [[self getDataController] getDeletedPhotoQueueSize];
+    if (![currentPhotoName isEqualToString:@"thumbnail"])
+    {
+        deleteCount++;
+        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo to Dropbox - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
+    }
     [self processEmptyDeletedPhotoQueue];
 }
 - (void)restClient:(DBRestClient*)client deletePathFailedWithError:(NSError*)error
@@ -716,7 +791,8 @@
     {
         if (isRemoveSourceForUploadAll)
         {
-            [self prepareUploadAllToDropbox];
+            if (![self prepareUploadAllToDropbox])
+                return; //return if no file to upload
             NSString *destDir = [ NSString stringWithFormat:@"/ChronicleMap/%@",  [ATHelper getSelectedDbFileName] ];
             [[self myRestClient ] createFolder:destDir]; //this will start chain action for copy all to dropbox
             isRemoveSourceForUploadAll = false;
@@ -746,9 +822,9 @@
 - (void)restClient:(DBRestClient*)client loadedMetadata:(DBMetadata*)metadata
 {
     if (metadata.isDirectory) {
-        NSLog(@"Folder '%@' contains:", metadata.path);
+        //NSLog(@"Folder '%@' contains:", metadata.path);
         for (DBMetadata *file in metadata.contents) {
-            NSLog(@"\t%@", file.filename);
+            //NSLog(@"\t%@", file.filename);
             NSString* localPhotoPath = [[[ATHelper getRootDocumentoryPath] stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:currentPhotoName];
             NSString* partialPath = [metadata.path substringFromIndex:14]; //metadata.path is "/ChronicleMap/myEvents/eventid"
             localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:partialPath] stringByAppendingPathComponent:file.filename];
@@ -760,10 +836,26 @@
 }
 - (void)restClient:(DBRestClient*)client loadMetadataFailedWithError:(NSError*)error
 {
-    if (showLoadMetadataErrorAlert)
+    if (showDownloadAllLoadMetadataErrorAlert)
     {
         [spinner stopAnimating];
-        showLoadMetadataErrorAlert = false;
+        showDownloadAllLoadMetadataErrorAlert = false;
+        NSString* path = (NSString*)[error.userInfo objectForKey:@"path"] ;
+        NSString* eventId = nil;
+        if (path != nil)
+            eventId = [[path componentsSeparatedByString:@"/"] lastObject];
+            //eventId = [path lastPathComponent] ;
+        if ([(NSString*)[error.userInfo objectForKey:@"error"] rangeOfString:@"not found" options:NSCaseInsensitiveSearch].location != NSNotFound )
+        {  //If come here because of newAdded photo not uploaded yet, then do nothting except .... following ...
+            if (![[self getDataController] isItInNewPhotoQueue:eventId])
+            {
+                //come here if directory in Dropbox cannot be found while we think it should. It may happen if /ChronicleMap/xxsourcexx is not in dropbox, Or it may also happen if we manually remove some directory from dropbox for this content
+                downloadFromDropboxLoadMedadataFailCount ++;
+                [self promptCopyFromDropboxStatus];
+            }
+            return;
+        }
+
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not Download from Dropbox"
                                                    message: @"May be the network is not available"
                                                   delegate: self
@@ -786,13 +878,14 @@
 
 - (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
     downloadFromDropboxFailCount++;
+    photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d failed", downloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
     [self promptCopyFromDropboxStatus];
 }
 
 - (void)promptCopyFromDropboxStatus
 {
-    NSLog(@"  download success=%d, failed=%d, total=%d",downloadFromDropboxSuccessCount,downloadFromDropboxFailCount,downloadFromDropboxStartCount);
-    if (downloadFromDropboxSuccessCount + downloadFromDropboxFailCount == downloadFromDropboxStartCount)
+    //NSLog(@"  download success=%d, failed=%d, total=%d",downloadFromDropboxSuccessCount,downloadFromDropboxFailCount,downloadFromDropboxStartCount);
+    if (downloadFromDropboxSuccessCount + downloadFromDropboxFailCount == downloadFromDropboxStartCount && downloadFromDropboxStartCount > 0)
     {
         [spinner stopAnimating];
         NSString* message;
@@ -801,9 +894,16 @@
         else if (downloadFromDropboxSuccessCount == 0)
             message = [NSString stringWithFormat:@"Download failed, please check if network is available, or if your Dropbox has photos in /ChronicleMap/%@ directory.", [ATHelper getSelectedDbFileName]];
         else
-            message = [NSString stringWithFormat:@"Download photos from Dropbox: %d success, %d fail.", downloadFromDropboxSuccessCount,downloadFromDropboxFailCount];
+            message = [NSString stringWithFormat:@"Download photos from Dropbox: %d success, %d fail. Please make sure you have a good wifi connection and try downloading all again.", downloadFromDropboxSuccessCount,downloadFromDropboxFailCount];
         
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Download photos from Dropbox finished" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+    }
+    else if (downloadFromDropboxLoadMedadataFailCount > 0 && downloadFromDropboxSuccessCount + downloadFromDropboxFailCount == 0 && onlyShowOnceForIssueWithDropbox)
+    { //this condition is used when loadMetadataWithError called the function
+        onlyShowOnceForIssueWithDropbox = false;
+        NSString* message = [NSString stringWithFormat:@"On your Dropbox, please check if photos are properly copied to /ChronicleMap/%@ folder!", [ATHelper getSelectedDbFileName]];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Some issue access Dropbox ChronicleMap folder." message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
 }

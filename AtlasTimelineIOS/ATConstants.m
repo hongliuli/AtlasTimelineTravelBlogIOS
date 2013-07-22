@@ -265,9 +265,9 @@
 }
 + (int) defaultZoomLevel{ //currently used when app start and focused clicked in timeline view to map view
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return 7;
+        return 12;
     else
-        return 7;
+        return 12;
 }
 + (int) timeScrollBigDateFont{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) 

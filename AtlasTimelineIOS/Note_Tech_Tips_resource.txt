@@ -19,7 +19,7 @@ Add existing xcode project to local GIT
 Open the project directory in a terminal and type the following:
 git init
 git add .
-git commit -m "Initial commit"
+git commit -m "Initial commit" 
 
 branch with xcode in organizer:
 http://useyourloaf.com/blog/2012/02/29/git-branch-management-with-xcode.html
@@ -30,10 +30,16 @@ Third Party API
 -----------------
 Form design, good for my setting window: http://escoz.com/open-source/quickdialog
 
-Social Framework 
+Social Framework / iRate
 ---------------- 
-Use 
-http://www.albertopasca.it/whiletrue/2012/10/objective-c-custom-uiactivityviewcontroller-icons-text/
+Use http://www.albertopasca.it/whiletrue/2012/10/objective-c-custom-uiactivityviewcontroller-icons-text/
+Rating use iRate: https://github.com/nicklockwood/iRate
+
+7/15/2013 Implement sync dropbox with my own way
+---------
+Did not use Dropbox new Sync API because it will too tightly couple user with Dropbox.
+I used DBRestClient for iOS. This is asynchronize api, I implement it in my own way to simulate its execution in 
+synchronous way but user still can interupt (I called my way Chain action)
 
 6/23/2013  display multiple photo in EventEditor with Horizontal table
 ----------

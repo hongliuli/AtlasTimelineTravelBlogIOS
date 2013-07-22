@@ -34,17 +34,8 @@ UIPopoverController *verifyViewPopover;
 }
 + (NSArray *)listFileAtPath:(NSString *)path
 {
-    //-----> LIST ALL FILES <-----//
-    NSLog(@"LISTING ALL FILES FOUND");
-
-    
     NSArray *directoryContent1 = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL];
     NSMutableArray* directoryContent = [NSMutableArray arrayWithArray:directoryContent1];
-    for (int count = 0; count < [directoryContent count]; count++)
-    {
-        //directoryContent[count] = [directoryContent[count] substringWithRange:NSMakeRange(0,[directoryContent[count] length] - 7)]; //remove .sqlite postfix
-        NSLog(@"File %d: %@", (count + 1), directoryContent[count]);
-    }
     return directoryContent;
 }
 
