@@ -122,8 +122,12 @@
             
         }
     }
-    int totalSizeInM = totalPhotoSize / 1048576;
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"%d events, %d photos, %dMB ",[eventList count], totalPhotoCount, totalSizeInM ];
+    float totalSizeInM = totalPhotoSize / 1048576;
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+    [formatter setMaximumFractionDigits:1];
+    [formatter setRoundingMode: NSNumberFormatterRoundDown];
+    NSString *numberString = [formatter stringFromNumber:[NSNumber numberWithFloat:totalSizeInM]];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"%d events, %d photos, %@MB ",[eventList count], totalPhotoCount, numberString ];
 }
 /*
 // Override to support conditional editing of the table view.

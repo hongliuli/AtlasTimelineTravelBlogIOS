@@ -230,7 +230,11 @@
     }
     if (alertView == downloadAllFromDropboxAlert)
     {
-        //if local path does not exist, loadFile will not write 
+        if (buttonIndex == 0)
+        {
+            return; //user canceled download all
+        }
+        //if local path does not exist, loadFile will not write
         NSString* localFullPath = [ATHelper getPhotoDocummentoryPath];
         if (![[NSFileManager defaultManager] fileExistsAtPath:localFullPath])
             [[NSFileManager defaultManager] createDirectoryAtPath:localFullPath withIntermediateDirectories:YES attributes:nil error:nil];
@@ -780,6 +784,7 @@
     int dbDeletedPhotoCount = [[self getDataController] getDeletedPhotoQueueSize];
     if (![currentPhotoName isEqualToString:@"thumbnail"])
     {
+        [spinner stopAnimating]; //TODO? seems weired here. but need it when only have item in deleteQueue
         deleteCount++;
         PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo to Dropbox - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
     }
@@ -844,8 +849,7 @@
         NSString* eventId = nil;
         if (path != nil)
             eventId = [[path componentsSeparatedByString:@"/"] lastObject];
-            //eventId = [path lastPathComponent] ;
-        if ([(NSString*)[error.userInfo objectForKey:@"error"] rangeOfString:@"not found" options:NSCaseInsensitiveSearch].location != NSNotFound )
+        if (error.code == 404 && [(NSString*)[error.userInfo objectForKey:@"error"] rangeOfString:@"not found" options:NSCaseInsensitiveSearch].location != NSNotFound )
         {  //If come here because of newAdded photo not uploaded yet, then do nothting except .... following ...
             if (![[self getDataController] isItInNewPhotoQueue:eventId])
             {
