@@ -8,6 +8,7 @@
 #define DOWNLOAD_START_ALERT 1
 #define DOWNLOAD_REPLACE_MY_SOURCE_ALERT 2
 #define DOWNLOAD_AGAIN_ALERT 3
+#define DOWNLOAD_CONFIRM 4
 
 #import "ATDownloadTableViewController.h"
 #import "ATConstants.h"
@@ -169,17 +170,41 @@ UIActivityIndicatorView* spinner;
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == 0)
+    if (alertView.tag == DOWNLOAD_CONFIRM)
     {
-        NSLog(@"user canceled upload");
-        // Any action can be performed here
+        UITextField *agree = [alertView textFieldAtIndex:0];
+        if ([agree.text caseInsensitiveCompare:@"agree"] == NSOrderedSame)
+        {
+            [self startReplaceDb];
+        }
+        else
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled replacing offline content!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }
     }
     else
     {
-        if (alertView.tag == DOWNLOAD_START_ALERT || alertView.tag == DOWNLOAD_AGAIN_ALERT)
-            [self startDownload];
-        if (alertView.tag == DOWNLOAD_REPLACE_MY_SOURCE_ALERT )
-            [self startReplaceDb];
+        if (buttonIndex == 0)
+        {
+            NSLog(@"user canceled upload");
+            // Any action can be performed here
+        }
+        else
+        {
+            if (alertView.tag == DOWNLOAD_START_ALERT || alertView.tag == DOWNLOAD_AGAIN_ALERT)
+                [self startDownload];
+            if (alertView.tag == DOWNLOAD_REPLACE_MY_SOURCE_ALERT )
+            {
+                UIAlertView* alert  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Confirm to replace %@ contents in your device!",[ATHelper getSelectedDbFileName]]
+                    message:@"Enter agree to continue:" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
+                UITextField * aa = [alert textFieldAtIndex:0];
+                aa.placeholder = @"agree";
+                alert.tag = DOWNLOAD_CONFIRM;
+                [alert show];
+            }
+        }
     }
 }
 
