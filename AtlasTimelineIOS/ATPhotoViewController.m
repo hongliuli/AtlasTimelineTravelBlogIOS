@@ -67,10 +67,11 @@ UILabel * lblCount = nil;
     [recognizer setDirection:( UISwipeGestureRecognizerDirectionLeft)];
     [[self view] addGestureRecognizer:recognizer];
     
-    lblCount = [[UILabel alloc] initWithFrame:CGRectMake([ATConstants screenWidth]/2 - 30, [ATConstants screenHeight] - 100, 60, 30)];
+    lblCount = [[UILabel alloc] initWithFrame:CGRectMake([ATConstants screenWidth]/2 - 20, 50, 80, 30)];
     lblCount.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.4 ];
     lblCount.textColor = [UIColor whiteColor];
     lblCount.textAlignment = UITextAlignmentCenter;
+    lblCount.font = [UIFont fontWithName:@"Helvetica-Bold" size:22.0];
     lblCount.layer.cornerRadius = 5;
     [self.view addSubview:lblCount];
     
@@ -78,7 +79,7 @@ UILabel * lblCount = nil;
 }
 
 -(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer {
-    NSLog(@"Swipe received.");
+    //NSLog(@"Swipe received.");
     int totalPhotoCount = [self.eventEditor.photoScrollView.photoList count];
     if(recognizer.direction == UISwipeGestureRecognizerDirectionRight)
     {
@@ -142,7 +143,7 @@ UILabel * lblCount = nil;
         self.eventEditor.photoScrollView.selectedAsShareIndex = 0;
 
     NSString* deletedFileName =self.eventEditor.photoScrollView.photoList[selectedPhotoIdx];
-    NSLog(@" deleted file = %@",deletedFileName);
+    //NSLog(@" deleted file = %@",deletedFileName);
     [self.eventEditor deleteCallback: deletedFileName];
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
@@ -179,7 +180,7 @@ UILabel * lblCount = nil;
 }
 - (void) showCount
 {
-    lblCount.text = [NSString stringWithFormat:@"%d/%d",self.currentIndex + 1, [self.eventEditor.photoScrollView.photoList count] ];
+    lblCount.text = [NSString stringWithFormat:@"%d / %d",self.currentIndex + 1, [self.eventEditor.photoScrollView.photoList count] ];
     [self.view bringSubviewToFront:lblCount];
     int deltaHeight;
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
@@ -189,7 +190,7 @@ UILabel * lblCount = nil;
     else{
         deltaHeight =100;
     }
-    CGRect frame = CGRectMake([ATConstants screenWidth]/2 - 30, [ATConstants screenHeight] - deltaHeight, 60, 30);
+    CGRect frame = CGRectMake([ATConstants screenWidth]/2 - 30, 20, 80, 30);
     [lblCount setFrame:frame];
     
 }
