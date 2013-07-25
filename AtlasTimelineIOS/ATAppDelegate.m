@@ -102,6 +102,8 @@
                                                   appSecret:@"o9ct42rr0696dzq" root:kDBRootDropbox]; // either kDBRootAppFolder or kDBRootDropbox;
     [DBSession setSharedSession:dbSession];
     
+    [[DBSession sharedSession] unlinkAll];//IMPORTANT: so each restart will ask user login to drobox. Without this, once login to dropbox from app, even reinstall app will not ask to login again, there is no way to switch dropbox account
+    
     return YES;
 }
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
