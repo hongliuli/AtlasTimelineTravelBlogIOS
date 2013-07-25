@@ -606,9 +606,9 @@
     NSURLResponse* response=nil;
     NSError* error=nil;
     NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    NSString* URLString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    //NSString* URLString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
-    if(URLString == nil)
+    if(data == nil || error != nil)
         [self addPinToMap:@"Unknow" :touchMapCoordinate];
     else 
         [self.geoCoder reverseGeocodeLocation: self.location completionHandler:
