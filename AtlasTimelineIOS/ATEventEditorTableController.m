@@ -232,7 +232,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
 -(void)takePictureAction:(id)sender
 {
-    NSLog(@"   ----- take picture action");
     self.hasPhotoFlag = EVENT_TYPE_NO_PHOTO;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
@@ -342,7 +341,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         else
         {
             //if date is already a a BC date, datePicker will crash here, so have the first line check above, so do not show date picker if is a BC date
-            NSLog(@"dateTxt is %@", dateTxt.text);
             NSDate* dt = [dateFormater dateFromString:self.dateTxt.text];
             if (dt != nil)
                 self.datePicker.date = dt;
@@ -451,7 +449,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         }
         else if (buttonIndex == 1)
         {
-            NSLog(@"user want continues to delete the events");
             //will delete selected event from annotation/db
             [self.delegate deleteEvent];
         }
@@ -465,7 +462,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         }
         else if (buttonIndex == 1)
         {
-            NSLog(@"user want continues to cancel the events");
             //will delete selected event from annotation/db
             [self.delegate cancelEvent];
         }
@@ -536,7 +532,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     [formatter setDateFormat:@"yyyyMMdd_hh_mm_ss"];
     //save to a temparay file
     NSString* timeStampPhotoName = [formatter stringFromDate:[NSDate date]];
-    NSLog(@"  photo file name is %@", timeStampPhotoName);
     NSString* photoFileName = [NSString stringWithFormat:@"%@", timeStampPhotoName];
 
     NSString* tmpFileNameForNewPhoto = [NSString stringWithFormat:@"%@%@", NEW_NOT_SAVED_FILE_PREFIX,timeStampPhotoName];
@@ -565,7 +560,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     {
         newImage = [ATHelper imageResizeWithImage:newPhoto scaledToSize:CGSizeMake(imageWidth, imageHeight)];
     }
-    NSLog(@"widh=%f, height=%f",newPhoto.size.width, newPhoto.size.height);
+    //NSLog(@"widh=%f, height=%f",newPhoto.size.width, newPhoto.size.height);
     imageData = UIImageJPEGRepresentation(newImage, JPEG_QUALITY); //quality should be configurable?
     NSString *fullPathToNewTmpPhotoFile = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:tmpFileNameForNewPhoto];
     NSError *error;
