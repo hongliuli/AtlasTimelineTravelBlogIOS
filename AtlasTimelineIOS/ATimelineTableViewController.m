@@ -432,7 +432,7 @@ NSMutableArray* originalEventListSorted;
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"detail view clicked row is %i" , indexPath.row);
+    //NSLog(@"detail view clicked row is %i" , indexPath.row);
     ATEventDataStruct* ent = nil;
     if (tableView == self.searchDisplayController.searchResultsTableView)
 	{
