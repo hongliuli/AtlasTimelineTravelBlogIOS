@@ -63,7 +63,7 @@
 //when scroll, will not come here, so have some heavy work such as calendar
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSLog(@"number of photos:%d",[self.photoList count]);
+    //NSLog(@"number of photos:%d",[self.photoList count]);
     if (self.photoList != nil && [self.photoList count] > 0)
         return [self.photoList count];
     else
@@ -144,7 +144,7 @@
 
 - (void) didSelectRowAtIndexPath:(NSIndexPath *)indexPath  //called by tapGesture. This is not in a TableViewController, so no didSelect... delegate mechanism, have to process  by tap gesture
 {
-    NSLog(@"select photo selected");
+    //NSLog(@"select photo selected");
     self.selectedPhotoIndex = indexPath.row;
     ATPhotoScrollCell *cell = (ATPhotoScrollCell*)[self.horizontalTableView cellForRowAtIndexPath:indexPath];
     [self.eventEditor showPhotoView:self.selectedPhotoIndex image:cell.photo.image];
