@@ -25,8 +25,8 @@
     int yearElapsedFromToday;
     NSCalendar* calendar;
     NSDateFormatter *dateLiterFormat;
-    NSDate* startDate;
-    NSDate* endDate;
+    NSDate* timeWindowStartDate;
+    NSDate* timeWindowEndDate;
     
     int focusedRow; //set in cellForRow, used in zoom etc to scroll to focused date
     int prevRow;
@@ -48,8 +48,8 @@
     if ((self = [super initWithFrame:frame]))
     {
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        startDate = appDelegate.mapViewController.startDate;
-        endDate = appDelegate.mapViewController.endDate;
+        timeWindowStartDate = appDelegate.mapViewController.startDate;
+        timeWindowEndDate = appDelegate.mapViewController.endDate;
         //NSLog(@"-------------ATTimeScrollWindowNew  initWithFrame called");
         float tableLength = frame.size.width;
         float tableWith = frame.size.height;
@@ -119,19 +119,19 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDateComponents *components = [calendar components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit
-                                               fromDate:startDate
-                                                 toDate:endDate
+                                               fromDate:timeWindowStartDate
+                                                 toDate:timeWindowEndDate
                                                 options:0];
     int selectedPeriodInDay = appDelegate.selectedPeriodInDays;
     
     //patch: somehow forcused date will go out of range after remove/update edge event (date at index 0 or count-1, make adjustment here
-    if ([appDelegate.focusedDate compare:startDate]==NSOrderedAscending || [appDelegate.focusedDate compare:endDate]==NSOrderedDescending)
-        appDelegate.focusedDate = endDate;
+    if ([appDelegate.focusedDate compare:timeWindowStartDate]==NSOrderedAscending || [appDelegate.focusedDate compare:timeWindowEndDate]==NSOrderedDescending)
+        appDelegate.focusedDate = timeWindowEndDate;
     
     if (selectedPeriodInDay <= 30)
     {
         //For day, use timeInterval is more accurate
-        NSTimeInterval interval = [endDate timeIntervalSinceDate: startDate];
+        NSTimeInterval interval = [timeWindowEndDate timeIntervalSinceDate: timeWindowStartDate];
         currentNumberOfRow = interval/86400; //better add some extra
     }
     else if (selectedPeriodInDay == 365)
@@ -158,7 +158,6 @@
 {
     [self.parent.timeZoomLine showHideScaleText:true];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    
     NSDate* oldFocusedDate = appDelegate.focusedDate;
     NSDateComponents *components = [calendar components:NSDayCalendarUnit|NSMonthCalendarUnit fromDate:oldFocusedDate];
     //int year = [components year];
@@ -257,8 +256,6 @@
         appDelegate.focusedDate = [calendar dateByAddingComponents:addOldMonthToNewFocusedDate toDate:appDelegate.focusedDate options:0];
     }
     
-    NSString* yearPart;
-    yearPart = [ATHelper getYearPartSmart:displayDate];
     NSString* dateString = [NSString stringWithFormat:@" %@", [format stringFromDate:displayDate]];
     NSString* shortYear = [dateString substringWithRange:NSMakeRange(7, 4)];
     
@@ -281,7 +278,7 @@
     idx = range.location + range.length;
     NSString* dayString = [monthDateString substringFromIndex:idx];
     NSString* weekDay3Letter = [dateLiterString substringToIndex:3];
-
+    
     if (daysInPeriod == 7)
     {
         cell.titleLabel.text = [NSString stringWithFormat:@"%@ %@",month3Letter,shortYear];
@@ -336,18 +333,69 @@
         cell.titleLabel.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:groupLabelBackgroundAlpha];
     }
     
-    
     int index1 = [self getIndexOfClosestDate:displayDate :0 :FIRST_TIME_CALL];
     NSDate* nextExpectedDate= [ATHelper dateByAddingComponentsRegardingEra:nextTimePeriodCompponent toDate:displayDate options:0];
     int index2 = [self getIndexOfClosestDate:nextExpectedDate :0 :FIRST_TIME_CALL];
-    //if (index1 - index2 != 0)
-    //   NSLog(@"    has events bellow:");
+    
+    //Start special edge logic. My recursive function does not return correct index for event start and end date
+    //Following is special hack to force start/end event to be counted as one to be displayed  as Cyan color
     //NSLog(@"--Recurs dDate %@ | nDate=%@  idx1=%i  idx2=%i diff=%i", [format stringFromDate: displayDate], [format stringFromDate: nextExpectedDate], index1, index2, index1-index2);
-    if (abs(index1 - index2) > 0)
+    int displayCount = abs(index1 - index2);
+    int totalCnt = [appDelegate.eventListSorted count];
+    NSDate* startDate;
+    NSDate* endDate;
+    
+    
+    NSDate* displayCellStartDate;
+    NSDate* displayCellEndDate;
+    
+    if (daysInPeriod == 365)
     {
-        cell.scallLabel.text=[NSString stringWithFormat:@"%i", index1-index2];
-        cell.scallLabel.textColor = [UIColor cyanColor];
+        
+        displayCellStartDate = [ATHelper getMonthStartDate:displayDate];
+        displayCellEndDate = [ATHelper dateByAddingComponentsRegardingEra:nextTimePeriodCompponent toDate:displayCellStartDate options:0];
+    }
+    else //TODO need see if 10 year/100 year need special
+    {
+        displayCellStartDate = [ATHelper getYearStartDate:displayDate];
+        displayCellEndDate = [ATHelper dateByAddingComponentsRegardingEra:nextTimePeriodCompponent toDate:displayCellStartDate options:0];
+    }
+    if (totalCnt > 0)
+    {
+        startDate = ((ATEventDataStruct*)appDelegate.eventListSorted[0]).eventDate;
+        endDate = ((ATEventDataStruct*)appDelegate.eventListSorted[totalCnt -1]).eventDate;
+        
+    }
+    if (daysInPeriod <=30)
+    {
+        if (totalCnt > 0 &&
+            ([startDate compare:displayDate] == NSOrderedSame || [endDate compare:displayDate] == NSOrderedSame))
+        {
+            displayCount++;
+        }
+    }
+    else if (totalCnt >0 &&
+             (([startDate compare:displayDate] == NSOrderedSame || [endDate compare:displayDate] == NSOrderedSame)
+                 ||(([displayCellEndDate compare:endDate] == NSOrderedDescending  && [endDate compare:displayCellStartDate] == NSOrderedDescending)
+                || ([startDate compare:displayCellStartDate] == NSOrderedDescending  && [displayCellEndDate compare:startDate] == NSOrderedDescending))
+             )
+        )
+    {
+        displayCount++; //take care of the first/last event not hightlighted. this is a hack way to resolv
+                  // but startDate event still not highlighted, why?
+    }
+    //END adjust edge case
+    
+    if (displayCount > 0)
+    {
+        cell.scallLabel.text=[NSString stringWithFormat:@"%i", displayCount];
+        cell.scallLabel.textColor = [UIColor blackColor];
         cell.scallLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:12.0];
+        cell.scallLabel.backgroundColor = [UIColor cyanColor];
+    }
+    else
+    {
+        cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1];
     }
     [self changeBackgroundImage:self year:yearForImages];
     //[self displayTimeElapseinSearchBar];
@@ -586,7 +634,13 @@
                 cell.subLabel.backgroundColor=[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
                 cell.subLabel.layer.cornerRadius = 8;
             }
-            cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1];
+
+            if ([ATHelper isStringNumber:cell.scallLabel.text])
+            {
+                cell.scallLabel.backgroundColor = [UIColor cyanColor];
+            }
+            else
+                cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1]; 
         }
         else
         {
@@ -603,7 +657,10 @@
             if (path.row > focusedRow && ![ATHelper isStringNumber:cell.scallLabel.text])
                 cell.scallLabel.textColor = [UIColor greenColor];
             if ([ATHelper isStringNumber:cell.scallLabel.text])
-                cell.scallLabel.textColor = [UIColor cyanColor];
+            {
+                cell.scallLabel.textColor = [UIColor blackColor];
+                cell.scallLabel.backgroundColor = [UIColor cyanColor];
+            }
         }
     }
 }
@@ -646,12 +703,12 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int selectedPeriodInDay = appDelegate.selectedPeriodInDays;
-    NSDateComponents *components = [calendar components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit fromDate:newFocusedDate toDate:startDate options:0];
+    NSDateComponents *components = [calendar components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit fromDate:newFocusedDate toDate:timeWindowStartDate options:0];
     
     if (selectedPeriodInDay == 30 || selectedPeriodInDay == 7)
     {
         //For day, use timeInterval is more accurate
-        NSTimeInterval interval = [newFocusedDate timeIntervalSinceDate: startDate];
+        NSTimeInterval interval = [newFocusedDate timeIntervalSinceDate: timeWindowStartDate];
         focusedRow = interval/86400;
     }
     else if (selectedPeriodInDay == 365)

@@ -1204,6 +1204,8 @@
     }
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
+    if (self.timeZoomLine != nil)
+        [self.timeZoomLine setNeedsDisplay];
 }
 - (void)cancelEvent{
     if (self.eventEditorPopover != nil)
@@ -1298,6 +1300,9 @@
     }
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
+    
+    if (self.timeZoomLine != nil)
+        [self.timeZoomLine setNeedsDisplay];
 }
 
 //Save photo to file. Called by updateEvent after write event to db

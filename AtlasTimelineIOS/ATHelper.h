@@ -21,6 +21,7 @@
 + (UIColor *)darkerColorForColor:(UIColor *)c;
 + (NSDate *)dateByAddingComponentsRegardingEra:(NSDateComponents *)comps toDate:(NSDate *)date options:(NSUInteger)opts;
 + (NSDate *)getYearStartDate:(NSDate*)date;
++ (NSDate *)getMonthStartDate:(NSDate*)date;
 + (void) createPhotoDocumentoryPath;
 + (NSString*) getRootDocumentoryPath;
 + (NSString*)getPhotoDocummentoryPath;

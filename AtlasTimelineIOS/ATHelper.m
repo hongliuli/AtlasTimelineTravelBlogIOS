@@ -151,6 +151,17 @@ UIPopoverController *verifyViewPopover;
     return [format dateFromString:startDateStr];
 }
 
++ (NSDate *)getMonthStartDate:(NSDate*)date
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSDateFormatter* format = appDelegate.dateFormater;
+    NSString *dateString = [NSString stringWithFormat:@"%@", [format stringFromDate:date]];
+    NSString* yearPart = [dateString substringFromIndex:[dateString length]-7];
+    NSString* monthPart = [dateString substringToIndex:2];
+    NSString* startDateStr = [NSString stringWithFormat:@"%@/01/%@",monthPart,yearPart];
+    return [format dateFromString:startDateStr];
+}
+
 //This function is from Googling, it is a magic function to scroll NSDate across BC/AD, saved me a very difficult issue, so now I can show BC/AD
 + (NSDate *)dateByAddingComponentsRegardingEra:(NSDateComponents *)comps toDate:(NSDate *)date options:(NSUInteger)opts
 {

@@ -9,6 +9,7 @@
 #import "ATTimeZoomLine.h"
 #import "ATAppDelegate.h"
 #import "ATHelper.h"
+#import "ATEventDataStruct.h"
 
 #define MOVABLE_VIEW_HEIGHT 4
 
@@ -31,8 +32,11 @@ UILabel* labelScaleText;
 NSCalendar *calendar;
 NSDateFormatter *dateLiterFormat;
 
-double frameWidth;
+NSDate* mStartDateFromParent;
+NSDate* mEndDateFromParent;
 
+double frameWidth;
+CGContextRef context;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -168,7 +172,7 @@ double frameWidth;
     int x = CGRectGetMaxX(rect);
     int y = CGRectGetMaxY(rect);
 
-    CGContextRef context = UIGraphicsGetCurrentContext();
+    context = UIGraphicsGetCurrentContext();
     CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
 
     CGContextSetLineWidth(context, 1.0);
@@ -193,6 +197,9 @@ double frameWidth;
     CGContextAddLineToPoint(context, x, y); 
     
     CGContextStrokePath(context);
+    [self drawEventDotsBySpan];
+    
+
 }
 
 //this will be called when add/modify ends event, so it is actually called inside setTimeScrollConfiguration()
@@ -309,6 +316,7 @@ double frameWidth;
         [self fitSzie:label3];
         [self fitSzie:label4];
         [self fitSzie:label5];
+
     }
     else //> 5 year, always show label as year such as 2003 AD
     {
@@ -329,6 +337,7 @@ double frameWidth;
         [self fitSzie:label3];
         [self fitSzie:label4];
         [self fitSzie:label5];
+        
     }
 }
 
@@ -344,6 +353,9 @@ double frameWidth;
 //will be called when scroll time window, zoom time window and add/modify ends events
 - (void)changeTimeScaleState:(NSDate*)startDate :(NSDate*)endDate :(int)periodIndays :(NSDate*)focusedDate
 {
+    mStartDateFromParent = startDate;
+    mEndDateFromParent = endDate;
+    
     if (calendar == nil)
         calendar = [NSCalendar currentCalendar];
     
@@ -358,9 +370,9 @@ double frameWidth;
         focusedDate = [[NSDate alloc] init];
     if (periodIndays <= 30)
     {
-        dateComponent.day = -5;
+        dateComponent.day = -1;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.day = 5;
+        dateComponent.day = 1;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
     }
     else if (periodIndays == 365)
@@ -407,6 +419,7 @@ double frameWidth;
        // return;
     }
     */
+
     NSTimeInterval interval = [endDate timeIntervalSinceDate: startDate];
     int dayInterval = interval/86400;
     double timeSpanInDay = dayInterval;
@@ -428,10 +441,13 @@ double frameWidth;
     }
     self.scaleLenForDisplay = scaleLengthInPix;
     double scaleStartAdj = 0;
-    if (scaleLengthInPix <40)
+    if (scaleLengthInPix <5)
     {
-        self.scaleLenForDisplay = 40;
-        scaleStartAdj = -5; //need compute?
+        if (periodIndays <= 30)
+            self.scaleLenForDisplay = 5;
+        else
+            self.scaleLenForDisplay = 10;
+        scaleStartAdj = 0; //need compute?
     }
     timeScaleImageView.frame = CGRectMake(scaleStartInPix + scaleStartAdj, 10, self.scaleLenForDisplay, MOVABLE_VIEW_HEIGHT);
     if (self.scaleLenForDisplay < 150)
@@ -445,13 +461,96 @@ double frameWidth;
     else //if over 500
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
     CGPoint center = timeScaleImageView.center;
-    center.y = 0;//labelScaleText.center.y;
+    center.y = 22;//labelScaleText.center.y;
 
     labelScaleText.center = center;
 
     //[labelScaleText setFrame:CGRectMake(
                                   //  floorf((timeScaleImageView.frame.size.width - labelScaleText.frame.size.width) / 2.0), 0,
                                   //  labelScaleText.frame.size.width, labelScaleText.frame.size.height)];
+    
+}
+
+- (void)drawEventDotsBySpan
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    
+    int size = [appDelegate.eventListSorted count] ;
+    if (appDelegate.eventListSorted == nil || size < 1)
+        return;
+
+    //TODO mStartDate/mEndDate should not be null
+    
+    NSTimeInterval interval = [mEndDateFromParent timeIntervalSinceDate: mStartDateFromParent];
+    int dayInterval = interval/86400;
+    double timeSpanInDay = dayInterval;
+    double pixPerDay = frameWidth / timeSpanInDay;
+    
+    int span = 1;
+    if (timeSpanInDay > 30 && timeSpanInDay <=365)
+        span = 1;
+    else if (timeSpanInDay > 365 && timeSpanInDay <= 5 * 365)
+        span = 5;
+    else if (timeSpanInDay > 5 * 365 && timeSpanInDay < 20 * 365)
+        span = 20;
+    else
+        span = 60;
+    
+    //CGContextRef context = UIGraphicsGetCurrentContext();
+
+    //NSLog(@"---- frame width=%f",self.frame.size.width);
+    NSDate* dt1 = ((ATEventDataStruct*)appDelegate.eventListSorted[0]).eventDate;
+    int numberOfEvent = 0;
+    //for (ATEventDataStruct* evt in appDelegate.eventListSorted)
+    for (int i = 0; i< size; i++ )
+    {
+        //NSLog(@"#### i=%d",i);
+        ATEventDataStruct* evt = appDelegate.eventListSorted[i];
+        NSTimeInterval interval;
+        int dayInterval;
+        double x;
+        
+        NSDate* dt = evt.eventDate;
+        if (i == 0 || i == size - 1) //TODO do not know why i==0 x=930 will not draw dots
+        {
+            interval = [dt  timeIntervalSinceDate: mStartDateFromParent];
+            dayInterval = interval/86400;
+            x = pixPerDay * dayInterval;
+            if (x >= self.frame.size.width)
+                x = x -5;
+            CGContextSetRGBFillColor(context, 255, 0, 0, 1);
+            CGContextFillEllipseInRect(context, CGRectMake(x, 3, 5.0, 5.0));
+            //NSLog(@" o or 1 -- draw dots for dt %@  dt1=%@ and x=%f i=%d", dt, dt1, x, i);
+        }
+    
+        int innerInterval = [dt1 timeIntervalSinceDate:dt]/86400;
+        if (innerInterval > span)
+        {
+            
+            interval = [dt  timeIntervalSinceDate: mStartDateFromParent];
+            dayInterval = interval/86400;
+            x = pixPerDay * dayInterval;
+
+           //NSLog(@"---- draw dots for dt %@  dt1=%@ and x=%f startDate=%@", dt, dt1, x, mStartDateFromParent);
+           // if (numberOfEvent > 5)
+           //     numberOfEvent = 5;
+            //for (int i = 0; i <= numberOfEvent; i++) //TODO want to draw dots vertically (max 5), but it only draw 1, do not know why
+            //{
+                //NSLog(@"---- draw dots for dt1 %@ and x=%f  y=%d  span=%d", dt1, x,-i*5, span);
+                
+                CGContextSetRGBFillColor(context, 255, 0, 0, 1);
+                CGContextFillEllipseInRect(context, CGRectMake(x, 3 - 5*numberOfEvent, 5.0, 5.0));
+  
+            //}
+            
+            dt1 = dt;
+            //numberOfEvent = 0;
+        }
+        else
+        {
+            //numberOfEvent++;
+        }
+    }
     
 }
 
