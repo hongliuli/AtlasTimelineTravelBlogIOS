@@ -132,7 +132,7 @@ CGContextRef context;
 {
     labelScaleText.hidden = !showFlag;
 }
-- (void)showHideInAnimation
+- (void)showHideInAnimation //todo this is not used now after add showHideZoomAnimation in time window
 {
     labelScaleText.hidden = false;
     CGRect frame = labelScaleText.frame;
@@ -461,7 +461,7 @@ CGContextRef context;
     else //if over 500
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
     CGPoint center = timeScaleImageView.center;
-    center.y = 22;//labelScaleText.center.y;
+    center.y = 23;//this value decided y value when scroll time window
 
     labelScaleText.center = center;
 
@@ -473,6 +473,7 @@ CGContextRef context;
 
 - (void)drawEventDotsBySpan
 {
+    float DOT_SIZE = 5.0;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     
     int size = [appDelegate.eventListSorted count] ;
@@ -519,7 +520,7 @@ CGContextRef context;
             if (x >= self.frame.size.width)
                 x = x -5;
             CGContextSetRGBFillColor(context, 255, 0, 0, 1);
-            CGContextFillEllipseInRect(context, CGRectMake(x, 3, 5.0, 5.0));
+            CGContextFillEllipseInRect(context, CGRectMake(x, 3, DOT_SIZE, DOT_SIZE));
             //NSLog(@" o or 1 -- draw dots for dt %@  dt1=%@ and x=%f i=%d", dt, dt1, x, i);
         }
     
@@ -539,7 +540,7 @@ CGContextRef context;
                 //NSLog(@"---- draw dots for dt1 %@ and x=%f  y=%d  span=%d", dt1, x,-i*5, span);
                 
                 CGContextSetRGBFillColor(context, 255, 0, 0, 1);
-                CGContextFillEllipseInRect(context, CGRectMake(x, 3 - 5*numberOfEvent, 5.0, 5.0));
+                CGContextFillEllipseInRect(context, CGRectMake(x, 3 - 5*numberOfEvent, DOT_SIZE, DOT_SIZE));
   
             //}
             

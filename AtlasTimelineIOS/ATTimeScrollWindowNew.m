@@ -14,6 +14,7 @@
 #import "ATHelper.h"
 #import "ATEventDataStruct.h"
 #import "ATTimeZoomLine.h"
+#import "ATConstants.h"
 
 #define FIRST_TIME_CALL -999
 #define GROUP_BACKGROUND_COLOR_1 0.0
@@ -21,7 +22,7 @@
 
 @implementation ATTimeScrollWindowNew
 {
-    float pinchVelocity; //minus is pinch in
+    float pinchVelocity; //minus is zoom out
     int yearElapsedFromToday;
     NSCalendar* calendar;
     NSDateFormatter *dateLiterFormat;
@@ -34,6 +35,9 @@
     
     NSString* prevGroupLabelText;
     float groupLabelBackgroundAlpha;
+    
+    UIView* rightZoomAnimationView;
+    UIView* leftZommAnimationView;
 }
 
 @synthesize horizontalTableView = _horizontalTableView;
@@ -101,6 +105,23 @@
         
         if (calendar == nil)
             calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        
+        //initialize left/right animation zoom view
+        leftZommAnimationView = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 50, [ATConstants timeScrollWindowHeight])];
+        leftZommAnimationView.backgroundColor = [UIColor clearColor] ; //]colorWithRed:1 green:1 blue:0.8 alpha:1 ];
+        [self addSubview:leftZommAnimationView];
+        leftZommAnimationView.hidden=true;
+        rightZoomAnimationView = [[UILabel alloc] initWithFrame:CGRectMake(0,0, 50, [ATConstants timeScrollWindowHeight])];
+        rightZoomAnimationView.backgroundColor = [UIColor clearColor] ; //]colorWithRed:1 green:1 blue:0.8 alpha:1 ];
+        [self addSubview:rightZoomAnimationView];
+        rightZoomAnimationView.hidden=true;
+        
+        leftZommAnimationView.layer.borderColor = [UIColor whiteColor].CGColor;
+        leftZommAnimationView.layer.borderWidth = 0.3f;
+        rightZoomAnimationView.layer.borderColor = [UIColor whiteColor].CGColor;
+        rightZoomAnimationView.layer.borderWidth = 0.3f;
+        leftZommAnimationView.backgroundColor = [[UIColor alloc] initWithRed:0.0 green:0.0 blue:0.0 alpha:0.1];
+        rightZoomAnimationView.backgroundColor = [[UIColor alloc] initWithRed:0.0 green:0.0 blue:0.0 alpha:0.1];
         
         
         //NSDateFormatter* format = appDelegate.dateFormater;
@@ -429,7 +450,7 @@
         
         [self.parent changeTimeScaleState];
         [self.parent refreshAnnotations];
-        [self.parent.timeZoomLine showHideInAnimation];
+        [self showHideZoomAnimation:pinchVelocity];
     }
 }
 
@@ -554,7 +575,7 @@
         [self performSettingFocusedRowForPinch:(NSDate*) appDelegate.focusedDate];
         [self.parent changeTimeScaleState];
         [self.parent refreshAnnotations];
-        [self.parent.timeZoomLine showHideInAnimation];
+        [self showHideZoomAnimation:-1];
     }
     else if (rect.origin.x > leftPosition && rect.origin.x <= middlePosition) //middle position
     {
@@ -571,7 +592,7 @@
         [self performSettingFocusedRowForPinch:(NSDate*) appDelegate.focusedDate];
         [self.parent changeTimeScaleState];
         [self.parent refreshAnnotations];
-        [self.parent.timeZoomLine showHideInAnimation];
+        [self showHideZoomAnimation:1];
     }
 }
 
@@ -956,6 +977,57 @@
     else
         return startPos;
 }
+
+- (void)showHideZoomAnimation:(float)pinchDirection //minus is zoom out
+{
+    int leftViewFromX;
+    int leftViewToX;
+    int rightViewFromX;
+    int rightViewToX;
+    
+    if (pinchDirection > 0) //zoom out
+    {
+        leftViewFromX = [ATConstants timeScrollWindowWidth]/2;
+        leftViewToX = 0;
+        rightViewFromX = [ATConstants timeScrollWindowWidth]/2;
+        rightViewToX = [ATConstants timeScrollWindowWidth];
+    }
+    else //zomm in
+    {
+        leftViewToX = [ATConstants timeScrollWindowWidth]/2;
+        leftViewFromX = 0;
+        rightViewToX = [ATConstants timeScrollWindowWidth]/2;
+        rightViewFromX = [ATConstants timeScrollWindowWidth];
+    }
+    int height = [ATConstants timeScrollWindowHeight];
+    leftZommAnimationView.frame=CGRectMake(leftViewFromX, 0, 50, height);
+    rightZoomAnimationView.frame=CGRectMake(rightViewFromX, 0, 50, height);
+    leftZommAnimationView.hidden = false;
+    rightZoomAnimationView.hidden = false;
+    CGRect leftFrameNew = CGRectMake(leftViewToX, 0, 50, height);
+    CGRect rightFrameNew = CGRectMake(rightViewToX, 0, 50, height);
+    [UIView transitionWithView:leftZommAnimationView
+                      duration:0.5f
+                       options:UIViewAnimationCurveEaseInOut
+                    animations:^(void) {
+                        leftZommAnimationView.frame = leftFrameNew;
+                    }
+                    completion:^(BOOL finished) {
+                        [leftZommAnimationView setHidden:TRUE];
+                    }];
+    [UIView transitionWithView:rightZoomAnimationView
+                      duration:0.5f
+                       options:UIViewAnimationCurveEaseInOut
+                    animations:^(void) {
+                        rightZoomAnimationView.frame = rightFrameNew;
+                    }
+                    completion:^(BOOL finished) {
+                        [rightZoomAnimationView setHidden:TRUE];
+                    }];
+    
+    //TODO may show labelScaleText in timeZoomLine
+}
+
 /*
  
  startIndex = getIndexOfCloesetDate(startDate, 0, eventList.size)

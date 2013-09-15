@@ -1,6 +1,7 @@
 
 TEST app archive:
 http://developer.apple.com/library/ios/#documentation/ToolsLanguages/Conceptual/YourFirstAppStoreSubmission/TestYourApponManyDevicesandiOSVersions/TestYourApponManyDevicesandiOSVersions.html
+    For Now, start from "Create an iOS App Store Package" because we already has others ready
 
 iTunes Connect / Develop Center  hongliuli@gmail.com/R...3
 
@@ -12,16 +13,28 @@ Should always test AdHoc Distribution, or at leaset to set Release mode for Prod
 
 Version History
 ---------------
-Version 2.0 prepare:
-1. Add multiple photos to a event
+version 2.1 (finish implement on 9/14/13)
+    1. display the event distribution dots on map time window
+    2. Precisely display number of event in time slots with Cyan background color
+    3. animation time window zooming (after 9/14/13)
+    
+Version 2.01 prepared on 7/28
+  Change the app store image order so the first image will include photo in the map
+  
+Version 2.0 available on 7/28:
+1. Allow an event to have multple photos. In a sense, an event is a photo folder
 2. Save/restore photos to dropbox account
 3. New version notification when click Settings
 4. Rate using iRate https://github.com/nicklockwood/iRate
 5. Add more links to Help View
 6. Fix iPad add/edit event will shift date unit by one. see TimeScrollWindowNiew line 555
 7. changed "Purchase Full Version" to "Support Us" and purchase prompt wording.
-8. Added event number, photo number, space used in "Offline Contents"
+8. Show app status such as # of events, # of photos and space taken by photos in "Offline Contents" 
+9. in iTunesConnect, replaced "track" with "album" in keywords list
 
+(Possible disaster: myEvent has a lot of event and photo in device, then accidently donwloaded myEvents content from server, thus leave the photos
+ in device dangling, only way to remove is remove app)
+ 
 
 [6/13/2013] Submit Ver1.2: [became available on 7/5/2013]
 (Re-submit by add Restore Purchase)
