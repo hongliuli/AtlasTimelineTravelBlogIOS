@@ -114,8 +114,10 @@ UIPopoverController *popoverController;
                                       initWithContentViewController:imagePicker];
                 popoverController.delegate = self;
             
-                [popoverController presentPopoverFromBarButtonItem:sender
-                                          permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+                //[popoverController presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+                CGRect imageFrame = CGRectMake(10, 10, 800, 600); //Size does not matter, this is fix for iOS7, iOS 7. Somehow the above presentPopoverFromBarButtonItem does not work anymore in iOS
+                [popoverController presentPopoverFromRect:imageFrame inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+
                 newMedia = NO;
             }
         }
