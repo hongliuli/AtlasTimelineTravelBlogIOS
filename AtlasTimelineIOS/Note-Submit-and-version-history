@@ -3,20 +3,24 @@ TEST app archive:
 http://developer.apple.com/library/ios/#documentation/ToolsLanguages/Conceptual/YourFirstAppStoreSubmission/TestYourApponManyDevicesandiOSVersions/TestYourApponManyDevicesandiOSVersions.html
     For Now, start from "Create an iOS App Store Package" because we already has others ready
 
-iTunes Connect / Develop Center  hongliuli@gmail.com/R...3
+iTunes Connect / Develop Center  hongliuli@gmail.com/Hongliu001 (future change will be 002 003 etc)
 
 See yahoo email on 6/5/2013 on Release test and create Targets for varirty release such as Free version, Paid version for share code
 
-I SET RELEASE MODE Optimun to NONE, otherwise app will crash. See [6/5/2013] change
+I set RELEASE MODE Optimun to NONE, otherwise app will crash. See [6/5/2013] change:
+   TARGET->Build Settings (search DEBUG) 
+   -> Apple LLV .. Code Generation 
+   -> expand Optimization Level, then check Release is set to None
+   
 Should always test AdHoc Distribution, or at leaset to set Release mode for Product->Scheme->Edit Scheme->Run AtlasTim..."
 
 
 Version History
 ---------------
-version 2.1 (finish implement on 9/14/13)
+version 2.1 (Submited on 9/14/15)
     1. display the event distribution dots on map time window
     2. Precisely display number of event in time slots with Cyan background color
-    3. animation time window zooming (after 9/14/13)
+    3. animation time window zooming
     
 Version 2.01 prepared on 7/28
   Change the app store image order so the first image will include photo in the map
