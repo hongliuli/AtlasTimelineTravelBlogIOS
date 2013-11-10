@@ -1,15 +1,41 @@
 
---------------------------------------------
-test archive
+   
+   
+   
+TEST app archive:
 http://developer.apple.com/library/ios/#documentation/ToolsLanguages/Conceptual/YourFirstAppStoreSubmission/TestYourApponManyDevicesandiOSVersions/TestYourApponManyDevicesandiOSVersions.html
+    For Now, start from "Create an iOS App Store Package" because we already has others ready
 
-iOS Dev Center / iTunes Connect  same login -> hongliuli@gmail.com  (pwd Cap R....3)
+iTunes Connect / Develop Center  hongliuli@gmail.com/Hongliu001 (future change will be 002 003 etc)
 
-1. Create App ID -> in Develope Center, search for "Manage your certificates, App IDs, devices, and provisioning profiles".
-   Bundle ID com.chroniclemap   detail see Develope Center
+Every year should only buy Developer license on hongliuli@gmail.com, not on my Apple Id hongliuli@yahoo.com
+
+See yahoo email on 6/5/2013 on Release test and create Targets for varirty release such as Free version, Paid version for share code
+
+I set RELEASE MODE Optimun to NONE, otherwise app will crash. See [6/5/2013] change:
+   TARGET->Build Settings (search DEBUG) 
+   -> Apple LLV .. Code Generation 
+   -> expand Optimization Level, then check Release is set to None
+   
+Should always test AdHoc Distribution, or at leaset to set Release mode for Product->Scheme->Edit Scheme->Run AtlasTim..."
+
+Xcode5 has issue. So I continues use Xcode4.6 to develope, but has issue connect to iPad with iOS7. The solution:
+   - open Xcode5.02 while connect a iOS7 iPad
+   - quite Xcode5.02 and open Xcode4, then we can see iPad name in schema dropdown for iPad
+   
+   
+if get certificate expire error, go to https://developer.apple.com/account/ios/profile/profileList.action  and do:
+  - clic "edit" for the expired profile
+  - check the radio button for create certificate, then click enabled [Generate] button
+  - in Xcode Organizer->Device, click [Refresh] button at the bottom right. 
+    (Note: Click [Renew] button does not work, may be a Xcode bug. have to got to dev portal as described above)
+   
+   
+   
+
 
 Dropbox api key (app name ChronicleMap)
---------------
+---------------
 App key - vmngs8cprefdyi3
 App secret - o9ct42rr0696dzq
 step by step: https://www.dropbox.com/developers/core/start/ios
