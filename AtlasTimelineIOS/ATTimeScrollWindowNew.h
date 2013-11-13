@@ -10,7 +10,7 @@
 
 @class ATViewController;
 
-@interface ATTimeScrollWindowNew : UIView <UITableViewDelegate, UITableViewDataSource>
+@interface ATTimeScrollWindowNew : UIView <UITableViewDelegate, UITableViewDataSource,UIScrollViewDelegate>
 @property (weak, nonatomic) ATViewController* parent; //will call parent to change slider
 @property (nonatomic, retain) UITableView *horizontalTableView;
 

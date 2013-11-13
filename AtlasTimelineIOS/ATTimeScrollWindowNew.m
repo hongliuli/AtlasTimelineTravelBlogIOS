@@ -17,8 +17,9 @@
 #import "ATConstants.h"
 
 #define FIRST_TIME_CALL -999
-#define GROUP_BACKGROUND_COLOR_1 0.0
-#define GROUP_BACKGROUND_COLOR_2 0.4
+//color from http://cloford.com/resources/colours/500col.htm
+#define GROUP_BACKGROUND_COLOR_1 @"0x0000FF"
+#define GROUP_BACKGROUND_COLOR_2 @"0x008B45"
 
 @implementation ATTimeScrollWindowNew
 {
@@ -34,7 +35,7 @@
     int currentNumberOfRow;
     
     NSString* prevGroupLabelText;
-    float groupLabelBackgroundAlpha;
+    NSString* groupLabelBackgroundAlpha;
     
     UIView* rightZoomAnimationView;
     UIView* leftZommAnimationView;
@@ -131,7 +132,10 @@
         [dateLiterFormat setDateFormat:@"EEEE MMMM dd"];
         [self scrollToFocusedRow];
     }
+    UIImageView *tempImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"timeWindowBackground.png"]];
+    [tempImageView setFrame:self.horizontalTableView.frame];
     
+    self.horizontalTableView.backgroundView = tempImageView;
     return self;
 }
 
@@ -261,7 +265,7 @@
         [nextTimePeriodCompponent setYear:100];
         cell.scallLabel.text = @"100 yrs";
     }
-    cell.scallLabel.textColor = [UIColor whiteColor];
+    cell.scallLabel.textColor = [UIColor blackColor];
     cell.scallLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:14.0];
     
     displayDate = [ATHelper dateByAddingComponentsRegardingEra:periodToAddForDisplay toDate:baseStartDate options:0];
@@ -321,7 +325,7 @@
         cell.subLabel.text = @"";
         cell.titleLabel.font = [UIFont boldSystemFontOfSize:14];
     }
-    cell.titleLabel.textColor = [UIColor whiteColor];
+    cell.titleLabel.textColor = [UIColor blackColor];
     cell.date = displayDate;
     
     if (daysInPeriod == 30 || daysInPeriod == 365)
@@ -331,13 +335,13 @@
             prevGroupLabelText = labelTxt;
         if (![prevGroupLabelText isEqualToString:labelTxt])
         {
-            if (groupLabelBackgroundAlpha == GROUP_BACKGROUND_COLOR_1)
+            if ([groupLabelBackgroundAlpha isEqualToString: GROUP_BACKGROUND_COLOR_1])
                 groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_2;
             else
                 groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_1;
             prevGroupLabelText = labelTxt;
         }
-        cell.titleLabel.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:groupLabelBackgroundAlpha];
+        cell.titleLabel.textColor = [ATHelper colorWithHexString:groupLabelBackgroundAlpha];
     }
     if (daysInPeriod == 7) //flip background color each week
     {
@@ -346,12 +350,12 @@
             compareToTxt = @"Sat";
         if ([weekDay3Letter isEqualToString:compareToTxt])
         {
-            if (groupLabelBackgroundAlpha == GROUP_BACKGROUND_COLOR_1)
+            if ([groupLabelBackgroundAlpha isEqualToString: GROUP_BACKGROUND_COLOR_1])
                 groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_2;
             else
                 groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_1;
         }
-        cell.titleLabel.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:groupLabelBackgroundAlpha];
+        cell.titleLabel.textColor = [ATHelper colorWithHexString:groupLabelBackgroundAlpha];
     }
     
     int index1 = [self getIndexOfClosestDate:displayDate :0 :FIRST_TIME_CALL];
@@ -594,6 +598,7 @@
         [self.parent refreshAnnotations];
         [self showHideZoomAnimation:1];
     }
+    //Todo this does not help to fix doubleTap issue, not important anyway. ----[self centerTable];
 }
 
 //have tap gesture achive two thing: prevent call tapGesture on parent mapView and process select a row action without a TableViewController
@@ -643,17 +648,12 @@
         {
             if (appDelegate.selectedPeriodInDays > 365)
             {
-                cell.subLabel.backgroundColor=[UIColor clearColor];
                 cell.titleLabel.textColor=[UIColor colorWithRed:1.0 green:0 blue:0 alpha:1];
-                cell.titleLabel.backgroundColor=[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7 ];
-                cell.titleLabel.layer.cornerRadius = 8;
             }
             else
             {
                 //cell.titleLabel.backgroundColor = [UIColor clearColor];
                 cell.subLabel.textColor=[UIColor redColor];
-                cell.subLabel.backgroundColor=[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
-                cell.subLabel.layer.cornerRadius = 8;
             }
 
             if ([ATHelper isStringNumber:cell.scallLabel.text])
@@ -661,20 +661,16 @@
                 cell.scallLabel.backgroundColor = [UIColor cyanColor];
             }
             else
-                cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1]; 
+                cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1];
         }
         else
         {
-            cell.titleLabel.textColor = [UIColor whiteColor];
-            cell.titleLabel.layer.cornerRadius=0;
-            cell.subLabel.textColor = [UIColor whiteColor];
             if (appDelegate.selectedPeriodInDays > 365)
-                cell.titleLabel.backgroundColor=[UIColor clearColor];
-            cell.subLabel.backgroundColor=[UIColor clearColor];
+                cell.titleLabel.textColor = [UIColor blackColor];
             
-            float colorDivider = rowDistance + 2;
-            cell.scallLabel.backgroundColor = [UIColor colorWithRed:1.0 green:0.1*colorDivider blue:0.1*colorDivider alpha:1];
-            cell.scallLabel.textColor = [UIColor whiteColor];
+            cell.subLabel.textColor = [UIColor blackColor];
+            
+            cell.scallLabel.textColor = [UIColor blackColor];
             if (path.row > focusedRow && ![ATHelper isStringNumber:cell.scallLabel.text])
                 cell.scallLabel.textColor = [UIColor greenColor];
             if ([ATHelper isStringNumber:cell.scallLabel.text])
@@ -699,8 +695,7 @@
     return [UIColor colorWithPatternImage:newImage];
 }
 
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+- (void)endDeceleratingAction
 {
     //NSLog(@"end move");
     [self.parent.timeZoomLine showHideScaleText: false];
@@ -710,15 +705,18 @@
 
 - (void) didSelectRowAtIndexPath:(NSIndexPath *)indexPath  //called by tapGesture. This is not in a TableViewController, so no didSelect... delegate mechanism, have to process  by tap gesture
 {
+    //TODO is it neccessart to move tapped cell to middle??? 
+    /*
     ATTimeScrollCell *cell = (ATTimeScrollCell*)[self.horizontalTableView cellForRowAtIndexPath:indexPath];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.focusedDate = cell.date;
-    focusedRow = indexPath.row;
+    //xxxxxx see new logic for center       focusedRow = indexPath.row;
     //NSLog(@" ------ horizontal row didselected  cell date is %@", appDelegate.focusedDate);
     [self.parent.timeZoomLine showHideScaleText:false];
     //[self displayTimeElapseinSearchBar]; //from Yixing suggestion, do not confuse people
     [self.parent refreshAnnotations];
     [self changeFocusedCellColorToRed ];
+     */
 }
 - (void) performSettingFocusedRowForDate:(NSDate*) newFocusedDate
 {
@@ -1026,6 +1024,30 @@
                     }];
     
     //TODO may show labelScaleText in timeZoomLine
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    // if decelerating, let scrollViewDidEndDecelerating: handle it
+    if (decelerate == NO) {
+        [self centerTable];
+        [self endDeceleratingAction];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    [self centerTable];
+    [self endDeceleratingAction];
+}
+
+- (void)centerTable {
+    NSIndexPath *pathForCenterCell = [self.horizontalTableView indexPathForRowAtPoint:CGPointMake(CGRectGetMidX(self.horizontalTableView.bounds), CGRectGetMidY(self.horizontalTableView.bounds))];
+    
+    [self.horizontalTableView scrollToRowAtIndexPath:pathForCenterCell atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    focusedRow = pathForCenterCell.row; //xxxxx need test
+    ATTimeScrollCell *cell = (ATTimeScrollCell*)[self.horizontalTableView cellForRowAtIndexPath:pathForCenterCell];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    appDelegate.focusedDate = cell.date;
+    NSLog(@"Center row is: %d", focusedRow);
 }
 
 /*
