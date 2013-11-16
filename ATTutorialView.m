@@ -169,18 +169,18 @@ UILabel* timeWindowLabel;
     int startY = initialY + itemHeight +50*iPhoneSizeYFactor;
     CGRect frm = CGRectMake(initialX, startY, itemWidth * iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = @"Browse by timeline: ";
+    lbl.text = @"Browse the time wheel: ";
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
     [self addSubview:lbl];
     
-    UIImageView* imgView = [[UIImageView alloc] initWithFrame:CGRectMake(frm.origin.x + 250*iPhoneSizeXFactor, frm.origin.y, imageSize, imageSize) ];
+    UIImageView* imgView = [[UIImageView alloc] initWithFrame:CGRectMake(frm.origin.x + 270*iPhoneSizeXFactor, frm.origin.y, imageSize, imageSize) ];
     [imgView setImage:[UIImage imageNamed:@"gesture-swipe.png"]]; //swipe image
     [self addSubview:imgView];
     
-    UILabel* lblLongPress = [[UILabel alloc] initWithFrame:CGRectMake(frm.origin.x + 350*iPhoneSizeXFactor, frm.origin.y, 250*iPhoneSizeXFactor, 80*iPhoneSizeYFactor)];
-    lblLongPress.text = @"Swipe on the Time Window located at the screen bottom ";
+    UILabel* lblLongPress = [[UILabel alloc] initWithFrame:CGRectMake(frm.origin.x + 350*iPhoneSizeXFactor, frm.origin.y, 320*iPhoneSizeXFactor, 90*iPhoneSizeYFactor)];
+    lblLongPress.text = @"Swipe on time wheel to change visible period in which events are visible by color ";
     lblLongPress.font = [UIFont fontWithName:@"Arial" size:fontSmall];
     lblLongPress.backgroundColor = [UIColor clearColor];
     lblLongPress.textColor = [UIColor whiteColor];
@@ -191,9 +191,9 @@ UILabel* timeWindowLabel;
     int startY2 = startY + itemHeight;
     CGRect frameLbl2 = CGRectMake(initialX , startY2 - 30*iPhoneSizeYFactor, 400*iPhoneSizeXFactor, itemHeight);
     UILabel* lbl2 = [[UILabel alloc] initWithFrame:frameLbl2];
-    lbl2.text = @"The event is colored if its date falls into Time Window, the darker the color is the closer is to the selected date: ";
+    lbl2.text = @"The event is colored if its date is visible in the time wheel, the darker the color is the closer is to the selected date in the center: ";
     lbl2.lineBreakMode = UILineBreakModeWordWrap;
-    lbl2.numberOfLines=2;
+    lbl2.numberOfLines=3;
     lbl2.font = [UIFont fontWithName:@"Arial" size:fontSmall];
     lbl2.backgroundColor = [UIColor clearColor];
     lbl2.textColor = [UIColor lightGrayColor];
@@ -234,7 +234,7 @@ UILabel* timeWindowLabel;
     CGRect lblFrame = CGRectMake(initialX, initialY + 3 * itemHeight + 50*iPhoneSizeYFactor, itemWidth*iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, initialY + 3 * itemHeight, itemWidth * iphoneSizeSpecialFactor, itemHeight)];
 
-    lbl.text = @"Zoom to change timescale:";
+    lbl.text = @"Zoom the time wheel:";
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
@@ -244,15 +244,25 @@ UILabel* timeWindowLabel;
 }
 - (void) addTimeZoomLevelSection2 //level wordings
 {
-    CGRect lblFrame = CGRectMake(initialX+320*iPhoneSizeXFactor, initialY + 3 * itemHeight + 52*iPhoneSizeYFactor, itemWidth, itemHeight);
+    CGRect lblFrame = CGRectMake(initialX+270*iPhoneSizeXFactor, initialY + 3 * itemHeight + 52*iPhoneSizeYFactor, itemWidth, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(1000*iPhoneSizeXFactor, initialY + 3 * itemHeight + 2, 0, 0)];
 
-    lbl.text = @"day / month / year / 10 yrs / 100 yrs ";
+    lbl.text = @"1) Change the time wheel spin scale to day / month / year / 10 yrs / 100 yrs ";
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall-2];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
     [lbl setFrame:lblFrame];
     [self addSubview:lbl];
+    
+    lblFrame = CGRectMake(initialX+270*iPhoneSizeXFactor, initialY + 3 * itemHeight + 52*iPhoneSizeYFactor + 20, itemWidth, itemHeight);
+    UILabel* lbl2 = [[UILabel alloc] initWithFrame:CGRectMake(1000*iPhoneSizeXFactor, initialY + 3 * itemHeight + 2, 0, 0)];
+    
+    lbl2.text = @"2) Thus the wheel's span is changed to week / month / 1yr / 10yrs / 100yrs/ 1000yrs accordingly";
+    lbl2.font = [UIFont fontWithName:@"Arial" size:fontSmall-2];
+    lbl2.backgroundColor = [UIColor clearColor];
+    lbl2.textColor = [UIColor whiteColor];
+    [lbl2 setFrame:lblFrame];
+    [self addSubview:lbl2];
 
 }
 
@@ -321,7 +331,7 @@ UILabel* timeWindowLabel;
     //Time Window Label description
     CGRect timeWindowFrame = CGRectMake(initialX, y_start - 20, itemWidth + 100, itemHeight);
     UILabel* timeWindowLbl = [[UILabel alloc] initWithFrame:timeWindowFrame];
-    timeWindowLbl.text = @"Time Window";
+    timeWindowLbl.text = @"Time Wheel";
     timeWindowLbl.font = [UIFont fontWithName:@"Arial" size:24];
     timeWindowLbl.backgroundColor = [UIColor clearColor];
     timeWindowLbl.textColor = [UIColor whiteColor];
