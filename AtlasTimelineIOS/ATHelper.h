@@ -28,4 +28,5 @@
 + (NSString*)getNewUnsavedEventPhotoPath;
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
 + (UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir;
++ (UIColor *) colorWithHexString: (NSString *) stringToConvert;
 @end
