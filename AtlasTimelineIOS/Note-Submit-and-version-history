@@ -2,7 +2,10 @@
 
 Version History
 ---------------
-version 2.1 (Submited on 9/14/15)
+version 2.2 (submited on 11/15/13)
+    Important Update: Browsing events by time is simpler and more intuitive with the time wheel.
+  
+version 2.1 (Submited on 9/14/13)
     1. display the event distribution dots on map time window
     2. Precisely display number of event in time slots with Cyan background color
     3. animation time window zooming
