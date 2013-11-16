@@ -20,6 +20,7 @@
 		CE0E5321168E671F00C147FB /* ATViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0E5320168E671F00C147FB /* ATViewController.m */; };
 		CE0E5365168E7B0D00C147FB /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E5364168E7B0D00C147FB /* MapKit.framework */; };
 		CE0E55A4173EEDA700631DB8 /* no_photo.png in Resources */ = {isa = PBXBuildFile; fileRef = CE0E55A3173EEDA700631DB8 /* no_photo.png */; };
+		CE10A8FF18305D6000CB1430 /* timeWindowBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = CE10A8FE18305D6000CB1430 /* timeWindowBackground.png */; };
 		CE13766F169E5938005C8C41 /* ATDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE13766E169E5938005C8C41 /* ATDataController.m */; };
 		CE137676169FB750005C8C41 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE137675169FB750005C8C41 /* CoreData.framework */; };
 		CE1A7463175A2516009DE741 /* scaleBkg_5.png in Resources */ = {isa = PBXBuildFile; fileRef = CE1A745E175A2516009DE741 /* scaleBkg_5.png */; };
@@ -104,6 +105,8 @@
 		CECECE2716B0C17400FD7C17 /* ATPreferenceEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = CECECE2616B0C17400FD7C17 /* ATPreferenceEntity.m */; };
 		CECECE3716B3031100FD7C17 /* ATSourceChooseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CECECE3616B3031100FD7C17 /* ATSourceChooseViewController.m */; };
 		CECECE3A16B31D3D00FD7C17 /* ATPreferenceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CECECE3916B31D3D00FD7C17 /* ATPreferenceViewController.m */; };
+		CED46F5B178E3739008397D6 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CED46F5A178E3739008397D6 /* Security.framework */; };
+		CED46F5D178E4774008397D6 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CED46F5C178E4774008397D6 /* DropboxSDK.framework */; };
 		CEDBDF3016EEC96C00ADB0FE /* frame-bottom.png in Resources */ = {isa = PBXBuildFile; fileRef = CEDBDF2C16EEC96C00ADB0FE /* frame-bottom.png */; };
 		CEDBDF3116EEC96C00ADB0FE /* frame-left.png in Resources */ = {isa = PBXBuildFile; fileRef = CEDBDF2D16EEC96C00ADB0FE /* frame-left.png */; };
 		CEDBDF3216EEC96C00ADB0FE /* frame-right.png in Resources */ = {isa = PBXBuildFile; fileRef = CEDBDF2E16EEC96C00ADB0FE /* frame-right.png */; };
@@ -138,6 +141,7 @@
 		CEE72EFC16E4051200403802 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE72EFA16E4051200403802 /* settings.png */; };
 		CEE72F0416E598B600403802 /* Note-Submit-and-version-history in Resources */ = {isa = PBXBuildFile; fileRef = CEE72F0316E598B600403802 /* Note-Submit-and-version-history */; };
 		CEF522E9175661530074321E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEF522E8175661530074321E /* Default-568h@2x.png */; };
+		CEFC9185179ACB2400BADAFB /* iRate.m in Sources */ = {isa = PBXBuildFile; fileRef = CEFC9184179ACB2300BADAFB /* iRate.m */; };
 		CEFE78801783BA5D00BC027D /* share.png in Resources */ = {isa = PBXBuildFile; fileRef = CEFE787F1783BA5D00BC027D /* share.png */; };
 		CEFE788217859BF800BC027D /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = CEFE788117859BF800BC027D /* .gitignore */; };
 /* End PBXBuildFile section */
@@ -164,6 +168,7 @@
 		CE0E5320168E671F00C147FB /* ATViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ATViewController.m; sourceTree = "<group>"; };
 		CE0E5364168E7B0D00C147FB /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		CE0E55A3173EEDA700631DB8 /* no_photo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = no_photo.png; path = images/no_photo.png; sourceTree = "<group>"; };
+		CE10A8FE18305D6000CB1430 /* timeWindowBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = timeWindowBackground.png; path = images/timeWindowBackground.png; sourceTree = "<group>"; };
 		CE13766D169E5938005C8C41 /* ATDataController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATDataController.h; sourceTree = "<group>"; };
 		CE13766E169E5938005C8C41 /* ATDataController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATDataController.m; sourceTree = "<group>"; };
 		CE137675169FB750005C8C41 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -287,6 +292,8 @@
 		CECECE3616B3031100FD7C17 /* ATSourceChooseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATSourceChooseViewController.m; sourceTree = "<group>"; };
 		CECECE3816B31D3D00FD7C17 /* ATPreferenceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATPreferenceViewController.h; sourceTree = "<group>"; };
 		CECECE3916B31D3D00FD7C17 /* ATPreferenceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATPreferenceViewController.m; sourceTree = "<group>"; };
+		CED46F5A178E3739008397D6 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		CED46F5C178E4774008397D6 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
 		CEDBDF2C16EEC96C00ADB0FE /* frame-bottom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "frame-bottom.png"; path = "images/frame-bottom.png"; sourceTree = "<group>"; };
 		CEDBDF2D16EEC96C00ADB0FE /* frame-left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "frame-left.png"; path = "images/frame-left.png"; sourceTree = "<group>"; };
 		CEDBDF2E16EEC96C00ADB0FE /* frame-right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "frame-right.png"; path = "images/frame-right.png"; sourceTree = "<group>"; };
@@ -325,6 +332,8 @@
 		CEE72EFA16E4051200403802 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = settings.png; path = images/settings.png; sourceTree = "<group>"; };
 		CEE72F0316E598B600403802 /* Note-Submit-and-version-history */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Note-Submit-and-version-history"; sourceTree = "<group>"; };
 		CEF522E8175661530074321E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		CEFC9183179ACB2300BADAFB /* iRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iRate.h; sourceTree = "<group>"; };
+		CEFC9184179ACB2300BADAFB /* iRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iRate.m; sourceTree = "<group>"; };
 		CEFE787F1783BA5D00BC027D /* share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = share.png; path = images/share.png; sourceTree = "<group>"; };
 		CEFE788117859BF800BC027D /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -334,6 +343,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CED46F5B178E3739008397D6 /* Security.framework in Frameworks */,
 				CE1D4E4D173890FA00AA603C /* Social.framework in Frameworks */,
 				CE1D4E471731EF5400AA603C /* StoreKit.framework in Frameworks */,
 				CE1BC182170935DC0067BA4A /* AssetsLibrary.framework in Frameworks */,
@@ -346,6 +356,7 @@
 				CE0E5302168E671F00C147FB /* UIKit.framework in Frameworks */,
 				CE0E5304168E671F00C147FB /* Foundation.framework in Frameworks */,
 				CE0E5306168E671F00C147FB /* CoreGraphics.framework in Frameworks */,
+				CED46F5D178E4774008397D6 /* DropboxSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,7 +375,6 @@
 				CEC3580216CB28AA009A833C /* ATTimeZoomLine.m */,
 				CE5B308416BA20A400D943EB /* ATTimeScrollWindow.h */,
 				CE5B308516BA20A400D943EB /* ATTimeScrollWindow.m */,
-				CE6053C8168F2CBC0006F110 /* Data */,
 			);
 			name = TimeScroll;
 			sourceTree = "<group>";
@@ -372,6 +382,8 @@
 		CE0E52F2168E671E00C147FB = {
 			isa = PBXGroup;
 			children = (
+				CED46F5C178E4774008397D6 /* DropboxSDK.framework */,
+				CED46F5A178E3739008397D6 /* Security.framework */,
 				CEFE788117859BF800BC027D /* .gitignore */,
 				CEF522E8175661530074321E /* Default-568h@2x.png */,
 				CE1D4E4C173890FA00AA603C /* Social.framework */,
@@ -438,6 +450,9 @@
 				CE70BF48176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m */,
 				CE75886816C352AB00AEE4AF /* ATHelper.h */,
 				CE75886916C352AB00AEE4AF /* ATHelper.m */,
+				CEFC9183179ACB2300BADAFB /* iRate.h */,
+				CEFC9184179ACB2300BADAFB /* iRate.m */,
+				CE6053C8168F2CBC0006F110 /* Data */,
 				CE6053C9168F2CD30006F110 /* Model Classes */,
 				CE0E5319168E671F00C147FB /* MainStoryboard_iPhone.storyboard */,
 				CE0E531C168E671F00C147FB /* MainStoryboard_iPad.storyboard */,
@@ -464,6 +479,7 @@
 		CE2A1CF216AD9882004476E8 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CE10A8FE18305D6000CB1430 /* timeWindowBackground.png */,
 				CEFE787F1783BA5D00BC027D /* share.png */,
 				CE1A7468175A6E65009DE741 /* scaleBkg_60.png */,
 				CE1A745E175A2516009DE741 /* scaleBkg_5.png */,
@@ -759,6 +775,7 @@
 				CE1A7469175A6E65009DE741 /* scaleBkg_60.png in Resources */,
 				CEFE78801783BA5D00BC027D /* share.png in Resources */,
 				CEFE788217859BF800BC027D /* .gitignore in Resources */,
+				CE10A8FF18305D6000CB1430 /* timeWindowBackground.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -813,6 +830,7 @@
 				CE70BF49176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m in Sources */,
 				CE56B1AD1775217700DB9FB7 /* ATPhotoScrollView.m in Sources */,
 				CE56B1B0177522AD00DB9FB7 /* ATPhotoScrollCell.m in Sources */,
+				CEFC9185179ACB2400BADAFB /* iRate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -902,6 +920,10 @@
 		CE0E5325168E671F00C147FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AtlasTimelineIOS/AtlasTimelineIOS-Prefix.pch";
 				INFOPLIST_FILE = "AtlasTimelineIOS/AtlasTimelineIOS-Info.plist";
@@ -914,6 +936,10 @@
 		CE0E5326168E671F00C147FB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AtlasTimelineIOS/AtlasTimelineIOS-Prefix.pch";
