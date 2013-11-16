@@ -49,6 +49,7 @@
 - (Boolean) eventInPeriodRange:(NSDate*) eventDate;
 - (float) getDistanceFromFocusedDate:(NSDate*) eventDate;
 - (void) setSelectedPeriodLabel;
+- (NSString*) getSelectedPeriodLabel;
 - (void) changeTimeScaleState;
 - (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent;
 - (void) setNewFocusedDateAndUpdateMapWithNewCenter:(ATEventDataStruct*) ent :(int)zoomLevel;
