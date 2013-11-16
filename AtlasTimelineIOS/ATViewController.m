@@ -513,33 +513,39 @@
 
 - (void) setSelectedPeriodLabel
 {
+    [self.timeZoomLine changeScaleText:[self getSelectedPeriodLabel]];
+}
+
+- (NSString*) getSelectedPeriodLabel
+{
     
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-
+    NSString* retStr=@"";
     if (appDelegate.selectedPeriodInDays == 7)
     {
-        [self.timeZoomLine changeScaleText:@"1 week"];
+        retStr = @"Span: 1week";
     }
     else if (appDelegate.selectedPeriodInDays == 30)
     {
-        [self.timeZoomLine changeScaleText:@"1 month"];
+        retStr = @"Span: 1mon";
     }
     else if (appDelegate.selectedPeriodInDays == 365)
     {
-        [self.timeZoomLine changeScaleText:@"10 months"];
+        retStr = @"Span: 1yr";
     }
     else if (appDelegate.selectedPeriodInDays == 3650)
     {
-        [self.timeZoomLine changeScaleText:@"10 years"];
+        retStr = @"Span: 10yrs";
     }
     else if (appDelegate.selectedPeriodInDays == 36500)
     {
-        [self.timeZoomLine changeScaleText:@"100 years"];
+        retStr = @"Span: 100yrs";
     }
     else if (appDelegate.selectedPeriodInDays == 365000)
     {
-        [self.timeZoomLine changeScaleText:@"1000 years"];
+        retStr = @"Span:1000yrs";
     }
+    return retStr;
 }
 
 - (void) flipTimelineWindowDisplay
