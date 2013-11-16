@@ -176,7 +176,7 @@
         currentNumberOfRow = components.year/100 + 2;
     }
     //NSLog(@"------ CurrentNumberOfRow=%i Number of Day %i, month %i, year %i",currentNumberOfRow, components.day, components.month, components.year);
-    return currentNumberOfRow + 5; //always returns 5 more so focuse to a late date works
+    return currentNumberOfRow + 7; //always returns 7 more so focuse to a late date works
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -265,7 +265,7 @@
         [nextTimePeriodCompponent setYear:100];
         cell.scallLabel.text = @"100 yrs";
     }
-    cell.scallLabel.textColor = [UIColor blackColor];
+    cell.scallLabel.textColor = [UIColor whiteColor];
     cell.scallLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:14.0];
     
     displayDate = [ATHelper dateByAddingComponentsRegardingEra:periodToAddForDisplay toDate:baseStartDate options:0];
@@ -426,6 +426,8 @@
     //[self displayTimeElapseinSearchBar];
     
     [self.parent changeTimeScaleState];
+    [self.parent.timeZoomLine changeDateText:cell.titleLabel.text];
+    [self.parent.timeZoomLine changeScaleText:[NSString stringWithFormat:@"%@\r%@",[self.parent getSelectedPeriodLabel],cell.titleLabel.text]];
     return cell;
 }
 
@@ -670,7 +672,9 @@
             
             cell.subLabel.textColor = [UIColor blackColor];
             
-            cell.scallLabel.textColor = [UIColor blackColor];
+            float colorDivider = rowDistance + 2;
+            cell.scallLabel.backgroundColor = [UIColor colorWithRed:1.0 green:0.1*colorDivider blue:0.1*colorDivider alpha:1];
+            cell.scallLabel.textColor = [UIColor whiteColor];
             if (path.row > focusedRow && ![ATHelper isStringNumber:cell.scallLabel.text])
                 cell.scallLabel.textColor = [UIColor greenColor];
             if ([ATHelper isStringNumber:cell.scallLabel.text])
