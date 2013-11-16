@@ -28,6 +28,7 @@ UILabel* labelSeg3;
 UILabel* labelSeg4;
 
 UILabel* labelScaleText;
+UILabel* labelDateText;
 
 NSCalendar *calendar;
 NSDateFormatter *dateLiterFormat;
@@ -107,16 +108,35 @@ CGContextRef context;
         
         //add the at front
         
-        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-6,23, 80, 16)];
-        labelScaleText.backgroundColor = [UIColor yellowColor] ; //]colorWithRed:1 green:1 blue:0.8 alpha:1 ];
+        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,23, 100, 50)];
+        labelScaleText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ];
         labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:13];
-        labelScaleText.layer.borderColor=[UIColor orangeColor].CGColor;
+        labelScaleText.layer.borderColor=[UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ].CGColor;
         labelScaleText.layer.borderWidth=1;
+        labelScaleText.layer.shadowColor = [UIColor grayColor].CGColor;
+        labelScaleText.layer.shadowOffset = CGSizeMake(5,5);
+        labelScaleText.layer.shadowOpacity = 1;
+        labelScaleText.layer.shadowRadius = 8.0;
+        labelScaleText.clipsToBounds = NO;
         labelScaleText.layer.cornerRadius = 8;
+        labelScaleText.numberOfLines = 0;
         labelScaleText.textAlignment = UITextAlignmentCenter;
         [self addSubview:labelScaleText];
         labelScaleText.hidden=true;
         labelScaleText.center = timeScaleImageView.center;
+        
+        int xCenter = timeScaleImageView.center.x;
+        labelDateText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,200, 100, 100)];
+        labelDateText.backgroundColor = [UIColor whiteColor] ; //]colorWithRed:1 green:1 blue:0.8 alpha:1 ];
+        labelDateText.font=[UIFont fontWithName:@"Helvetica" size:16];
+        labelDateText.layer.borderColor=[UIColor orangeColor].CGColor;
+        labelDateText.layer.borderWidth=1;
+        labelDateText.layer.cornerRadius = 50;
+        labelDateText.textAlignment = UITextAlignmentCenter;
+        //Puposely comment out    [self addSubview:labelDateText];
+        labelDateText.hidden=true;
+        labelDateText.center = CGPointMake(xCenter, -50);// timeScaleImageView.center;
+
         
     }
     return self;
@@ -127,26 +147,15 @@ CGContextRef context;
 {
     labelScaleText.text = text;
 }
+- (void) changeDateText:(NSString *)text
+{
+    labelDateText.text = text;
+}
 //called by outside when scrollWindow start/stop, or when change time zoom
 - (void)showHideScaleText:(BOOL)showFlag
 {
     labelScaleText.hidden = !showFlag;
-}
-- (void)showHideInAnimation //todo this is not used now after add showHideZoomAnimation in time window
-{
-    labelScaleText.hidden = false;
-    CGRect frame = labelScaleText.frame;
-    labelScaleText.frame = CGRectMake(frame.origin.x,-90, 70,15);
-    [UIView transitionWithView:labelScaleText
-                      duration:0.5f
-                       options:UIViewAnimationCurveEaseInOut
-                    animations:^(void) {
-                        labelScaleText.frame = frame;
-                    }
-                    completion:^(BOOL finished) {
-                        // Do nothing
-                        //[labelScaleText setHidden:true];
-                    }];
+    labelDateText.hidden = !showFlag;
 }
 
 //have to call this after set text otherwise sizeToFit will not work
@@ -461,7 +470,7 @@ CGContextRef context;
     else //if over 500
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
     CGPoint center = timeScaleImageView.center;
-    center.y = 23;//this value decided y value when scroll time window
+    center.y = -25;//this value decided y value when scroll time window
 
     labelScaleText.center = center;
 
