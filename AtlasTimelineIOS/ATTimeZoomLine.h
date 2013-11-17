@@ -7,9 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ATViewController.h"
 
 @interface ATTimeZoomLine : UIView
 
+@property ATViewController* mapViewController;
 @property float scaleLenForDisplay;
 
 - (void)changeScaleText:(NSString*)text; //called in mapview controller
