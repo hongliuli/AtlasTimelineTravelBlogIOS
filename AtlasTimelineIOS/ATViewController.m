@@ -375,7 +375,12 @@
         
         ATEventDataStruct* eventStart = eventList[eventCount -1];
         ATEventDataStruct* eventEnd = eventList[0];
-        self.startDate = [ATHelper getYearStartDate: eventStart.eventDate];
+        //add 5 year
+        dayComponent.year = 0;
+        dayComponent.month = -5;
+
+        NSDate* newStartDt = [theCalendar dateByAddingComponents:dayComponent toDate:eventStart.eventDate options:0];
+        self.startDate = [ATHelper getYearStartDate: newStartDt];
         self.endDate = eventEnd.eventDate;
 
        // following is to set intial time period based on event distribution after app start or updated edge events, but has exception, need more study (Studied and may found the bug need test)
