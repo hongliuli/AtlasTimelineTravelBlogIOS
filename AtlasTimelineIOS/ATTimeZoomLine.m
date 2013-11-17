@@ -485,9 +485,8 @@ CGContextRef context;
     float DOT_SIZE = 5.0;
     float DOT_Y_POS = 3.0;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    float dotSize = DOT_SIZE;
 
-    Boolean drawBarFlag = false; //draw bar if there are event visible in map screen
+    Boolean eventVisibleOnMapFlag = false; //draw bar if there are event visible in map screen
     int size = [appDelegate.eventListSorted count] ;
     if (appDelegate.eventListSorted == nil || size < 1)
         return;
@@ -521,6 +520,8 @@ CGContextRef context;
     NSDate* dt1 = ((ATEventDataStruct*)appDelegate.eventListSorted[0]).eventDate;
 
     //for (ATEventDataStruct* evt in appDelegate.eventListSorted)
+    float previouseVisibleEventDrawXPos = 0;
+    float previouseRegularDotXPos = 0;
     for (int i = 0; i< size; i++ )
     {
         //NSLog(@"#### i=%d",i);
@@ -532,7 +533,7 @@ CGContextRef context;
         NSDate* dt = evt.eventDate;
         if ([self checkIfEventOnScreen:evt :northWestCorner :southEastCorner])
         {
-            drawBarFlag = true;
+            eventVisibleOnMapFlag = true;
         }
         if (i == 0 || i == size - 1) //TODO do not know why i==0 x=930 will not draw dots
         {
@@ -541,10 +542,11 @@ CGContextRef context;
             x = pixPerDay * dayInterval;
             if (x >= self.frame.size.width)
                 x = x -5;
-            if (drawBarFlag)
+            if (eventVisibleOnMapFlag)
             {
                 CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
                 CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
+                previouseVisibleEventDrawXPos = x;
             }
             else
             {
@@ -552,7 +554,7 @@ CGContextRef context;
                 CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, DOT_SIZE));
             }
             //dt1 = dt;
-            drawBarFlag = false;
+            eventVisibleOnMapFlag = false;
             //NSLog(@" o or 1 -- draw dots for dt %@  dt1=%@ and x=%f i=%d", dt, dt1, x, i);
         }
         else
@@ -565,32 +567,27 @@ CGContextRef context;
                 dayInterval = interval/86400;
                 x = pixPerDay * dayInterval;
 
-               //NSLog(@"---- draw dots for dt %@  dt1=%@ and x=%f startDate=%@", dt, dt1, x, mStartDateFromParent);
-               // if (numberOfEvent > 5)
-               //     numberOfEvent = 5;
-                //for (int i = 0; i <= numberOfEvent; i++) //TODO want to draw dots vertically (max 5), but it only draw 1, do not know why
-                //{
-                    //NSLog(@"---- draw dots for dt1 %@ and x=%f  y=%d  span=%d", dt1, x,-i*5, span);
-                    if (drawBarFlag)
+                if (eventVisibleOnMapFlag)
+                {
+                    CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
+                    CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
+                    previouseVisibleEventDrawXPos = x;
+                }
+                else
+                {
+                    if (abs(x - previouseVisibleEventDrawXPos) >= DOT_SIZE) //make sure barDots will be draw always and not covered by later regular dot
                     {
-                        CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
-                        CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
+                        if (abs(x - previouseRegularDotXPos) >= DOT_SIZE) //do not draw if too crowd
+                        {
+                            CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
+                            CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, DOT_SIZE));
+                            previouseRegularDotXPos = x;
+                        }
                     }
-                    else
-                    {
-                        CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
-                        CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, dotSize, dotSize));
-                    }
-      
-                //}
+                }
                 
                 dt1 = dt;
-                drawBarFlag = false;
-                //numberOfEvent = 0;
-            }
-            else
-            {
-                //numberOfEvent++;
+                eventVisibleOnMapFlag = false;
             }
         }
     } //end for loop
