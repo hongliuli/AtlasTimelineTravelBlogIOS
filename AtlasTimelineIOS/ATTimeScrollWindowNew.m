@@ -203,7 +203,7 @@
         increaseDirection = 1;
     prevRow = currentRow;
     
-    focusedRow = currentRow - 4*increaseDirection; //this is to select center row as focusedRow because timeScrollWindow has 9 dates
+    focusedRow = currentRow - 4*increaseDirection ; //this is to select center row as focusedRow because timeScrollWindow has 9 dates
     
     static NSString *CellIdentifier = @"ATTimeScrollCell";
     
@@ -1051,7 +1051,6 @@
     ATTimeScrollCell *cell = (ATTimeScrollCell*)[self.horizontalTableView cellForRowAtIndexPath:pathForCenterCell];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.focusedDate = cell.date;
-    NSLog(@"Center row is: %d", focusedRow);
 }
 
 /*
