@@ -499,6 +499,7 @@ CGContextRef context;
     double pixPerDay = frameWidth / timeSpanInDay;
     
     int span = 1;
+    /** Do not need following because I already add not draw of to close
     if (timeSpanInDay > 30 && timeSpanInDay <=365)
         span = 1;
     else if (timeSpanInDay > 365 && timeSpanInDay <= 5 * 365)
@@ -507,6 +508,7 @@ CGContextRef context;
         span = 20;
     else
         span = 60;
+     */
     
     //Get current map range
     MKCoordinateRegion region =  self.mapViewController.mapView.region;
@@ -558,37 +560,32 @@ CGContextRef context;
             //NSLog(@" o or 1 -- draw dots for dt %@  dt1=%@ and x=%f i=%d", dt, dt1, x, i);
         }
         else
-        {
-            int innerInterval = [dt1 timeIntervalSinceDate:dt]/86400;
-            if (innerInterval > span)
+        {   
+            interval = [dt  timeIntervalSinceDate: mStartDateFromParent];
+            dayInterval = interval/86400;
+            x = pixPerDay * dayInterval;
+            
+            if (eventVisibleOnMapFlag)
             {
-                
-                interval = [dt  timeIntervalSinceDate: mStartDateFromParent];
-                dayInterval = interval/86400;
-                x = pixPerDay * dayInterval;
-
-                if (eventVisibleOnMapFlag)
+                CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
+                CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
+                previouseVisibleEventDrawXPos = x;
+            }
+            else
+            {
+                if (abs(x - previouseVisibleEventDrawXPos) >= DOT_SIZE) //make sure barDots will be draw always and not covered by later regular dot
                 {
-                    CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
-                    CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
-                    previouseVisibleEventDrawXPos = x;
-                }
-                else
-                {
-                    if (abs(x - previouseVisibleEventDrawXPos) >= DOT_SIZE) //make sure barDots will be draw always and not covered by later regular dot
+                    if (abs(x - previouseRegularDotXPos) >= DOT_SIZE) //do not draw if too crowd
                     {
-                        if (abs(x - previouseRegularDotXPos) >= DOT_SIZE) //do not draw if too crowd
-                        {
-                            CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
-                            CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, DOT_SIZE));
-                            previouseRegularDotXPos = x;
-                        }
+                        CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
+                        CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, DOT_SIZE));
+                        previouseRegularDotXPos = x;
                     }
                 }
-                
-                dt1 = dt;
-                eventVisibleOnMapFlag = false;
             }
+            
+            dt1 = dt;
+            eventVisibleOnMapFlag = false;
         }
     } //end for loop
     
