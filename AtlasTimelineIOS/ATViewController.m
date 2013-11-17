@@ -458,6 +458,7 @@
         [self.timeZoomLine removeFromSuperview]; //incase orientation change
     self.timeZoomLine = [[ATTimeZoomLine alloc] initWithFrame:timeZoomLineFrame];
     self.timeZoomLine.backgroundColor = [UIColor clearColor];
+    self.timeZoomLine.mapViewController = self;
     [self.view addSubview:self.timeZoomLine];
 
     [self changeTimeScaleState];
@@ -835,6 +836,7 @@
 
     //NSLog(@"retion didChange, zoom level is %i", [self zoomLevel]);
     [self showDescriptionLabelViews:mapView];
+    [self.timeZoomLine setNeedsDisplay];
     regionChangeTimeStart = [[NSDate alloc] init];
     
 }
