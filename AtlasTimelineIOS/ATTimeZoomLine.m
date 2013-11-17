@@ -469,9 +469,9 @@ CGContextRef context;
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar400.png"]];
     else //if over 500
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
+    
     CGPoint center = timeScaleImageView.center;
-    center.y = -25;//this value decided y value when scroll time window
-
+    center.y = -29;//this value decided y value when scroll time window
     labelScaleText.center = center;
 
     //[labelScaleText setFrame:CGRectMake(
@@ -483,8 +483,11 @@ CGContextRef context;
 - (void)drawEventDotsBySpan
 {
     float DOT_SIZE = 5.0;
+    float DOT_Y_POS = 3.0;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    
+    float dotSize = DOT_SIZE;
+
+    Boolean drawBarFlag = false; //draw bar if there are event visible in map screen
     int size = [appDelegate.eventListSorted count] ;
     if (appDelegate.eventListSorted == nil || size < 1)
         return;
@@ -506,11 +509,17 @@ CGContextRef context;
     else
         span = 60;
     
-    //CGContextRef context = UIGraphicsGetCurrentContext();
-
-    //NSLog(@"---- frame width=%f",self.frame.size.width);
+    //Get current map range
+    MKCoordinateRegion region =  self.mapViewController.mapView.region;
+    CLLocationCoordinate2D northWestCorner, southEastCorner;
+    CLLocationCoordinate2D center   = region.center;
+    northWestCorner.latitude  = center.latitude  - (region.span.latitudeDelta  / 2.0);
+    northWestCorner.longitude = center.longitude - (region.span.longitudeDelta / 2.0);
+    southEastCorner.latitude  = center.latitude  + (region.span.latitudeDelta  / 2.0);
+    southEastCorner.longitude = center.longitude + (region.span.longitudeDelta / 2.0);
+    
     NSDate* dt1 = ((ATEventDataStruct*)appDelegate.eventListSorted[0]).eventDate;
-    int numberOfEvent = 0;
+
     //for (ATEventDataStruct* evt in appDelegate.eventListSorted)
     for (int i = 0; i< size; i++ )
     {
@@ -521,6 +530,10 @@ CGContextRef context;
         double x;
         
         NSDate* dt = evt.eventDate;
+        if ([self checkIfEventOnScreen:evt :northWestCorner :southEastCorner])
+        {
+            drawBarFlag = true;
+        }
         if (i == 0 || i == size - 1) //TODO do not know why i==0 x=930 will not draw dots
         {
             interval = [dt  timeIntervalSinceDate: mStartDateFromParent];
@@ -528,40 +541,74 @@ CGContextRef context;
             x = pixPerDay * dayInterval;
             if (x >= self.frame.size.width)
                 x = x -5;
-            CGContextSetRGBFillColor(context, 255, 0, 0, 1);
-            CGContextFillEllipseInRect(context, CGRectMake(x, 3, DOT_SIZE, DOT_SIZE));
+            if (drawBarFlag)
+            {
+                CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
+                CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
+            }
+            else
+            {
+                CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
+                CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, DOT_SIZE));
+            }
+            //dt1 = dt;
+            drawBarFlag = false;
             //NSLog(@" o or 1 -- draw dots for dt %@  dt1=%@ and x=%f i=%d", dt, dt1, x, i);
-        }
-    
-        int innerInterval = [dt1 timeIntervalSinceDate:dt]/86400;
-        if (innerInterval > span)
-        {
-            
-            interval = [dt  timeIntervalSinceDate: mStartDateFromParent];
-            dayInterval = interval/86400;
-            x = pixPerDay * dayInterval;
-
-           //NSLog(@"---- draw dots for dt %@  dt1=%@ and x=%f startDate=%@", dt, dt1, x, mStartDateFromParent);
-           // if (numberOfEvent > 5)
-           //     numberOfEvent = 5;
-            //for (int i = 0; i <= numberOfEvent; i++) //TODO want to draw dots vertically (max 5), but it only draw 1, do not know why
-            //{
-                //NSLog(@"---- draw dots for dt1 %@ and x=%f  y=%d  span=%d", dt1, x,-i*5, span);
-                
-                CGContextSetRGBFillColor(context, 255, 0, 0, 1);
-                CGContextFillEllipseInRect(context, CGRectMake(x, 3 - 5*numberOfEvent, DOT_SIZE, DOT_SIZE));
-  
-            //}
-            
-            dt1 = dt;
-            //numberOfEvent = 0;
         }
         else
         {
-            //numberOfEvent++;
+            int innerInterval = [dt1 timeIntervalSinceDate:dt]/86400;
+            if (innerInterval > span)
+            {
+                
+                interval = [dt  timeIntervalSinceDate: mStartDateFromParent];
+                dayInterval = interval/86400;
+                x = pixPerDay * dayInterval;
+
+               //NSLog(@"---- draw dots for dt %@  dt1=%@ and x=%f startDate=%@", dt, dt1, x, mStartDateFromParent);
+               // if (numberOfEvent > 5)
+               //     numberOfEvent = 5;
+                //for (int i = 0; i <= numberOfEvent; i++) //TODO want to draw dots vertically (max 5), but it only draw 1, do not know why
+                //{
+                    //NSLog(@"---- draw dots for dt1 %@ and x=%f  y=%d  span=%d", dt1, x,-i*5, span);
+                    if (drawBarFlag)
+                    {
+                        CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
+                        CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
+                    }
+                    else
+                    {
+                        CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
+                        CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, dotSize, dotSize));
+                    }
+      
+                //}
+                
+                dt1 = dt;
+                drawBarFlag = false;
+                //numberOfEvent = 0;
+            }
+            else
+            {
+                //numberOfEvent++;
+            }
         }
-    }
+    } //end for loop
     
+}
+
+-(Boolean)checkIfEventOnScreen:(ATEventDataStruct*) event :(CLLocationCoordinate2D)northWestCorner :(CLLocationCoordinate2D)southEastCorner
+{
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(event.lat, event.lng);
+    CLLocationCoordinate2D location = coord;
+    
+    return(
+        location.latitude  >= northWestCorner.latitude &&
+        location.latitude  <= southEastCorner.latitude &&
+        
+        location.longitude >= northWestCorner.longitude &&
+        location.longitude <= southEastCorner.longitude
+           );
 }
 
 
