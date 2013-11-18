@@ -3,7 +3,9 @@
 Version History
 ---------------
 version 2.2 (submited on 11/15/13)
-    Important Update: Browsing events by time is simpler and more intuitive with the time wheel.
+    Important Update: 
+    1. Time Wheel - Browsing events by time is more intuitive with Time Wheel.
+    2. Brown Dots - When move/zoom map, the time series of the events on screen are indicated by brown color dots. This powerful feature allow us to easily browse event sequence in one location.
   
 version 2.1 (Submited on 9/14/13)
     1. display the event distribution dots on map time window
