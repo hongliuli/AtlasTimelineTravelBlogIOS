@@ -10,6 +10,8 @@
 #import "ATAppDelegate.h"
 #import "ATHelper.h"
 #import "ATEventDataStruct.h"
+#import "ATTimeScrollWindowNew.h"
+#import "Toast+UIView.h"
 
 #define MOVABLE_VIEW_HEIGHT 4
 
@@ -26,6 +28,9 @@ UILabel* labelSeg1;
 UILabel* labelSeg2;
 UILabel* labelSeg3;
 UILabel* labelSeg4;
+
+static Boolean toastHelpFirstTime = true;
+static int toastFirstTimeDelay = 0;
 
 UILabel* labelScaleText;
 UILabel* labelDateText;
@@ -524,6 +529,8 @@ CGContextRef context;
     //for (ATEventDataStruct* evt in appDelegate.eventListSorted)
     float previouseVisibleEventDrawXPos = 0;
     float previouseRegularDotXPos = 0;
+
+
     for (int i = 0; i< size; i++ )
     {
         //NSLog(@"#### i=%d",i);
@@ -570,6 +577,13 @@ CGContextRef context;
                 CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
                 CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
                 previouseVisibleEventDrawXPos = x;
+                if (toastHelpFirstTime && toastFirstTimeDelay == 4)
+                {
+                    [self makeToast:@"Tip: Time dots have darker color for events on screen. See it by moving/zooming map." duration:25.0 position:@"center"];
+                    toastHelpFirstTime = false;
+                    self.hidden = false;
+                    self.mapViewController.timeScrollWindow.hidden  = false;
+                }
             }
             else
             {
@@ -583,12 +597,11 @@ CGContextRef context;
                     }
                 }
             }
-            
             dt1 = dt;
             eventVisibleOnMapFlag = false;
         }
     } //end for loop
-    
+    toastFirstTimeDelay++;
 }
 
 -(Boolean)checkIfEventOnScreen:(ATEventDataStruct*) event :(CLLocationCoordinate2D)northWestCorner :(CLLocationCoordinate2D)southEastCorner
