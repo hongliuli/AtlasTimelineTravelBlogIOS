@@ -29,7 +29,6 @@ UILabel* labelSeg2;
 UILabel* labelSeg3;
 UILabel* labelSeg4;
 
-static Boolean toastHelpFirstTime = true;
 static int toastFirstTimeDelay = 0;
 
 UILabel* labelScaleText;
@@ -553,7 +552,7 @@ CGContextRef context;
                 x = x -5;
             if (eventVisibleOnMapFlag)
             {
-                CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
+                CGContextSetRGBFillColor(context, 0,0.5,0.2, 1);
                 CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
                 previouseVisibleEventDrawXPos = x;
             }
@@ -574,13 +573,14 @@ CGContextRef context;
             
             if (eventVisibleOnMapFlag)
             {
-                CGContextSetRGBFillColor(context, 0.5, 0.0, 0.0, 1);
+                CGContextSetRGBFillColor(context, 0,0.5,0.2, 1);
                 CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
                 previouseVisibleEventDrawXPos = x;
-                if (toastHelpFirstTime && toastFirstTimeDelay == 4)
+                if (toastFirstTimeDelay > 10 && toastFirstTimeDelay < 1000 )
                 {
-                    [self makeToast:@"Tip: Time dots have darker color for events on screen. See it by moving/zooming map." duration:25.0 position:@"center"];
-                    toastHelpFirstTime = false;
+                    toastFirstTimeDelay = 10001; //My Trick so only display once
+                    
+                    [self makeToast:@"Tip: Green dots is for events that are moved into screen" duration:60.0 position:[NSValue valueWithCGPoint:CGPointMake(x, -25)]];
                     self.hidden = false;
                     self.mapViewController.timeScrollWindow.hidden  = false;
                 }

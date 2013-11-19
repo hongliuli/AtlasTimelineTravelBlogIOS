@@ -15,6 +15,7 @@
 #import "ATEventDataStruct.h"
 #import "ATTimeZoomLine.h"
 #import "ATConstants.h"
+#import "Toast+UIView.h"
 
 #define FIRST_TIME_CALL -999
 //color from http://cloford.com/resources/colours/500col.htm
@@ -42,7 +43,7 @@
 }
 
 @synthesize horizontalTableView = _horizontalTableView;
-
+static int toastFirstTimeDelay = 0;
 
 #pragma mark - Table View Data Source
 
@@ -705,6 +706,12 @@
     [self.parent.timeZoomLine showHideScaleText: false];
     [self.parent refreshAnnotations];
     [self changeFocusedCellColorToRed ];
+    
+    if (toastFirstTimeDelay == 10  )
+    {
+        [self makeToast:@"Tip: Zoom span by pinching on time wheel: week / month / year / 10 yrs / ..." duration:20.0 position:@"center"];
+    }
+    toastFirstTimeDelay ++;
 }
 
 - (void) didSelectRowAtIndexPath:(NSIndexPath *)indexPath  //called by tapGesture. This is not in a TableViewController, so no didSelect... delegate mechanism, have to process  by tap gesture
