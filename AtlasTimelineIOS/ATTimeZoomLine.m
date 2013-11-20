@@ -579,8 +579,10 @@ CGContextRef context;
                 if (toastFirstTimeDelay > 10 && toastFirstTimeDelay < 1000 )
                 {
                     toastFirstTimeDelay = 10001; //My Trick so only display once
-                    
-                    [self makeToast:@"Tip: Green dots is for events that are moved into screen" duration:60.0 position:[NSValue valueWithCGPoint:CGPointMake(x, -25)]];
+                    float xPos = x - 170;
+                    if (xPos < 80)
+                        xPos = 100;
+                    [self makeToast:@"Tip: Green dots indicate events currently displayed on map." duration:60.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
                     self.hidden = false;
                     self.mapViewController.timeScrollWindow.hidden  = false;
                 }

@@ -709,7 +709,7 @@ static int toastFirstTimeDelay = 0;
     
     if (toastFirstTimeDelay == 10  )
     {
-        [self makeToast:@"Tip: Zoom span by pinching on time wheel: week / month / year / 10 yrs / ..." duration:20.0 position:@"center"];
+        [self makeToast:@"Tip: Pinch or double-tap right/left here to zoom time span - week/month/year/10yrs ..." duration:20.0 position:@"center"];
     }
     toastFirstTimeDelay ++;
 }
