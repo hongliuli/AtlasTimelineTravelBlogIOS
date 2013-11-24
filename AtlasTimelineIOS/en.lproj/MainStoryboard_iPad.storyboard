@@ -701,26 +701,29 @@
         <scene sceneID="DT5-n1-epL">
             <objects>
                 <viewController storyboardIdentifier="image_picker" id="98E-Q5-3nF" customClass="ATViewImagePickerController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="vZG-1t-Juc">
+                    <view key="view" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="vZG-1t-Juc">
                         <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" id="sBt-5l-11f">
-                                <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            </imageView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="tuj-vD-Wsi">
-                                <rect key="frame" x="0.0" y="960" width="768" height="44"/>
+                                <rect key="frame" x="1" y="960" width="768" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <items>
                                     <barButtonItem title="Item" id="pag-Uv-4lg"/>
                                 </items>
                             </toolbar>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" id="QCY-ZU-ufq">
+                                <rect key="frame" x="8" y="270" width="753" height="683"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </scrollView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <outlet property="imageView" destination="sBt-5l-11f" id="vFX-cI-uzZ"/>
+                        <outlet property="scrollView" destination="QCY-ZU-ufq" id="zOa-wm-yOI"/>
                         <outlet property="toolbar" destination="tuj-vD-Wsi" id="vkh-LP-rtm"/>
                     </connections>
                 </viewController>
@@ -827,7 +830,7 @@
         <class className="ATViewImagePickerController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ATViewImagePickerController.h"/>
             <relationships>
-                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
                 <relationship kind="outlet" name="toolbar" candidateClass="UIToolbar"/>
             </relationships>
         </class>

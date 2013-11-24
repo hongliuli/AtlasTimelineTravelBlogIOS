@@ -8,21 +8,23 @@
 
 #import <UIKit/UIKit.h>
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "ELCImagePickerController.h"
 
 @protocol ATImagePickerDelegate;
 
-@interface ATViewImagePickerController : UIViewController<UIImagePickerControllerDelegate,
-UINavigationControllerDelegate, UIPopoverControllerDelegate>
-@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@interface ATViewImagePickerController : UIViewController<ELCImagePickerControllerDelegate,UIScrollViewDelegate,UINavigationControllerDelegate>
+
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (nonatomic, copy) NSArray *chosenImages;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 
+//@property (weak) id<ELCImagePickerControllerDelegate> delegate;
 @property (weak) id<ATImagePickerDelegate> delegate;
-
 @end
 
 
-//ATEventEditor will assigin itself to above "delegate" var, implement doneSelectPicture
+//ATEventEditor will assigin itself to above "delegate" var, implement doneSelectPictures
 @protocol ATImagePickerDelegate <NSObject>
 @required
-- (void)doneSelectPicture:(UIImage*)newPhoto;
+- (void)doneSelectPictures:(NSArray*)images;
 @end
