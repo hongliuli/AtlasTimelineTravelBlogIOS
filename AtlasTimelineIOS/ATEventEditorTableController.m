@@ -524,7 +524,15 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 
 //callback from imagePicker Controller
-- (void)doneSelectPicture:(UIImage*)newPhoto
+- (void)doneSelectPictures:(NSMutableArray*)images
+{
+    for (int i = 0; i<[images count]; i++)
+    {
+        [self doneSelectedPicture:images[i] :i ];
+    }
+}
+
+- (void)doneSelectedPicture:(UIImage*)newPhoto :(int)idx
 {
     if (newPhoto == nil)
         return;
@@ -532,7 +540,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     [formatter setDateFormat:@"yyyyMMdd_hh_mm_ss"];
     //save to a temparay file
     NSString* timeStampPhotoName = [formatter stringFromDate:[NSDate date]];
-    NSString* photoFileName = [NSString stringWithFormat:@"%@", timeStampPhotoName];
+    timeStampPhotoName = [NSString stringWithFormat:@"%@_%d", timeStampPhotoName,idx];
 
     NSString* tmpFileNameForNewPhoto = [NSString stringWithFormat:@"%@%@", NEW_NOT_SAVED_FILE_PREFIX,timeStampPhotoName];
     if (self.photoScrollView.photoList == nil)
@@ -540,9 +548,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     else
         [self.photoScrollView.photoList addObject:tmpFileNameForNewPhoto];//Note tmpFile.. is add, later in cellForTableview will check if file lenght is 8 then get file from temp directory
     if (photoNewAddedList == nil)
-        photoNewAddedList = [NSMutableArray arrayWithObjects:photoFileName, nil];
+        photoNewAddedList = [NSMutableArray arrayWithObjects:timeStampPhotoName, nil];
     else
-        [photoNewAddedList addObject:photoFileName]; //so later mapView will move above new added file to real location
+        [photoNewAddedList addObject:timeStampPhotoName]; //so later mapView will move above new added file to real location
     //Save new photo to a temp location, so when user really tap save event, mapview will copy these temp photos to perment place
     self.hasPhotoFlag = EVENT_TYPE_HAS_PHOTO; //saveAction will write this to eventType. save image file will be in ATViewController's updateEvent because only there we can get uniqueId as filename
     //Write file to temp location before user tap event save button
