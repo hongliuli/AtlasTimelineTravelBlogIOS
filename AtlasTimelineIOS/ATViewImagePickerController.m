@@ -10,7 +10,6 @@
 #import "ELCImagePickerController.h"
 #import "ELCAlbumPickerController.h"
 #import "ELCAssetTablePicker.h"
-#import "ATCameraAction.h"
 
 
 @interface ATViewImagePickerController ()
@@ -35,13 +34,11 @@ UIPopoverController *popoverController;
 {
 
 	// Do any additional setup after loading the view.
-    /*
     UIBarButtonItem *cameraButton = [[UIBarButtonItem alloc]
                                      initWithTitle:@"Camera"
                                      style:UIBarButtonItemStyleBordered
                                      target:self
                                      action:@selector(useCamera:)];
-     */
     UIBarButtonItem *cameraRollButton = [[UIBarButtonItem alloc]
                                          initWithTitle:@"Camera Roll"
                                          style:UIBarButtonItemStyleBordered
@@ -50,7 +47,7 @@ UIPopoverController *popoverController;
     UIBarButtonItem* space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem* doneButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem: UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
-    NSArray *items = [NSArray arrayWithObjects: //cameraButton, //issue with camera when integrate ECLImagePicker, disable it because camera is not important in our app
+    NSArray *items = [NSArray arrayWithObjects: cameraButton, //issue with camera when integrate ECLImagePicker, disable it because camera is not important in our app
                       cameraRollButton, space, doneButton,nil];
     [self.toolbar setItems:items animated:NO];
     [super viewDidLoad];
@@ -69,11 +66,9 @@ UIPopoverController *popoverController;
     if ([UIImagePickerController isSourceTypeAvailable:
          UIImagePickerControllerSourceTypeCamera])
     {
-        ATCameraAction* action = [[ATCameraAction alloc] init];
-        action.parentCtlr = self;
         UIImagePickerController *imagePicker =
         [[UIImagePickerController alloc] init];
-        imagePicker.delegate = action;
+        imagePicker.delegate = self;
         imagePicker.sourceType =
         UIImagePickerControllerSourceTypeCamera;
         imagePicker.mediaTypes = [NSArray arrayWithObjects:
@@ -124,7 +119,43 @@ finishedSavingWithError:(NSError *)error
     }
 }
 
-//called when photo picked
+//called when camera finish (protocal for camera)
+-(void)imagePickerController:(UIImagePickerController *)picker
+didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+    NSLog(@"------ATCameraAction didFinish delegate");
+    [self dismissViewControllerAnimated:YES completion:nil];
+
+    NSString *mediaType = [info
+                           objectForKey:UIImagePickerControllerMediaType];
+    
+    if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+        UIImage *image = [info
+                          objectForKey:UIImagePickerControllerOriginalImage];
+        CGRect workingFrame = _scrollView.frame;
+        workingFrame.origin.x = 0;
+        workingFrame.origin.y=0;
+        
+        //save to file will be in EventEditor with doneSelectPictures() callback
+        NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
+        [images addObject:image];
+            
+        UIImageView *imageview = [[UIImageView alloc] initWithImage:image];
+        [imageview setContentMode:UIViewContentModeScaleAspectFit ];//     UIViewContentModeScaleAspectFit];
+        imageview.frame = workingFrame;
+            
+        [_scrollView addSubview:imageview];
+        self.chosenImages = images;
+        
+        [_scrollView setPagingEnabled:YES];
+        [_scrollView setContentSize:CGSizeMake(workingFrame.origin.x, workingFrame.size.height)];
+    }
+    else if ([mediaType isEqualToString:(NSString *)kUTTypeMovie])
+    {
+        // Code here to support video if enabled
+    }
+}
+//called when photo picked (protocal from ELCImagePicker)
 - (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
 {
     NSLog(@"----- didFinish ");
