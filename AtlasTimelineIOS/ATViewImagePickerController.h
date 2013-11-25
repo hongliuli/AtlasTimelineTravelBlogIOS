@@ -12,7 +12,7 @@
 
 @protocol ATImagePickerDelegate;
 
-@interface ATViewImagePickerController : UIViewController<ELCImagePickerControllerDelegate,UIScrollViewDelegate,UINavigationControllerDelegate>
+@interface ATViewImagePickerController : UIViewController<ELCImagePickerControllerDelegate,UIScrollViewDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (nonatomic, copy) NSArray *chosenImages;
