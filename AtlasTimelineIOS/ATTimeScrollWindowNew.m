@@ -707,9 +707,9 @@ static int toastFirstTimeDelay = 0;
     [self.parent refreshAnnotations];
     [self changeFocusedCellColorToRed ];
     
-    if (toastFirstTimeDelay == 10  )
+    if (toastFirstTimeDelay == 20  )
     {
-        [self makeToast:@"Tip: Pinch or double-tap right/left here to zoom time span - week/month/year/10yrs ..." duration:20.0 position:@"center"];
+        [self makeToast:@"tip: Pinch or right/left double-tap to zoom time." duration:15.0 position:@"center"];
     }
     toastFirstTimeDelay ++;
 }
