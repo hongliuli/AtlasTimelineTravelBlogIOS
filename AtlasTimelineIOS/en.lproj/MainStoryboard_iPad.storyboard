@@ -713,7 +713,7 @@
                                 </items>
                             </toolbar>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" id="QCY-ZU-ufq">
-                                <rect key="frame" x="8" y="270" width="753" height="683"/>
+                                <rect key="frame" x="8" y="270" width="1011" height="683"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </scrollView>
@@ -722,6 +722,7 @@
                     </view>
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
                     <connections>
                         <outlet property="scrollView" destination="QCY-ZU-ufq" id="zOa-wm-yOI"/>
                         <outlet property="toolbar" destination="tuj-vD-Wsi" id="vkh-LP-rtm"/>
