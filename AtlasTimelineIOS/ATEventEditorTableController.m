@@ -11,7 +11,6 @@
 #import "ATEventDataStruct.h"
 #import "ATAppDelegate.h"
 #import "ATViewImagePickerController.h"
-#import "ATPhotoViewController.h"
 #import "ATPhotoScrollViewControler.h"
 #import "ATHelper.h"
 #import <QuartzCore/QuartzCore.h>
