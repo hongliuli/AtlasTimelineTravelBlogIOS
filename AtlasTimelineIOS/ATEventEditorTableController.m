@@ -12,7 +12,7 @@
 #import "ATAppDelegate.h"
 #import "ATViewImagePickerController.h"
 #import "ATPhotoViewController.h"
-#import "ATPhotoScrollView.h"
+#import "ATPhotoScrollViewControler.h"
 #import "ATHelper.h"
 #import <QuartzCore/QuartzCore.h>
 #import <Social/Social.h>
@@ -219,15 +219,16 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     //use Modal with Done button is good both iPad/iPhone
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
-    ATPhotoViewController* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_view"];
-    [self presentModalViewController:ctr animated:YES];
+    ATPhotoScrollViewControler* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_view"];
     ctr.eventEditor = self;
     ctr.currentIndex = self.photoScrollView.selectedPhotoIndex;
+    [self presentModalViewController:ctr animated:YES]; //ATPhotoScrollViewController::viewDidLoad will be called
 
-    [ctr imageView].contentMode = UIViewContentModeScaleAspectFit;
-    [ctr imageView].clipsToBounds = YES;
-    [[ctr imageView] setImage:image];
-    [ctr showCount];
+
+   // [ctr imageView].contentMode = UIViewContentModeScaleAspectFit;
+   // [ctr imageView].clipsToBounds = YES;
+   // [[ctr imageView] setImage:image];
+   // [ctr showCount];
 }
 
 -(void)takePictureAction:(id)sender
