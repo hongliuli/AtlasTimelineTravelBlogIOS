@@ -78,6 +78,7 @@
 		CEAD5A3A172B5BD700CB7082 /* gesture-pinch.png in Resources */ = {isa = PBXBuildFile; fileRef = CEAD5A36172B5BD700CB7082 /* gesture-pinch.png */; };
 		CEAD5A3B172B5BD700CB7082 /* gesture-tap.png in Resources */ = {isa = PBXBuildFile; fileRef = CEAD5A37172B5BD700CB7082 /* gesture-tap.png */; };
 		CEAD5A3F172B610700CB7082 /* gesture-swipe.png in Resources */ = {isa = PBXBuildFile; fileRef = CEAD5A3E172B610700CB7082 /* gesture-swipe.png */; };
+		CEAF859F184ECCDA0011F59E /* ATPhotoScrollViewControler.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAF859E184ECCDA0011F59E /* ATPhotoScrollViewControler.m */; };
 		CEBD4EAD1724BBDB001B3798 /* TimeScaleBar100.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBD4EA81724BBDB001B3798 /* TimeScaleBar100.png */; };
 		CEBD4EAE1724BBDB001B3798 /* TimeScaleBar200.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBD4EA91724BBDB001B3798 /* TimeScaleBar200.png */; };
 		CEBD4EAF1724BBDB001B3798 /* TimeScaleBar300.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBD4EAA1724BBDB001B3798 /* TimeScaleBar300.png */; };
@@ -139,7 +140,6 @@
 		CEE2ABE516FF8A52003D6AB9 /* icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE2ABE416FF8A52003D6AB9 /* icon-72.png */; };
 		CEE2ABE716FF8F12003D6AB9 /* icon-144.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE2ABE616FF8F12003D6AB9 /* icon-144.png */; };
 		CEE3F0EF1708C363004A1BEA /* ATViewImagePickerController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE3F0EE1708C362004A1BEA /* ATViewImagePickerController.m */; };
-		CEE4E834171A70AC00628F76 /* ATPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE4E833171A70AC00628F76 /* ATPhotoViewController.m */; };
 		CEE4E836171B221E00628F76 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE4E835171B221E00628F76 /* info.png */; };
 		CEE72EFB16E4051200403802 /* help-about.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE72EF916E4051200403802 /* help-about.png */; };
 		CEE72EFC16E4051200403802 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE72EFA16E4051200403802 /* settings.png */; };
@@ -263,6 +263,8 @@
 		CEAD5A36172B5BD700CB7082 /* gesture-pinch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gesture-pinch.png"; path = "images/gesture-pinch.png"; sourceTree = "<group>"; };
 		CEAD5A37172B5BD700CB7082 /* gesture-tap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gesture-tap.png"; path = "images/gesture-tap.png"; sourceTree = "<group>"; };
 		CEAD5A3E172B610700CB7082 /* gesture-swipe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gesture-swipe.png"; path = "images/gesture-swipe.png"; sourceTree = "<group>"; };
+		CEAF859D184ECCDA0011F59E /* ATPhotoScrollViewControler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATPhotoScrollViewControler.h; sourceTree = "<group>"; };
+		CEAF859E184ECCDA0011F59E /* ATPhotoScrollViewControler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATPhotoScrollViewControler.m; sourceTree = "<group>"; };
 		CEBD4EA81724BBDB001B3798 /* TimeScaleBar100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TimeScaleBar100.png; path = images/TimeScaleBar100.png; sourceTree = "<group>"; };
 		CEBD4EA91724BBDB001B3798 /* TimeScaleBar200.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TimeScaleBar200.png; path = images/TimeScaleBar200.png; sourceTree = "<group>"; };
 		CEBD4EAA1724BBDB001B3798 /* TimeScaleBar300.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TimeScaleBar300.png; path = images/TimeScaleBar300.png; sourceTree = "<group>"; };
@@ -340,8 +342,6 @@
 		CEE2ABE616FF8F12003D6AB9 /* icon-144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-144.png"; sourceTree = "<group>"; };
 		CEE3F0ED1708C362004A1BEA /* ATViewImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATViewImagePickerController.h; sourceTree = "<group>"; };
 		CEE3F0EE1708C362004A1BEA /* ATViewImagePickerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATViewImagePickerController.m; sourceTree = "<group>"; };
-		CEE4E832171A70AC00628F76 /* ATPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATPhotoViewController.h; sourceTree = "<group>"; };
-		CEE4E833171A70AC00628F76 /* ATPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATPhotoViewController.m; sourceTree = "<group>"; };
 		CEE4E835171B221E00628F76 /* info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = info.png; path = images/info.png; sourceTree = "<group>"; };
 		CEE72EF916E4051200403802 /* help-about.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "help-about.png"; path = "images/help-about.png"; sourceTree = "<group>"; };
 		CEE72EFA16E4051200403802 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = settings.png; path = images/settings.png; sourceTree = "<group>"; };
@@ -597,14 +597,14 @@
 				CE56B1AC1775217700DB9FB7 /* ATPhotoScrollView.m */,
 				CE56B1AE177522AD00DB9FB7 /* ATPhotoScrollCell.h */,
 				CE56B1AF177522AD00DB9FB7 /* ATPhotoScrollCell.m */,
-				CEE4E832171A70AC00628F76 /* ATPhotoViewController.h */,
-				CEE4E833171A70AC00628F76 /* ATPhotoViewController.m */,
 				CEE3F0ED1708C362004A1BEA /* ATViewImagePickerController.h */,
 				CEE3F0EE1708C362004A1BEA /* ATViewImagePickerController.m */,
 				CEBD4EB817277D45001B3798 /* ATTutorialView.h */,
 				CEBD4EB917277D45001B3798 /* ATTutorialView.m */,
 				CEF416E5184105FA003A5383 /* ATCameraAction.h */,
 				CEF416E6184105FA003A5383 /* ATCameraAction.m */,
+				CEAF859D184ECCDA0011F59E /* ATPhotoScrollViewControler.h */,
+				CEAF859E184ECCDA0011F59E /* ATPhotoScrollViewControler.m */,
 			);
 			name = MapViews;
 			sourceTree = "<group>";
@@ -883,7 +883,6 @@
 				CE049EBC16EB7491009F6404 /* ATTimeScrollCell.m in Sources */,
 				CE049EBE16EB7491009F6404 /* ATTimeScrollWindowNew.m in Sources */,
 				CEE3F0EF1708C363004A1BEA /* ATViewImagePickerController.m in Sources */,
-				CEE4E834171A70AC00628F76 /* ATPhotoViewController.m in Sources */,
 				CEBD4EB7172757C4001B3798 /* ATUserVerifyViewController.m in Sources */,
 				CEBD4EBA17277D46001B3798 /* ATTutorialView.m in Sources */,
 				CE70BF49176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m in Sources */,
@@ -897,6 +896,7 @@
 				CEE84DA8183EF7CB003725C1 /* ELCAssetTablePicker.m in Sources */,
 				CEE84DA9183EF7CB003725C1 /* ELCImagePickerController.m in Sources */,
 				CEF416E7184105FA003A5383 /* ATCameraAction.m in Sources */,
+				CEAF859F184ECCDA0011F59E /* ATPhotoScrollViewControler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
