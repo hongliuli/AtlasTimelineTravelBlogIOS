@@ -68,6 +68,9 @@
 		CE7E3D9F1698F523004E71CD /* ATEventAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7E3D9E1698F523004E71CD /* ATEventAnnotationView.m */; };
 		CE7E3DA21698F55B004E71CD /* ATUnsavedAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7E3DA11698F55B004E71CD /* ATUnsavedAnnotationView.m */; };
 		CE97FC9B170795A600F97A3E /* no_image.gif in Resources */ = {isa = PBXBuildFile; fileRef = CE97FC9A170795A600F97A3E /* no_image.gif */; };
+		CEA41D3A18580C410034F1C3 /* BasePhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA41D3518580C410034F1C3 /* BasePhotoViewController.m */; };
+		CEA41D3B18580C410034F1C3 /* ImageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA41D3718580C410034F1C3 /* ImageScrollView.m */; };
+		CEA41D3C18580C410034F1C3 /* PhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA41D3918580C410034F1C3 /* PhotoViewController.m */; };
 		CEAAC531168F4E2E00BFCD31 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEAAC530168F4E2E00BFCD31 /* MessageUI.framework */; };
 		CEAAC535168F4FAD00BFCD31 /* SectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAAC534168F4FAD00BFCD31 /* SectionHeaderView.m */; };
 		CEAAC538168F5F1A00BFCD31 /* ATPeriod.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAAC537168F5F1A00BFCD31 /* ATPeriod.m */; };
@@ -78,7 +81,6 @@
 		CEAD5A3A172B5BD700CB7082 /* gesture-pinch.png in Resources */ = {isa = PBXBuildFile; fileRef = CEAD5A36172B5BD700CB7082 /* gesture-pinch.png */; };
 		CEAD5A3B172B5BD700CB7082 /* gesture-tap.png in Resources */ = {isa = PBXBuildFile; fileRef = CEAD5A37172B5BD700CB7082 /* gesture-tap.png */; };
 		CEAD5A3F172B610700CB7082 /* gesture-swipe.png in Resources */ = {isa = PBXBuildFile; fileRef = CEAD5A3E172B610700CB7082 /* gesture-swipe.png */; };
-		CEAF859F184ECCDA0011F59E /* ATPhotoScrollViewControler.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAF859E184ECCDA0011F59E /* ATPhotoScrollViewControler.m */; };
 		CEBD4EAD1724BBDB001B3798 /* TimeScaleBar100.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBD4EA81724BBDB001B3798 /* TimeScaleBar100.png */; };
 		CEBD4EAE1724BBDB001B3798 /* TimeScaleBar200.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBD4EA91724BBDB001B3798 /* TimeScaleBar200.png */; };
 		CEBD4EAF1724BBDB001B3798 /* TimeScaleBar300.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBD4EAA1724BBDB001B3798 /* TimeScaleBar300.png */; };
@@ -250,6 +252,12 @@
 		CE7E3DA01698F55B004E71CD /* ATUnsavedAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATUnsavedAnnotationView.h; sourceTree = "<group>"; };
 		CE7E3DA11698F55B004E71CD /* ATUnsavedAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATUnsavedAnnotationView.m; sourceTree = "<group>"; };
 		CE97FC9A170795A600F97A3E /* no_image.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = no_image.gif; path = images/no_image.gif; sourceTree = "<group>"; };
+		CEA41D3418580C410034F1C3 /* BasePhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePhotoViewController.h; sourceTree = "<group>"; };
+		CEA41D3518580C410034F1C3 /* BasePhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePhotoViewController.m; sourceTree = "<group>"; };
+		CEA41D3618580C410034F1C3 /* ImageScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageScrollView.h; sourceTree = "<group>"; };
+		CEA41D3718580C410034F1C3 /* ImageScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageScrollView.m; sourceTree = "<group>"; };
+		CEA41D3818580C410034F1C3 /* PhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoViewController.h; sourceTree = "<group>"; };
+		CEA41D3918580C410034F1C3 /* PhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoViewController.m; sourceTree = "<group>"; };
 		CEAAC530168F4E2E00BFCD31 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		CEAAC533168F4FAD00BFCD31 /* SectionHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeaderView.h; sourceTree = "<group>"; };
 		CEAAC534168F4FAD00BFCD31 /* SectionHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeaderView.m; sourceTree = "<group>"; };
@@ -263,8 +271,6 @@
 		CEAD5A36172B5BD700CB7082 /* gesture-pinch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gesture-pinch.png"; path = "images/gesture-pinch.png"; sourceTree = "<group>"; };
 		CEAD5A37172B5BD700CB7082 /* gesture-tap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gesture-tap.png"; path = "images/gesture-tap.png"; sourceTree = "<group>"; };
 		CEAD5A3E172B610700CB7082 /* gesture-swipe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "gesture-swipe.png"; path = "images/gesture-swipe.png"; sourceTree = "<group>"; };
-		CEAF859D184ECCDA0011F59E /* ATPhotoScrollViewControler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATPhotoScrollViewControler.h; sourceTree = "<group>"; };
-		CEAF859E184ECCDA0011F59E /* ATPhotoScrollViewControler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATPhotoScrollViewControler.m; sourceTree = "<group>"; };
 		CEBD4EA81724BBDB001B3798 /* TimeScaleBar100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TimeScaleBar100.png; path = images/TimeScaleBar100.png; sourceTree = "<group>"; };
 		CEBD4EA91724BBDB001B3798 /* TimeScaleBar200.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TimeScaleBar200.png; path = images/TimeScaleBar200.png; sourceTree = "<group>"; };
 		CEBD4EAA1724BBDB001B3798 /* TimeScaleBar300.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TimeScaleBar300.png; path = images/TimeScaleBar300.png; sourceTree = "<group>"; };
@@ -589,6 +595,12 @@
 		CE2A1D3616AE18F5004476E8 /* MapViews */ = {
 			isa = PBXGroup;
 			children = (
+				CEA41D3418580C410034F1C3 /* BasePhotoViewController.h */,
+				CEA41D3518580C410034F1C3 /* BasePhotoViewController.m */,
+				CEA41D3618580C410034F1C3 /* ImageScrollView.h */,
+				CEA41D3718580C410034F1C3 /* ImageScrollView.m */,
+				CEA41D3818580C410034F1C3 /* PhotoViewController.h */,
+				CEA41D3918580C410034F1C3 /* PhotoViewController.m */,
 				CE0E531F168E671F00C147FB /* ATViewController.h */,
 				CE0E5320168E671F00C147FB /* ATViewController.m */,
 				CE4DDC0E16A7AC2300911CE2 /* ATEventEditorTableController.h */,
@@ -603,8 +615,6 @@
 				CEBD4EB917277D45001B3798 /* ATTutorialView.m */,
 				CEF416E5184105FA003A5383 /* ATCameraAction.h */,
 				CEF416E6184105FA003A5383 /* ATCameraAction.m */,
-				CEAF859D184ECCDA0011F59E /* ATPhotoScrollViewControler.h */,
-				CEAF859E184ECCDA0011F59E /* ATPhotoScrollViewControler.m */,
 			);
 			name = MapViews;
 			sourceTree = "<group>";
@@ -896,7 +906,9 @@
 				CEE84DA8183EF7CB003725C1 /* ELCAssetTablePicker.m in Sources */,
 				CEE84DA9183EF7CB003725C1 /* ELCImagePickerController.m in Sources */,
 				CEF416E7184105FA003A5383 /* ATCameraAction.m in Sources */,
-				CEAF859F184ECCDA0011F59E /* ATPhotoScrollViewControler.m in Sources */,
+				CEA41D3A18580C410034F1C3 /* BasePhotoViewController.m in Sources */,
+				CEA41D3B18580C410034F1C3 /* ImageScrollView.m in Sources */,
+				CEA41D3C18580C410034F1C3 /* PhotoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
