@@ -146,6 +146,7 @@
 {
     //NSLog(@"select photo selected");
     self.selectedPhotoIndex = indexPath.row;
+    [ATEventEditorTableController setSelectedPhotoIdx:indexPath.row];
     ATPhotoScrollCell *cell = (ATPhotoScrollCell*)[self.horizontalTableView cellForRowAtIndexPath:indexPath];
     [self.eventEditor showPhotoView:self.selectedPhotoIndex image:cell.photo.image];
     

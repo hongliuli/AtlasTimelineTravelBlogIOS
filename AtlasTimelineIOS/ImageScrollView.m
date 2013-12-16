@@ -46,7 +46,7 @@
  */
 
 #import <Foundation/Foundation.h>
-
+#import <QuartzCore/QuartzCore.h>
 #import "ImageScrollView.h"
 #import "ATEventEditorTableController.h"
 #import "ATHelper.h"
@@ -96,8 +96,9 @@ static NSString *_ImageNameAtIndex(NSUInteger index);
 {
     _index = index;
     
-
-    [self displayImage:_ImageAtIndex(index)];
+    UIImage* img =_ImageAtIndex(index);
+    if (img != nil)
+        [self displayImage:_ImageAtIndex(index)];
 
 }
 
@@ -159,6 +160,9 @@ static NSString *_ImageNameAtIndex(NSUInteger index);
 
 - (void)displayImage:(UIImage *)image
 {
+    if (image == nil)
+        return;
+    
     // clear the previous image
     [_zoomView removeFromSuperview];
     _zoomView = nil;
@@ -168,6 +172,9 @@ static NSString *_ImageNameAtIndex(NSUInteger index);
 
     // make a new UIImageView for the new image
     _zoomView = [[UIImageView alloc] initWithImage:image];
+    UIColor *borderColor = [UIColor blackColor];
+    [_zoomView.layer setBorderColor:borderColor.CGColor];
+    [_zoomView.layer setBorderWidth:15.0];
     [self addSubview:_zoomView];
     
     [self configureForImageSize:image.size];
@@ -203,9 +210,27 @@ static NSString *_ImageNameAtIndex(NSUInteger index);
     if (minScale > maxScale) {
         minScale = maxScale;
     }
-        
+    
+    //Following value is from my test on ipod/ipad, need test redina also.
+    //if maxScale and minScale is same or 1, then no scale will happen when zoom
+    if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation))
+    {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        {
+            maxScale = 0.9;
+            minScale = 0.8;
+        }
+        else
+        {
+            maxScale = 0.5;
+            minScale = 0.3;
+        }
+
+    }
     self.maximumZoomScale = maxScale;
     self.minimumZoomScale = minScale;
+  
+    //NSLog(@" ####### max / min is %f / %f ",maxScale,minScale);
 }
 
 #pragma mark -
@@ -274,29 +299,32 @@ static NSString *_ImageNameAtIndex(NSUInteger index);
 
 static NSArray *_ImageData(void)
 {
-    //TODO
     return [ATEventEditorTableController photoList];
 }
 
 static NSUInteger _ImageCount(void)
 {
     static NSUInteger count = 0;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        count = [_ImageData() count];
-    });
+    count = [_ImageData() count];
     return count;
 }
 
 static NSString *_ImageNameAtIndex(NSUInteger index)
 {
-    return [_ImageData() objectAtIndex:index];
+    int idx = (int)index;
+    if (idx >= 0 && idx < [_ImageData() count])
+        return [_ImageData() objectAtIndex:index];
+    else
+        return nil;
 }
 
 // we use "imageWithContentsOfFile:" instead of "imageNamed:" here to avoid caching
 static UIImage *_ImageAtIndex(NSUInteger index)
 {
     NSString *photoName = _ImageNameAtIndex(index);
-    return [ATHelper readPhotoFromFile:photoName eventId:[ATEventEditorTableController eventId]];
+    if (photoName != nil)
+        return [ATHelper readPhotoFromFile:photoName eventId:[ATEventEditorTableController eventId]];
+    else
+        return nil;
 }
 

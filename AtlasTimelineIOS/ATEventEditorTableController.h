@@ -55,6 +55,12 @@
 - (void)deleteCallback:(NSString*) photoFileName;
 - (void)resetEventEditor;
 
++ (NSArray*) photoList;
++ (NSString*) eventId;
++ (void)setEventId:(NSString*)eventId;
++ (int) selectedPhotoIdx;
++ (void) setSelectedPhotoIdx:(int)idx;
+
 @end
 
 // I can save/delete Core Data here, but I will let these to be done in mapview by delegate since we have pass info back to update annotation view when save/delete

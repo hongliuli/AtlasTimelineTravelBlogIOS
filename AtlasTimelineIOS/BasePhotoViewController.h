@@ -16,6 +16,6 @@
 @property (strong, nonatomic) NSMutableArray* photoList;
 
 @property (weak, nonatomic) ATEventEditorTableController* eventEditor;
-@property int currentIndex;
+@property int initialPhotoIdx;
 
 @end

@@ -1056,6 +1056,7 @@
         self.eventEditor.eventType = ann.eventType;
         self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
         self.eventEditor.eventId = ann.uniqueId;
+        [ATEventEditorTableController setEventId:ann.uniqueId];
         //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
         [self.eventEditor createPhotoScrollView: ann.uniqueId ];
         

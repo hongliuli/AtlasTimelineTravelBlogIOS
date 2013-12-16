@@ -11,7 +11,7 @@
 #import "ATEventDataStruct.h"
 #import "ATAppDelegate.h"
 #import "ATViewImagePickerController.h"
-#import "ATPhotoScrollViewControler.h"
+#import "BasePhotoViewController.h"
 #import "ATHelper.h"
 #import <QuartzCore/QuartzCore.h>
 #import <Social/Social.h>
@@ -43,6 +43,10 @@
 
 @implementation ATEventEditorTableController
 
+static NSArray* _photoList = nil;
+static NSString* _eventId = nil;
+static int _selectedPhotoIdx=0;
+
 ATViewImagePickerController* imagePicker;
 
 @synthesize delegate;
@@ -69,7 +73,11 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
 }
  */
-
++ (NSArray*) photoList { return _photoList;}
++ (NSString*) eventId { return _eventId;}
++ (void) setEventId:(NSString *)evtId { _eventId = evtId;}
++ (int) selectedPhotoIdx { return _selectedPhotoIdx;}
++ (void) setSelectedPhotoIdx:(int)idx { _selectedPhotoIdx = idx; }
 
 - (void)viewDidLoad
 {
@@ -183,6 +191,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             self.photoScrollView.photoList = [NSMutableArray arrayWithArray:tmpFileList];
             //remove thumbnail file title
             [self.photoScrollView.photoList removeObject:@"thumbnail"];
+            _photoList = self.photoScrollView.photoList;
         }
     }
     //tricky: in iPod, here will be called before viewForSectionHeader, so customViewForPhoto is nil
@@ -218,10 +227,11 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     //use Modal with Done button is good both iPad/iPhone
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
-    ATPhotoScrollViewControler* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_view"];
+    BasePhotoViewController* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_view"];
     ctr.eventEditor = self;
-    ctr.currentIndex = self.photoScrollView.selectedPhotoIndex;
+    ctr.initialPhotoIdx = self.photoScrollView.selectedPhotoIndex;
     [self presentModalViewController:ctr animated:YES]; //ATPhotoScrollViewController::viewDidLoad will be called
+    //[self presentViewController:ctr animated:false completion:nil];
 
 
    // [ctr imageView].contentMode = UIViewContentModeScaleAspectFit;
