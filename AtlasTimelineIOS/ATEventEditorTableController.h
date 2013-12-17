@@ -55,6 +55,7 @@
 - (void)deleteCallback:(NSString*) photoFileName;
 - (void)resetEventEditor;
 
+//these can easily be assigne to BasePhotoViewController, but ImageScrollView also need, so make them static
 + (NSArray*) photoList;
 + (NSString*) eventId;
 + (void)setEventId:(NSString*)eventId;
