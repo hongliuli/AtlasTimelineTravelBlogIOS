@@ -79,16 +79,6 @@
     [self.view bringSubviewToFront:self.pageControl];
 }
 
-- (void) viewDidAppear:(BOOL)animated
-{
-    // Set up the page control
-    NSInteger tmpIdx = self.initialPhotoIdx;
-    //TODO ##### following initial page setting is so weired, it max set to 3 event tmpIdx is 4,5,6, ...
-    //     #####  Do not know why???????????????????? xxxxxxxxxx
-    [self.pageControl setCurrentPage:tmpIdx];
-    //NSLog(@"----- self.initialPhotoind=%d, pageCountro.currentPage=%d",tmpIdx,self.pageControl.currentPage);
-    self.pageControl.numberOfPages = [[ATEventEditorTableController photoList] count];
-}
 
 # pragma mark - UIPageViewControllerDataSource
 
@@ -123,7 +113,7 @@
 
 - (void) deleteAction: (id)sender
 {
-    int selectedPhotoIdx = self.initialPhotoIdx;
+    int selectedPhotoIdx = self.pageControl.currentPage;
     if (self.eventEditor.photoScrollView.selectedAsThumbnailIndex == selectedPhotoIdx)
         self.eventEditor.photoScrollView.selectedAsThumbnailIndex = NOT_THUMBNAIL;
     if (self.eventEditor.photoScrollView.selectedAsShareIndex == selectedPhotoIdx)
@@ -136,13 +126,13 @@
 }
 - (void) setDefaultAction: (id)sender
 {
-    self.eventEditor.photoScrollView.selectedAsThumbnailIndex = self.initialPhotoIdx;
+    self.eventEditor.photoScrollView.selectedAsThumbnailIndex = self.pageControl.currentPage;
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //so map marker icon will display on new cell
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
 - (void) setShareAction: (id)sender
 {
-    self.eventEditor.photoScrollView.selectedAsShareIndex = self.initialPhotoIdx;
+    self.eventEditor.photoScrollView.selectedAsShareIndex = self.pageControl.currentPage;
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new selected cell
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
