@@ -1405,11 +1405,33 @@
     }
 }
 
--(UIImage*)readPhotoThumbFromFile:(NSString*)fileName
+-(UIImage*)readPhotoThumbFromFile:(NSString*)eventId
 {
-    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fileName];
-    fullPathToFile = [fullPathToFile stringByAppendingPathComponent:@"thumbnail"];
-    return [UIImage imageWithContentsOfFile:fullPathToFile];
+    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
+    NSString* thumbPath = [fullPathToFile stringByAppendingPathComponent:@"thumbnail"];
+    UIImage* thumnailImage = [UIImage imageWithContentsOfFile:thumbPath];
+    if (thumnailImage == nil)
+    {
+        //If thumbnail is null, create one with the first photo if there is one
+        //This part of code is to solve the issue after user migrate to a new device and copy photos from dropbox where no thumbnail image in file
+        NSError *error = nil;
+        NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
+        NSString* photoForThumbnail = nil;
+        NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
+        if (tmpFileList != nil && [tmpFileList count] > 0)
+        {
+            photoForThumbnail = tmpFileList[0];
+        }
+
+        if (photoForThumbnail != nil ) 
+        {
+            UIImage* photo = [UIImage imageWithContentsOfFile: [fullPathToFile stringByAppendingPathComponent:photoForThumbnail ]];
+            thumnailImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
+            NSData* imageData = UIImageJPEGRepresentation(thumnailImage, JPEG_QUALITY);
+            [imageData writeToFile:thumbPath atomically:NO];
+        }
+    }
+    return thumnailImage;
 }
 
 
