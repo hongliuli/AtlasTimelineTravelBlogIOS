@@ -86,7 +86,7 @@ NSMutableArray* originalEventListSorted;
      Get the plays and quotations data from the core data set in ATAppDelegate, then pass the array on to the table view controller.
      */
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    mapViewSelectedYear = [ATHelper getYearPartSmart:appDelegate.focusedDate];
+    mapViewSelectedYear = [ATHelper getYearPartHelper:appDelegate.focusedDate];
     originalEventListSorted = appDelegate.eventListSorted;
     if ([originalEventListSorted count] == 0)
     {
@@ -118,13 +118,13 @@ NSMutableArray* originalEventListSorted;
     NSMutableArray* orderedYearList = [[NSMutableArray alloc] init];
     ATPeriod* period = [[ATPeriod alloc] init];
     ATEventDataStruct* firstEnt = eventListSorted[0];
-    NSString* prevYear = [ATHelper getYearPartSmart:firstEnt.eventDate];
+    NSString* prevYear = [ATHelper getYearPartHelper:firstEnt.eventDate];
     //remember eventListSorted is sorted on event date
     NSString* year;
     int periodCount = 0;
     for (ATEventDataStruct* ent in eventListSorted)
     {
-        year = [ATHelper getYearPartSmart:ent.eventDate];
+        year = [ATHelper getYearPartHelper:ent.eventDate];
         //NSLog(@"myear %@     prevYear= %@     %@", year, prevYear, evtDate);
         if ([year isEqualToString: prevYear])
         {
