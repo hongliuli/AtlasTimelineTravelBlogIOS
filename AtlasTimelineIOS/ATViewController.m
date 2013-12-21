@@ -84,6 +84,7 @@
 
     NSMutableArray* selectedAnnotationBringToFrontList;
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
+    ATEventAnnotation* selectedEventAnnotation;
 }
 
 @synthesize mapView = _mapView;
@@ -757,7 +758,7 @@
                         tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
                         tmpLbl.text = [NSString stringWithFormat:@" %@", ann.description ];
                         tmpLbl.layer.cornerRadius = 8;
-                        tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
+                        tmpLbl.layer.borderColor = [UIColor redColor].CGColor;
                         tmpLbl.layer.borderWidth = 1;
                     }
                 }
@@ -766,6 +767,9 @@
                     tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
                     tmpLbl.text = [NSString stringWithFormat:@" %@", ann.description ];
                     tmpLbl.layer.cornerRadius = 8;
+                    //If the event has photo before but the photos do not exist anymore, then show text with red board
+                    //If this happen, the photo may in Dropbox. if not  in dropbox, then it lost forever.
+                    //To change color, add a photo and delete it, then it will change to brown border
                     tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
                     tmpLbl.layer.borderWidth = 1;
                 }
@@ -989,6 +993,7 @@
 {
     //need use base class ATEventAnnotation here to handle call out for all type of annotation
     ATEventAnnotation* ann = [view annotation];
+    selectedEventAnnotation = ann;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
@@ -1256,7 +1261,11 @@
         newData.uniqueId = newEntity.uniqueId;
 
     [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
-    
+    if ([deletedList count] > 0 && [self.eventEditor.photoScrollView.photoList count] == 0)
+    { //This is to fix floating photo if removed last photo in an event
+        NSString *key=[NSString stringWithFormat:@"%f|%f", selectedEventAnnotation.coordinate.latitude, selectedEventAnnotation.coordinate.longitude];
+        [selectedAnnotationSet removeObjectForKey:key];
+    }
     NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
     UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
     if (tmpLbl != nil)
