@@ -108,7 +108,9 @@
  */
 - (void) doneAction: (id)sender
 {
+    int selectedPhotoIdx = self.pageControl.currentPage;
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
+    [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 }
 
 - (void) deleteAction: (id)sender
@@ -126,14 +128,18 @@
 }
 - (void) setDefaultAction: (id)sender
 {
-    self.eventEditor.photoScrollView.selectedAsThumbnailIndex = self.pageControl.currentPage;
+    int selectedPhotoIdx = self.pageControl.currentPage;
+    self.eventEditor.photoScrollView.selectedAsThumbnailIndex = selectedPhotoIdx;
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //so map marker icon will display on new cell
+    [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
 - (void) setShareAction: (id)sender
 {
-    self.eventEditor.photoScrollView.selectedAsShareIndex = self.pageControl.currentPage;
-    [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new selected cell
+    int selectedPhotoIdx = self.pageControl.currentPage;
+    self.eventEditor.photoScrollView.selectedAsShareIndex = selectedPhotoIdx;
+    [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new 
+    [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
     [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
 }
 
