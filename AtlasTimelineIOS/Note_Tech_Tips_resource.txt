@@ -26,9 +26,13 @@ if get certificate expire error, go to https://developer.apple.com/account/ios/p
   - check the radio button for create certificate, then click enabled [Generate] button
   - in Xcode Organizer->Device, click [Refresh] button at the bottom right. 
     (Note: Click [Renew] button does not work, may be a Xcode bug. have to got to dev portal as described above)
+Chute Photo Picker Plus
+    https://github.com/chute/photo-picker-plus-ios to pick photo from all sources (flickr/facebook)
+    To add Chute SDK and PhotoPickerPlus Component, simplly in project, "Add Files To ..."
+    Login to get app ID and Secrets:
+        http://apps.getchute.com hongliuli@yahoo.com / hongliu123; created an app here chroniclemap
    
-   
-   
+If get error "Undefined symbols for architecture armv7". See http://stackoverflow.com/questions/6429494/undefined-symbols-for-architecture-armv7
 
 
 Dropbox api key (app name ChronicleMap)
@@ -47,7 +51,15 @@ git commit -m "Initial commit"
 branch with xcode in organizer:
 http://useyourloaf.com/blog/2012/02/29/git-branch-management-with-xcode.html
     
---------------------------------------------
+=====================================================
+
+Enhance Photo Scroll View and zoom photo (12/2013)
+-------------------------
+This is a very difficult task. example on Raywenlinch only zoom one photo, and scroll photos could not zoom.
+Apple Scroller sample use UIPageView as root and I could not add my button.
+Finally find a sample that changed Apple Scroller sample to use a UIViewController as root controller so I can add my buttons: http://stackoverflow.com/questions/17171777/how-to-implement-uipageviewcontroller-with-a-uiscrollview/17207056#17207056
+
+
 
 Third Party API
 -----------------

@@ -2,6 +2,13 @@
 
 Version History
 ---------------
+Version 2.3 prepare
+    1. Imporved photo view to scroll smoothly and be able to zoom photo
+    2. Fixed a bug in Timeline view, now events are always grouped by year. (should not use getYearPartSmart() function)
+    3. Automaticall generate thumbnail once copied photo from dropbox
+    4. Display text with red boarder if this event's photo lost forevever, or can be copied from dropbox
+    5. Fix floating photo issue. This will happen if a event is in focuse and its last  photo is deleted
+    
 version 2.2 (submited on 11/15/13)
     Important Update: 
     1. Time Wheel - Browsing events by time is more intuitive with Time Wheel.
