@@ -45,8 +45,10 @@
     int deleteCount;
     int downloadFromDropboxStartCount;
     int downloadFromDropboxSuccessCount;
+    int totalDownloadFromDropboxSuccessCount;
     int downloadFromDropboxFailCount;
     int downloadFromDropboxLoadMedadataFailCount;
+    int downloadAlreadyExistCount;
     BOOL onlyShowOnceForIssueWithDropbox;
     int totalPhotoCountInDevice;
     BOOL isEventDir;
@@ -234,25 +236,33 @@
         {
             return; //user canceled download all
         }
-        //if local path does not exist, loadFile will not write
-        NSString* localFullPath = [ATHelper getPhotoDocummentoryPath];
-        if (![[NSFileManager defaultManager] fileExistsAtPath:localFullPath])
-            [[NSFileManager defaultManager] createDirectoryAtPath:localFullPath withIntermediateDirectories:YES attributes:nil error:nil];
-        downloadFromDropboxStartCount = 0;
-        downloadFromDropboxSuccessCount = 0;
-        downloadFromDropboxFailCount = 0;
-        downloadFromDropboxLoadMedadataFailCount = 0;
         onlyShowOnceForIssueWithDropbox = true;
         showDownloadAllLoadMetadataErrorAlert = true;
-        if ([eventListToCopyPhotoFromDropbox count] > 0)
-            [spinner startAnimating];
-        for(NSString* eventId in eventListToCopyPhotoFromDropbox)
-        {
-            //local path has to exist for loadFile to save. But local path may not exist after re-install app so need do it here
-            if (![[NSFileManager defaultManager] fileExistsAtPath:[localFullPath stringByAppendingPathComponent:eventId]])
-                [[NSFileManager defaultManager] createDirectoryAtPath:[localFullPath stringByAppendingPathComponent:eventId] withIntermediateDirectories:YES attributes:nil error:nil];
-            [[self myRestClient] loadMetadata:[NSString stringWithFormat:@"/ChronicleMap/%@/%@", [ATHelper getSelectedDbFileName], eventId]]; //then see loadedMetadata delegate where we start download file
-        }
+        totalDownloadFromDropboxSuccessCount = 0;
+        [self startDownload];
+    }
+}
+
+-(void) startDownload
+{
+    //if local path does not exist, loadFile will not write
+    NSString* localFullPath = [ATHelper getPhotoDocummentoryPath];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:localFullPath])
+        [[NSFileManager defaultManager] createDirectoryAtPath:localFullPath withIntermediateDirectories:YES attributes:nil error:nil];
+    downloadFromDropboxStartCount = 0;
+    downloadFromDropboxSuccessCount = 0;
+    downloadFromDropboxFailCount = 0;
+    downloadFromDropboxLoadMedadataFailCount = 0;
+    downloadAlreadyExistCount = 0;
+
+    if ([eventListToCopyPhotoFromDropbox count] > 0)
+        [spinner startAnimating];
+    for(NSString* eventId in eventListToCopyPhotoFromDropbox)
+    {
+        //local path has to exist for loadFile to save. But local path may not exist after re-install app so need do it here
+        if (![[NSFileManager defaultManager] fileExistsAtPath:[localFullPath stringByAppendingPathComponent:eventId]])
+            [[NSFileManager defaultManager] createDirectoryAtPath:[localFullPath stringByAppendingPathComponent:eventId] withIntermediateDirectories:YES attributes:nil error:nil];
+        [[self myRestClient] loadMetadata:[NSString stringWithFormat:@"/ChronicleMap/%@/%@", [ATHelper getSelectedDbFileName], eventId]]; //then see loadedMetadata delegate where we start download file
     }
 }
 
@@ -823,7 +833,8 @@
     }
 }
 
-//following loadedMetadata delegate is for copy from dropbox to device
+//following loadedMetadata delegate is for copy from dropbox to device. When it come here after loadMetaData() called with eventId
+//so here is a directory for the eventId
 - (void)restClient:(DBRestClient*)client loadedMetadata:(DBMetadata*)metadata
 {
     if (metadata.isDirectory) {
@@ -833,9 +844,20 @@
             NSString* localPhotoPath = [[[ATHelper getRootDocumentoryPath] stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:currentPhotoName];
             NSString* partialPath = [metadata.path substringFromIndex:14]; //metadata.path is "/ChronicleMap/myEvents/eventid"
             localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:partialPath] stringByAppendingPathComponent:file.filename];
-            [[self myRestClient] loadFile:[NSString stringWithFormat:@"%@/%@", metadata.path, file.filename ] intoPath:localPhotoPath];
+
+            if (![[NSFileManager defaultManager] fileExistsAtPath:localPhotoPath]){
+                //NSLog(@"------ Local file not exist %@",localPhotoPath);
+                [[self myRestClient] loadFile:[NSString stringWithFormat:@"%@/%@", metadata.path, file.filename ] intoPath:localPhotoPath];
+            }
+            else
+            {
+                downloadAlreadyExistCount ++;
+            }
+
             if (![file.filename isEqualToString:@"thumbnail"])
+            {
                 downloadFromDropboxStartCount++;
+            }
         }
     }
 }
@@ -875,30 +897,38 @@
     if (![localPath hasSuffix:@"thumbnail" ])
     {
         downloadFromDropboxSuccessCount++;
-        photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d failed", downloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
+        photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d failed", totalDownloadFromDropboxSuccessCount + downloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
     }
 	[self promptCopyFromDropboxStatus];
 }
 
 - (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
     downloadFromDropboxFailCount++;
-    photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d failed", downloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
+    photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d failed", totalDownloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
     [self promptCopyFromDropboxStatus];
 }
 
 - (void)promptCopyFromDropboxStatus
 {
     //NSLog(@"  download success=%d, failed=%d, total=%d",downloadFromDropboxSuccessCount,downloadFromDropboxFailCount,downloadFromDropboxStartCount);
-    if (downloadFromDropboxSuccessCount + downloadFromDropboxFailCount == downloadFromDropboxStartCount && downloadFromDropboxStartCount > 0)
+    if (   downloadFromDropboxSuccessCount + downloadFromDropboxFailCount + downloadAlreadyExistCount == downloadFromDropboxStartCount
+        && downloadFromDropboxStartCount > 0)
     {
+        totalDownloadFromDropboxSuccessCount = totalDownloadFromDropboxSuccessCount + downloadFromDropboxSuccessCount;
+        if (downloadFromDropboxFailCount > 0)
+        {
+            NSLog(@"  ########## call startDownload in promptCopyFromDropboxStats");
+            [self startDownload];
+            return;
+        }
         [spinner stopAnimating];
         NSString* message;
         if (downloadFromDropboxFailCount == 0)
-            message = [NSString stringWithFormat: @"%d photos have been downloaded to your device from Dropbox!", downloadFromDropboxSuccessCount ];
+            message = [NSString stringWithFormat: @"%d photos have been downloaded to your device from Dropbox!", totalDownloadFromDropboxSuccessCount ];
         else if (downloadFromDropboxSuccessCount == 0)
             message = [NSString stringWithFormat:@"Download failed, please check if network is available, or if your Dropbox has photos in /ChronicleMap/%@ directory.", [ATHelper getSelectedDbFileName]];
         else
-            message = [NSString stringWithFormat:@"Download photos from Dropbox: %d success, %d fail. Please make sure you have a good wifi connection and try downloading all again.", downloadFromDropboxSuccessCount,downloadFromDropboxFailCount];
+            message = [NSString stringWithFormat:@"Download photos from Dropbox: %d success, %d fail. Please make sure you have a good wifi connection and try downloading all again.", totalDownloadFromDropboxSuccessCount,downloadFromDropboxFailCount];
         
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Download photos from Dropbox finished" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
@@ -906,8 +936,8 @@
     else if (downloadFromDropboxLoadMedadataFailCount > 0 && downloadFromDropboxSuccessCount + downloadFromDropboxFailCount == 0 && onlyShowOnceForIssueWithDropbox)
     { //this condition is used when loadMetadataWithError called the function
         onlyShowOnceForIssueWithDropbox = false;
-        NSString* message = [NSString stringWithFormat:@"On your Dropbox, please check if photos are properly copied to /ChronicleMap/%@ folder!", [ATHelper getSelectedDbFileName]];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Some issue access Dropbox ChronicleMap folder." message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        NSString* message = [NSString stringWithFormat:@"This may happen if the app was uninstalled before upload all photos to dropbox /ChronicleMap/%@ folder!", [ATHelper getSelectedDbFileName]];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Dropbox may not have some photos you are looking for." message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
 }
