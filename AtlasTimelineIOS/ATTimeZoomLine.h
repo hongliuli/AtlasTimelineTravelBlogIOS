@@ -15,7 +15,7 @@
 @property float scaleLenForDisplay;
 
 - (void)changeScaleText:(NSString*)text; //called in mapview controller
-- (void)changeDateText:(NSString*)text; //called in timeWindowNew
+- (void)changeDateText:(NSString*)yearText :(NSString*)monthText; //called in timeWindowNew
 - (void)showHideScaleText:(BOOL)showFlag; //called in scroll window when start scroll and stop scroll
 - (void)showHideInAnimation;
 - (void)changeScaleLabelsDateFormat:(NSDate*)startDay :(NSDate*)endDay;
