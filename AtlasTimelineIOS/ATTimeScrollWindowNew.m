@@ -22,6 +22,9 @@
 #define GROUP_BACKGROUND_COLOR_1 @"0x0000FF"
 #define GROUP_BACKGROUND_COLOR_2 @"0x008B45"
 
+#define SCROLL_DIRECTION_RIGHT 1
+#define SCROLL_DIRECTION_LEFT 2
+
 @implementation ATTimeScrollWindowNew
 {
     float pinchVelocity; //minus is zoom out
@@ -40,6 +43,9 @@
     
     UIView* rightZoomAnimationView;
     UIView* leftZommAnimationView;
+    
+    NSInteger lastContentOffset;
+    int scrollDirection;
 }
 
 @synthesize horizontalTableView = _horizontalTableView;
@@ -270,6 +276,7 @@ static int toastFirstTimeDelay = 0;
     cell.scallLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:14.0];
     
     displayDate = [ATHelper dateByAddingComponentsRegardingEra:periodToAddForDisplay toDate:baseStartDate options:0];
+
     NSDateComponents *tmpCom = [calendar components:NSYearCalendarUnit|NSMonthCalendarUnit fromDate:displayDate];
     int yearForImages = tmpCom.year;
     //IMPORTANT Since startDate always started at 01/01/yyyy, When move time by year/10year/..., date part will be lost, so need to add back
@@ -423,11 +430,16 @@ static int toastFirstTimeDelay = 0;
     {
         cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1];
     }
-    [self changeBackgroundImage:self year:yearForImages];
+    //[self changeBackgroundImage:self year:yearForImages];
     //[self displayTimeElapseinSearchBar];
     
     [self.parent changeTimeScaleState];
-    [self.parent.timeZoomLine changeDateText:cell.titleLabel.text];
+
+    NSString* yrTxt = [ATHelper getYearPartHelper:appDelegate.focusedDate];
+    NSString* monthTxt  = [ATHelper getMonthDateInTwoNumber:appDelegate.focusedDate];
+    if (daysInPeriod >= 3650)
+        monthTxt = @"";
+    [self.parent.timeZoomLine changeDateText:yrTxt :monthTxt];
     [self.parent.timeZoomLine changeScaleText:[NSString stringWithFormat:@"%@\r%@",[self.parent getSelectedPeriodLabel],cell.titleLabel.text]];
     return cell;
 }
@@ -709,7 +721,7 @@ static int toastFirstTimeDelay = 0;
     
     if (toastFirstTimeDelay == 20  )
     {
-        [self makeToast:@"tip: Pinch or right/left double-tap to zoom time." duration:15.0 position:@"center"];
+        [self makeToast:@"Tip: Pinch or right/left double-tap to zoom time." duration:15.0 position:@"center"];
     }
     toastFirstTimeDelay ++;
 }
@@ -1059,7 +1071,23 @@ static int toastFirstTimeDelay = 0;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.focusedDate = cell.date;
 }
+//Following it to detect scroll direction, currently I am not using it
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    lastContentOffset = scrollView.contentOffset.y;
+}
 
+
+- (void)scrollViewDidScroll:(UIScrollView *)sender
+{
+    if (lastContentOffset > self.horizontalTableView.contentOffset.y)
+        scrollDirection = SCROLL_DIRECTION_RIGHT;
+    else if (lastContentOffset < self.horizontalTableView.contentOffset.y)
+        scrollDirection = SCROLL_DIRECTION_LEFT;
+    
+    lastContentOffset = self.horizontalTableView.contentOffset.y;
+    
+    // do whatever you need to with scrollDirection here.
+}
 /*
  
  startIndex = getIndexOfCloesetDate(startDate, 0, eventList.size)
