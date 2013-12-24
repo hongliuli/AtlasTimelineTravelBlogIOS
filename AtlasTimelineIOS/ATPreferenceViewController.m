@@ -264,6 +264,8 @@
             [[NSFileManager defaultManager] createDirectoryAtPath:[localFullPath stringByAppendingPathComponent:eventId] withIntermediateDirectories:YES attributes:nil error:nil];
         [[self myRestClient] loadMetadata:[NSString stringWithFormat:@"/ChronicleMap/%@/%@", [ATHelper getSelectedDbFileName], eventId]]; //then see loadedMetadata delegate where we start download file
     }
+    //NSLog(@"---------- spinner stop %d", downloadAlreadyExistCount);
+    [spinner stopAnimating];
 }
 
 -(void)startUploadJson
@@ -548,7 +550,7 @@
             else
             {
                 downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Download photos from Dropbox:/ChronicleMap/%@", [ATHelper getSelectedDbFileName]]
-                        message: @"Find all photos in the above Dropbox folder and save to the corresponding events in your device. This operation is safe, it will not remove existing photos in your device."
+                        message: @"Download all ChronicleMap event photos in Dropbox that are not in your app. This operation is safe and repeatable."
                         delegate: self
                         cancelButtonTitle:@"Cancel"
                         otherButtonTitles:@"Yes, Continue",nil];
@@ -859,6 +861,9 @@
                 downloadFromDropboxStartCount++;
             }
         }
+        //following is to prompt user that device already has all photos in dropbox
+        if ( [photoFromDropboxCell.textLabel.text isEqualToString:@"Photos from Dropbox (All)"])
+                photoFromDropboxCell.textLabel.text = @"All photos are already downloaded";
     }
 }
 - (void)restClient:(DBRestClient*)client loadMetadataFailedWithError:(NSError*)error
