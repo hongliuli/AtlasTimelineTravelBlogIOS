@@ -9,11 +9,13 @@
 #import "ATTimeZoomLine.h"
 #import "ATAppDelegate.h"
 #import "ATHelper.h"
+#import "ATConstants.h"
 #import "ATEventDataStruct.h"
 #import "ATTimeScrollWindowNew.h"
 #import "Toast+UIView.h"
 
 #define MOVABLE_VIEW_HEIGHT 4
+#define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
 
 @implementation ATTimeZoomLine
 
@@ -33,6 +35,7 @@ static int toastFirstTimeDelay = 0;
 
 UILabel* labelScaleText;
 UILabel* labelDateText;
+UILabel* labelDateMonthText;
 
 NSCalendar *calendar;
 NSDateFormatter *dateLiterFormat;
@@ -112,12 +115,12 @@ CGContextRef context;
         
         //add the at front
         
-        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,23, 100, 50)];
-        labelScaleText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ];
+        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,15, 10, 10)]; //if enlarge it, it will show all text inside, but I think not need.
+        labelScaleText.backgroundColor = [UIColor clearColor ];
         labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:13];
-        labelScaleText.layer.borderColor=[UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ].CGColor;
+        labelScaleText.layer.borderColor=[UIColor lightGrayColor].CGColor;
         labelScaleText.layer.borderWidth=1;
-        labelScaleText.layer.shadowColor = [UIColor grayColor].CGColor;
+        labelScaleText.layer.shadowColor = [UIColor blackColor].CGColor;
         labelScaleText.layer.shadowOffset = CGSizeMake(5,5);
         labelScaleText.layer.shadowOpacity = 1;
         labelScaleText.layer.shadowRadius = 8.0;
@@ -129,17 +132,43 @@ CGContextRef context;
         labelScaleText.hidden=true;
         labelScaleText.center = timeScaleImageView.center;
         
-        int xCenter = timeScaleImageView.center.x;
-        labelDateText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,200, 100, 100)];
-        labelDateText.backgroundColor = [UIColor whiteColor] ; //]colorWithRed:1 green:1 blue:0.8 alpha:1 ];
-        labelDateText.font=[UIFont fontWithName:@"Helvetica" size:16];
-        labelDateText.layer.borderColor=[UIColor orangeColor].CGColor;
+        //UIWindow* theWindow = [[UIApplication sharedApplication] keyWindow];
+        //UIViewController* rvc = theWindow.rootViewController;
+        
+
+        //Following orientation of -45 and -5 is based on test, need test on more
+        int xCenter = SCREEN_WIDTH/2 -45;//self.mapViewController.timeScrollWindow.center.x;
+        xCenter = [ATConstants screenWidth]/2 -45;
+        UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (UIInterfaceOrientationIsPortrait(interfaceOrientation))
+            xCenter = SCREEN_WIDTH/2 - 15;
+        labelDateText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,200, 80, 80)];
+        labelDateText.backgroundColor = [UIColor colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];
+        labelDateText.font=[UIFont fontWithName:@"Helvetica-bold" size:24];
+        labelDateText.layer.borderColor=[UIColor grayColor].CGColor;
         labelDateText.layer.borderWidth=1;
-        labelDateText.layer.cornerRadius = 50;
+        labelDateText.layer.shadowColor = [UIColor blackColor].CGColor;
+        labelDateText.layer.shadowOffset = CGSizeMake(100,100);
+        labelDateText.layer.shadowOpacity = 1;
+        labelDateText.layer.shadowRadius = 40.0;
+        labelDateText.layer.cornerRadius = 40;
         labelDateText.textAlignment = UITextAlignmentCenter;
         //Puposely comment out    [self addSubview:labelDateText];
-        labelDateText.hidden=true;
-        labelDateText.center = CGPointMake(xCenter, -50);// timeScaleImageView.center;
+        [self addSubview:labelDateText];
+        
+        labelDateMonthText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,240, 40, 40)];
+        labelDateMonthText.backgroundColor = [UIColor clearColor];
+        labelDateMonthText.font=[UIFont fontWithName:@"Helvetica" size:20];
+        labelDateMonthText.textColor = [UIColor grayColor];
+        labelDateMonthText.layer.borderColor=[UIColor clearColor].CGColor;
+        labelDateMonthText.layer.borderWidth=0;
+        labelDateMonthText.textAlignment = UITextAlignmentCenter;
+        //Puposely comment out    [self addSubview:labelDateText];
+        [self addSubview:labelDateMonthText];
+        
+
+        labelDateText.center = CGPointMake(xCenter, 0);// timeScaleImageView.center;
+        labelDateMonthText.center = CGPointMake(xCenter, 20);// timeScaleImageView.center;
 
         
     }
@@ -149,17 +178,19 @@ CGContextRef context;
 //called in ATViewController
 - (void) changeScaleText:(NSString *)text
 {
-    labelScaleText.text = text;
+    labelScaleText.text = @"";
 }
-- (void) changeDateText:(NSString *)text
+- (void) changeDateText:(NSString *)yearText :(NSString*)monthText
 {
-    labelDateText.text = text;
+    labelDateText.text = yearText;
+    labelDateMonthText.text = monthText;
 }
 //called by outside when scrollWindow start/stop, or when change time zoom
 - (void)showHideScaleText:(BOOL)showFlag
 {
     labelScaleText.hidden = !showFlag;
     labelDateText.hidden = !showFlag;
+    labelDateMonthText.hidden = !showFlag;
 }
 
 //have to call this after set text otherwise sizeToFit will not work
@@ -276,23 +307,23 @@ CGContextRef context;
     NSDateComponents *dateComponent = [[NSDateComponents alloc] init];
     if (timeSpanInDay > 30 && timeSpanInDay <=365) //show Label as 01/02/2013
     {
-        label1.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInLetter:tmpDate]];
+        label1.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];
                        
         dateComponent.day = timeSpanInDay/4;
         tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        label2.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInLetter:tmpDate]];
+        label2.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];
         
         dateComponent.day = timeSpanInDay/2;
         tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        label3.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInLetter:tmpDate]];
+        label3.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];
         
         dateComponent.day = 3*timeSpanInDay/4;
         tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        label4.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInLetter:tmpDate]];
+        label4.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];
         dateComponent.day = timeSpanInDay;
         
         tmpDate = endDay;
-        label5.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInLetter:tmpDate]];;
+        label5.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];;
         [self fitSzie:label1];
         [self fitSzie:label2];
         [self fitSzie:label3];
@@ -475,7 +506,7 @@ CGContextRef context;
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
     
     CGPoint center = timeScaleImageView.center;
-    center.y = -29;//this value decided y value when scroll time window
+    center.y = -10;//this value decided y value when scroll time window
     labelScaleText.center = center;
 
     //[labelScaleText setFrame:CGRectMake(
@@ -501,18 +532,6 @@ CGContextRef context;
     int dayInterval = interval/86400;
     double timeSpanInDay = dayInterval;
     double pixPerDay = frameWidth / timeSpanInDay;
-    
-    int span = 1;
-    /** Do not need following because I already add not draw of to close
-    if (timeSpanInDay > 30 && timeSpanInDay <=365)
-        span = 1;
-    else if (timeSpanInDay > 365 && timeSpanInDay <= 5 * 365)
-        span = 5;
-    else if (timeSpanInDay > 5 * 365 && timeSpanInDay < 20 * 365)
-        span = 20;
-    else
-        span = 60;
-     */
     
     //Get current map range
     MKCoordinateRegion region =  self.mapViewController.mapView.region;
@@ -582,7 +601,7 @@ CGContextRef context;
                     float xPos = x - 170;
                     if (xPos < 80)
                         xPos = 100;
-                    [self makeToast:@"Tip: Green dots indicate events currently displayed on map." duration:60.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
+                    [self makeToast:@"Tip: Green dots indicate events currently displayed on map." duration:30.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
                     self.hidden = false;
                     self.mapViewController.timeScrollWindow.hidden  = false;
                 }
