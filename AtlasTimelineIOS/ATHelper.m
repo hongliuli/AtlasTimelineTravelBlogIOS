@@ -101,6 +101,13 @@ UIPopoverController *verifyViewPopover;
     NSString* dayString = [monthDateString substringFromIndex:idx];
     return [NSString stringWithFormat:@"%@ %@",month3Letter,dayString];
 }
++ (NSString*) getMonthDateInTwoNumber:(NSDate *)date
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSDateFormatter* format = appDelegate.dateFormater;
+    NSString *dateString = [NSString stringWithFormat:@"%@", [format stringFromDate:date]];
+    return [dateString substringToIndex:2];
+}
 
 //Check UserDefaults to see if email/securitycode is there. if there, it is surely match to server
 //if not, call server to create one, send to email, and ask user get from email and save to userDefaults (verify again before save to userDefaults)

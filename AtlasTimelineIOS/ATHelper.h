@@ -15,6 +15,7 @@
 + (NSString*)getYearPartSmart:(NSDate*)date;
 + (NSString*) getYearPartHelper:(NSDate*) date;
 + (NSString*) getMonthDateInLetter:(NSDate*)date;
++ (NSString*) getMonthDateInTwoNumber:(NSDate*)date;
 + (Boolean)checkUserEmailAndSecurityCode:(UIViewController*)sender;
 + (NSString*) getSelectedDbFileName;
 + (void) setSelectedDbFileName:(NSString*)fileName;
