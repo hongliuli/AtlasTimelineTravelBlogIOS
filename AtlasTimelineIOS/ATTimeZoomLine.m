@@ -116,9 +116,9 @@ CGContextRef context;
         //add the at front
         
         labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,15, 10, 10)]; //if enlarge it, it will show all text inside, but I think not need.
-        labelScaleText.backgroundColor = [UIColor clearColor ];
+        labelScaleText.backgroundColor = [UIColor yellowColor ];
         labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:13];
-        labelScaleText.layer.borderColor=[UIColor lightGrayColor].CGColor;
+        labelScaleText.layer.borderColor=[UIColor yellowColor].CGColor;
         labelScaleText.layer.borderWidth=1;
         labelScaleText.layer.shadowColor = [UIColor blackColor].CGColor;
         labelScaleText.layer.shadowOffset = CGSizeMake(5,5);
