@@ -150,10 +150,10 @@
     int cnt = [appDelegate.eventListSorted count];
     
     uploadAlertView = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Sync %i events to %@ on server",cnt, [ATHelper getSelectedDbFileName]]
-                                                   message: [NSString stringWithFormat:@"WARNING: Upload will replace existing %@ event data on server.",_source]
+                                                   message: [NSString stringWithFormat:@"WARNING: Export will replace existing %@ event data on server.",_source]
                                                   delegate: self
                                          cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"Upload & Replace",@"Cancel & Logout",nil];
+                                         otherButtonTitles:@"Export & Replace",@"Cancel & Logout",nil];
     
     
     [uploadAlertView show];
@@ -343,13 +343,13 @@
     [spinner stopAnimating];
     if (![returnStatus isEqual:@"SUCCESS"])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Upload Failed!" message:@"Fail reason could be network issue or data issue!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Export Failed!" message:@"Fail reason could be network issue or data issue!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         return;
     }
     else
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Upload Success!"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Export Success!"
                                                         message: [NSString stringWithFormat:@"%i %@ events have been uploaded to server successfully!",eventCount,[ATHelper getSelectedDbFileName]]
                                                        delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
@@ -396,7 +396,7 @@
             ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
             int numberOfNewPhotos = [dataController getNewPhotoQueueSizeExcludeThumbNail];
             int numberOfDeletedPhoto = [dataController getDeletedPhotoQueueSize];
-            cell.textLabel.text = [NSString stringWithFormat:@"Photo to Dropbox - New:%d  Del:%d",numberOfNewPhotos,numberOfDeletedPhoto ];
+            cell.textLabel.text = [NSString stringWithFormat:@"Photo Export - New:%d  Del:%d",numberOfNewPhotos,numberOfDeletedPhoto ];
             PhotoToDropboxCell = cell;
         }
         if (row == ROW_SYNC_FROM_DROPBOX)
@@ -456,7 +456,7 @@
             int dbDeletedPhotoCount = [[self getDataController] getDeletedPhotoQueueSize];
             //set cell count again (already done in celFor...) here, is to refresh count after user clicked this row and already synched
             UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
-            cell.textLabel.text = [NSString stringWithFormat:@"Photo to Dropbox - New:%d  Del:%d",dbNewPhotoCount,dbDeletedPhotoCount ];
+            cell.textLabel.text = [NSString stringWithFormat:@"Photo Export - New:%d  Del:%d",dbNewPhotoCount,dbDeletedPhotoCount ];
             if (dbNewPhotoCount + dbDeletedPhotoCount > 0)
             {
                 [spinner startAnimating]; //stop when chain complete or any error
@@ -496,7 +496,7 @@
             }
             if (totalPhotoCountInDevice == 0)
             {
-                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"No photos to upload to your Dropbox!"
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"No photos to export to your Dropbox!"
                                                                message: @""
                                                               delegate: self
                                                      cancelButtonTitle:@"OK"
@@ -549,8 +549,8 @@
             }
             else
             {
-                downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Download photos from Dropbox:/ChronicleMap/%@", [ATHelper getSelectedDbFileName]]
-                        message: @"Download all ChronicleMap event photos in Dropbox that are not in your app. This operation is safe and repeatable."
+                downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Import photos from Dropbox:/ChronicleMap/%@", [ATHelper getSelectedDbFileName]]
+                        message: [NSString stringWithFormat:@"Import %@ photos in Dropbox that are not in your app. This operation is safe and repeatable.",[ATHelper getSelectedDbFileName]]
                         delegate: self
                         cancelButtonTitle:@"Cancel"
                         otherButtonTitles:@"Yes, Continue",nil];
@@ -717,7 +717,7 @@
     if (![currentPhotoName isEqualToString:@"thumbnail"])
     {
         uploadSuccessExcludeThumbnailCount++;
-        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo to Dropbox - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
+        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo Export - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
     }
     [self startProcessNewPhotoQueueChainAction]; //start upload next file until
 }
@@ -798,7 +798,7 @@
     {
         [spinner stopAnimating]; //TODO? seems weired here. but need it when only have item in deleteQueue
         deleteCount++;
-        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo to Dropbox - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
+        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo Export - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
     }
     [self processEmptyDeletedPhotoQueue];
 }
@@ -862,7 +862,7 @@
             }
         }
         //following is to prompt user that device already has all photos in dropbox
-        if ( [photoFromDropboxCell.textLabel.text isEqualToString:@"Photos from Dropbox (All)"])
+        if ( [photoFromDropboxCell.textLabel.text isEqualToString:@"Photo Import (All)"])
                 photoFromDropboxCell.textLabel.text = @"All photos are already downloaded";
     }
 }
@@ -887,7 +887,7 @@
             return;
         }
 
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not Download from Dropbox"
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not import from Dropbox"
                                                    message: @"May be the network is not available"
                                                   delegate: self
                                          cancelButtonTitle:@"OK"
@@ -922,7 +922,6 @@
         totalDownloadFromDropboxSuccessCount = totalDownloadFromDropboxSuccessCount + downloadFromDropboxSuccessCount;
         if (downloadFromDropboxFailCount > 0)
         {
-            NSLog(@"  ########## call startDownload in promptCopyFromDropboxStats");
             [self startDownload];
             return;
         }
@@ -931,17 +930,17 @@
         if (downloadFromDropboxFailCount == 0)
             message = [NSString stringWithFormat: @"%d photos have been downloaded to your device from Dropbox!", totalDownloadFromDropboxSuccessCount ];
         else if (downloadFromDropboxSuccessCount == 0)
-            message = [NSString stringWithFormat:@"Download failed, please check if network is available, or if your Dropbox has photos in /ChronicleMap/%@ directory.", [ATHelper getSelectedDbFileName]];
+            message = [NSString stringWithFormat:@"Import failed, please check if network is available, or if your Dropbox has photos in /ChronicleMap/%@ directory.", [ATHelper getSelectedDbFileName]];
         else
-            message = [NSString stringWithFormat:@"Download photos from Dropbox: %d success, %d fail. Please make sure you have a good wifi connection and try downloading all again.", totalDownloadFromDropboxSuccessCount,downloadFromDropboxFailCount];
+            message = [NSString stringWithFormat:@"Import photos from Dropbox: %d success, %d fail. Please make sure you have a good wifi connection and try again.", totalDownloadFromDropboxSuccessCount,downloadFromDropboxFailCount];
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Download photos from Dropbox finished" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Import photos from Dropbox finished" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
     else if (downloadFromDropboxLoadMedadataFailCount > 0 && downloadFromDropboxSuccessCount + downloadFromDropboxFailCount == 0 && onlyShowOnceForIssueWithDropbox)
     { //this condition is used when loadMetadataWithError called the function
         onlyShowOnceForIssueWithDropbox = false;
-        NSString* message = [NSString stringWithFormat:@"This may happen if the app was uninstalled before upload all photos to dropbox /ChronicleMap/%@ folder!", [ATHelper getSelectedDbFileName]];
+        NSString* message = [NSString stringWithFormat:@"This may happen if the app was uninstalled before export all photos to dropbox /ChronicleMap/%@ folder!", [ATHelper getSelectedDbFileName]];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Dropbox may not have some photos you are looking for." message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
