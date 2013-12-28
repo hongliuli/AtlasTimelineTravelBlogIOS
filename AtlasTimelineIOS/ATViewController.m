@@ -1454,7 +1454,7 @@
 }
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    NSLog(@"Rodation detected");
+    //NSLog(@"Rodation detected");
     [self displayTimelineControls];
     [self calculateSearchBarFrame]; //in iPhone, make search bar wider in landscape
     [self closeTutorialView];
