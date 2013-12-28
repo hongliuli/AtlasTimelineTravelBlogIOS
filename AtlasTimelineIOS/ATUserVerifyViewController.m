@@ -95,7 +95,7 @@ NSString* receivedSecurityCode; //use this to compare with user entered
        [userDefault setObject:receivedSecurityCode forKey:[ATConstants UserSecurityCodeKeyName]];
        [userDefault synchronize];
 
-       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Verify Success!" message:@"You can download/upload from any device with the same email address!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Verify Success!" message:@"You can import/export from any device with the same email address!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
        [self dismissViewControllerAnimated:true completion:nil];
        [alert show];
    }
