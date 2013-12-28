@@ -157,8 +157,8 @@ UIActivityIndicatorView* spinner;
     else
     {
         selectedAtlasName = cell.textLabel.text;
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Download %@",selectedAtlasName]
-                                                       message: @"Download may take a few minutes, continue?."
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Import %@",selectedAtlasName]
+                                                       message: @"Import may take a few minutes, continue?."
                                                       delegate: self
                                              cancelButtonTitle:@"Cancel"
                                              otherButtonTitles:@"Continue",nil];
