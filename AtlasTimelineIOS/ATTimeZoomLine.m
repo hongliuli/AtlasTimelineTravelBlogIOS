@@ -136,12 +136,19 @@ CGContextRef context;
         //UIViewController* rvc = theWindow.rootViewController;
         
 
-        //Following orientation of -45 and -5 is based on test, need test on more
+        //Following xCenter numbers is based on test, if some number even make program crash when change orenation
+        int deviceDeltaLandscape = 0;
+        int deviceDeltaPortrait = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            deviceDeltaLandscape = 50;
+            deviceDeltaPortrait = -100;
+        }
         int xCenter = SCREEN_WIDTH/2 -45;//self.mapViewController.timeScrollWindow.center.x;
-        xCenter = [ATConstants screenWidth]/2 -45;
+        xCenter = [ATConstants screenWidth]/2 -45 + deviceDeltaLandscape;
         UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
         if (UIInterfaceOrientationIsPortrait(interfaceOrientation))
-            xCenter = SCREEN_WIDTH/2 - 15;
+            xCenter = SCREEN_WIDTH/2 - 15 - deviceDeltaPortrait;
         labelDateText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,200, 80, 80)];
         labelDateText.backgroundColor = [UIColor colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];
         labelDateText.font=[UIFont fontWithName:@"Helvetica-bold" size:24];
