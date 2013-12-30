@@ -148,7 +148,15 @@ CGContextRef context;
         xCenter = [ATConstants screenWidth]/2 -45 + deviceDeltaLandscape;
         UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
         if (UIInterfaceOrientationIsPortrait(interfaceOrientation))
-            xCenter = SCREEN_WIDTH/2 - 15 - deviceDeltaPortrait;
+            xCenter = SCREEN_WIDTH/2 - 17 - deviceDeltaPortrait;
+        //for Retina landscape iPhone5, need special adjust
+        
+        CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
+
+        if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] && ([UIScreen mainScreen].scale == 2.0)
+            && UIInterfaceOrientationIsLandscape(interfaceOrientation)
+            && screenRect.size.height == 568) //to see if it is iPhone5 width
+            xCenter = xCenter -43;
         labelDateText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,200, 80, 80)];
         labelDateText.backgroundColor = [UIColor colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];
         labelDateText.font=[UIFont fontWithName:@"Helvetica-bold" size:24];
