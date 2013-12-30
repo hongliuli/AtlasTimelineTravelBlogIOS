@@ -61,7 +61,8 @@
     [shareButton setBackgroundImage:shareIcon forState:UIControlStateNormal];
     [shareButton addTarget:self action:@selector(setShareAction:) forControlEvents:UIControlEventTouchUpInside];
     shareButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
-    UIBarButtonItem* setShareButton = [[UIBarButtonItem alloc] initWithCustomView:shareButton ];
+    //sharebutton not used, now I am sending all images
+    //UIBarButtonItem* setShareButton = [[UIBarButtonItem alloc] initWithCustomView:shareButton ];
     
     UIBarButtonItem* deleteButton = [[UIBarButtonItem alloc]
                                      initWithBarButtonSystemItem: UIBarButtonSystemItemTrash target:self action:@selector(deleteAction:)];
@@ -69,7 +70,7 @@
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpace.width = 10;
     
-    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
+    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, deleteButton, nil];
     [self.toolbar setItems:items animated:NO];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
