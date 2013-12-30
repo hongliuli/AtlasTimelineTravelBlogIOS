@@ -391,12 +391,14 @@
                                                     options:0];
         if (appDelegate.selectedPeriodInDays == 0) //for add/delete ending events, do not change time zoom level, following is for when app start
         {
-        if (components.year > 10)
-            appDelegate.selectedPeriodInDays = 36500;
-        else if (components.year > 1)
-            appDelegate.selectedPeriodInDays = 3650;
-        else if (components.month > 1)
-            appDelegate.selectedPeriodInDays = 365;
+            if (components.year > 1000)
+                appDelegate.selectedPeriodInDays = 36500;
+            else if (components.year > 100)
+                appDelegate.selectedPeriodInDays = 3650;
+            else if (components.year >= 2)
+                appDelegate.selectedPeriodInDays = 365;
+            else
+                appDelegate.selectedPeriodInDays = 30;
         }
 
     }
