@@ -2,19 +2,26 @@
 
 Version History
 ---------------
-Version 2.3 prepare
-    1. Imporved photo view to scroll smoothly and be able to zoom photo
-    2. Fixed a bug in Timeline view, now events are always grouped by year. (should not use getYearPartSmart() function)
-    3. Automaticall generate thumbnail once copied photo from dropbox
-    4. Display text with red boarder if this event's photo lost forevever, or can be copied from dropbox
-    5. Fix floating photo issue. This will happen if a event is in focuse and its last  photo is deleted
-    
-version 2.2 (submited on 11/15/13)
+Version 2.14 prepare (Uploaded on Dec 29)
+    1. Imporved photo view to scroll smoothly and be able to zoom in/out photo
+    2. When share event, The first 10 photos instead of a selected one will be shared
+    3. Improved Dropbox to download smartly: 1) Do not download if already in app; 2) retry if failed download all
+    4. Timeline view bug fix: now events are always grouped by year. (should not use getYearPartSmart() function)
+    5. Add a magnifier to display the Year/Month of the selected period when scroll time wheel. 
+    6. Automaticall generate thumbnail once copied photo from dropbox
+    7. Display text with red boarder if this event's photo lost forevever, or can be copied from dropbox
+    8. Fix floating photo issue. This will happen if a event is in focuse and its last  photo is deleted
+    9. re-adjusted initial daysInPeriod when app start
+    (Next version: share on WeChat, Click photo to bring view only photoViewer with small maps and scroll photo by time;
+        localization; add photo in Timeline view; migrate to iOS 7?)
+version 2.13
+    Providing the ability to select multiple photos at a time from camera roll (Dec 7)
+version 2.12 (submited on 11/15/13)
     Important Update: 
     1. Time Wheel - Browsing events by time is more intuitive with Time Wheel.
-    2. Brown Dots - When move/zoom map, the time series of the events on screen are indicated by brown color dots. This powerful feature allow us to easily browse event sequence in one location.
-  
-version 2.1 (Submited on 9/14/13)
+    2. Green Dots - When move/zoom map, the time series of the events on screen are indicated by Green color dots. This powerful feature allow us to easily browse event sequence in one location.
+version 2.11: fixed photo pick error in new iOS7 (Oct 7)
+version 2.10 (Submited on 9/14/13)
     1. display the event distribution dots on map time window
     2. Precisely display number of event in time slots with Cyan background color
     3. animation time window zooming
