@@ -191,42 +191,25 @@ static NSString *_ImageNameAtIndex(NSUInteger index);
 
 - (void)setMaxMinZoomScalesForCurrentBounds
 {
-    CGSize boundsSize = self.bounds.size;
-                
-    // calculate min/max zoomscale
-    CGFloat xScale = boundsSize.width  / _imageSize.width;    // the scale needed to perfectly fit the image width-wise
-    CGFloat yScale = boundsSize.height / _imageSize.height;   // the scale needed to perfectly fit the image height-wise
-    
-    // fill width if the image and phone are both portrait or both landscape; otherwise take smaller scale
-    BOOL imagePortrait = _imageSize.height > _imageSize.width;
-    BOOL phonePortrait = boundsSize.height > boundsSize.width;
-    CGFloat minScale = imagePortrait == phonePortrait ? xScale : MIN(xScale, yScale);
-    
-    // on high resolution screens we have double the pixel density, so we will be seeing every pixel if we limit the
-    // maximum zoom scale to 0.5.
-    CGFloat maxScale = 1.0 / [[UIScreen mainScreen] scale];
 
-    // don't let minScale exceed maxScale. (If the image is smaller than the screen, we don't want to force it to be zoomed.) 
-    if (minScale > maxScale) {
-        minScale = maxScale;
-    }
+    CGFloat maxScale = 4.0;
+    CGFloat minScale = 1;
     
     //Following value is from my test on ipod/ipad, need test redina also.
     //if maxScale and minScale is same or 1, then no scale will happen when zoom
-    if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation))
-    {
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        {
-            maxScale = 0.9;
-            minScale = 0.8;
-        }
-        else
-        {
-            maxScale = 0.5;
-            minScale = 0.3;
-        }
 
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    {
+        maxScale = 4;
+        minScale = 1;
     }
+    else
+    {
+        maxScale = 0.8;
+        minScale = 0.3;
+    }
+
+
     self.maximumZoomScale = maxScale;
     self.minimumZoomScale = minScale;
   
