@@ -12,9 +12,13 @@
 #import "ATDataController.h"
 #import "ATConstants.h"
 #import "ATEventEntity.h"
+#import "ATEventDataStruct.h"
 #import "ATHelper.h"
 #import "iRate.h"
 
+
+#define EVENT_TYPE_NO_PHOTO 0
+#define EVENT_TYPE_HAS_PHOTO 1
 
 @interface ATAppDelegate ()
 //TODO should add data store initialize here and pass data store to ATTimelineTableViewController, or the controller come to here to get data store
@@ -71,7 +75,25 @@
         NSDate *second = [(ATEventEntity*)b eventDate];
         return [first compare:second]== NSOrderedAscending;
     }];
-    _eventListSorted =[[NSMutableArray alloc] initWithArray:sortedArray];
+    _eventListSorted =[[NSMutableArray alloc] initWithCapacity:100];
+    //IMPORTANT: replace appDelegate's managed obj with pure object. without this, ATEventEntity fields will have nil value after pass to caller (changed for iOS7 )
+    for (ATEventEntity* ent in sortedArray) {
+ 
+        ATEventDataStruct* entData = [[ATEventDataStruct alloc] init];
+        entData.address = ent.address;
+        entData.eventDate = ent.eventDate;
+        entData.eventDesc = ent.eventDesc;
+        if ([ent.eventType intValue] == EVENT_TYPE_HAS_PHOTO)
+            entData.eventType = EVENT_TYPE_HAS_PHOTO;
+        //NSLog(@"event date=%@   eventType=%i",entData.eventDate, entData.eventType);
+        entData.uniqueId = ent.uniqueId;
+        entData.lat = [ent.lat doubleValue];
+        entData.lng = [ent.lng doubleValue];
+        [_eventListSorted addObject:entData];
+    }
+    ATEventDataStruct * ent0 = sortedArray[0];
+    NSLog(@" --- in appDelegate date=%@, lat=%f", ent0.eventDate, ent0.lat);
+
     return _eventListSorted;
 }
 
