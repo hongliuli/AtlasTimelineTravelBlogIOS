@@ -16,7 +16,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <Social/Social.h>
 
-#define JPEG_QUALITY 0.6
+#define JPEG_QUALITY 1.0
 #define THUMB_JPEG_QUALITY 0.3
 #define RESIZE_WIDTH 1024
 #define RESIZE_HEIGHT 768
