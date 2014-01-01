@@ -298,42 +298,24 @@
     NSArray * eventList = appDelegate.eventListSorted;
     if ([eventList count] > 0)
     {
-        ATEventEntity* ent = eventList[0];
-        ATEventDataStruct* entStruct = [[ATEventDataStruct alloc] init];
-        entStruct.lat = [ent.lat doubleValue];
-        entStruct.lng = [ent.lng doubleValue];
+        ATEventDataStruct* entStruct = eventList[0];
 
         [self setMapCenter:entStruct :[ATConstants defaultZoomLevel]];
     }
 
-    NSMutableArray* newEventList = [[NSMutableArray alloc] init];
     //add annotation. ### this is the loop where we can adding NSLog to print individual items
-    for (ATEventEntity* ent in eventList) {
-        CLLocationCoordinate2D coord = CLLocationCoordinate2DMake((CLLocationDegrees)[ent.lat doubleValue], (CLLocationDegrees)[ent.lng doubleValue]);
+    for (ATEventDataStruct* ent in eventList) {
+        CLLocationCoordinate2D coord = CLLocationCoordinate2DMake((CLLocationDegrees)ent.lat, (CLLocationDegrees)ent.lng);
         ATAnnotationSelected *eventAnnotation = [[ATAnnotationSelected alloc] initWithLocation:coord];
         eventAnnotation.uniqueId = ent.uniqueId;
         
         eventAnnotation.address = ent.address;
         eventAnnotation.description=ent.eventDesc;
         eventAnnotation.eventDate=ent.eventDate;
-        eventAnnotation.eventType = [ent.eventType integerValue];
+        eventAnnotation.eventType = ent.eventType;
         [self.mapView addAnnotation:eventAnnotation];
-        ATEventDataStruct* entData = [[ATEventDataStruct alloc] init];
-        entData.address = ent.address;
-        entData.eventDate = ent.eventDate;
-        entData.eventDesc = ent.eventDesc;
-        if ([ent.eventType intValue] == EVENT_TYPE_HAS_PHOTO)
-            entData.eventType = EVENT_TYPE_HAS_PHOTO;
-//NSLog(@"event date=%@   eventType=%i",entData.eventDate, entData.eventType);
-        entData.uniqueId = ent.uniqueId;
-        entData.lat = [ent.lat doubleValue];
-        entData.lng = [ent.lng doubleValue];
-        [newEventList addObject:entData];
     }
-    //IMPORTANT: replace appDelegate's managed obj with pure object. Also without this this list's item is lost value some how
-    //           For example, in Timeline View, when I get event from the list, the data is gone
-    [appDelegate.eventListSorted removeAllObjects];
-    appDelegate.eventListSorted = newEventList;
+
     appDelegate.mapViewController = self; //my way of share object, used in ATHelper
     [self setTimeScrollConfiguration]; //I misplaced before above loop and get strange error
     [self displayTimelineControls]; //put it here so change db source will call it, but have to put in viewDidAppear as well somehow
