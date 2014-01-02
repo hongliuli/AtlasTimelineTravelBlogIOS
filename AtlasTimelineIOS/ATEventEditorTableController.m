@@ -337,6 +337,11 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             //[textField resignFirstResponder]; //comment this out, I decide to let keypad show together with date picker slot machine, otherwise a big issue in iPad: click desc/address to bring keypad, then date field, will leave keypad always displayed. But need test on iPhone. we can
             self.datePicker = [[UIDatePicker alloc] init];
 
+            
+            [UIView appearanceWhenContainedIn:[UITableView class], [UIDatePicker class], nil].backgroundColor = [UIColor colorWithWhite:1 alpha:1];
+            
+            self.datePicker.backgroundColor = [UIColor blackColor];
+            
             [self.datePicker setFrame:CGRectMake(0,165,320,180)];
                 
             [self.datePicker addTarget:self action:@selector(changeDateInLabel:) forControlEvents:UIControlEventValueChanged];
