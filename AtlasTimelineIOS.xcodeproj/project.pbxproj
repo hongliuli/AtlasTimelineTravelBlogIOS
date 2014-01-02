@@ -742,6 +742,11 @@
 				CLASSPREFIX = AT;
 				LastUpgradeCheck = 0450;
 				ORGANIZATIONNAME = hong;
+				TargetAttributes = {
+					CE0E52FC168E671E00C147FB = {
+						DevelopmentTeam = JS265C62L9;
+					};
+				};
 			};
 			buildConfigurationList = CE0E52F7168E671E00C147FB /* Build configuration list for PBXProject "AtlasTimelineIOS" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1000,6 +1005,8 @@
 		CE0E5325168E671F00C147FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1008,8 +1015,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AtlasTimelineIOS/AtlasTimelineIOS-Prefix.pch";
 				INFOPLIST_FILE = "AtlasTimelineIOS/AtlasTimelineIOS-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1017,6 +1025,8 @@
 		CE0E5326168E671F00C147FB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1026,8 +1036,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AtlasTimelineIOS/AtlasTimelineIOS-Prefix.pch";
 				INFOPLIST_FILE = "AtlasTimelineIOS/AtlasTimelineIOS-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
