@@ -1088,6 +1088,14 @@ static int toastFirstTimeDelay = 0;
     
     // do whatever you need to with scrollDirection here.
 }
+
+//add for iOS 7 migration
+- (void)tableView:(UITableView *)tableView
+  willDisplayCell:(UITableViewCell *)cell
+forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [cell setBackgroundColor:[UIColor clearColor]];
+}
 /*
  
  startIndex = getIndexOfCloesetDate(startDate, 0, eventList.size)
