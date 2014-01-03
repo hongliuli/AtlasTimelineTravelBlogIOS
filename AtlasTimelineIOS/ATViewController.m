@@ -474,7 +474,7 @@
         locationbtn = [UIButton buttonWithType:UIButtonTypeCustom];
     else
         [locationbtn removeFromSuperview];
-    locationbtn.frame = CGRectMake([ATConstants screenWidth] - 50, 20, 30, 30);
+    locationbtn.frame = CGRectMake([ATConstants screenWidth] - 50, 90, 30, 30);
     [locationbtn setImage:[UIImage imageNamed:@"currentLocation.jpg"] forState:UIControlStateNormal];
     [locationbtn addTarget:self action:@selector(currentLocationClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.mapView addSubview:locationbtn];
