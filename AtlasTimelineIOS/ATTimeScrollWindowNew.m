@@ -769,6 +769,7 @@ static int toastFirstTimeDelay = 0;
     {
         focusedRow = abs(components.year / 100);
     }
+    focusedRow++; //do not know why, have to add by 1 for focused to selected event work
     [self.horizontalTableView reloadData];
     //NSLog(@" ------ year=%i,mon=%i,day=%d,focusedRow=%i,currNoRow=%i",components.year, components.month, components.day,focusedRow,currentNumberOfRow);
     if (focusedRow > currentNumberOfRow) //this check is not neccessary, but leave it here
@@ -960,8 +961,8 @@ static int toastFirstTimeDelay = 0;
 
 -(void) setNewFocusedDateFromAnnotation:(NSDate *)newFocusedDate
 {
-    NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
-    [dateComponents setYear:-1];
+    //NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+    //[dateComponents setYear:-1];
     [self performSettingFocusedRowForDate:newFocusedDate];
 }
 
