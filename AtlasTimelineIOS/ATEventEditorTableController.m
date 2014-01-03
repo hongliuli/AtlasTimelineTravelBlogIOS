@@ -172,6 +172,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         label2.text = @"(The 1st 10 photos)";
         [customView addSubview:label2];
     }
+    [self.view bringSubviewToFront:self.datePicker];
+    [self.view bringSubviewToFront:self.toolbar];
     return customView;
 }
 
@@ -338,25 +340,28 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             self.datePicker = [[UIDatePicker alloc] init];
 
             
-            [UIView appearanceWhenContainedIn:[UITableView class], [UIDatePicker class], nil].backgroundColor = [UIColor colorWithWhite:1 alpha:1];
+            //[UIView appearanceWhenContainedIn:[UITableView class], [UIDatePicker class], nil].backgroundColor = [UIColor colorWithWhite:1 alpha:1];
             
-            self.datePicker.backgroundColor = [UIColor blackColor];
+            self.datePicker.backgroundColor = [UIColor whiteColor];
             
-            [self.datePicker setFrame:CGRectMake(0,165,320,180)];
+            
+            [self.datePicker setFrame:CGRectMake(0,240,320,180)];
                 
             [self.datePicker addTarget:self action:@selector(changeDateInLabel:) forControlEvents:UIControlEventValueChanged];
             self.datePicker.datePickerMode = UIDatePickerModeDate;
         
             [self.view addSubview:self.datePicker];
             
-            self.toolbar = [[UIToolbar alloc] initWithFrame: CGRectMake(0, 290, 320, 44)];
-            self.toolbar.barStyle = UIBarStyleBlackOpaque;
+            self.toolbar = [[UIToolbar alloc] initWithFrame: CGRectMake(0, 380, 320, 44)];
         
-            UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: @"Done" style: UIBarButtonItemStyleBordered target: self action: @selector(datePicked:)];
+            UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: @"Done" style: UIBarButtonItemStyleDone target: self action: @selector(datePicked:)];
             doneButton.width = 50;
             doneButton.tintColor = [UIColor blueColor];
             self.toolbar.items = [NSArray arrayWithObject: doneButton];
+   
+            
             [self.view addSubview: self.toolbar];
+
         }
         
         if ([self.dateTxt.text isEqualToString: @""] || self.dateTxt.text == nil)
