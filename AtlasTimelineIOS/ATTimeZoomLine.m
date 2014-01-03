@@ -34,7 +34,7 @@ UILabel* labelSeg4;
 static int toastFirstTimeDelay = 0;
 
 UILabel* labelScaleText;
-UILabel* labelDateText;
+UILabel* labelMagnifier;
 UILabel* labelDateMonthText;
 
 NSCalendar *calendar;
@@ -157,19 +157,19 @@ CGContextRef context;
             && UIInterfaceOrientationIsLandscape(interfaceOrientation)
             && screenRect.size.height == 568) //to see if it is iPhone5 width
             xCenter = xCenter -43;
-        labelDateText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,200, 80, 80)];
-        labelDateText.backgroundColor = [UIColor colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];
-        labelDateText.font=[UIFont fontWithName:@"Helvetica-bold" size:24];
-        labelDateText.layer.borderColor=[UIColor grayColor].CGColor;
-        labelDateText.layer.borderWidth=1;
-        labelDateText.layer.shadowColor = [UIColor blackColor].CGColor;
-        labelDateText.layer.shadowOffset = CGSizeMake(100,100);
-        labelDateText.layer.shadowOpacity = 1;
-        labelDateText.layer.shadowRadius = 40.0;
-        labelDateText.layer.cornerRadius = 40;
-        labelDateText.textAlignment = UITextAlignmentCenter;
+        labelMagnifier = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,200, 80, 80)];
+        labelMagnifier.backgroundColor = [UIColor colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];
+        labelMagnifier.font=[UIFont fontWithName:@"Helvetica-bold" size:24];
+        labelMagnifier.layer.borderColor=[UIColor grayColor].CGColor;
+        labelMagnifier.layer.borderWidth=1;
+        labelMagnifier.layer.shadowColor = [UIColor blackColor].CGColor;
+        labelMagnifier.layer.shadowOffset = CGSizeMake(100,100);
+        labelMagnifier.layer.shadowOpacity = 1;
+        labelMagnifier.layer.shadowRadius = 40.0;
+        labelMagnifier.layer.cornerRadius = 40;
+        labelMagnifier.textAlignment = NSTextAlignmentCenter;
         //Puposely comment out    [self addSubview:labelDateText];
-        [self addSubview:labelDateText];
+        [self addSubview:labelMagnifier];
         
         labelDateMonthText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,240, 40, 40)];
         labelDateMonthText.backgroundColor = [UIColor clearColor];
@@ -177,12 +177,12 @@ CGContextRef context;
         labelDateMonthText.textColor = [UIColor grayColor];
         labelDateMonthText.layer.borderColor=[UIColor clearColor].CGColor;
         labelDateMonthText.layer.borderWidth=0;
-        labelDateMonthText.textAlignment = UITextAlignmentCenter;
+        labelDateMonthText.textAlignment = NSTextAlignmentCenter;
         //Puposely comment out    [self addSubview:labelDateText];
         [self addSubview:labelDateMonthText];
         
 
-        labelDateText.center = CGPointMake(xCenter, 0);// timeScaleImageView.center;
+        labelMagnifier.center = CGPointMake(xCenter, 0);// timeScaleImageView.center;
         labelDateMonthText.center = CGPointMake(xCenter, 20);// timeScaleImageView.center;
 
         
@@ -197,14 +197,23 @@ CGContextRef context;
 }
 - (void) changeDateText:(NSString *)yearText :(NSString*)monthText
 {
-    labelDateText.text = yearText;
+    if ([yearText rangeOfString:@"BC"].location == NSNotFound)
+    {
+        labelMagnifier.text=[yearText substringToIndex:4];
+        labelMagnifier.textColor = [UIColor blackColor];
+    }
+    else
+    {
+        labelMagnifier.text=[yearText substringToIndex:4];
+        labelMagnifier.textColor = [UIColor redColor];
+    }
     labelDateMonthText.text = monthText;
 }
 //called by outside when scrollWindow start/stop, or when change time zoom
 - (void)showHideScaleText:(BOOL)showFlag
 {
     labelScaleText.hidden = !showFlag;
-    labelDateText.hidden = !showFlag;
+    labelMagnifier.hidden = !showFlag;
     labelDateMonthText.hidden = !showFlag;
 }
 
@@ -215,7 +224,7 @@ CGContextRef context;
     label.backgroundColor = bgColor;
     label.textColor = [UIColor whiteColor];
     label.font=[UIFont fontWithName:@"Helvetica-Bold" size:13];
-    label.textAlignment = UITextAlignmentCenter;
+    label.textAlignment = NSTextAlignmentCenter;
     label.layer.cornerRadius = 5;
     label.layer.borderColor = [UIColor brownColor].CGColor;
     label.layer.borderWidth = 1;
