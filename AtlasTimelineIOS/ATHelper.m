@@ -174,15 +174,16 @@ UIPopoverController *verifyViewPopover;
 {
     if (calendar == nil)
         calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    
+    /*** comment out because iOS7 fixed era issue
     NSDateComponents *toDateComps = [calendar components:NSEraCalendarUnit fromDate:date];
     NSDateComponents *compsCopy = [comps copy];
+    NSLog(@"-- toDate=%@, era=%d", date, [toDateComps era]);
     if ([toDateComps era] == 0) //B.C. era
     {
         if ([comps year] != NSUndefinedDateComponent) [compsCopy setYear:-[comps year]];
     }
-    
-    return [calendar dateByAddingComponents:compsCopy toDate:date options:opts];
+    */
+    return [calendar dateByAddingComponents:comps toDate:date options:opts];
 }
 
 + (NSString*) getSelectedDbFileName
