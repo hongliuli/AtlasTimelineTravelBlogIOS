@@ -335,14 +335,14 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         NSDateFormatter *dateFormater = appDelegate.dateFormater; 
         if (self.datePicker == nil) //will be nill if clicked Done button
         {
-            //Test on iPad to see if need to diable keypad in iPad when click on date field
+            //Moved resignFirstResponder to UIControlEventValueChanged callback function and solved my problem on 12/4/2014
             //[textField resignFirstResponder]; //comment this out, I decide to let keypad show together with date picker slot machine, otherwise a big issue in iPad: click desc/address to bring keypad, then date field, will leave keypad always displayed. But need test on iPhone. we can
             self.datePicker = [[UIDatePicker alloc] init];
 
             
             //[UIView appearanceWhenContainedIn:[UITableView class], [UIDatePicker class], nil].backgroundColor = [UIColor colorWithWhite:1 alpha:1];
             
-            self.datePicker.backgroundColor = [UIColor whiteColor];
+            self.datePicker.backgroundColor = [UIColor colorWithRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0];
             
             
             [self.datePicker setFrame:CGRectMake(0,240,320,180)];
@@ -353,6 +353,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             [self.view addSubview:self.datePicker];
             
             self.toolbar = [[UIToolbar alloc] initWithFrame: CGRectMake(0, 380, 320, 44)];
+            //[self.toolbar setBackgroundColor:[UIColor clearColor]];
+            [self.toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
         
             UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: @"Done" style: UIBarButtonItemStyleDone target: self action: @selector(datePicked:)];
             doneButton.width = 50;
@@ -398,8 +400,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     return YES;
 }
-
-
 - (IBAction)saveAction:(id)sender {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
@@ -524,6 +524,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
     dateTxt.text = [NSString stringWithFormat:@"%@",
             [dateFormater stringFromDate:self.datePicker.date]];
+    [self.dateTxt resignFirstResponder];
     
 }
 
