@@ -467,7 +467,7 @@
         appDelegate.focusedDate = existingFocusedDate;
     else
         appDelegate.focusedDate = [[NSDate alloc] init];
-    [self.timeScrollWindow setNewFocusedDateFromAnnotation:appDelegate.focusedDate];
+    [self.timeScrollWindow setNewFocusedDateFromAnnotation:appDelegate.focusedDate needAdjusted:FALSE];
     
     //NOTE the trick to set background image for a bar buttonitem
     if (locationbtn == nil)
@@ -759,7 +759,7 @@
                 }
                 
                 //tmpLbl.textAlignment = UITextAlignmentCenter;
-                tmpLbl.lineBreakMode = UILineBreakModeWordWrap;
+                tmpLbl.lineBreakMode = NSLineBreakByWordWrapping;
 
                 
                 [self setDescLabelSizeByZoomLevel:tmpLbl];
@@ -885,7 +885,7 @@
 {
     int zoomLevel = [self zoomLevel];
     CGSize expectedLabelSize = [tmpLbl.text sizeWithFont:tmpLbl.font
-            constrainedToSize:tmpLbl.frame.size lineBreakMode:UILineBreakModeWordWrap];
+            constrainedToSize:tmpLbl.frame.size lineBreakMode:NSLineBreakByWordWrapping];
     tmpLbl.numberOfLines = 0;
     tmpLbl.font = [UIFont fontWithName:@"Arial" size:11];
     int labelWidth = 60;
@@ -1081,7 +1081,7 @@
         ent.eventType = ann.eventType;
         ent.eventDesc = ann.description;
         
-        [self setNewFocusedDateAndUpdateMap:ent];
+        [self setNewFocusedDateAndUpdateMap:ent needAdjusted:TRUE]; //No reason, have to do focusedRow++ when focused a event in time wheel
         timelineWindowShowFlag = 1;
         self.timeScrollWindow.hidden=false;
         self.timeZoomLine.hidden = false;
@@ -1089,19 +1089,21 @@
     }
 }
 
-- (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent
+//I could not explain, but for tap left annotation button to focuse date, have to to do focusedRow++ in ATTimeScrollWindowNew
+- (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent needAdjusted:(BOOL)needAdjusted
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.focusedDate = ent.eventDate;
-    [self.timeScrollWindow setNewFocusedDateFromAnnotation:ent.eventDate];
+    [self.timeScrollWindow setNewFocusedDateFromAnnotation:ent.eventDate needAdjusted:needAdjusted];
     [self refreshAnnotations];
     //[self setMapCenter:ent];
 }
 - (void) setNewFocusedDateAndUpdateMapWithNewCenter:(ATEventDataStruct*) ent :(int)zoomLevel
 {
-    [self setNewFocusedDateAndUpdateMap:ent];
+    [self setNewFocusedDateAndUpdateMap:ent needAdjusted:FALSE];
     [self setMapCenter:ent :zoomLevel];
 }
+//Mostly called from time wheel (ATTimeScrollWindowNew
 - (void) refreshAnnotations //Refresh based on new forcusedDate / selectedPeriodInDays
 {
     //NSLog(@"refreshAnnotation called");
@@ -1296,7 +1298,7 @@
     }
     
     appDelegate.focusedDate = ann.eventDate;
-    [self setNewFocusedDateAndUpdateMap:newData];
+    [self setNewFocusedDateAndUpdateMap:newData needAdjusted:FALSE];
     
     //following check if new date is out of range when add.  or if it is update, then check if update on ends event
     if ( (newIndex != NSNotFound && (newIndex == 0 || newIndex == [list count] -1))

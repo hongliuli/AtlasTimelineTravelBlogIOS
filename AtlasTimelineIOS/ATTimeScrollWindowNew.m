@@ -570,7 +570,7 @@ static int toastFirstTimeDelay = 0;
             //focusedRow = abs(components.year / 10);
         }
     }
-    [self performSettingFocusedRowForDate:newFocusedDate];
+    [self performSettingFocusedRowForDate:newFocusedDate needAdjusted: FALSE];
 }
 
 - (IBAction)handleDoubleTap:(UITapGestureRecognizer *)recognizer{
@@ -601,7 +601,7 @@ static int toastFirstTimeDelay = 0;
         NSDate* today = [[NSDate alloc] init];
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         appDelegate.focusedDate = today;
-        [self performSettingFocusedRowForDate:today];
+        [self performSettingFocusedRowForDate:today needAdjusted:FALSE];
         [self.parent refreshAnnotations];
         [self.parent.timeZoomLine showHideScaleText:false]; //have to do this else scale label will show
     }
@@ -741,7 +741,7 @@ static int toastFirstTimeDelay = 0;
     [self changeFocusedCellColorToRed ];
      */
 }
-- (void) performSettingFocusedRowForDate:(NSDate*) newFocusedDate
+- (void) performSettingFocusedRowForDate:(NSDate*) newFocusedDate needAdjusted:(BOOL)fromFocuseEventDate
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int selectedPeriodInDay = appDelegate.selectedPeriodInDays;
@@ -769,12 +769,16 @@ static int toastFirstTimeDelay = 0;
     {
         focusedRow = abs(components.year / 100);
     }
-    focusedRow++; //do not know why, have to add by 1 for focused to selected event work
+    
+    if (fromFocuseEventDate)
+        focusedRow++; //TODO: do not know why, only when focused a selected event to time wheel need to add by 1. Need test iPhone case
     [self.horizontalTableView reloadData];
+
     //NSLog(@" ------ year=%i,mon=%i,day=%d,focusedRow=%i,currNoRow=%i",components.year, components.month, components.day,focusedRow,currentNumberOfRow);
     if (focusedRow > currentNumberOfRow) //this check is not neccessary, but leave it here
         focusedRow = currentNumberOfRow - 5;
     [self scrollToFocusedRow]; //important
+    
 }
 
 -(void) displayTimeElapseinSearchBar
@@ -959,11 +963,11 @@ static int toastFirstTimeDelay = 0;
     
 }
 
--(void) setNewFocusedDateFromAnnotation:(NSDate *)newFocusedDate
+-(void) setNewFocusedDateFromAnnotation:(NSDate *)newFocusedDate needAdjusted:(BOOL)needAdjusted
 {
     //NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
     //[dateComponents setYear:-1];
-    [self performSettingFocusedRowForDate:newFocusedDate];
+    [self performSettingFocusedRowForDate:newFocusedDate needAdjusted:needAdjusted];
 }
 
 //recursive function to get index of a event

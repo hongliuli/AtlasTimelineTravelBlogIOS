@@ -15,6 +15,6 @@
 @property (nonatomic, retain) UITableView *horizontalTableView;
 
 - (IBAction)handlePinch:(UIPanGestureRecognizer *)recognizer;
-- (void) setNewFocusedDateFromAnnotation:(NSDate*) newFocusedDate; //put in interface because parent map view will call this after focuse annotation
+- (void) setNewFocusedDateFromAnnotation:(NSDate*) newFocusedDate needAdjusted:(BOOL) needAdjusted; //put in interface because parent map view will call this after focuse annotation
 
 @end
