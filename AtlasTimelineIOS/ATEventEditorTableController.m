@@ -309,7 +309,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [[UIActivityViewController alloc]
          initWithActivityItems:activityItems
          applicationActivities:nil];
-        activityController.excludedActivityTypes = [NSArray arrayWithObjects: UIActivityTypePostToWeibo, UIActivityTypePrint,UIActivityTypeAssignToContact,UIActivityTypeCopyToPasteboard, UIActivityTypeMessage,UIActivityTypeSaveToCameraRoll, nil];
+        activityController.excludedActivityTypes = [NSArray arrayWithObjects: UIActivityTypePrint,UIActivityTypeAssignToContact,UIActivityTypeCopyToPasteboard, UIActivityTypeMessage, nil];
+        //Finally can set subject in email with following line (01/05/2014)
+        NSString* emailSubject = self.description.text;
+        if ([emailSubject length] > 50)
+            emailSubject = [NSString stringWithFormat:@"%@...",[emailSubject substringToIndex:50]];
+        [activityController setValue:emailSubject forKey:@"subject"];
     
         [self presentViewController:activityController
                        animated:YES completion:nil];
