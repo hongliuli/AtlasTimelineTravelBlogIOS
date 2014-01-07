@@ -807,6 +807,8 @@
         [[view superview] bringSubviewToFront:view];
     }
     [selectedAnnotationBringToFrontList removeAllObjects];
+    //didAddAnnotationViews is called when focused to date or move timewheel caused by addAnnotation:removedAnntationSet
+    [self showDescriptionLabelViews:self.mapView];
 }
 
 
@@ -830,7 +832,7 @@
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
 {
-    if (timelineWindowShowFlag == 0)
+    if (timelineWindowShowFlag == 0) //why this?
         return;
     for (id key in selectedAnnotationSet) {
         NSArray *splitArray = [key componentsSeparatedByString:@"|"];
@@ -1112,7 +1114,9 @@
     [ annotationsToRemove removeObject:self.mapView.userLocation ] ;
     [ self.mapView removeAnnotations:annotationsToRemove ] ;
     [self.mapView addAnnotations:annotationsToRemove];
-    [self showDescriptionLabelViews:self.mapView];
+    //[2014-01-06]
+    //*** By moving following to didAddAnnotation(), I solved the issue that forcuse an event to date cause all image to show, because above [self.mapView addAnnotations:...] will run parallel to bellow [self showDescr..] while this depends on selectedAnnotationSet prepared in viewForAnnotation, thuse cause problem
+    //[self showDescriptionLabelViews:self.mapView];
 }
 
 - (NSString*)getImageIdentifier:(NSDate *)eventDate
