@@ -82,7 +82,7 @@
     CGRect timeScrollWindowFrame;
     ATTutorialView* tutorialView;
 
-    NSMutableArray* selectedAnnotationBringToFrontList;
+    NSMutableDictionary* whiteFlagAnnotationSet;
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
     ATEventAnnotation* selectedEventAnnotation;
 }
@@ -98,7 +98,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    selectedAnnotationBringToFrontList = [[NSMutableArray alloc] init];
     [ATHelper createPhotoDocumentoryPath];
     self.locationManager = [[CLLocationManager alloc] init];
     timelineWindowShowFlag = 1;
@@ -139,6 +138,7 @@
     [_mapView addGestureRecognizer:tapgr];
 
     selectedAnnotationSet = [[NSMutableDictionary alloc] init];
+    whiteFlagAnnotationSet = [[NSMutableDictionary alloc] init];
     selectedAnnotationNearestLocationList = [[NSMutableArray alloc] init];
     regionChangeTimeStart = [[NSDate alloc] init];
     [self prepareMapView];
@@ -400,6 +400,7 @@
         [selectedAnnotationSet removeAllObjects];
         [selectedAnnotationNearestLocationList removeAllObjects];
     }
+    [whiteFlagAnnotationSet removeAllObjects];
 }
 - (void)setMapCenter:(ATEventDataStruct*)ent :(int)zoomLevel
 {
@@ -696,7 +697,6 @@
         //keey list of red  annotations
         if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]])
         {
-            [selectedAnnotationBringToFrontList addObject:annView];
             UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
             if (tmpLbl == nil)
             {
@@ -792,6 +792,15 @@
                 [tmpLbl removeFromSuperview];
             }
         }
+        if ([selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier]])
+        {
+            [whiteFlagAnnotationSet setObject:annView forKey:key ];// atIndexedSubscript:<#(NSUInteger)#> addObject:annView];
+        }
+        else
+        {
+            [whiteFlagAnnotationSet removeObjectForKey:key];
+        }
+        annView.hidden = false;
         return annView;
     }
     
@@ -799,22 +808,15 @@
 }
 
 
-//to put those white annotation behind the darkest annotation
 - (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
-    for (MKAnnotationView *view in selectedAnnotationBringToFrontList)
-    {
-        [[view superview] bringSubviewToFront:view];
-    }
-    [selectedAnnotationBringToFrontList removeAllObjects];
     //didAddAnnotationViews is called when focused to date or move timewheel caused by addAnnotation:removedAnntationSet
     [self showDescriptionLabelViews:self.mapView];
 }
 
-
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-    //NSLog(@"regione willChange size: %i", [selectedAnnotationSet count]);
+    //NSLog(@"regione willChange size: %i    whiteFlag set count %i ", [selectedAnnotationSet count], [whiteFlagAnnotationSet count]);
     for (id key in selectedAnnotationSet) {
         UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
        // ATEventAnnotation* eventAnn = (ATEventAnnotation*)key;
@@ -825,15 +827,14 @@
 {
 
     //NSLog(@"retion didChange, zoom level is %i", [self zoomLevel]);
-    [self showDescriptionLabelViews:mapView];
     [self.timeZoomLine setNeedsDisplay];
     regionChangeTimeStart = [[NSDate alloc] init];
+    [self showDescriptionLabelViews:mapView];
     
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
 {
-    if (timelineWindowShowFlag == 0) //why this?
-        return;
+    [self hideNearestWhiteFlagAnnotation];
     for (id key in selectedAnnotationSet) {
         NSArray *splitArray = [key componentsSeparatedByString:@"|"];
         UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
@@ -842,40 +843,55 @@
         coordinate.longitude = [splitArray[1] doubleValue];
         CGPoint annotationViewPoint = [mapView convertCoordinate:coordinate
                                                    toPointToView:mapView];
-        bool tooCloseToShowFlag = false;
         
-        for (NSValue* val in selectedAnnotationNearestLocationList)
-        {
-            CGPoint p = [val CGPointValue];
-            CGFloat xDist = (annotationViewPoint.x - p.x);
-            CGFloat yDist = (annotationViewPoint.y - p.y);
-            CGFloat distance = sqrt((xDist * xDist) + (yDist * yDist));
-            if (distance < DISTANCE_TO_HIDE)
+        if (timelineWindowShowFlag != 0)
+        {  //if time wheel also dispeared, do not show any image, so skip following code
+            bool tooCloseToShowFlag = false;
+            
+            for (NSValue* val in selectedAnnotationNearestLocationList)
             {
-                tooCloseToShowFlag = true;
-                break;
+                CGPoint p = [val CGPointValue];
+                CGFloat xDist = (annotationViewPoint.x - p.x);
+                CGFloat yDist = (annotationViewPoint.y - p.y);
+                CGFloat distance = sqrt((xDist * xDist) + (yDist * yDist));
+                if (distance < DISTANCE_TO_HIDE)
+                {
+                    tooCloseToShowFlag = true;
+                    break;
+                }
             }
+            if (tooCloseToShowFlag)
+            {
+                tmpLbl.hidden = true;
+                continue;
+            }
+            else
+            {
+                [selectedAnnotationNearestLocationList addObject: [NSValue valueWithCGPoint:annotationViewPoint]];
+            }
+            
+            [self setDescLabelSizeByZoomLevel:tmpLbl];
+            CGSize size = tmpLbl.frame.size;
+            [tmpLbl setFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, size.width, size.height)];
+            if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
+                tmpLbl.hidden = true;
+            else
+                tmpLbl.hidden=false;
         }
-        if (tooCloseToShowFlag)
-        {
-            tmpLbl.hidden = true;
-            continue;
-        }
-        else
-        {
-            [selectedAnnotationNearestLocationList addObject: [NSValue valueWithCGPoint:annotationViewPoint]];
-        }
-
-        [self setDescLabelSizeByZoomLevel:tmpLbl];
-        CGSize size = tmpLbl.frame.size;
-        [tmpLbl setFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, size.width, size.height)];
-        if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
-            tmpLbl.hidden = true;
-        else
-            tmpLbl.hidden=false;
     }
     [selectedAnnotationNearestLocationList removeAllObjects];
 }
+
+
+- (void) hideNearestWhiteFlagAnnotation
+{
+    for (id key in whiteFlagAnnotationSet)
+    {
+        MKAnnotationView* whiteFlagAnn = [whiteFlagAnnotationSet objectForKey:key];
+        [[whiteFlagAnn superview] sendSubviewToBack:whiteFlagAnn];
+    }
+}
+
 - (void) hideDescriptionLabelViews
 {
     for (id key in selectedAnnotationSet) {
@@ -1114,6 +1130,7 @@
     [ annotationsToRemove removeObject:self.mapView.userLocation ] ;
     [ self.mapView removeAnnotations:annotationsToRemove ] ;
     [self.mapView addAnnotations:annotationsToRemove];
+    [self cleanSelectedAnnotationSet];
     //[2014-01-06]
     //*** By moving following to didAddAnnotation(), I solved the issue that forcuse an event to date cause all image to show, because above [self.mapView addAnnotations:...] will run parallel to bellow [self showDescr..] while this depends on selectedAnnotationSet prepared in viewForAnnotation, thuse cause problem
     //[self showDescriptionLabelViews:self.mapView];
@@ -1150,7 +1167,7 @@
     if (segmentDistance>= - 5 && segmentDistance < -4 )
         return [ATConstants Past4AnnotationIdentifier];
     if (segmentDistance < -5 )
-        return @"small-white-flag.png"; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
+        return [ATConstants WhiteFlagAnnotationIdentifier]; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
     return nil;
 }
 
