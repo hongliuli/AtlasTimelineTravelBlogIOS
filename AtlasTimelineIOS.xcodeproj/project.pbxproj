@@ -51,6 +51,7 @@
 		CE384F69184062ED0009B6E0 /* Overlay.png in Resources */ = {isa = PBXBuildFile; fileRef = CE384F67184062ED0009B6E0 /* Overlay.png */; };
 		CE384F6A184062ED0009B6E0 /* Overlay@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE384F68184062ED0009B6E0 /* Overlay@2x.png */; };
 		CE397EE816AB3E1800C4AD18 /* ATEventDataStruct.m in Sources */ = {isa = PBXBuildFile; fileRef = CE397EE716AB3E1800C4AD18 /* ATEventDataStruct.m */; };
+		CE3DF30A187FA39C0065337E /* add-button-md.png in Resources */ = {isa = PBXBuildFile; fileRef = CE3DF309187FA39C0065337E /* add-button-md.png */; };
 		CE4DDC1016A7AC2300911CE2 /* ATEventEditorTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE4DDC0F16A7AC2300911CE2 /* ATEventEditorTableController.m */; };
 		CE56B1AD1775217700DB9FB7 /* ATPhotoScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE56B1AC1775217700DB9FB7 /* ATPhotoScrollView.m */; };
 		CE56B1B0177522AD00DB9FB7 /* ATPhotoScrollCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CE56B1AF177522AD00DB9FB7 /* ATPhotoScrollCell.m */; };
@@ -201,6 +202,7 @@
 		CE384F68184062ED0009B6E0 /* Overlay@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Overlay@2x.png"; path = "images/Overlay@2x.png"; sourceTree = "<group>"; };
 		CE397EE616AB3E1800C4AD18 /* ATEventDataStruct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATEventDataStruct.h; sourceTree = "<group>"; };
 		CE397EE716AB3E1800C4AD18 /* ATEventDataStruct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATEventDataStruct.m; sourceTree = "<group>"; };
+		CE3DF309187FA39C0065337E /* add-button-md.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "add-button-md.png"; path = "images/add-button-md.png"; sourceTree = "<group>"; };
 		CE4DDC0E16A7AC2300911CE2 /* ATEventEditorTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATEventEditorTableController.h; sourceTree = "<group>"; };
 		CE4DDC0F16A7AC2300911CE2 /* ATEventEditorTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATEventEditorTableController.m; sourceTree = "<group>"; };
 		CE56B1AB1775217700DB9FB7 /* ATPhotoScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATPhotoScrollView.h; sourceTree = "<group>"; };
@@ -468,6 +470,7 @@
 		CE2A1CF216AD9882004476E8 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CE3DF309187FA39C0065337E /* add-button-md.png */,
 				CE384F67184062ED0009B6E0 /* Overlay.png */,
 				CE384F68184062ED0009B6E0 /* Overlay@2x.png */,
 				CE10A8FE18305D6000CB1430 /* timeWindowBackground.png */,
@@ -700,6 +703,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE0E530C168E671F00C147FB /* InfoPlist.strings in Resources */,
+				CE3DF30A187FA39C0065337E /* add-button-md.png in Resources */,
 				CE0E531B168E671F00C147FB /* MainStoryboard_iPhone.storyboard in Resources */,
 				CE0E531E168E671F00C147FB /* MainStoryboard_iPad.storyboard in Resources */,
 				CE6053C6168E9D660006F110 /* Note_Tech_Tips_resource.txt in Resources */,
