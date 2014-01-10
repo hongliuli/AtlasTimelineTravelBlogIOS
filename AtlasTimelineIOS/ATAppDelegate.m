@@ -91,8 +91,6 @@
         entData.lng = [ent.lng doubleValue];
         [_eventListSorted addObject:entData];
     }
-    ATEventDataStruct * ent0 = sortedArray[0];
-    NSLog(@" --- in appDelegate date=%@, lat=%f", ent0.eventDate, ent0.lat);
 
     return _eventListSorted;
 }
