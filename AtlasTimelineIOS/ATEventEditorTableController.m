@@ -134,7 +134,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [customView addSubview:lblNewAddedCount];
         
         // create the button object
-        UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeContactAdd];
+        UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        UIImage *thumb2 = [UIImage imageNamed:@"add-button-md.png"];
+        [photoBtn setImage:thumb2 forState:UIControlStateNormal];
         photoBtn.frame = CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 110, EDITOR_PHOTOVIEW_HEIGHT - 25, 35, 35);
         [photoBtn addTarget:self action:@selector(takePictureAction:) forControlEvents:UIControlEventTouchUpInside];
         photoBtn.tag = ADD_PHOTO_BUTTON_TAG_777;
