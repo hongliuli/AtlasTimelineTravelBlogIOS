@@ -770,8 +770,9 @@ static int toastFirstTimeDelay = 0;
         focusedRow = abs(components.year / 100);
     }
     
-    if (fromFocuseEventDate)
-        focusedRow++; //TODO: do not know why, only when focused a selected event to time wheel need to add by 1. Need test iPhone case
+    if (fromFocuseEventDate && UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        focusedRow++; //TODO: do not know why, only when focused a selected event to time wheel need to add by 1, in iPad  not iPhone case
+
     [self.horizontalTableView reloadData];
 
     //NSLog(@" ------ year=%i,mon=%i,day=%d,focusedRow=%i,currNoRow=%i",components.year, components.month, components.day,focusedRow,currentNumberOfRow);
