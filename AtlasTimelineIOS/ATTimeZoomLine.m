@@ -190,6 +190,11 @@ CGContextRef context;
     return self;
 }
 
+-(void) hideMagnifier
+{
+    labelMagnifier.hidden = true;
+}
+
 //called in ATViewController
 - (void) changeScaleText:(NSString *)text
 {

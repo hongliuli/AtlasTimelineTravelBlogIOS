@@ -20,5 +20,6 @@
 - (void)showHideInAnimation;
 - (void)changeScaleLabelsDateFormat:(NSDate*)startDay :(NSDate*)endDay;
 - (void)changeTimeScaleState:(NSDate*)startDate :(NSDate*)endDate :(int)periodIndays :(NSDate*)focusedDate;
+- (void) hideMagnifier;
 
 @end

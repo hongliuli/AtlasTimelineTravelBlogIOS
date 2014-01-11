@@ -969,6 +969,7 @@ static int toastFirstTimeDelay = 0;
     //NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
     //[dateComponents setYear:-1];
     [self performSettingFocusedRowForDate:newFocusedDate needAdjusted:needAdjusted];
+    [self.parent.timeZoomLine hideMagnifier];
 }
 
 //recursive function to get index of a event
