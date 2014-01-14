@@ -59,6 +59,8 @@
 #define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
+#define TIME_LINK_DEPTH 5
+
 @interface MFTopAlignedLabel : UILabel
 
 @end
@@ -85,6 +87,8 @@
     NSMutableDictionary* whiteFlagAnnotationSet;
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
     ATEventAnnotation* selectedEventAnnotation;
+    NSMutableDictionary* timeLinkOverlayDepthColorMap; // latlngTimeLinkDepthMapForOverlay;
+    NSMutableArray* timeLinkOverlaysToBeCleaned ;
 }
 
 @synthesize mapView = _mapView;
@@ -1098,13 +1102,142 @@
         ent.eventDate = ann.eventDate;
         ent.eventType = ann.eventType;
         ent.eventDesc = ann.description;
+        ent.uniqueId = ann.uniqueId;
         
         [self setNewFocusedDateAndUpdateMap:ent needAdjusted:TRUE]; //No reason, have to do focusedRow++ when focused a event in time wheel
         timelineWindowShowFlag = 1;
         self.timeScrollWindow.hidden=false;
         self.timeZoomLine.hidden = false;
-
+        [self.mapView removeOverlays:timeLinkOverlaysToBeCleaned];
+        [self showTimeLinkOverlay:ent];
     }
+}
+
+- (void) showTimeLinkOverlay:(ATEventDataStruct*)ent
+{
+
+    if (timeLinkOverlayDepthColorMap == nil) //keyed on lat|lng, value is depth. viewForOverlay() can use this to decide what color the link to draw
+        timeLinkOverlayDepthColorMap = [[NSMutableDictionary alloc] init];
+    else
+        [timeLinkOverlayDepthColorMap removeAllObjects];
+    
+    if (timeLinkOverlaysToBeCleaned == nil)
+        timeLinkOverlaysToBeCleaned = [[NSMutableArray alloc] init];
+    else
+        [timeLinkOverlaysToBeCleaned removeAllObjects];
+    
+    
+    //following prepare mkPoi
+    NSArray* futureOverlays = [self prepareTimeLinkOverlays:ent :true];
+    NSArray* pastOverlays = [self prepareTimeLinkOverlays:ent :false];
+    
+    [timeLinkOverlaysToBeCleaned addObjectsFromArray:futureOverlays];
+    [timeLinkOverlaysToBeCleaned addObjectsFromArray:pastOverlays];
+    
+    
+    // http://stackoverflow.com/questions/15061207/how-to-draw-a-straight-line-on-an-ios-map-without-moving-the-map-using-mkmapkit
+    //add line by line, instead add all lines in one MKPolyline object, because I want to draw color differently in viewForOverlay
+    int size = [futureOverlays count];
+    for(int i = 0; i < size; i++)
+    {
+        MKPolyline* line = futureOverlays[i];
+        [self.mapView addOverlay:line];
+    }
+    size = [pastOverlays count];
+    for(int i = 0; i < size; i++)
+    {
+        MKPolyline* line = pastOverlays[i];
+        [self.mapView addOverlay:line];
+    }
+}
+
+- (NSArray*) prepareTimeLinkOverlays:(ATEventDataStruct*)ent :(BOOL)direction
+{
+    //direction = true is for event before ent
+    //direction = false is for event after ent
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSMutableArray* list  = appDelegate.eventListSorted;
+    int listSize =[list count];
+    
+    
+    int currEventIdxConstant = [list indexOfObject:ent];
+    
+    //link all same day, and 5 different days before/after, (same day must be togetther
+    NSInteger linkDepth = 0;
+    int linkCount = 0;
+    if (direction)
+        linkDepth = 2 * TIME_LINK_DEPTH;
+    
+    ATEventDataStruct* prevEvent = ent;
+    ATEventDataStruct* thisEvent = nil;
+    NSMutableArray* returnPolylineList = [[NSMutableArray alloc] init];
+    //Following is to add points for event in future, and in before depends on direction, the logic is not ideal, hope it works
+    while (linkDepth != TIME_LINK_DEPTH) { //TODO TIME_LINK_DEPTH is 5, should be configurable, same day event link together
+        if (direction)
+            linkCount --;
+        else
+            linkCount++;
+        int thisIdx = currEventIdxConstant + linkCount;
+        MKPolyline* timeLinkPolyline = nil;
+        if (thisIdx >= 0 && thisIdx < listSize)
+        {
+            thisEvent = list[thisIdx];
+            MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2);
+            pointArr[0] = [self getEventMapPoint:prevEvent];
+            pointArr[1] = [self getEventMapPoint:thisEvent];
+            timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:2];
+            [returnPolylineList addObject:timeLinkPolyline];
+        }
+        else
+            break;
+
+        int tmp = linkDepth;
+        if (![prevEvent.eventDate isEqualToDate:thisEvent.eventDate])
+        {
+            if (direction)
+                linkDepth --;
+            else
+                linkDepth ++;
+            tmp = linkDepth;
+            if (linkDepth > TIME_LINK_DEPTH)
+                tmp = TIME_LINK_DEPTH - linkDepth; //should be negative value
+        }
+        NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
+        [timeLinkOverlayDepthColorMap  setValue: [NSNumber numberWithInteger:tmp]  forKey:key];
+        prevEvent = thisEvent;
+    }
+    return returnPolylineList;
+}
+
+- (MKMapPoint) getEventMapPoint:(ATEventDataStruct*)evt
+{
+    CLLocationCoordinate2D workingCoordinate;
+    workingCoordinate.latitude = evt.lat;
+    workingCoordinate.longitude = evt.lng;
+    return MKMapPointForCoordinate(workingCoordinate);
+}
+
+- (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id <MKOverlay>)overlay
+{
+    //TODO draw line color according to date distance, use mkPointDateMapForTimeLinOverlay
+    NSString *key=[NSString stringWithFormat:@"%f|%f", overlay.coordinate.latitude, overlay.coordinate.longitude];
+    NSNumber* tmp = [timeLinkOverlayDepthColorMap objectForKey:key];
+    float colorHint = [tmp floatValue];
+    float depthFloat = TIME_LINK_DEPTH;
+
+    float alpha = abs(colorHint/depthFloat);
+NSLog(@"  color Hint %f, alpha=%f  key=%@", colorHint,alpha,key);
+    UIColor* color = [UIColor colorWithRed:1 green:0 blue:0 alpha:alpha];
+    if (colorHint < 0)
+        color = [UIColor colorWithRed:0 green:1 blue:0 alpha:alpha];
+    
+    
+    MKPolylineView* routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
+    routeLineView.fillColor = color;
+    routeLineView.strokeColor = color;
+    routeLineView.lineWidth = 4;
+        
+    return routeLineView;
 }
 
 //I could not explain, but for tap left annotation button to focuse date, have to to do focusedRow++ in ATTimeScrollWindowNew
