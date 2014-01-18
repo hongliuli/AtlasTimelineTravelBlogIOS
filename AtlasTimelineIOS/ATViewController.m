@@ -16,14 +16,7 @@
 #import "ATViewController.h"
 #import "ATDefaultAnnotation.h"
 #import "ATAnnotationSelected.h"
-#import "ATAnnotationAfter1.h"
-#import "ATAnnotationAfter2.h"
-#import "ATAnnotationAfter3.h"
-#import "ATAnnotationAfter4.h"
-#import "ATAnnotationPast1.h"
-#import "ATAnnotationPast2.h"
-#import "ATAnnotationPast3.h"
-#import "ATAnnotationPast4.h"
+#import "ATAnnotationFocused.h"
 #import "ATDataController.h"
 #import "ATEventEntity.h"
 #import "ATEventDataStruct.h"
@@ -59,7 +52,9 @@
 #define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
-#define TIME_LINK_DEPTH 5
+//TODO Following should be in configuration settings
+#define TIME_LINK_DEPTH 6
+#define TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT 30
 
 @interface MFTopAlignedLabel : UILabel
 
@@ -89,6 +84,7 @@
     ATEventAnnotation* selectedEventAnnotation;
     NSMutableDictionary* timeLinkOverlayDepthColorMap; // latlngTimeLinkDepthMapForOverlay;
     NSMutableArray* timeLinkOverlaysToBeCleaned ;
+    ATAnnotationFocused* focusedAnnotationIndicator;
 }
 
 @synthesize mapView = _mapView;
@@ -807,6 +803,12 @@
         annView.hidden = false;
         return annView;
     }
+    else if ([annotation isKindOfClass:[ATAnnotationFocused class]])
+    {
+        MKAnnotationView* annView = [self getImageAnnotationView:@"focusedFlag.png" :annotation];
+        annView.annotation = annotation;
+        return annView;
+    }
     
     return nil;
 }
@@ -1126,6 +1128,20 @@
     else
         [timeLinkOverlaysToBeCleaned removeAllObjects];
     
+    //first draw a circle on selected event
+    CLLocationCoordinate2D workingCoordinate;
+    workingCoordinate.latitude = ent.lat;
+    workingCoordinate.longitude = ent.lng;
+    if (focusedAnnotationIndicator == nil)
+        focusedAnnotationIndicator = [[ATAnnotationFocused alloc] init];
+    else
+        [self.mapView removeAnnotation:focusedAnnotationIndicator];
+    focusedAnnotationIndicator.coordinate = workingCoordinate;
+    [self.mapView addAnnotation:focusedAnnotationIndicator];
+    
+
+    
+    
     
     //following prepare mkPoi
     NSArray* futureOverlays = [self prepareTimeLinkOverlays:ent :true];
@@ -1178,10 +1194,17 @@
         else
             linkCount++;
         int thisIdx = currEventIdxConstant + linkCount;
+        
         MKPolyline* timeLinkPolyline = nil;
         if (thisIdx >= 0 && thisIdx < listSize)
         {
             thisEvent = list[thisIdx];
+
+            NSTimeInterval interval = [thisEvent.eventDate timeIntervalSinceDate: prevEvent.eventDate];
+       // NSLog(@"            in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
+            if (abs(interval/86400.0) > TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT)
+                break;
+  
             MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2);
             pointArr[0] = [self getEventMapPoint:prevEvent];
             pointArr[1] = [self getEventMapPoint:thisEvent];
@@ -1192,12 +1215,15 @@
             break;
 
         int tmp = linkDepth;
+        if (linkDepth > TIME_LINK_DEPTH)
+            tmp = TIME_LINK_DEPTH - linkDepth; //should be negative value
         if (![prevEvent.eventDate isEqualToDate:thisEvent.eventDate])
         {
             if (direction)
                 linkDepth --;
             else
                 linkDepth ++;
+
             tmp = linkDepth;
             if (linkDepth > TIME_LINK_DEPTH)
                 tmp = TIME_LINK_DEPTH - linkDepth; //should be negative value
@@ -1219,25 +1245,40 @@
 
 - (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id <MKOverlay>)overlay
 {
-    //TODO draw line color according to date distance, use mkPointDateMapForTimeLinOverlay
-    NSString *key=[NSString stringWithFormat:@"%f|%f", overlay.coordinate.latitude, overlay.coordinate.longitude];
-    NSNumber* tmp = [timeLinkOverlayDepthColorMap objectForKey:key];
-    float colorHint = [tmp floatValue];
-    float depthFloat = TIME_LINK_DEPTH;
-
-    float alpha = abs(colorHint/depthFloat);
-NSLog(@"  color Hint %f, alpha=%f  key=%@", colorHint,alpha,key);
-    UIColor* color = [UIColor colorWithRed:1 green:0 blue:0 alpha:alpha];
-    if (colorHint < 0)
-        color = [UIColor colorWithRed:0 green:1 blue:0 alpha:alpha];
-    
-    
-    MKPolylineView* routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
-    routeLineView.fillColor = color;
-    routeLineView.strokeColor = color;
-    routeLineView.lineWidth = 4;
+    if ([overlay isKindOfClass:[MKCircle class]])
+    {
+        MKCircleView *circleView = [[MKCircleView alloc] initWithOverlay:overlay];
+        circleView.strokeColor = [UIColor blueColor];
+        circleView.fillColor = [[UIColor blueColor] colorWithAlphaComponent:0.4];
+        return circleView;
         
-    return routeLineView;
+    }
+    else
+    {
+        //TODO draw line color according to date distance, use mkPointDateMapForTimeLinOverlay
+        NSString *key=[NSString stringWithFormat:@"%f|%f", overlay.coordinate.latitude, overlay.coordinate.longitude];
+        NSNumber* tmp = [timeLinkOverlayDepthColorMap objectForKey:key];
+        double colorHint = [tmp doubleValue];
+        double depthFloat = TIME_LINK_DEPTH;
+        
+        double alpha = colorHint/depthFloat;
+        if (alpha < 0)
+            alpha = alpha * (-1.0);  //abs() is for int only, color will fail silently if give alpha value negative or great than 1. this fucking function make me crazy
+        else
+            alpha = (depthFloat - colorHint)/depthFloat;
+        
+        UIColor* color = [UIColor colorWithRed:0.6 green:0 blue:0 alpha:alpha];
+        if (colorHint < 0)
+            color = [UIColor colorWithRed:0 green:0.6 blue:0 alpha:alpha];
+        
+        
+        MKPolylineView* routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
+        routeLineView.fillColor = color;
+        routeLineView.strokeColor = color;
+        routeLineView.lineWidth = 2;
+        
+        return routeLineView;
+    }
 }
 
 //I could not explain, but for tap left annotation button to focuse date, have to to do focusedRow++ in ATTimeScrollWindowNew
