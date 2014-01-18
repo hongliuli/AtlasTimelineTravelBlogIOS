@@ -83,6 +83,8 @@
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
     ATEventAnnotation* selectedEventAnnotation;
     NSMutableDictionary* timeLinkOverlayDepthColorMap; // latlngTimeLinkDepthMapForOverlay;
+    int timeLinkDepthDirectionFuture;
+    int timeLinkDepthDirectionPast;
     NSMutableArray* timeLinkOverlaysToBeCleaned ;
     ATAnnotationFocused* focusedAnnotationIndicator;
 }
@@ -1144,6 +1146,8 @@
     
     
     //following prepare mkPoi
+    timeLinkDepthDirectionFuture = 0;
+    timeLinkDepthDirectionPast = 0;
     NSArray* futureOverlays = [self prepareTimeLinkOverlays:ent :true];
     NSArray* pastOverlays = [self prepareTimeLinkOverlays:ent :false];
     
@@ -1167,7 +1171,7 @@
     }
 }
 
-- (NSArray*) prepareTimeLinkOverlays:(ATEventDataStruct*)ent :(BOOL)direction
+- (NSArray*) prepareTimeLinkOverlays:(ATEventDataStruct*)ent :(BOOL)directionFuture
 {
     //direction = true is for event before ent
     //direction = false is for event after ent
@@ -1181,19 +1185,16 @@
     //link all same day, and 5 different days before/after, (same day must be togetther
     NSInteger linkDepth = 0;
     int linkCount = 0;
-    if (direction)
-        linkDepth = 2 * TIME_LINK_DEPTH;
-    
+
     ATEventDataStruct* prevEvent = ent;
     ATEventDataStruct* thisEvent = nil;
     NSMutableArray* returnPolylineList = [[NSMutableArray alloc] init];
     //Following is to add points for event in future, and in before depends on direction, the logic is not ideal, hope it works
-    while (linkDepth != TIME_LINK_DEPTH) { //TODO TIME_LINK_DEPTH is 5, should be configurable, same day event link together
-        if (direction)
-            linkCount --;
-        else
-            linkCount++;
+    while (linkDepth <= TIME_LINK_DEPTH) { //TODO TIME_LINK_DEPTH is 5, should be configurable, same day event link together
+        linkCount++;
         int thisIdx = currEventIdxConstant + linkCount;
+        if (directionFuture)
+            thisIdx = currEventIdxConstant - linkCount;
         
         MKPolyline* timeLinkPolyline = nil;
         if (thisIdx >= 0 && thisIdx < listSize)
@@ -1201,10 +1202,10 @@
             thisEvent = list[thisIdx];
 
             NSTimeInterval interval = [thisEvent.eventDate timeIntervalSinceDate: prevEvent.eventDate];
-       // NSLog(@"            in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
+
             if (abs(interval/86400.0) > TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT)
                 break;
-  
+//NSLog(@"            in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
             MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2);
             pointArr[0] = [self getEventMapPoint:prevEvent];
             pointArr[1] = [self getEventMapPoint:thisEvent];
@@ -1214,24 +1215,26 @@
         else
             break;
 
-        int tmp = linkDepth;
-        if (linkDepth > TIME_LINK_DEPTH)
-            tmp = TIME_LINK_DEPTH - linkDepth; //should be negative value
         if (![prevEvent.eventDate isEqualToDate:thisEvent.eventDate])
         {
-            if (direction)
-                linkDepth --;
-            else
-                linkDepth ++;
-
-            tmp = linkDepth;
-            if (linkDepth > TIME_LINK_DEPTH)
-                tmp = TIME_LINK_DEPTH - linkDepth; //should be negative value
+            linkDepth ++;
+            
         }
+        int tmp = linkDepth;
+        if (directionFuture)
+            tmp = - tmp;
+
+//NSLog(@"    in prepare: linDepth=%d  tmp=%d",linkDepth, tmp);
         NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
         [timeLinkOverlayDepthColorMap  setValue: [NSNumber numberWithInteger:tmp]  forKey:key];
+            
         prevEvent = thisEvent;
     }
+    if (directionFuture)
+        timeLinkDepthDirectionFuture = linkDepth;
+    else
+        timeLinkDepthDirectionPast = linkDepth;
+//NSLog(@"    in prepare: ======= linkDepth=%d   timLinkDepthDirectioTrue=%d   False=%d",linkDepth, timeLinkDepthDirectionFuture, timeLinkDepthDirectionPast);
     return returnPolylineList;
 }
 
@@ -1245,40 +1248,45 @@
 
 - (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id <MKOverlay>)overlay
 {
-    if ([overlay isKindOfClass:[MKCircle class]])
+    //TODO draw line color according to date distance, use mkPointDateMapForTimeLinOverlay
+    NSString *key=[NSString stringWithFormat:@"%f|%f", overlay.coordinate.latitude, overlay.coordinate.longitude];
+    NSNumber* tmp = [timeLinkOverlayDepthColorMap objectForKey:key];
+    float colorHint = [tmp floatValue];
+
+    double depthFloat = timeLinkDepthDirectionPast;
+    if (colorHint < 0) //we put negative number -tmp in prepareTimeLink()
+        depthFloat = timeLinkDepthDirectionFuture;
+    
+    if (depthFloat == 0.0)
+        return nil;
+    //double alpha = colorHint/depthFloat;
+    double alpha = (depthFloat  - abs(colorHint))/depthFloat;
+    if (alpha == 0)
+        alpha = 0.1;
+    if (alpha < 0)
+        alpha = alpha * (-1.0);  //abs() is for int only, color will fail silently if give alpha value negative or great than 1. this fucking function make me crazy
+    
+
+    
+    UIColor* color = [UIColor colorWithRed:0.6 green:0 blue:0 alpha:alpha];
+    if (colorHint < 0)
+        color = [UIColor colorWithRed:0 green:0.6 blue:0 alpha:alpha];
+    
+    
+    MKPolylineView* routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
+    if (alpha == 1.0 )//|| colorHint == -1)
     {
-        MKCircleView *circleView = [[MKCircleView alloc] initWithOverlay:overlay];
-        circleView.strokeColor = [UIColor blueColor];
-        circleView.fillColor = [[UIColor blueColor] colorWithAlphaComponent:0.4];
-        return circleView;
-        
+        routeLineView.fillColor = [UIColor blueColor];
+        routeLineView.strokeColor = [UIColor blackColor];
     }
     else
     {
-        //TODO draw line color according to date distance, use mkPointDateMapForTimeLinOverlay
-        NSString *key=[NSString stringWithFormat:@"%f|%f", overlay.coordinate.latitude, overlay.coordinate.longitude];
-        NSNumber* tmp = [timeLinkOverlayDepthColorMap objectForKey:key];
-        double colorHint = [tmp doubleValue];
-        double depthFloat = TIME_LINK_DEPTH;
-        
-        double alpha = colorHint/depthFloat;
-        if (alpha < 0)
-            alpha = alpha * (-1.0);  //abs() is for int only, color will fail silently if give alpha value negative or great than 1. this fucking function make me crazy
-        else
-            alpha = (depthFloat - colorHint)/depthFloat;
-        
-        UIColor* color = [UIColor colorWithRed:0.6 green:0 blue:0 alpha:alpha];
-        if (colorHint < 0)
-            color = [UIColor colorWithRed:0 green:0.6 blue:0 alpha:alpha];
-        
-        
-        MKPolylineView* routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
         routeLineView.fillColor = color;
         routeLineView.strokeColor = color;
         routeLineView.lineWidth = 2;
-        
-        return routeLineView;
     }
+    
+    return routeLineView;
 }
 
 //I could not explain, but for tap left annotation button to focuse date, have to to do focusedRow++ in ATTimeScrollWindowNew
