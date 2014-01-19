@@ -52,6 +52,9 @@
 #define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
+#define TIME_LINK_DASH_LINE_STYLE_FOR_SAME_DEPTH 1
+#define TIME_LINK_SOLID_LINE_STYLE 2
+
 //TODO Following should be in configuration settings
 #define TIME_LINK_DEPTH 6
 #define TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT 30
@@ -1149,6 +1152,7 @@
     timeLinkDepthDirectionFuture = 0;
     timeLinkDepthDirectionPast = 0;
     NSArray* futureOverlays = [self prepareTimeLinkOverlays:ent :true];
+        NSLog(@"---------------------------------------");
     NSArray* pastOverlays = [self prepareTimeLinkOverlays:ent :false];
     
     [timeLinkOverlaysToBeCleaned addObjectsFromArray:futureOverlays];
@@ -1189,6 +1193,7 @@
     ATEventDataStruct* prevEvent = ent;
     ATEventDataStruct* thisEvent = nil;
     NSMutableArray* returnPolylineList = [[NSMutableArray alloc] init];
+    NSMutableArray* eventsInSameDepth = [[NSMutableArray alloc] init];
     //Following is to add points for event in future, and in before depends on direction, the logic is not ideal, hope it works
     while (linkDepth <= TIME_LINK_DEPTH) { //TODO TIME_LINK_DEPTH is 5, should be configurable, same day event link together
         linkCount++;
@@ -1203,32 +1208,68 @@
 
             NSTimeInterval interval = [thisEvent.eventDate timeIntervalSinceDate: prevEvent.eventDate];
 
-            if (abs(interval/86400.0) > TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT)
+            if (abs(interval/86400.0) > TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT + 100000) //TODO  may need to tie with period lenth
                 break;
-//NSLog(@"            in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
-            MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2);
-            pointArr[0] = [self getEventMapPoint:prevEvent];
-            pointArr[1] = [self getEventMapPoint:thisEvent];
-            timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:2];
-            [returnPolylineList addObject:timeLinkPolyline];
+//NSLog(@"===in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
+            
+            [eventsInSameDepth addObject:prevEvent];
+            [eventsInSameDepth addObject:thisEvent];
         }
         else
             break;
-        NSString* dashLineFlag = @"N";
-        if (![prevEvent.eventDate isEqualToDate:thisEvent.eventDate])
-            linkDepth ++;
-        else
-            dashLineFlag = @"Y";
-        int tmp = linkDepth;
-        if (directionFuture)
-            tmp = - tmp;
         
-        NSString* lineStyle = [NSString stringWithFormat:@"%d|%@", tmp, dashLineFlag];
-//NSLog(@"    in prepare: linDepth=%d  tmp=%d",linkDepth, tmp);
-        NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
-        [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
+        int numberOfSameDepthLine;
+        if (![prevEvent.eventDate isEqualToDate:thisEvent.eventDate])
+        { //draw all time lines in the same time unit in one overlay
+            numberOfSameDepthLine = [eventsInSameDepth count] / 2 - 1;  //the last one is not same depth
+            if (numberOfSameDepthLine > 0)
+            {
+                MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2 * numberOfSameDepthLine);
+                for (int i = 0; i < numberOfSameDepthLine; i++)  //only process those with same date
+                {
+                    pointArr[2*i] = [self getEventMapPoint:eventsInSameDepth[2*i]];
+                    pointArr[2*i + 1] = [self getEventMapPoint:eventsInSameDepth[2*i+1]];
+                }
+                timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:(2*numberOfSameDepthLine)];
+                [returnPolylineList addObject:timeLinkPolyline];
+                free(pointArr);
+                int tmp = linkDepth;
+                if (directionFuture)
+                    tmp = - tmp;
+                NSString* lineStyle = [NSString stringWithFormat:@"%d|%d", tmp, TIME_LINK_DASH_LINE_STYLE_FOR_SAME_DEPTH];
+//NSLog(@"    in prepare: linDepth=%d  tmp=%d, dashLine",linkDepth, tmp);
+                NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
+                [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
+                linkDepth ++;
+            }
+            //the last one must have differnt date, so add separately. Actually here take care of line with different date
+            int startIdx = [eventsInSameDepth count] - 2;
+            MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2);
+            pointArr[0] = [self getEventMapPoint:eventsInSameDepth[startIdx]];
+            pointArr[1] = [self getEventMapPoint:eventsInSameDepth[startIdx+1]];
+            timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:2];
+            [returnPolylineList addObject:timeLinkPolyline];
+            free(pointArr);
+            linkDepth ++;
+            int tmp = linkDepth;
+            if (directionFuture)
+                tmp = - tmp;
+
+            NSString* lineStyle = [NSString stringWithFormat:@"%d|%d", tmp, TIME_LINK_SOLID_LINE_STYLE];
+            NSLog(@"    in prepare: linDepth=%d  tmp=%d, Solid Line",linkDepth, tmp);
+            NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
+            [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
             
-        prevEvent = thisEvent;
+            [eventsInSameDepth removeAllObjects];
+
+            prevEvent = thisEvent;
+        }
+        else
+        {
+            prevEvent = thisEvent;
+            continue;
+        }
+        
     }
     if (directionFuture)
         timeLinkDepthDirectionFuture = linkDepth;
@@ -1255,7 +1296,7 @@
     
     NSArray *splitArray = [lineStyle componentsSeparatedByString:@"|"];
     float colorHint =[splitArray[0] floatValue];
-    NSString* dashFlag = splitArray[1];
+    int lineStyleFlag = [splitArray[1] intValue];
     
     double depthFloat = timeLinkDepthDirectionPast;
     if (colorHint < 0) //we put negative number -tmp in prepareTimeLink()
@@ -1273,29 +1314,25 @@
 
     
     UIColor* color = [UIColor colorWithRed:0.6 green:0 blue:0 alpha:alpha];
-    if (colorHint < 0)
+    if (colorHint <= 0)
         color = [UIColor colorWithRed:0 green:0.6 blue:0 alpha:alpha];
     
     
     MKPolylineView* routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
-    if (alpha == 1.0 )//|| colorHint == -1)
+
+    routeLineView.fillColor = color;
+    routeLineView.strokeColor = color;
+    routeLineView.lineWidth = 1;
+    if (lineStyleFlag == TIME_LINK_DASH_LINE_STYLE_FOR_SAME_DEPTH) //for all events in same depth, draw dashed line
     {
-        routeLineView.fillColor = [UIColor blueColor];
-        routeLineView.strokeColor = [UIColor grayColor];
-        routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:8],[NSNumber numberWithFloat:15], nil];
-        routeLineView.lineWidth = 4;
-    }
-    else
-    {
-        routeLineView.fillColor = color;
-        routeLineView.strokeColor = color;
-        routeLineView.lineWidth = 1;
-        if ([dashFlag isEqualToString:@"Y"])
+        routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:3],[NSNumber numberWithFloat:10], nil];
+        routeLineView.lineWidth = 2;
+        if (alpha == 1.0)
         {
-            routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:8],[NSNumber numberWithFloat:10], nil];
-            routeLineView.lineWidth = 2;
+            routeLineView.strokeColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.2];
+            routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:6],[NSNumber numberWithFloat:15], nil];
+            routeLineView.lineWidth = 8;
         }
-        
     }
     
     return routeLineView;
