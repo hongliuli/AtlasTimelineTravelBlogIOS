@@ -1214,19 +1214,19 @@
         }
         else
             break;
-
+        NSString* dashLineFlag = @"N";
         if (![prevEvent.eventDate isEqualToDate:thisEvent.eventDate])
-        {
             linkDepth ++;
-            
-        }
+        else
+            dashLineFlag = @"Y";
         int tmp = linkDepth;
         if (directionFuture)
             tmp = - tmp;
-
+        
+        NSString* lineStyle = [NSString stringWithFormat:@"%d|%@", tmp, dashLineFlag];
 //NSLog(@"    in prepare: linDepth=%d  tmp=%d",linkDepth, tmp);
         NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
-        [timeLinkOverlayDepthColorMap  setValue: [NSNumber numberWithInteger:tmp]  forKey:key];
+        [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
             
         prevEvent = thisEvent;
     }
@@ -1250,9 +1250,13 @@
 {
     //TODO draw line color according to date distance, use mkPointDateMapForTimeLinOverlay
     NSString *key=[NSString stringWithFormat:@"%f|%f", overlay.coordinate.latitude, overlay.coordinate.longitude];
-    NSNumber* tmp = [timeLinkOverlayDepthColorMap objectForKey:key];
-    float colorHint = [tmp floatValue];
-
+    NSString *lineStyle = [timeLinkOverlayDepthColorMap objectForKey:key];
+    
+    
+    NSArray *splitArray = [lineStyle componentsSeparatedByString:@"|"];
+    float colorHint =[splitArray[0] floatValue];
+    NSString* dashFlag = splitArray[1];
+    
     double depthFloat = timeLinkDepthDirectionPast;
     if (colorHint < 0) //we put negative number -tmp in prepareTimeLink()
         depthFloat = timeLinkDepthDirectionFuture;
@@ -1277,13 +1281,21 @@
     if (alpha == 1.0 )//|| colorHint == -1)
     {
         routeLineView.fillColor = [UIColor blueColor];
-        routeLineView.strokeColor = [UIColor blackColor];
+        routeLineView.strokeColor = [UIColor grayColor];
+        routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:8],[NSNumber numberWithFloat:15], nil];
+        routeLineView.lineWidth = 4;
     }
     else
     {
         routeLineView.fillColor = color;
         routeLineView.strokeColor = color;
-        routeLineView.lineWidth = 2;
+        routeLineView.lineWidth = 1;
+        if ([dashFlag isEqualToString:@"Y"])
+        {
+            routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:8],[NSNumber numberWithFloat:10], nil];
+            routeLineView.lineWidth = 2;
+        }
+        
     }
     
     return routeLineView;
