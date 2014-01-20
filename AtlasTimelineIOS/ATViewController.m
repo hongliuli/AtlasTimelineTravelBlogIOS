@@ -58,6 +58,7 @@
 //TODO Following should be in configuration settings
 #define TIME_LINK_DEPTH 6
 #define TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT 30
+#define MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP 5
 
 @interface MFTopAlignedLabel : UILabel
 
@@ -1152,7 +1153,7 @@
     timeLinkDepthDirectionFuture = 0;
     timeLinkDepthDirectionPast = 0;
     NSArray* futureOverlays = [self prepareTimeLinkOverlays:ent :true];
-        NSLog(@"---------------------------------------");
+//NSLog(@"---------------------------------------");
     NSArray* pastOverlays = [self prepareTimeLinkOverlays:ent :false];
     
     [timeLinkOverlaysToBeCleaned addObjectsFromArray:futureOverlays];
@@ -1194,7 +1195,20 @@
     ATEventDataStruct* thisEvent = nil;
     NSMutableArray* returnPolylineList = [[NSMutableArray alloc] init];
     NSMutableArray* eventsInSameDepth = [[NSMutableArray alloc] init];
+    
+    //Time link logic 1: max time to stop time link witn max depth limit
+    int timeLinkMaxNumberOfDaysBtwTwoEvent = TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT;
+    if (appDelegate.selectedPeriodInDays >31 && appDelegate.selectedPeriodInDays < 365)
+    {
+        timeLinkMaxNumberOfDaysBtwTwoEvent = 30;
+    }
+    else if (appDelegate.selectedPeriodInDays >= 365 && appDelegate.selectedPeriodInDays <=3600)
+        timeLinkMaxNumberOfDaysBtwTwoEvent = 365;
+    else
+        timeLinkMaxNumberOfDaysBtwTwoEvent = 36000;
+    
     //Following is to add points for event in future, and in before depends on direction, the logic is not ideal, hope it works
+    //NOTE a senario: if zoom range is not day and focused group is at end, then dashed line for this group will not show
     while (linkDepth <= TIME_LINK_DEPTH) { //TODO TIME_LINK_DEPTH is 5, should be configurable, same day event link together
         linkCount++;
         int thisIdx = currEventIdxConstant + linkCount;
@@ -1208,18 +1222,46 @@
 
             NSTimeInterval interval = [thisEvent.eventDate timeIntervalSinceDate: prevEvent.eventDate];
 
-            if (abs(interval/86400.0) > TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT + 100000) //TODO  may need to tie with period lenth
+            if (abs(interval/86400.0) > timeLinkMaxNumberOfDaysBtwTwoEvent) //TODO  may need to tie with period lenth
                 break;
 //NSLog(@"===in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
-            
-            [eventsInSameDepth addObject:prevEvent];
-            [eventsInSameDepth addObject:thisEvent];
+NSLog(@"   eventsInSameDepth count = %d",[eventsInSameDepth count]);
+           // if ([eventsInSameDepth count] <= MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP) //to prevent two many links in same group when with large time zoom
+           // {
+                [eventsInSameDepth addObject:prevEvent];
+                [eventsInSameDepth addObject:thisEvent];
+            //}
         }
         else
             break;
         
         int numberOfSameDepthLine;
-        if (![prevEvent.eventDate isEqualToDate:thisEvent.eventDate])
+        //Time Link logic 2: put group of events in same time link depth according to time wheel zoom
+        BOOL sameDepthFlag = false;
+        if (appDelegate.selectedPeriodInDays <=30)
+        {
+            sameDepthFlag = [prevEvent.eventDate isEqualToDate:thisEvent.eventDate];
+        }
+        else if (appDelegate.selectedPeriodInDays >30 && appDelegate.selectedPeriodInDays <= 365)
+        {
+            NSString* year1 = [ATHelper getYearMonthForTimeLink:prevEvent.eventDate];
+            NSString* year2 = [ATHelper getYearMonthForTimeLink:thisEvent.eventDate];
+            sameDepthFlag = [year1 isEqualToString:year2];
+        }
+        else if (appDelegate.selectedPeriodInDays >365 && appDelegate.selectedPeriodInDays <=3600)
+        {
+            NSString* year1 = [ATHelper getYearPartHelper:prevEvent.eventDate];
+            NSString* year2 = [ATHelper getYearPartHelper:thisEvent.eventDate];
+            sameDepthFlag = [year1 isEqualToString:year2];
+        }
+        else
+        {
+            NSString* year1 = [ATHelper get10YearForTimeLink:prevEvent.eventDate];
+            NSString* year2 = [ATHelper get10YearForTimeLink:thisEvent.eventDate];
+            sameDepthFlag = [year1 isEqualToString:year2];
+        }
+        
+        if (!sameDepthFlag)
         { //draw all time lines in the same time unit in one overlay
             numberOfSameDepthLine = [eventsInSameDepth count] / 2 - 1;  //the last one is not same depth
             if (numberOfSameDepthLine > 0)
@@ -1256,7 +1298,7 @@
                 tmp = - tmp;
 
             NSString* lineStyle = [NSString stringWithFormat:@"%d|%d", tmp, TIME_LINK_SOLID_LINE_STYLE];
-            NSLog(@"    in prepare: linDepth=%d  tmp=%d, Solid Line",linkDepth, tmp);
+//NSLog(@"    in prepare: linDepth=%d  tmp=%d, Solid Line",linkDepth, tmp);
             NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
             [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
             
@@ -1307,7 +1349,11 @@
     //double alpha = colorHint/depthFloat;
     double alpha = (depthFloat  - abs(colorHint))/depthFloat;
     if (alpha == 0)
+    {
         alpha = 0.1;
+        if (depthFloat <= 2)
+            alpha = 0.7;
+    }
     if (alpha < 0)
         alpha = alpha * (-1.0);  //abs() is for int only, color will fail silently if give alpha value negative or great than 1. this fucking function make me crazy
     
@@ -1752,9 +1798,8 @@
 //select/deselect tap will interfare my tap gesture handler, so try to resume timeline window original show/hide status
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
 {
-    //NSLog(@"selected anno");
-    if (timelineWindowShowFlag == 0) //always show timewindow when select
-        [self flipTimelineWindowDisplay];
+    //when click on annotation, all timewheel/image will flip just as tap on map, so I will flip it back so keep same state as before tap on annotation
+    [self flipTimelineWindowDisplay];
 }
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
 {
