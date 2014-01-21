@@ -333,19 +333,21 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 -(void)textFieldDidBeginEditing:(UITextField*)textField
 {
+ }
+//[2014-01-21] change following code from textFieldDidBegingEditing to shouldBeginEditing, and return false to disable keybord (should configurable to enable keyboarder for BC input
+//       This change resolved a big headache in iPad: click desc/address to bring keypad, then date field, will leave keypad always displayed.
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
     if (textField.tag == DATE_TEXT_FROM_STORYBOARD_999) { //999 is for date textField in storyboard
         NSString* bcDate = self.dateTxt.text;
         //if date is already a a BC date, datePicker will crash, so do not show date picker if is a BC date
         if (bcDate != nil && [bcDate rangeOfString:@"BC"].location!=NSNotFound)
-            return;
+            return true;
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSDateFormatter *dateFormater = appDelegate.dateFormater; 
+        NSDateFormatter *dateFormater = appDelegate.dateFormater;
         if (self.datePicker == nil) //will be nill if clicked Done button
         {
-            //Moved resignFirstResponder to UIControlEventValueChanged callback function and solved my problem on 12/4/2014
-            //[textField resignFirstResponder]; //comment this out, I decide to let keypad show together with date picker slot machine, otherwise a big issue in iPad: click desc/address to bring keypad, then date field, will leave keypad always displayed. But need test on iPhone. we can
             self.datePicker = [[UIDatePicker alloc] init];
-
+            
             
             //[UIView appearanceWhenContainedIn:[UITableView class], [UIDatePicker class], nil].backgroundColor = [UIColor colorWithWhite:1 alpha:1];
             
@@ -353,31 +355,31 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             
             
             [self.datePicker setFrame:CGRectMake(0,240,320,180)];
-                
+            
             [self.datePicker addTarget:self action:@selector(changeDateInLabel:) forControlEvents:UIControlEventValueChanged];
             self.datePicker.datePickerMode = UIDatePickerModeDate;
-        
+            
             [self.view addSubview:self.datePicker];
             
             self.toolbar = [[UIToolbar alloc] initWithFrame: CGRectMake(0, 380, 320, 44)];
             //[self.toolbar setBackgroundColor:[UIColor clearColor]];
             [self.toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-        
+            
             UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: @"Done" style: UIBarButtonItemStyleDone target: self action: @selector(datePicked:)];
             doneButton.width = 50;
             doneButton.tintColor = [UIColor blueColor];
             self.toolbar.items = [NSArray arrayWithObject: doneButton];
-   
+            
             
             [self.view addSubview: self.toolbar];
-
+            
         }
         
         if ([self.dateTxt.text isEqualToString: @""] || self.dateTxt.text == nil)
         {
             self.datePicker.date = [[NSDate alloc] init];
             self.dateTxt.text = [NSString stringWithFormat:@"%@",
-            [dateFormater stringFromDate:self.datePicker.date]];
+                                 [dateFormater stringFromDate:self.datePicker.date]];
         }
         else
         {
@@ -394,6 +396,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         self.address.hidden=true;
         self.address.backgroundColor = [UIColor darkGrayColor];//do not know why this does not work, however it does not mappter
     }
+    //TODO return YES to enable edit date text for BC date, need configurable parameter
+    return NO;  // Hide both keyboard and blinking cursor.
 }
 - (BOOL) textViewShouldBeginEditing:(UITextView *)textView
 {
@@ -531,8 +535,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
     dateTxt.text = [NSString stringWithFormat:@"%@",
             [dateFormater stringFromDate:self.datePicker.date]];
-    [self.dateTxt resignFirstResponder];
-    
 }
 
 - (void)datePicked:(id)sender{
