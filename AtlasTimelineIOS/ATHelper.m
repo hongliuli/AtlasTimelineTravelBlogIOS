@@ -65,6 +65,26 @@ UIPopoverController *verifyViewPopover;
         yearPart = [yearPart substringWithRange:NSMakeRange(0,4)];
     return yearPart;
 }
++ (NSString*) get10YearForTimeLink:(NSDate*) date
+{
+    return [[ATHelper getYearPartHelper:date ] substringToIndex:3];
+}
++ (NSString*) get100YearForTimeLink:(NSDate*) date
+{
+    return [[ATHelper getYearPartHelper:date ] substringToIndex:2];
+}
++ (NSString*) getYearMonthForTimeLink:(NSDate*) date
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSDateFormatter* format = appDelegate.dateFormater;
+    NSDate* smallDate = [format dateFromString:@"01/01/0010 AD"];
+    NSString *dateString = [NSString stringWithFormat:@" %@", [format stringFromDate:date]];
+    NSString* yearPart = [dateString substringFromIndex:[dateString length]-7];
+    NSString* monthPart = [dateString substringToIndex:3];
+    if ([smallDate compare:date] == NSOrderedAscending)
+        yearPart = [yearPart substringWithRange:NSMakeRange(0,4)];
+    return [NSString stringWithFormat:@"%@%@", monthPart, yearPart ];
+}
 
 + (NSString*) getFormatedMonthDate: (NSDate*) date
 {

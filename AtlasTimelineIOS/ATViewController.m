@@ -58,7 +58,7 @@
 //TODO Following should be in configuration settings
 #define TIME_LINK_DEPTH 6
 #define TIME_LINK_MAX_NUMBER_OF_DAYS_BTW_TWO_EVENT 30
-#define MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP 5
+#define MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP 10 //Must be even number. the purpose is to reduce too many line if too may events in same group
 
 @interface MFTopAlignedLabel : UILabel
 
@@ -1225,12 +1225,10 @@
             if (abs(interval/86400.0) > timeLinkMaxNumberOfDaysBtwTwoEvent) //TODO  may need to tie with period lenth
                 break;
 //NSLog(@"===in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
-NSLog(@"   eventsInSameDepth count = %d",[eventsInSameDepth count]);
-           // if ([eventsInSameDepth count] <= MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP) //to prevent two many links in same group when with large time zoom
-           // {
-                [eventsInSameDepth addObject:prevEvent];
-                [eventsInSameDepth addObject:thisEvent];
-            //}
+
+            [eventsInSameDepth addObject:prevEvent];
+            [eventsInSameDepth addObject:thisEvent];
+
         }
         else
             break;
@@ -1264,34 +1262,48 @@ NSLog(@"   eventsInSameDepth count = %d",[eventsInSameDepth count]);
         if (!sameDepthFlag)
         { //draw all time lines in the same time unit in one overlay
             numberOfSameDepthLine = [eventsInSameDepth count] / 2 - 1;  //the last one is not same depth
+            int pointArrSize = numberOfSameDepthLine;
+            if (numberOfSameDepthLine > MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP)
+                pointArrSize = MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP;
             if (numberOfSameDepthLine > 0)
             {
-                MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2 * numberOfSameDepthLine);
+                // /******* Following code works to draw line amoung events in same depth, and not to draw all but the configurable number for performance. But I comment it out because I think no need to draw if in same depth because annotation color already dell the events are in same depth.
+                int skipCount = 0;
+                MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2 * pointArrSize);
                 for (int i = 0; i < numberOfSameDepthLine; i++)  //only process those with same date
                 {
-                    pointArr[2*i] = [self getEventMapPoint:eventsInSameDepth[2*i]];
-                    pointArr[2*i + 1] = [self getEventMapPoint:eventsInSameDepth[2*i+1]];
+                    if (numberOfSameDepthLine > MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP
+                        && i >= MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP/2
+                        && i <= (numberOfSameDepthLine - MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP/2 - 1)
+                        )
+                    { //only show first few and last few timelink line, not all for better berformance
+                        skipCount ++;
+                        continue;
+                    }
+                    pointArr[2*(i - skipCount) ] = [self getEventMapPoint:eventsInSameDepth[2*i]];
+                    pointArr[2*(i - skipCount)  + 1] = [self getEventMapPoint:eventsInSameDepth[2*i+1]];
+
                 }
-                timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:(2*numberOfSameDepthLine)];
+                timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:(2*pointArrSize)];
                 [returnPolylineList addObject:timeLinkPolyline];
                 free(pointArr);
                 int tmp = linkDepth;
                 if (directionFuture)
                     tmp = - tmp;
                 NSString* lineStyle = [NSString stringWithFormat:@"%d|%d", tmp, TIME_LINK_DASH_LINE_STYLE_FOR_SAME_DEPTH];
-//NSLog(@"    in prepare: linDepth=%d  tmp=%d, dashLine",linkDepth, tmp);
                 NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
                 [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
+                // ******************************/
                 linkDepth ++;
             }
             //the last one must have differnt date, so add separately. Actually here take care of line with different date
             int startIdx = [eventsInSameDepth count] - 2;
-            MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2);
-            pointArr[0] = [self getEventMapPoint:eventsInSameDepth[startIdx]];
-            pointArr[1] = [self getEventMapPoint:eventsInSameDepth[startIdx+1]];
-            timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:2];
+            MKMapPoint* pointArr2 = malloc(sizeof(CLLocationCoordinate2D) * 2);
+            pointArr2[0] = [self getEventMapPoint:eventsInSameDepth[startIdx]];
+            pointArr2[1] = [self getEventMapPoint:eventsInSameDepth[startIdx+1]];
+            timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr2 count:2];
             [returnPolylineList addObject:timeLinkPolyline];
-            free(pointArr);
+            free(pointArr2);
             linkDepth ++;
             int tmp = linkDepth;
             if (directionFuture)
@@ -1359,9 +1371,9 @@ NSLog(@"   eventsInSameDepth count = %d",[eventsInSameDepth count]);
     
 
     
-    UIColor* color = [UIColor colorWithRed:0.6 green:0 blue:0 alpha:alpha];
+    UIColor* color = [UIColor colorWithRed:0.9 green:0 blue:0 alpha:alpha];
     if (colorHint <= 0)
-        color = [UIColor colorWithRed:0 green:0.6 blue:0 alpha:alpha];
+        color = [UIColor colorWithRed:0 green:0.9 blue:0 alpha:alpha];
     
     
     MKPolylineView* routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
@@ -1369,18 +1381,20 @@ NSLog(@"   eventsInSameDepth count = %d",[eventsInSameDepth count]);
     routeLineView.fillColor = color;
     routeLineView.strokeColor = color;
     routeLineView.lineWidth = 1;
+    // /***** following working code no longer need. see comments for events in same depth
     if (lineStyleFlag == TIME_LINK_DASH_LINE_STYLE_FOR_SAME_DEPTH) //for all events in same depth, draw dashed line
     {
-        routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:3],[NSNumber numberWithFloat:10], nil];
-        routeLineView.lineWidth = 2;
-        if (alpha == 1.0)
+        //DashLine render is too slow, get rid of it
+       // routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:3],[NSNumber numberWithFloat:10], nil];
+        routeLineView.lineWidth = 1;
+        if (alpha == 1.0) //for depth = 0 same events
         {
-            routeLineView.strokeColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.2];
-            routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:6],[NSNumber numberWithFloat:15], nil];
-            routeLineView.lineWidth = 8;
+            routeLineView.strokeColor = [UIColor colorWithRed:0.7 green:0.6 blue:1.0 alpha:0.5];
+            //routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:6],[NSNumber numberWithFloat:15], nil];
+            routeLineView.lineWidth = 1;
         }
     }
-    
+   // *********/
     return routeLineView;
 }
 

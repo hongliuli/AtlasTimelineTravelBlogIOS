@@ -22,6 +22,9 @@
 + (UIColor *)darkerColorForColor:(UIColor *)c;
 + (NSDate *)dateByAddingComponentsRegardingEra:(NSDateComponents *)comps toDate:(NSDate *)date options:(NSUInteger)opts;
 + (NSDate *)getYearStartDate:(NSDate*)date;
++ (NSString*) get10YearForTimeLink:(NSDate*) date;
++ (NSString*) get100YearForTimeLink:(NSDate*) date;
++ (NSString*) getYearMonthForTimeLink:(NSDate*) date;
 + (NSDate *)getMonthStartDate:(NSDate*)date;
 + (void) createPhotoDocumentoryPath;
 + (NSString*) getRootDocumentoryPath;
