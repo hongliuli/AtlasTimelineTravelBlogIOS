@@ -1117,7 +1117,8 @@
         self.timeScrollWindow.hidden=false;
         self.timeZoomLine.hidden = false;
         [self.mapView removeOverlays:timeLinkOverlaysToBeCleaned];
-        [self showTimeLinkOverlay:ent];
+        if ([ATHelper getOptionDisplayTimeLink])
+            [self showTimeLinkOverlay:ent];
     }
 }
 

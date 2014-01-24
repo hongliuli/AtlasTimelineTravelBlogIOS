@@ -396,8 +396,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         self.address.hidden=true;
         self.address.backgroundColor = [UIColor darkGrayColor];//do not know why this does not work, however it does not mappter
     }
-    //TODO return YES to enable edit date text for BC date, need configurable parameter
-    return NO;  // Hide both keyboard and blinking cursor.
+    if ([ATHelper getOptionDateFieldKeyboardEnable])
+        return YES;
+    else
+        return NO;  // Hide both keyboard and blinking cursor.
 }
 - (BOOL) textViewShouldBeginEditing:(UITextView *)textView
 {
