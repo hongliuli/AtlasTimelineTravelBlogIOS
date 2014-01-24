@@ -33,4 +33,11 @@
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
 + (UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir;
 + (UIColor *) colorWithHexString: (NSString *) stringToConvert;
+
+//set/get options
++ (BOOL) getOptionDateFieldKeyboardEnable;
++ (void) setOptionDateFieldKeyboardEnable:(BOOL)flag;
++ (BOOL) getOptionDisplayTimeLink;
++ (void) setOptionDisplayTimeLink:(BOOL)flag;
+
 @end

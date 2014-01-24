@@ -16,14 +16,16 @@
 #import "ATEventDataStruct.h"
 #import "ATHelpWebView.h"
 #import "ATInAppPurchaseViewController.h"
+#import "ATOptionsTableViewController.h"
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
-#define SECTION_LOGIN_EMAIL 1
+#define SECTION_OPTIONS 1
+#define SECTION_LOGIN_EMAIL 2
 #define ROW_SYNC_TO_DROPBOX 2
 #define ROW_SYNC_TO_DROPBOX_ALL 3
 #define ROW_SYNC_FROM_DROPBOX 4
-#define SECTION_THREE 2
+#define SECTION_SUPPORT_US 3
 #define ROW_VIDEO_TUTORIAL 0
 #define ROW_PURCHASE 1
 #define ROW_RESTORE_PURCHASE 2
@@ -122,6 +124,10 @@
         ATSourceChooseViewController *sourceChooseViewController = segue.destinationViewController;
         sourceChooseViewController.delegate = self;
         sourceChooseViewController.source = _source;
+    }
+    if ([segue.identifier isEqualToString:@"options_id"]) {
+        ATOptionsTableViewController *optionPage = segue.destinationViewController;
+        optionPage.parent = self;
     }
     if ([segue.identifier isEqualToString:@"download"]) {
         Boolean successFlag = [ATHelper checkUserEmailAndSecurityCode:self];
@@ -377,7 +383,7 @@
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
     int section = indexPath.section;
     int row = indexPath.row;
-    if (section == SECTION_THREE)
+    if (section == SECTION_SUPPORT_US)
     {
         if (row == ROW_PURCHASE || row == ROW_RESTORE_PURCHASE)
         {
@@ -402,6 +408,11 @@
         if (row == ROW_SYNC_FROM_DROPBOX)
             photoFromDropboxCell = cell;
     }
+    else if (section == SECTION_OPTIONS)
+    {
+        
+    }
+    
     return cell;
 }
 
@@ -416,7 +427,7 @@
 {
     int section = indexPath.section;
     int row = indexPath.row;
-    if (section == SECTION_THREE)
+    if (section == SECTION_SUPPORT_US)
     {
         if (row == ROW_VIDEO_TUTORIAL)
         {

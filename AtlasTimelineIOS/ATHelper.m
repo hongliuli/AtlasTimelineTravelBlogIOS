@@ -330,4 +330,39 @@ UIPopoverController *verifyViewPopover;
                            alpha:1.0f];
 }
 
+//set/get options
++ (BOOL) getOptionDateFieldKeyboardEnable
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flag = [userDefault objectForKey:@"DateFieldKeyboardEnable"];
+    if (flag == nil || [flag isEqualToString:@"N"]) //default is N
+        return false;
+    else
+        return true;
+}
++ (void) setOptionDateFieldKeyboardEnable:(BOOL)flag
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flagStr = @"N";
+    if (flag)
+        flagStr = @"Y";
+    [userDefault setObject:flagStr forKey:@"DateFieldKeyboardEnable"];
+}
++ (BOOL) getOptionDisplayTimeLink
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flag = [userDefault objectForKey:@"DisPlayTimeLink"];
+    if (flag == nil || [flag isEqualToString:@"Y"]) //default is Y
+        return true;
+    else
+        return false;
+}
++ (void) setOptionDisplayTimeLink:(BOOL)flag
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flagStr = @"N";
+    if (flag)
+        flagStr = @"Y";
+    [userDefault setObject:flagStr forKey:@"DisPlayTimeLink"];
+}
 @end
