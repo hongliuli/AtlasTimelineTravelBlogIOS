@@ -239,7 +239,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     UIStoryboard* storyboard = appDelegate.storyBoard;
     BasePhotoViewController* ctr = [storyboard instantiateViewControllerWithIdentifier:@"photo_view"];
     ctr.eventEditor = self;
-    [self presentModalViewController:ctr animated:YES]; //ATPhotoScrollViewController::viewDidLoad will be called
+    //[self presentModalViewController:ctr animated:YES]; //ATPhotoScrollViewController::viewDidLoad will be called
+    [self presentViewController:ctr animated:YES completion:nil];
     ctr.pageControl.numberOfPages = [self.photoScrollView.photoList count];
     ctr.pageControl.currentPage = self.photoScrollView.selectedPhotoIndex; //This is very strange, I have to go to storyboard and set PageControll's number Of Page to a big number such as 999, instead of default 3, otherwise my intiall page will always stay at 3.
     ctr.photoList = self.photoScrollView.photoList;
@@ -260,7 +261,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     imagePicker = [storyboard instantiateViewControllerWithIdentifier:@"image_picker"];
     imagePicker.delegate = self;
     //Use Modal with Done button is good for both iPad/iPhone
-    [self presentModalViewController:imagePicker animated:YES];
+    //[self presentModalViewController:imagePicker animated:YES];
+    [self presentViewController:imagePicker animated:YES completion:nil];
 }
 - (IBAction)shareButtonAction:(id)sender {
     NSString *version = [[UIDevice currentDevice] systemVersion];
@@ -461,7 +463,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         thumbNailFileName = self.photoScrollView.photoList[thumbNailIndex];
         
     [self.delegate updateEvent:ent newAddedList:photoNewAddedList deletedList:photoDeletedList thumbnailFileName:thumbNailFileName];
-    [self dismissModalViewControllerAnimated:true]; //for iPhone case
+    [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 
 - (IBAction)deleteAction:(id)sender {
@@ -481,7 +483,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     {
         [self.delegate deleteEvent];
     }
-    [self dismissModalViewControllerAnimated:true]; //for iPhone case
+    [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -529,7 +531,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     else
         [self.delegate cancelEvent];
 
-    [self dismissModalViewControllerAnimated:true]; //for iPhone case
+    [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 
 - (void)changeDateInLabel:(id)sender{
