@@ -38,6 +38,8 @@
     int prevRow;
     int currentNumberOfRow;
     
+    float gradulColor;
+    
     NSString* prevGroupLabelText;
     NSString* groupLabelBackgroundAlpha;
     
@@ -46,6 +48,10 @@
     
     NSInteger lastContentOffset;
     int scrollDirection;
+    
+    UIImageView* year100View;
+    UIImageView* year10View;
+    UIImageView* year1View;
 }
 
 @synthesize horizontalTableView = _horizontalTableView;
@@ -143,6 +149,21 @@ static int toastFirstTimeDelay = 0;
     [tempImageView setFrame:self.horizontalTableView.frame];
     
     self.horizontalTableView.backgroundView = tempImageView;
+    
+    year1View = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+    year1View.backgroundColor = [UIColor clearColor];
+    year1View.opaque = NO;
+    year1View.image = [UIImage imageNamed:@"timeWheel1year.png"];
+    
+    year10View = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+    year10View.backgroundColor = [UIColor clearColor];
+    year10View.opaque = NO;
+    year10View.image = [UIImage imageNamed:@"timeWheel10Years.png"];
+    
+    year100View = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+    year100View.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"timeWheel100Years.png"]];
+    
+    
     return self;
 }
 
@@ -236,6 +257,7 @@ static int toastFirstTimeDelay = 0;
         [periodToAddForDisplay setDay:currentRow];
         [nextTimePeriodCompponent setDay:1];
         cell.scallLabel.text = @"day";
+        cell.backgroundView = nil;
     }
     else if (daysInPeriod == 30)
     {
@@ -243,6 +265,12 @@ static int toastFirstTimeDelay = 0;
         [periodToAddForDisplay setDay:currentRow];
         [nextTimePeriodCompponent setDay:1];
         cell.scallLabel.text = @"day";
+
+        UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+        av.backgroundColor = [UIColor clearColor];
+        av.opaque = NO;
+        av.image = [UIImage imageNamed:@"scaleDay.png"];
+        cell.backgroundView = av;
     }
     else if (daysInPeriod == 365)
     {
@@ -250,6 +278,13 @@ static int toastFirstTimeDelay = 0;
         [periodToAddForDisplay setMonth:currentRow];
         [nextTimePeriodCompponent setMonth:1];
         cell.scallLabel.text = @"month";
+
+        UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+        av.backgroundColor = [UIColor clearColor];
+        av.opaque = NO;
+        av.image = [UIImage imageNamed:@"scaleYearMonth.png"];
+        cell.backgroundView = av;
+
     }
     else if (daysInPeriod == 3650)
     {
@@ -257,6 +292,12 @@ static int toastFirstTimeDelay = 0;
         [periodToAddForDisplay setYear:currentRow];
         [nextTimePeriodCompponent setYear:1];
         cell.scallLabel.text = @"year";
+        UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+        av.backgroundColor = [UIColor clearColor];
+        av.opaque = NO;
+        av.image = [UIImage imageNamed:@"scaleYear1.png"];
+        cell.backgroundView = av;
+
     }
     else if (daysInPeriod == 36500)
     {
@@ -264,6 +305,11 @@ static int toastFirstTimeDelay = 0;
         [periodToAddForDisplay setYear:currentRow * 10];
         [nextTimePeriodCompponent setYear:10];
         cell.scallLabel.text = @"10 yrs";
+        UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+        av.backgroundColor = [UIColor clearColor];
+        av.opaque = NO;
+        av.image = [UIImage imageNamed:@"scaleYear10.png"];
+        cell.backgroundView = av;
     }
     else if (daysInPeriod == 365000)
     {
@@ -271,9 +317,14 @@ static int toastFirstTimeDelay = 0;
         [periodToAddForDisplay setYear:currentRow * 100];
         [nextTimePeriodCompponent setYear:100];
         cell.scallLabel.text = @"100 yrs";
+        UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+        av.backgroundColor = [UIColor clearColor];
+        av.opaque = NO;
+        av.image = [UIImage imageNamed:@"scaleYear100.png"];
+        cell.backgroundView = av;
     }
     cell.scallLabel.textColor = [UIColor whiteColor];
-    cell.scallLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:14.0];
+    cell.scallLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:13.0];
     
     displayDate = [ATHelper dateByAddingComponentsRegardingEra:periodToAddForDisplay toDate:baseStartDate options:0];
 
@@ -316,6 +367,17 @@ static int toastFirstTimeDelay = 0;
     {
         cell.titleLabel.text = [NSString stringWithFormat:@"%@ %@",month3Letter,shortYear];
         cell.subLabel.text = [NSString stringWithFormat:@"%@ %@",weekDay3Letter,dayString];
+        NSString* str = cell.subLabel.text;
+        if ([str hasPrefix:@"Sun"])
+        {
+            gradulColor = 0.0;
+            cell.titleLabel.textColor = [UIColor blueColor];
+            UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+            av.backgroundColor = [UIColor clearColor];
+            av.opaque = NO;
+            av.image = [UIImage imageNamed:@"scaleEdge.png"];
+            cell.backgroundView = av;
+        }
     }
     else if (daysInPeriod == 30)
     {
@@ -441,6 +503,82 @@ static int toastFirstTimeDelay = 0;
         monthTxt = @"";
     [self.parent.timeZoomLine changeDateText:yrTxt :monthTxt];
     [self.parent.timeZoomLine changeScaleText:[NSString stringWithFormat:@"%@\r%@",[self.parent getSelectedPeriodLabel],cell.titleLabel.text]];
+    
+    //logic to make color gradully
+    /*
+    if (daysInPeriod == 7)
+    {
+        NSString* str = cell.subLabel.text;
+        if ([str hasPrefix:@"Sun"])
+        {
+            gradulColor = 0.0;
+            cell.titleLabel.textColor = [UIColor blueColor];
+            UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+            av.backgroundColor = [UIColor clearColor];
+            av.opaque = NO;
+            av.image = [UIImage imageNamed:@"scaleEdge.png"];
+            cell.backgroundView = av;
+        }
+        else
+        {
+            float alphaValue = 1.0 - gradulColor/7.0;
+            if (alphaValue < 0.3)
+                alphaValue = 0.3;
+            gradulColor = gradulColor + 1.0;
+            cell.titleLabel.textColor = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:alphaValue];
+        }
+            
+    }
+    else if (daysInPeriod == 30)
+    {
+        NSString* str = cell.subLabel.text;
+        if ([str hasPrefix:@"01"])
+        {
+            gradulColor = 0.0;
+     
+            cell.titleLabel.textColor = [UIColor blueColor];
+            UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+            av.backgroundColor = [UIColor clearColor];
+            av.opaque = NO;
+            av.image = [UIImage imageNamed:@"scaleDayEdge.png"];
+            cell.backgroundView = av;
+     
+        }
+        else
+        {
+            float alphaValue = 1.0 - gradulColor/7.0;
+            if (alphaValue < 0.3)
+                alphaValue = 0.3;
+            gradulColor = gradulColor + 1.0;
+            cell.titleLabel.textColor = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:alphaValue];
+        }
+    }
+    else if (daysInPeriod == 365)
+    {        NSString* str = cell.subLabel.text;
+        if ([str hasPrefix:@"Jan"])
+        {
+            gradulColor = 0.0;
+            cell.titleLabel.textColor = [UIColor blueColor];
+            
+            UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+            av.backgroundColor = [UIColor clearColor];
+            av.opaque = NO;
+            av.image = [UIImage imageNamed:@"scaleYearMonthEdge.png"];
+            cell.backgroundView = av;
+            
+        }
+        else
+        {
+            float alphaValue = 1.0 - gradulColor/7.0;
+            if (alphaValue < 0.3)
+                alphaValue = 0.3;
+            gradulColor = gradulColor + 1.0;
+            cell.titleLabel.textColor = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:alphaValue];
+        }
+        
+    }
+     */
+    
     return cell;
 }
 
