@@ -554,6 +554,7 @@
         self.timeScrollWindow.hidden = true;
         self.timeZoomLine.hidden = true;
         [self hideDescriptionLabelViews];
+        self.navigationController.navigationBarHidden = true;
     }
     else
     {
@@ -561,6 +562,7 @@
         self.timeScrollWindow.hidden=false;
         self.timeZoomLine.hidden = false;
         [self showDescriptionLabelViews:self.mapView];
+        self.navigationController.navigationBarHidden = false;
     }
 }
 - (void)handleTapGesture:(UIGestureRecognizer *)gestureRecognizer
@@ -1117,6 +1119,7 @@
         timelineWindowShowFlag = 1;
         self.timeScrollWindow.hidden=false;
         self.timeZoomLine.hidden = false;
+        self.navigationController.navigationBarHidden = false;
         [self.mapView removeOverlays:timeLinkOverlaysToBeCleaned];
         if ([ATHelper getOptionDisplayTimeLink])
             [self showTimeLinkOverlay:ent];
