@@ -164,7 +164,12 @@ UIPopoverController *verifyViewPopover;
        //[appDelegate.mapViewController.navigationController pushViewController:verifyView animated:true];
         
         //IMPORTANT User used method in iOS5 tutor page180 (remember the seque is from WHOLE view, not from a conrol), note sender will be preference or download view
-        [sender performSegueWithIdentifier:@"user_verify_seque_id" sender:nil];
+        
+        
+        [sender presentViewController:verifyView animated:YES completion:nil];
+        
+        
+        //[sender performSegueWithIdentifier:@"user_verify_seque_id" sender:nil];
         
     }
 }
