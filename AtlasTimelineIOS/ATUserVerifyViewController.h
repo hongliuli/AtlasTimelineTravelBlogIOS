@@ -14,6 +14,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *securityCodeText;
 - (IBAction)getEmailAction:(id)sender;
 - (IBAction)verifySecurityCodeAction:(id)sender;
+- (IBAction)dismiss:(id)sender;
 
 
 @end
