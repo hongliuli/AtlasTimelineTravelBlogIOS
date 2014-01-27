@@ -51,7 +51,7 @@
 - (void) setSelectedPeriodLabel;
 - (NSString*) getSelectedPeriodLabel;
 - (void) changeTimeScaleState;
-- (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent;
+- (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent needAdjusted:(BOOL)newdAdjust;
 - (void) setNewFocusedDateAndUpdateMapWithNewCenter:(ATEventDataStruct*) ent :(int)zoomLevel;
 - (void) refreshAnnotations;
 - (void) cleanSelectedAnnotationSet; //see comments in .m file
