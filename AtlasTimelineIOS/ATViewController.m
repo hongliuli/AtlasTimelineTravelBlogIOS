@@ -680,7 +680,7 @@
             rightButton.accessibilityLabel=@"right";
             customPinView.rightCalloutAccessoryView = rightButton;
             UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
-            [leftButton setImage:[UIImage imageNamed:@"focusedIcon.png"] forState:UIControlStateNormal];
+            [leftButton setImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
             leftButton.accessibilityLabel=@"left";
             customPinView.leftCalloutAccessoryView = leftButton;
             
@@ -991,7 +991,7 @@
             rightButton.accessibilityLabel=@"right";
             customPinView.rightCalloutAccessoryView = rightButton;
             UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
-            [leftButton setImage:[UIImage imageNamed:@"focusedIcon.png"] forState:UIControlStateNormal];
+            [leftButton setImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
             leftButton.accessibilityLabel=@"left";
             customPinView.leftCalloutAccessoryView = leftButton;
             
@@ -1027,7 +1027,8 @@
         }
         else {
             //[self performSegueWithIdentifier:@"eventeditor_segue_id" sender:nil];
-            [self.navigationController presentModalViewController:self.eventEditor animated:YES]; //pushViewController: self.eventEditor animated:YES];
+            //[self.navigationController presentModalViewController:self.eventEditor animated:YES]; //pushViewController: self.eventEditor animated:YES];
+            [self.navigationController presentViewController:self.eventEditor animated:YES completion:nil];
         }
         //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
         [self.eventEditor resetEventEditor];
