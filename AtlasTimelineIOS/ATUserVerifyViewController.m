@@ -106,6 +106,10 @@ NSString* receivedSecurityCode; //use this to compare with user entered
    }
 }
 
+- (IBAction)dismiss:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
