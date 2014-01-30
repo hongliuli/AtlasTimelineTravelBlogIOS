@@ -913,14 +913,14 @@
     if (![localPath hasSuffix:@"thumbnail" ])
     {
         downloadFromDropboxSuccessCount++;
-        photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d failed", totalDownloadFromDropboxSuccessCount + downloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
+        photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d warnings", totalDownloadFromDropboxSuccessCount + downloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
     }
 	[self promptCopyFromDropboxStatus];
 }
 
 - (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
     downloadFromDropboxFailCount++;
-    photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d failed", totalDownloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
+    photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading ... %d success, %d warnings", totalDownloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
     [self promptCopyFromDropboxStatus];
 }
 
