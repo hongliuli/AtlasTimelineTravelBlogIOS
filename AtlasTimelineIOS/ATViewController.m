@@ -1232,15 +1232,15 @@
     NSMutableArray* eventsInSameDepth = [[NSMutableArray alloc] init];
     
     //Time link logic 1: max time to stop time link witn max depth limit
-    int timeLinkMaxNumberOfDaysBtwTwoEvent = 1;
+    int timeLinkMaxNumberOfDaysBtwTwoEvent = 30; //if time zoom is in day, then max is 30
     if (appDelegate.selectedPeriodInDays >31 && appDelegate.selectedPeriodInDays <= 365)
     {
-        timeLinkMaxNumberOfDaysBtwTwoEvent = 30;
+        timeLinkMaxNumberOfDaysBtwTwoEvent = 365;
     }
     else if (appDelegate.selectedPeriodInDays > 365 && appDelegate.selectedPeriodInDays <=3600)
-        timeLinkMaxNumberOfDaysBtwTwoEvent = 365;
+        timeLinkMaxNumberOfDaysBtwTwoEvent = 3650;
     else if (appDelegate.selectedPeriodInDays > 3600)
-        timeLinkMaxNumberOfDaysBtwTwoEvent = 3600;
+        timeLinkMaxNumberOfDaysBtwTwoEvent = 36000;
     
     //Following is to add points for event in future, and in before depends on direction, the logic is not ideal, hope it works
     //NOTE a senario: if zoom range is not day and focused group is at end, then dashed line for this group will not show
@@ -1250,6 +1250,7 @@
         if (directionFuture)
             thisIdx = currEventIdxConstant - linkCount;
 
+        BOOL breakFlag = false;
         MKPolyline* timeLinkPolyline = nil;
         if (thisIdx >= 0 && thisIdx < listSize)
         {
@@ -1258,18 +1259,28 @@
             NSTimeInterval interval = [thisEvent.eventDate timeIntervalSinceDate: prevEvent.eventDate];
 
             if (abs(interval/86400.0) > timeLinkMaxNumberOfDaysBtwTwoEvent) //TODO  may need to tie with period lenth
-                break;
+            {
+                if ([eventsInSameDepth count] == 0)
+                    break;
+                else
+                    breakFlag = true; //breakFlag = true;
+            }
+            else
+            {
 
-            //NSLog(@"===in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
+                //NSLog(@"===in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
             
-            [eventsInSameDepth addObject:prevEvent];
-            [eventsInSameDepth addObject:thisEvent];
+                [eventsInSameDepth addObject:prevEvent];
+                [eventsInSameDepth addObject:thisEvent];
+            }
             
         }
         else
         {
             if ([eventsInSameDepth count] == 0)
-                break; //breakFlag = true;
+                break;
+            else
+                breakFlag = true; //breakFlag = true;
             //else will continues following to finish remaining draw for nodes in same depth
         }
 
@@ -1299,7 +1310,7 @@
             sameDepthFlag = [year1 isEqualToString:year2];
         }
         
-        if (!sameDepthFlag)
+        if (!sameDepthFlag || breakFlag)
         { //if depth changed, draw the link. For same depth links, draw all in one overlay for better performance
             numberOfSameDepthLine = [eventsInSameDepth count] / 2 - 1;  //the last one is not same depth
             int pointArrSize = numberOfSameDepthLine;
@@ -1327,6 +1338,7 @@
                 timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:(2*pointArrSize)];
                 [returnPolylineList addObject:timeLinkPolyline];
                 free(pointArr);
+                linkDepth ++;
                 int tmp = linkDepth;
                 if (directionFuture)
                     tmp = - tmp;
@@ -1334,7 +1346,6 @@
                 NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
                 [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
                 // ******************************/
-                linkDepth ++;
             }
             //the last one must have differnt date, so add separately. Actually here take care of line with different date
             int startIdx = [eventsInSameDepth count] - 2;
@@ -1357,6 +1368,9 @@
             [eventsInSameDepth removeAllObjects];
             
             prevEvent = thisEvent;
+            
+            if (breakFlag)
+                break;
         }
         else
         {   //so all same depth link will be in same overlay
@@ -1427,12 +1441,11 @@
         //DashLine render is too slow, get rid of it
         // routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:3],[NSNumber numberWithFloat:10], nil];
         routeLineView.lineWidth = 1;
-        if (alpha == 1.0) //for depth = 0 same events
-        {
+        
+        if (abs(colorHint) <= 1) //color link to blue only when first depth has same 
             routeLineView.strokeColor = [UIColor colorWithRed:0.7 green:0.6 blue:1.0 alpha:0.5];
-            //routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:6],[NSNumber numberWithFloat:15], nil];
-            routeLineView.lineWidth = 1;
-        }
+        //routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:6],[NSNumber numberWithFloat:15], nil]; //dash line is too slow
+        
     }
     // *********/
     return routeLineView;
@@ -1861,7 +1874,7 @@
 }
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
 {
-    NSLog(@"de-selected anno");
+    //NSLog(@"de-selected anno");
    // if (mapViewShowWhatFlag == 1) //since select will always show it, deselect will do opposit always
     if (mapViewShowWhatFlag == 3)
         mapViewShowWhatFlag = 1;
