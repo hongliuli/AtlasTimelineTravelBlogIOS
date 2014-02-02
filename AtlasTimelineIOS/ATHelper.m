@@ -128,6 +128,13 @@ UIPopoverController *verifyViewPopover;
     NSString *dateString = [NSString stringWithFormat:@"%@", [format stringFromDate:date]];
     return [dateString substringToIndex:2];
 }
++ (NSString*) getMonthSlashDateInNumber:(NSDate *)date
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSDateFormatter* format = appDelegate.dateFormater;
+    NSString *dateString = [NSString stringWithFormat:@"%@", [format stringFromDate:date]];
+    return [dateString substringToIndex:5];
+}
 
 //Check UserDefaults to see if email/securitycode is there. if there, it is surely match to server
 //if not, call server to create one, send to email, and ask user get from email and save to userDefaults (verify again before save to userDefaults)
@@ -336,6 +343,23 @@ UIPopoverController *verifyViewPopover;
 }
 
 //set/get options
++ (BOOL) getOptionDateFieldMoveDateMagnifier
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flag = [userDefault objectForKey:@"DateFieldDateMagnifier"];
+    if (flag == nil || [flag isEqualToString:@"N"]) //default is N
+        return false;
+    else
+        return true;
+}
++ (void) setOptionDateFieldMoveDateMagnifier:(BOOL)flag
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flagStr = @"N";
+    if (flag)
+        flagStr = @"Y";
+    [userDefault setObject:flagStr forKey:@"DateFieldKeyboardEnable"];
+}
 + (BOOL) getOptionDateFieldKeyboardEnable
 {
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
@@ -370,4 +394,36 @@ UIPopoverController *verifyViewPopover;
         flagStr = @"Y";
     [userDefault setObject:flagStr forKey:@"DisPlayTimeLink"];
 }
+
++ (BOOL) getOptionDateMagnifierModeScroll
+{  //This option may readd many time when scroll, so read from memory instead from dis each time
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSString* flag = appDelegate.optionEnableDateMagnifierMove;
+    if (flag == nil || [@"NEEDINIT" isEqualToString: flag])
+    {
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        flag = [userDefault objectForKey:@"DateMagnifierMode"];
+    }
+    if (flag == nil || [flag isEqualToString:@"Y"]) //default is Y
+        return true;
+    else
+        return false;
+}
++ (void) setOptionDateMagnifierModeScroll:(BOOL)flag
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flagStr = @"N";
+    appDelegate.optionEnableDateMagnifierMove = @"N";
+    if (flag)
+    {
+        flagStr = @"Y";
+        appDelegate.optionEnableDateMagnifierMove = @"Y";
+    }
+    [userDefault setObject:flagStr forKey:@"DateMagnifierMode"];
+}
+
+
+
 @end

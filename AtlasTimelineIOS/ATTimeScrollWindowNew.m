@@ -497,12 +497,8 @@ static int toastFirstTimeDelay = 0;
     
     [self.parent changeTimeScaleState];
 
-    NSString* yrTxt = [ATHelper getYearPartHelper:appDelegate.focusedDate];
-    NSString* monthTxt  = [ATHelper getMonthDateInTwoNumber:appDelegate.focusedDate];
-    if (daysInPeriod >= 3650)
-        monthTxt = @"";
-    [self.parent.timeZoomLine changeDateText:yrTxt :monthTxt];
-    [self.parent.timeZoomLine changeScaleText:[NSString stringWithFormat:@"%@\r%@",[self.parent getSelectedPeriodLabel],cell.titleLabel.text]];
+    [self.parent.timeZoomLine changeDateText];
+    [self.parent.timeZoomLine changeScaleText];
     
     //logic to make color gradully
     /*
@@ -854,14 +850,18 @@ static int toastFirstTimeDelay = 0;
 {
     //NSLog(@"end move");
     [self.parent.timeZoomLine showHideScaleText: false];
+    [self.parent.timeZoomLine changeDateText];
+    [self.parent.timeZoomLine changeScaleText];
     [self.parent refreshAnnotations];
     [self changeFocusedCellColorToRed ];
     
+    /*
     if (toastFirstTimeDelay == 20  )
     {
         [self makeToast:@"Tip: Pinch or right/left double-tap to zoom time." duration:15.0 position:@"center"];
     }
     toastFirstTimeDelay ++;
+     */
 }
 
 - (void) didSelectRowAtIndexPath:(NSIndexPath *)indexPath  //called by tapGesture. This is not in a TableViewController, so no didSelect... delegate mechanism, have to process  by tap gesture
@@ -1107,7 +1107,6 @@ static int toastFirstTimeDelay = 0;
     //NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
     //[dateComponents setYear:-1];
     [self performSettingFocusedRowForDate:newFocusedDate needAdjusted:needAdjusted];
-    [self.parent.timeZoomLine hideMagnifier];
 }
 
 //recursive function to get index of a event

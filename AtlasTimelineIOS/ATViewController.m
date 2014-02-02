@@ -157,6 +157,7 @@
 {
     [self displayTimelineControls]; //MOTHER FUCKER, I struggled long time when I decide to put timescrollwindow at bottom. Finally figure out have to put this code here in viewDidAppear. If I put it in viewDidLoad, then first time timeScrollWindow will be displayed in other places if I want to display at bottom, have to put it here
     [self.timeZoomLine showHideScaleText:false];
+    [ATHelper setOptionDateFieldKeyboardEnable:false]; //always set default to not allow keyboard
 }
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
@@ -515,7 +516,7 @@
 
 - (void) setSelectedPeriodLabel
 {
-    [self.timeZoomLine changeScaleText:[self getSelectedPeriodLabel]];
+    [self.timeZoomLine changeScaleText];
 }
 
 - (NSString*) getSelectedPeriodLabel

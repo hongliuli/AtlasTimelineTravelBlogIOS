@@ -14,12 +14,11 @@
 @property ATViewController* mapViewController;
 @property float scaleLenForDisplay;
 
-- (void)changeScaleText:(NSString*)text; //called in mapview controller
-- (void)changeDateText:(NSString*)yearText :(NSString*)monthText; //called in timeWindowNew
+- (void)changeScaleText; //called in mapview controller
+- (void)changeDateText; //called in timeWindowNew
 - (void)showHideScaleText:(BOOL)showFlag; //called in scroll window when start scroll and stop scroll
 - (void)showHideInAnimation;
 - (void)changeScaleLabelsDateFormat:(NSDate*)startDay :(NSDate*)endDay;
 - (void)changeTimeScaleState:(NSDate*)startDate :(NSDate*)endDate :(int)periodIndays :(NSDate*)focusedDate;
-- (void) hideMagnifier;
 
 @end

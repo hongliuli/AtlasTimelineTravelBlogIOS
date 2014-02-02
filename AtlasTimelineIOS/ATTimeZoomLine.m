@@ -34,6 +34,7 @@ UILabel* labelSeg4;
 static int toastFirstTimeDelay = 0;
 
 UILabel* labelScaleText;
+UILabel* labelScaleTextSecondLine;
 UILabel* labelMagnifier;
 UILabel* labelDateMonthText;
 
@@ -115,22 +116,30 @@ CGContextRef context;
         
         //add the at front
         
-        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,15, 10, 10)]; //if enlarge it, it will show all text inside, but I think not need.
-        labelScaleText.backgroundColor = [UIColor yellowColor ];
-        labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:13];
-        labelScaleText.layer.borderColor=[UIColor yellowColor].CGColor;
+        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,55, 80, 50)]; //if enlarge it, it will show all text inside, but I think not need.
+        labelScaleText.backgroundColor = [UIColor colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];;
+        labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:20];
+        labelScaleText.layer.borderColor=[UIColor grayColor].CGColor;
         labelScaleText.layer.borderWidth=1;
-        labelScaleText.layer.shadowColor = [UIColor blackColor].CGColor;
-        labelScaleText.layer.shadowOffset = CGSizeMake(5,5);
-        labelScaleText.layer.shadowOpacity = 1;
-        labelScaleText.layer.shadowRadius = 8.0;
-        labelScaleText.clipsToBounds = NO;
-        labelScaleText.layer.cornerRadius = 8;
-        labelScaleText.numberOfLines = 0;
-        labelScaleText.textAlignment = UITextAlignmentCenter;
+        //labelScaleText.clipsToBounds = NO;
+        labelScaleText.layer.cornerRadius = 20;
+        labelScaleText.numberOfLines = 2;
+        labelScaleText.textAlignment = NSTextAlignmentCenter;
+        
+        labelScaleTextSecondLine = [[UILabel alloc] initWithFrame:CGRectMake(-30,55, 80, 50)];
+        labelScaleTextSecondLine.backgroundColor = [UIColor clearColor];
+        labelScaleTextSecondLine.font=[UIFont fontWithName:@"Helvetica" size:16];
+        labelScaleTextSecondLine.numberOfLines = 2;
+        labelScaleTextSecondLine.textAlignment = NSTextAlignmentCenter;
+        
+        
         [self addSubview:labelScaleText];
+        [self addSubview:labelScaleTextSecondLine];
+        
         labelScaleText.hidden=true;
         labelScaleText.center = timeScaleImageView.center;
+        labelScaleTextSecondLine.hidden=true;
+        labelScaleTextSecondLine.center = timeScaleImageView.center;
         
         //UIWindow* theWindow = [[UIApplication sharedApplication] keyWindow];
         //UIViewController* rvc = theWindow.rootViewController;
@@ -173,8 +182,8 @@ CGContextRef context;
         
         labelDateMonthText = [[UILabel alloc] initWithFrame:CGRectMake(xCenter,240, 40, 40)];
         labelDateMonthText.backgroundColor = [UIColor clearColor];
-        labelDateMonthText.font=[UIFont fontWithName:@"Helvetica" size:20];
-        labelDateMonthText.textColor = [UIColor grayColor];
+        labelDateMonthText.font=[UIFont fontWithName:@"Helvetica" size:14];
+        labelDateMonthText.textColor = [UIColor blackColor];
         labelDateMonthText.layer.borderColor=[UIColor clearColor].CGColor;
         labelDateMonthText.layer.borderWidth=0;
         labelDateMonthText.textAlignment = NSTextAlignmentCenter;
@@ -190,18 +199,53 @@ CGContextRef context;
     return self;
 }
 
--(void) hideMagnifier
-{
-    labelMagnifier.hidden = true;
-}
-
 //called in ATViewController
-- (void) changeScaleText:(NSString *)text
+- (void) changeScaleText
 {
-    labelScaleText.text = @"";
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if ([ATHelper getOptionDateMagnifierModeScroll])
+    {
+        labelScaleText.hidden = false;
+        labelScaleTextSecondLine.hidden = false;
+        labelMagnifier.hidden = true;
+        labelDateMonthText.hidden = true;
+    }
+    else
+    {
+        labelScaleText.hidden = true;
+        labelScaleTextSecondLine.hidden = true;
+        labelMagnifier.hidden = false;
+        labelDateMonthText.hidden = false;
+    }
+    NSString* yrTxt = [ATHelper getYearPartHelper:appDelegate.focusedDate];
+    NSString* monthDateText  = @"";
+    if (appDelegate.selectedPeriodInDays   < 3650)
+        monthDateText = [ATHelper getMonthSlashDateInNumber:appDelegate.focusedDate];
+
+    labelScaleText.text = [NSString stringWithFormat:@"%@\n ", yrTxt ];;
+    labelScaleTextSecondLine.text = [NSString stringWithFormat:@" \n%@", monthDateText ];
 }
-- (void) changeDateText:(NSString *)yearText :(NSString*)monthText
+- (void) changeDateText
 {
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if ([ATHelper getOptionDateMagnifierModeScroll])
+    {
+        labelScaleText.hidden = true;
+        labelScaleTextSecondLine.hidden = true;
+        labelMagnifier.hidden = false;
+        labelDateMonthText.hidden = false;
+    }
+    else
+    {
+        labelScaleText.hidden = false;
+        labelScaleTextSecondLine.hidden = false;
+        labelMagnifier.hidden = true;
+        labelDateMonthText.hidden = true;
+    }
+    NSString* yearText = [ATHelper getYearPartHelper:appDelegate.focusedDate];
+    NSString* monthDateText  = @"";
+    if (appDelegate.selectedPeriodInDays < 3650)
+        monthDateText = [ATHelper getMonthSlashDateInNumber:appDelegate.focusedDate];
     if ([yearText rangeOfString:@"BC"].location == NSNotFound)
     {
         labelMagnifier.text=[yearText substringToIndex:4];
@@ -212,14 +256,17 @@ CGContextRef context;
         labelMagnifier.text=[yearText substringToIndex:4];
         labelMagnifier.textColor = [UIColor redColor];
     }
-    labelDateMonthText.text = monthText;
+    labelDateMonthText.text = monthDateText;
 }
+
 //called by outside when scrollWindow start/stop, or when change time zoom
 - (void)showHideScaleText:(BOOL)showFlag
 {
-    labelScaleText.hidden = !showFlag;
+    //labelScaleText.hidden = !showFlag;
+    //labelScaleTextSecondLine.hidden = !showFlag;
     labelMagnifier.hidden = !showFlag;
     labelDateMonthText.hidden = !showFlag;
+    
 }
 
 //have to call this after set text otherwise sizeToFit will not work
@@ -537,6 +584,7 @@ CGContextRef context;
     CGPoint center = timeScaleImageView.center;
     center.y = -10;//this value decided y value when scroll time window
     labelScaleText.center = center;
+    labelScaleTextSecondLine.center = center;
 
     //[labelScaleText setFrame:CGRectMake(
                                   //  floorf((timeScaleImageView.frame.size.width - labelScaleText.frame.size.width) / 2.0), 0,

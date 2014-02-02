@@ -9,8 +9,10 @@
 #import "ATOptionsTableViewController.h"
 #import "ATHelper.h"
 
-#define ROW_DATE_FIELD_KEYBOARD 0
+#define ROW_ENABLE_MOVE_DATE 0
 #define ROW_ENABLE_TIME_LINK 1
+#define ROW_DATE_FIELD_KEYBOARD 2
+
 
 @interface ATOptionsTableViewController ()
 
@@ -57,11 +59,27 @@
 {
 #warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return 2;
+    return 3;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     switch( [indexPath row] ) {
+        case ROW_ENABLE_MOVE_DATE: {
+            UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellMoveDate"];
+            if( aCell == nil ) {
+                aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellMoveDate"];
+                aCell.textLabel.text = @"Date Magnifer Scroll";
+                aCell.selectionStyle = UITableViewCellSelectionStyleNone;
+                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
+                aCell.accessoryView = switchView;
+                if ([ATHelper getOptionDateMagnifierModeScroll])
+                    [switchView setOn:YES animated:NO];
+                else
+                    [switchView setOn:NO animated:NO];
+                [switchView addTarget:self action:@selector(dateMagnifierModeChanged:) forControlEvents:UIControlEventValueChanged];
+            }
+            return aCell;
+        }
         case ROW_DATE_FIELD_KEYBOARD: {
             UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellDateField"];
             if( aCell == nil ) {
@@ -112,6 +130,14 @@
         [ATHelper setOptionDisplayTimeLink:true];
     else
         [ATHelper setOptionDisplayTimeLink:false];
+}
+
+- (void) dateMagnifierModeChanged:(id)sender {
+    UISwitch* switchControl = sender;
+    if (switchControl.on)
+        [ATHelper setOptionDateMagnifierModeScroll:true];
+    else
+        [ATHelper setOptionDateMagnifierModeScroll:false];
 }
 
 

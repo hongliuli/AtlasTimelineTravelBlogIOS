@@ -16,6 +16,7 @@
 + (NSString*) getYearPartHelper:(NSDate*) date;
 + (NSString*) getMonthDateInLetter:(NSDate*)date;
 + (NSString*) getMonthDateInTwoNumber:(NSDate*)date;
++ (NSString*) getMonthSlashDateInNumber:(NSDate *)date;
 + (Boolean)checkUserEmailAndSecurityCode:(UIViewController*)sender;
 + (NSString*) getSelectedDbFileName;
 + (void) setSelectedDbFileName:(NSString*)fileName;
@@ -35,9 +36,15 @@
 + (UIColor *) colorWithHexString: (NSString *) stringToConvert;
 
 //set/get options
++ (BOOL) getOptionDateFieldMoveDateMagnifier;
++ (void) setOptionDateFieldMoveDateMagnifier:(BOOL)flag;
 + (BOOL) getOptionDateFieldKeyboardEnable;
 + (void) setOptionDateFieldKeyboardEnable:(BOOL)flag;
 + (BOOL) getOptionDisplayTimeLink;
 + (void) setOptionDisplayTimeLink:(BOOL)flag;
++ (BOOL) getOptionDateMagnifierModeScroll;
++ (void) setOptionDateMagnifierModeScroll:(BOOL)flag;
+
+
 
 @end

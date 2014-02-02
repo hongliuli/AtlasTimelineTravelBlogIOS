@@ -23,6 +23,8 @@
 @property(strong, nonatomic) NSDate* focusedDate;
 @property(strong, nonatomic) UIStoryboard* storyBoard;
 
+@property NSString* optionEnableDateMagnifierMove;
+
 -(void) emptyEventList;
 
 @end
