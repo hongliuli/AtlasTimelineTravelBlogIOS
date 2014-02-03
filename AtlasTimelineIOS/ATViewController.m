@@ -248,7 +248,7 @@
                                        initWithTarget:self action:@selector(handleTapOnTutorial:)];
         [tutorialView addGestureRecognizer:tap];
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.frame = CGRectMake([ATConstants screenWidth] - 120, 20, 110, 30);
+        button.frame = CGRectMake([ATConstants screenWidth] - 120, 65, 110, 30);
         
         [button.layer setCornerRadius:7.0f];
         //[button.layer:YES];

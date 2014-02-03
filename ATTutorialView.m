@@ -114,9 +114,9 @@ UILabel* timeWindowLabel;
     [self addTimeZoomLevelSection1];
     [self addTimeZoomLevelSection2];
     [self addDoubleTapCenterSection:x_start + [ATConstants timeScrollWindowWidth]/3]; //this first so red shade go under pinch
-    [self addTimeZoomLevelSection:x_start :@"gesture-doubletap.png" :@"Double-tap at left to zoom out"];
-    [self addTimeZoomLevelSection:x_start + [ATConstants timeScrollWindowWidth]/3-85 :@"gesture-pinch.png" :@"Pinch is another way of zoom in/out"];
-    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3 :@"gesture-doubletap.png" :@"Double-tap at right to zoom in"];
+    [self addTimeZoomLevelSection:x_start - 50 :@"TimewheelZoomOut.png" :@"Zoom-out Time Wheel"];
+    [self addTimeZoomLevelSection:x_start + [ATConstants timeScrollWindowWidth]/3-85 :@"gesture-pinch.png" :@"Pinch is another way of zooming Time Wheel"];
+    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 50:@"TimewheelZoomIn.png" :@"Zoom-in Time Wheel"];
 }
 
 - (void) addLongPressSection
@@ -159,7 +159,7 @@ UILabel* timeWindowLabel;
     lblLongPress.font = [UIFont fontWithName:@"Arial" size:fontSmall];
     lblLongPress.backgroundColor = [UIColor clearColor];
     lblLongPress.textColor = [UIColor whiteColor];
-    lblLongPress.lineBreakMode = UILineBreakModeWordWrap;
+    lblLongPress.lineBreakMode = NSLineBreakByWordWrapping;
     lblLongPress.numberOfLines=2;
     [self addSubview:lblLongPress];
 }
@@ -184,7 +184,7 @@ UILabel* timeWindowLabel;
     lblLongPress.font = [UIFont fontWithName:@"Arial" size:fontSmall];
     lblLongPress.backgroundColor = [UIColor clearColor];
     lblLongPress.textColor = [UIColor whiteColor];
-    lblLongPress.lineBreakMode = UILineBreakModeWordWrap;
+    lblLongPress.lineBreakMode = NSLineBreakByWordWrapping;
     lblLongPress.numberOfLines=2;
     [self addSubview:lblLongPress];
     
@@ -192,7 +192,7 @@ UILabel* timeWindowLabel;
     CGRect frameLbl2 = CGRectMake(initialX , startY2 - 30*iPhoneSizeYFactor, 400*iPhoneSizeXFactor, itemHeight);
     UILabel* lbl2 = [[UILabel alloc] initWithFrame:frameLbl2];
     lbl2.text = @"The event is colored if its date is visible in the time wheel, the darker the color is the closer is to the selected date in the center: ";
-    lbl2.lineBreakMode = UILineBreakModeWordWrap;
+    lbl2.lineBreakMode = NSLineBreakByWordWrapping;
     lbl2.numberOfLines=3;
     lbl2.font = [UIFont fontWithName:@"Arial" size:fontSmall];
     lbl2.backgroundColor = [UIColor clearColor];
@@ -279,7 +279,7 @@ UILabel* timeWindowLabel;
     UILabel* lbl = [[UILabel alloc] initWithFrame:lblFrame];
     lbl.text = text;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
-    lbl.lineBreakMode = UILineBreakModeWordWrap;
+    lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=2;
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
@@ -322,14 +322,14 @@ UILabel* timeWindowLabel;
     UILabel* lbl = [[UILabel alloc] initWithFrame:lblFrame];
     lbl.text = @"Double-tap at center to center on today";
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall - 2];
-    lbl.lineBreakMode = UILineBreakModeWordWrap;
+    lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=2;
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor redColor];
     [self addSubview:lbl];
     
     //Time Window Label description
-    CGRect timeWindowFrame = CGRectMake(initialX, y_start - 20, itemWidth + 100, itemHeight);
+    CGRect timeWindowFrame = CGRectMake(initialX, y_start - 60, itemWidth + 100, itemHeight);
     UILabel* timeWindowLbl = [[UILabel alloc] initWithFrame:timeWindowFrame];
     timeWindowLbl.text = @"Time Wheel";
     timeWindowLbl.font = [UIFont fontWithName:@"Arial" size:24];

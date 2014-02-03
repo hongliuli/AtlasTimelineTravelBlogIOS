@@ -52,6 +52,9 @@
     UIImageView* year100View;
     UIImageView* year10View;
     UIImageView* year1View;
+    
+    UIButton *btnZoomOut;
+    UIButton *btnZoomIn;
 }
 
 @synthesize horizontalTableView = _horizontalTableView;
@@ -144,6 +147,22 @@ static int toastFirstTimeDelay = 0;
         dateLiterFormat=[[NSDateFormatter alloc] init];
         [dateLiterFormat setDateFormat:@"EEEE MMMM dd"];
         [self scrollToFocusedRow];
+        
+        int timewheelZoomButtonSize = 45;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && focusedRow + 1 > currentNumberOfRow)
+            timewheelZoomButtonSize = 35;
+        btnZoomOut = [UIButton buttonWithType:UIButtonTypeCustom];
+        btnZoomOut.frame = CGRectMake(20, 2, timewheelZoomButtonSize, timewheelZoomButtonSize);
+        [btnZoomOut setImage:[UIImage imageNamed:@"TimewheelZoomOut.png"] forState:UIControlStateNormal];
+        [btnZoomOut addTarget:self action:@selector(zoomOutAction:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:btnZoomOut];
+        
+        btnZoomIn = [UIButton buttonWithType:UIButtonTypeCustom];
+        btnZoomIn.frame = CGRectMake([ATConstants timeScrollWindowWidth] - 70, 2, timewheelZoomButtonSize, timewheelZoomButtonSize);
+        [btnZoomIn setImage:[UIImage imageNamed:@"TimewheelZoomIn.png"] forState:UIControlStateNormal];
+        [btnZoomIn addTarget:self action:@selector(zoomInAction:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:btnZoomIn];
+        
     }
     UIImageView *tempImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"timeWindowBackground.png"]];
     [tempImageView setFrame:self.horizontalTableView.frame];
@@ -584,7 +603,7 @@ static int toastFirstTimeDelay = 0;
 - (IBAction)handlePinch:(UIPinchGestureRecognizer *)recognizer {
     // recognizer.view.transform = CGAffineTransformScale(recognizer.view.transform, recognizer.scale, recognizer.scale);
     // recognizer.scale = 1;
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+
     if(recognizer.state == UIGestureRecognizerStateBegan)
     {
         pinchVelocity = 0;
@@ -599,14 +618,20 @@ static int toastFirstTimeDelay = 0;
     }
     if ([recognizer state] == UIGestureRecognizerStateEnded)
     {
-        [self performSettingFocusedRowForPinch:appDelegate.focusedDate];
-        
-        [self.parent changeTimeScaleState];
-        [self.parent refreshAnnotations];
-        [self showHideZoomAnimation:pinchVelocity];
+        [self doTimewheelZooming:pinchVelocity];
+
     }
 }
 
+- (void) doTimewheelZooming:(int)direction
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    [self performSettingFocusedRowForPinch:appDelegate.focusedDate];
+    
+    [self.parent changeTimeScaleState];
+    [self.parent refreshAnnotations];
+    [self showHideZoomAnimation:direction];
+}
 - (void) performSettingFocusedRowForPinch:(NSDate*) newFocusedDate
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -718,17 +743,14 @@ static int toastFirstTimeDelay = 0;
     else
         rect = [self.horizontalTableView convertRect:[self.horizontalTableView rectForRowAtIndexPath:index] toView:[self.horizontalTableView superview]];
     
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int windowWidth = [ATConstants timeScrollWindowWidth];
     int leftPosition = windowWidth/3;
     int middlePosition = 2 * windowWidth / 3;
     if (rect.origin.x <= leftPosition) //touch right side,  zoom out
     {
         pinchVelocity = -999; //reuse code for pinch. as long as less than 0
-        [self performSettingFocusedRowForPinch:(NSDate*) appDelegate.focusedDate];
-        [self.parent changeTimeScaleState];
-        [self.parent refreshAnnotations];
-        [self showHideZoomAnimation:-1];
+        [self doTimewheelZooming:pinchVelocity];
     }
     else if (rect.origin.x > leftPosition && rect.origin.x <= middlePosition) //middle position
     {
@@ -742,12 +764,20 @@ static int toastFirstTimeDelay = 0;
     else //touched right side, zoom in the time window
     {
         pinchVelocity = 999; //reuse code for pinch. as long as greate than 0
-        [self performSettingFocusedRowForPinch:(NSDate*) appDelegate.focusedDate];
-        [self.parent changeTimeScaleState];
-        [self.parent refreshAnnotations];
-        [self showHideZoomAnimation:1];
+        [self doTimewheelZooming:pinchVelocity];
     }
     //Todo this does not help to fix doubleTap issue, not important anyway. ----[self centerTable];
+}
+
+-(void) zoomInAction:(id)sender
+{
+    pinchVelocity = 999; //reuse code for pinch. as long as greate than 0
+    [self doTimewheelZooming:pinchVelocity];
+}
+-(void) zoomOutAction:(id)sender
+{
+    pinchVelocity = -999; //reuse code for pinch. as long as greate than 0
+    [self doTimewheelZooming:pinchVelocity];
 }
 
 //have tap gesture achive two thing: prevent call tapGesture on parent mapView and process select a row action without a TableViewController
@@ -855,13 +885,39 @@ static int toastFirstTimeDelay = 0;
     [self.parent refreshAnnotations];
     [self changeFocusedCellColorToRed ];
     
-    /*
-    if (toastFirstTimeDelay == 20  )
+    //animate button for emphasis
+    if (toastFirstTimeDelay == 5 || toastFirstTimeDelay == 15 || toastFirstTimeDelay == 35 || toastFirstTimeDelay == 60 )
     {
-        [self makeToast:@"Tip: Pinch or right/left double-tap to zoom time." duration:15.0 position:@"center"];
+       
+        btnZoomOut.alpha = 1.0f;
+        [UIView animateWithDuration:0.5f
+                              delay:0.0f
+                            options:UIViewAnimationOptionAutoreverse
+                         animations:^
+         {
+             [UIView setAnimationRepeatCount:10.0f/2.0f];
+             btnZoomOut.alpha = 0.0f;
+         }
+        completion:^(BOOL finished)
+         {
+             btnZoomOut.alpha = 1.0;
+         }];
+        btnZoomIn.alpha = 1.0f;
+        [UIView animateWithDuration:0.5f
+                              delay:0.0f
+                            options:UIViewAnimationOptionAutoreverse
+                         animations:^
+         {
+             [UIView setAnimationRepeatCount:10.0f/2.0f];
+             btnZoomIn.alpha = 0.0f;
+         }
+                         completion:^(BOOL finished)
+         {
+             btnZoomIn.alpha = 1.0;
+         }];
+        
     }
     toastFirstTimeDelay ++;
-     */
 }
 
 - (void) didSelectRowAtIndexPath:(NSIndexPath *)indexPath  //called by tapGesture. This is not in a TableViewController, so no didSelect... delegate mechanism, have to process  by tap gesture
