@@ -114,9 +114,9 @@ UILabel* timeWindowLabel;
     [self addTimeZoomLevelSection1];
     [self addTimeZoomLevelSection2];
     [self addDoubleTapCenterSection:x_start + [ATConstants timeScrollWindowWidth]/3]; //this first so red shade go under pinch
-    [self addTimeZoomLevelSection:x_start - 50 :@"TimewheelZoomOut.png" :@"Zoom-out Time Wheel"];
+    [self addTimeZoomLevelSection:x_start - 50 :@"TimewheelZoomOut.png" :@"Tap to zoom out Time Wheel"];
     [self addTimeZoomLevelSection:x_start + [ATConstants timeScrollWindowWidth]/3-85 :@"gesture-pinch.png" :@"Pinch is another way of zooming Time Wheel"];
-    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 50:@"TimewheelZoomIn.png" :@"Zoom-in Time Wheel"];
+    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 50:@"TimewheelZoomIn.png" :@"Tap to zoom in Time Wheel"];
 }
 
 - (void) addLongPressSection
@@ -283,6 +283,8 @@ UILabel* timeWindowLabel;
     lbl.numberOfLines=2;
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
+    if ([lbl.text rangeOfString:@"Pinch"].location != NSNotFound)
+        lbl.textColor = [UIColor grayColor];
     [self addSubview:lbl];
     
     //draw line
