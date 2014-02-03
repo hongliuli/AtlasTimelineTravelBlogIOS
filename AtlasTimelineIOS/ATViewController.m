@@ -1069,7 +1069,7 @@
         //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
         [self.eventEditor resetEventEditor];
         
-        //***********************************************
+        /***********************************************
         //TODO xxxxxx THIS PART is for from ver1.2 to ver3, that is from single photo to multiple photo, to copy old version photo to directory structure
         //     Should remove this part in later version
         if (ann.uniqueId != nil)
@@ -1096,7 +1096,7 @@
                 [self.dataController insertNewPhotoQueue:[ann.uniqueId stringByAppendingPathComponent:@"movedFromSinglePhotoVersion"]];
             }
         }
-        //*************************************************
+        ************************************comment out finally on Feb 1, 2013 *************/
         
         
         self.eventEditor.coordinate = ann.coordinate;
@@ -1561,6 +1561,10 @@
     NSMutableArray* list  = appDelegate.eventListSorted;
     
     NSString *key=[NSString stringWithFormat:@"%f|%f",self.selectedAnnotation.coordinate.latitude, self.selectedAnnotation.coordinate.longitude];
+    //remove photo/text icon as well if there are
+    UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+    if (tmpLbl != nil)
+        [tmpLbl removeFromSuperview];
     [selectedAnnotationSet removeObjectForKey:key];//in case this is
     int index = [list indexOfObject:tmp]; //implemented isEqual
     if (index != NSNotFound)
@@ -1621,7 +1625,10 @@
     NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
     UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
     if (tmpLbl != nil)
+    {
+        [tmpLbl removeFromSuperview];
         [selectedAnnotationSet removeObjectForKey:key]; //so when update a event with new photo or text, the new photo/text will occure immediately because all annotations will be redraw for possible date change
+    }
     
     //Need remove/add annotation or following will work?
     [self.selectedAnnotation setDescription:newData.eventDesc];
