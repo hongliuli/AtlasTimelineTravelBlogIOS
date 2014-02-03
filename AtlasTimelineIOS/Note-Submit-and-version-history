@@ -2,7 +2,19 @@
 
 Version History
 ---------------
-Version 2.14 prepare (Uploaded on Dec 29)
+Version 2.15
+    1. Migrate to iOS 7 (see Note_Tech_Tips for detail)
+    2. Add time link to indicate event chronological relationship on map
+    3. Add scrolling date magnifier and have option to center it or scroll it. This improves picking date on Timewheel
+    4. Automatically set email subject when share by email
+    5. Add zoom-in/out buttons on Timewheel
+    6. Add an option to enable keyboard for entering BC date
+    7. Other changes include add options menu, add scale line to timewheel background; Fixed code warning for presentModalView and dismissModalView in iOS 7; hide mapview's navigator bar as well  when hide time wheel; Solved crowded images issue when focused event by date; put white flag behind selected event note, fixed floating lable when add photo to a selected event and update/delete an selected event
+    
+    3. enable to download World History Sample (no photo)
+
+    
+Version 2.14 prepare (Uploaded on Dec 29, 2013)
     1. Imporved photo view to scroll smoothly and be able to zoom in/out photo
     2. When share event, The first 10 photos instead of a selected one will be shared
     3. Improved Dropbox to download smartly: 1) Do not download if already in app; 2) retry if failed download all
@@ -10,10 +22,15 @@ Version 2.14 prepare (Uploaded on Dec 29)
     5. Add a magnifier to display the Year/Month of the selected period when scroll time wheel. 
     6. Automaticall generate thumbnail once copied photo from dropbox
     7. Display text with red boarder if this event's photo lost forevever, or can be copied from dropbox
-    8. Fix floating photo issue. This will happen if a event is in focuse and its last  photo is deleted
+    8. Fix floating photo issue. This will happen if a event is in focuse and its last  photo is deleted (actually more issues need fixed in next version)
     9. re-adjusted initial daysInPeriod when app start
-    (Next version: share on WeChat, Click photo to bring view only photoViewer with small maps and scroll photo by time;
-        localization; add photo in Timeline view; migrate to iOS 7?)
+  (Next version: 
+    . share on WeChat, 
+    . share event to another user, so need upload photos to our server?
+    . Click photo to bring view only photoViewer with small maps and scroll photo to next event;
+    . localization; 
+    . add photo in Timeline view; 
+
 version 2.13
     Providing the ability to select multiple photos at a time from camera roll (Dec 7)
 version 2.12 (submited on 11/15/13)

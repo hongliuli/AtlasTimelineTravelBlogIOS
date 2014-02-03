@@ -16,6 +16,16 @@ I set RELEASE MODE Optimun to NONE, otherwise app will crash. See [6/5/2013] cha
    
 Should always test AdHoc Distribution, or at leaset to set Release mode for Product->Scheme->Edit Scheme->Run AtlasTim..."
 
+Migrate to Xcode5.02 and iOS 7
+        - Managed object can not be put into array and pass to other function, especially in iOS, so changed AppDelegate to replace ATEventEntity to ATEventDataStruct in sortedEventList
+        - DatePicker changes:
+            . some neccessary style change for iOS7
+            . improved way to dismiss keyboard for datepicker by move resignFirstRespond to valueChanged event
+        - Enabled BC/AD, iOS7 fixed Era issue, so I simplified dateByAddingComponentsRegardingEra() function
+        - Address Search box background color need change
+        - Time wheel table background image issue 
+        - Photo UIPageControl repositoned in storyboard in iOS7, have to remove it, and add to BasePhotoViewController again, then create outlet, change position hint so it will always located at bottom. (iOS fixed PageControl bug that need give initial page number to a big number 999)
+        - Current Location need to move down a little in iOS 7
 Xcode5 has issue. So I continues use Xcode4.6 to develope, but has issue connect to iPad with iOS7. The solution:
    - open Xcode5.02 while connect a iOS7 iPad
    - quite Xcode5.02 and open Xcode4, then we can see iPad name in schema dropdown for iPad
