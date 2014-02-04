@@ -716,11 +716,13 @@
             UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
             rightButton.accessibilityLabel=@"right";
             customPinView.rightCalloutAccessoryView = rightButton;
+            
             UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
-            [leftButton setImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
+            [leftButton setTintColor:[UIColor clearColor]];
+            [leftButton setBackgroundImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
+            
             leftButton.accessibilityLabel=@"left";
             customPinView.leftCalloutAccessoryView = leftButton;
-            
             return customPinView;
             
         }
@@ -1026,10 +1028,13 @@
             UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
             rightButton.accessibilityLabel=@"right";
             customPinView.rightCalloutAccessoryView = rightButton;
-            UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
-            [leftButton setImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
-            leftButton.accessibilityLabel=@"left";
-            customPinView.leftCalloutAccessoryView = leftButton;
+            
+             UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
+             [leftButton setTintColor:[UIColor clearColor]];
+             [leftButton setBackgroundImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
+
+             leftButton.accessibilityLabel=@"left";
+             customPinView.leftCalloutAccessoryView = leftButton;
             
             return customPinView;
         }
