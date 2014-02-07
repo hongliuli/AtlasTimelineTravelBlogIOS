@@ -55,6 +55,7 @@
 - (void) setNewFocusedDateAndUpdateMapWithNewCenter:(ATEventDataStruct*) ent :(int)zoomLevel;
 - (void) refreshAnnotations;
 - (void) cleanSelectedAnnotationSet; //see comments in .m file
+- (void) showTimeLinkOverlay;
 
 
 @end

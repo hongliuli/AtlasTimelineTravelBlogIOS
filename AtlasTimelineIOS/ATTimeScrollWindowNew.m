@@ -630,6 +630,7 @@ static int toastFirstTimeDelay = 0;
     
     [self.parent changeTimeScaleState];
     [self.parent refreshAnnotations];
+    [self.parent showTimeLinkOverlay];
     [self showHideZoomAnimation:direction];
 }
 - (void) performSettingFocusedRowForPinch:(NSDate*) newFocusedDate

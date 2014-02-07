@@ -95,6 +95,7 @@
     int timeLinkDepthDirectionPast;
     NSMutableArray* timeLinkOverlaysToBeCleaned ;
     ATAnnotationFocused* focusedAnnotationIndicator;
+    ATEventDataStruct* focusedEvent;
 }
 
 @synthesize mapView = _mapView;
@@ -757,6 +758,7 @@
                     if (img != nil)
                     {
                         UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
+                        [imgView setAlpha:0.85];
                         imgView.tag = 100; //later used to get subview
                         /*
                          imgView.contentMode = UIViewContentModeScaleAspectFill;
@@ -1159,15 +1161,20 @@
         self.timeScrollWindow.hidden=false;
         self.timeZoomLine.hidden = false;
         self.navigationController.navigationBarHidden = false;
-        [self.mapView removeOverlays:timeLinkOverlaysToBeCleaned];
-        if ([ATHelper getOptionDisplayTimeLink])
-            [self showTimeLinkOverlay:ent];
+        focusedEvent = ent;
+        [self showTimeLinkOverlay];
     }
 }
 
-- (void) showTimeLinkOverlay:(ATEventDataStruct*)ent
+//always start from focusedEvent
+- (void) showTimeLinkOverlay
 {
-    
+    if (timeLinkOverlaysToBeCleaned != nil)
+        [self.mapView removeOverlays:timeLinkOverlaysToBeCleaned];
+    if (![ATHelper getOptionDisplayTimeLink])
+        return;
+    if (focusedEvent == nil)
+        return;
     if (timeLinkOverlayDepthColorMap == nil) //keyed on lat|lng, value is depth. viewForOverlay() can use this to decide what color the link to draw
         timeLinkOverlayDepthColorMap = [[NSMutableDictionary alloc] init];
     else
@@ -1180,8 +1187,8 @@
     
     //first draw a circle on selected event
     CLLocationCoordinate2D workingCoordinate;
-    workingCoordinate.latitude = ent.lat;
-    workingCoordinate.longitude = ent.lng;
+    workingCoordinate.latitude = focusedEvent.lat;
+    workingCoordinate.longitude = focusedEvent.lng;
     if (focusedAnnotationIndicator == nil)
         focusedAnnotationIndicator = [[ATAnnotationFocused alloc] init];
     else
@@ -1193,9 +1200,9 @@
     //following prepare mkPoi
     timeLinkDepthDirectionFuture = 0;
     timeLinkDepthDirectionPast = 0;
-    NSArray* futureOverlays = [self prepareTimeLinkOverlays:ent :true];
+    NSArray* futureOverlays = [self prepareTimeLinkOverlays:focusedEvent :true];
     //NSLog(@"---------------------------------------");
-    NSArray* pastOverlays = [self prepareTimeLinkOverlays:ent :false];
+    NSArray* pastOverlays = [self prepareTimeLinkOverlays:focusedEvent :false];
     
     [timeLinkOverlaysToBeCleaned addObjectsFromArray:futureOverlays];
     [timeLinkOverlaysToBeCleaned addObjectsFromArray:pastOverlays];
@@ -1622,17 +1629,18 @@
         newData.uniqueId = newEntity.uniqueId;
     
     [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
-    if ([deletedList count] > 0 && [self.eventEditor.photoScrollView.photoList count] == 0)
-    { //This is to fix floating photo if removed last photo in an event
-        NSString *key=[NSString stringWithFormat:@"%f|%f", selectedEventAnnotation.coordinate.latitude, selectedEventAnnotation.coordinate.longitude];
-        [selectedAnnotationSet removeObjectForKey:key];
-    }
+
     NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
     UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
     if (tmpLbl != nil)
     {
         [tmpLbl removeFromSuperview];
         [selectedAnnotationSet removeObjectForKey:key]; //so when update a event with new photo or text, the new photo/text will occure immediately because all annotations will be redraw for possible date change
+    }
+    if ([deletedList count] > 0 && [self.eventEditor.photoScrollView.photoList count] == 0)
+    { //This is to fix floating photo if removed last photo in an event
+        NSString *key=[NSString stringWithFormat:@"%f|%f", selectedEventAnnotation.coordinate.latitude, selectedEventAnnotation.coordinate.longitude];
+        [selectedAnnotationSet removeObjectForKey:key];
     }
     
     //Need remove/add annotation or following will work?
