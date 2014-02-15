@@ -637,6 +637,7 @@ static int toastFirstTimeDelay = 0;
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int selectedPeriodInDay = appDelegate.selectedPeriodInDays;
+    /**** change 2/16/14  do not have day in week
     if (selectedPeriodInDay == 7)
     {
         if (pinchVelocity <0)
@@ -650,6 +651,7 @@ static int toastFirstTimeDelay = 0;
             [alert show];
         }
     }
+     */
     if (selectedPeriodInDay == 30)
     {
         if (pinchVelocity <0)
@@ -661,7 +663,10 @@ static int toastFirstTimeDelay = 0;
         }
         else if (pinchVelocity > 0 )
         {
-            appDelegate.selectedPeriodInDays = 7;
+            //appDelegate.selectedPeriodInDays = 7;
+            appDelegate.selectedPeriodInDays = 30;
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Zoom-In Time Wheel has reached 30-days range limit!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
         }
     }
     if (selectedPeriodInDay == 365)
@@ -891,12 +896,12 @@ static int toastFirstTimeDelay = 0;
     {
        
         btnZoomOut.alpha = 1.0f;
-        [UIView animateWithDuration:0.5f
+        [UIView animateWithDuration:0.2f
                               delay:0.0f
                             options:UIViewAnimationOptionAutoreverse
                          animations:^
          {
-             [UIView setAnimationRepeatCount:10.0f/2.0f];
+             [UIView setAnimationRepeatCount:8.0f/2.0f];
              btnZoomOut.alpha = 0.0f;
          }
         completion:^(BOOL finished)
@@ -904,12 +909,12 @@ static int toastFirstTimeDelay = 0;
              btnZoomOut.alpha = 1.0;
          }];
         btnZoomIn.alpha = 1.0f;
-        [UIView animateWithDuration:0.5f
+        [UIView animateWithDuration:0.2f
                               delay:0.0f
                             options:UIViewAnimationOptionAutoreverse
                          animations:^
          {
-             [UIView setAnimationRepeatCount:10.0f/2.0f];
+             [UIView setAnimationRepeatCount:8.0f/2.0f];
              btnZoomIn.alpha = 0.0f;
          }
                          completion:^(BOOL finished)
