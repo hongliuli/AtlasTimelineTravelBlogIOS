@@ -26,10 +26,12 @@ UILabel* label2;
 UILabel* label3;
 UILabel* label4;
 UILabel* label5;
+/*
 UILabel* labelSeg1;
 UILabel* labelSeg2;
 UILabel* labelSeg3;
 UILabel* labelSeg4;
+ */
 
 static int toastFirstTimeDelay = 0;
 
@@ -90,6 +92,7 @@ CGContextRef context;
         [self addSubview:label4];
         [self addSubview:label5];
         
+        /*
         labelSeg1 = [[UILabel alloc] initWithFrame:CGRectMake(segLabelShift, -5, 70, 15)];
         labelSeg1.backgroundColor = [UIColor clearColor];
         labelSeg1.textColor = [UIColor blueColor];
@@ -110,13 +113,13 @@ CGContextRef context;
         labelSeg4.textColor = [UIColor blueColor];
         labelSeg4.font=[UIFont fontWithName:@"Helvetica" size:11];
         [self addSubview:labelSeg4];
-        
+        */
         dateLiterFormat=[[NSDateFormatter alloc] init];
         [dateLiterFormat setDateFormat:@"EEEE MMMM dd"];
         
         //add the at front
         
-        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,55, 80, 50)]; //if enlarge it, it will show all text inside, but I think not need.
+        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,-11, 80, 50)]; //if enlarge it, it will show all text inside, but I think not need.
         labelScaleText.backgroundColor = [UIColor colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];;
         labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:20];
         labelScaleText.layer.borderColor=[UIColor grayColor].CGColor;
@@ -126,7 +129,7 @@ CGContextRef context;
         labelScaleText.numberOfLines = 2;
         labelScaleText.textAlignment = NSTextAlignmentCenter;
         
-        labelScaleTextSecondLine = [[UILabel alloc] initWithFrame:CGRectMake(-30,55, 80, 50)];
+        labelScaleTextSecondLine = [[UILabel alloc] initWithFrame:CGRectMake(-30,-11, 80, 50)];
         labelScaleTextSecondLine.backgroundColor = [UIColor clearColor];
         labelScaleTextSecondLine.font=[UIFont fontWithName:@"Helvetica" size:16];
         labelScaleTextSecondLine.numberOfLines = 2;
@@ -136,10 +139,12 @@ CGContextRef context;
         [self addSubview:labelScaleText];
         [self addSubview:labelScaleTextSecondLine];
         
+        CGPoint center = timeScaleImageView.center;
+        center.y = 100;
         labelScaleText.hidden=true;
-        labelScaleText.center = timeScaleImageView.center;
+        labelScaleText.center = center;
         labelScaleTextSecondLine.hidden=true;
-        labelScaleTextSecondLine.center = timeScaleImageView.center;
+        labelScaleTextSecondLine.center = center;
         
         //UIWindow* theWindow = [[UIApplication sharedApplication] keyWindow];
         //UIViewController* rvc = theWindow.rootViewController;
@@ -328,7 +333,9 @@ CGContextRef context;
     NSTimeInterval interval = [endDay timeIntervalSinceDate: startDay];
     int dayInterval = interval/86400;
     double timeSpanInDay = dayInterval;
-    float tmp = 0.0;
+
+    /*** comment on 2/16/14, do not want to show segment text
+     float tmp = 0.0;
     int timeSegment = 0;
     NSString* timeSegmentUnit = nil;
     if (timeSpanInDay < 121)
@@ -356,7 +363,7 @@ CGContextRef context;
     labelSeg2.text = [NSString stringWithFormat:@"%i%@ %@",timeSegment,plusSign,timeSegmentUnit];
     labelSeg3.text = [NSString stringWithFormat:@"%i%@ %@",timeSegment,plusSign,timeSegmentUnit];
     labelSeg4.text = [NSString stringWithFormat:@"%i%@ %@",timeSegment,plusSign,timeSegmentUnit];
-    
+    */
     if (calendar == nil)
         calendar = [NSCalendar currentCalendar];
     
@@ -582,7 +589,7 @@ CGContextRef context;
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
     
     CGPoint center = timeScaleImageView.center;
-    center.y = -10;//this value decided y value when scroll time window
+    center.y = -25;//this value decided y value when scroll time window
     labelScaleText.center = center;
     labelScaleTextSecondLine.center = center;
 
@@ -596,6 +603,7 @@ CGContextRef context;
 {
     float DOT_SIZE = 5.0;
     float DOT_Y_POS = 3.0;
+    float DOT_Y_POS_GREEN = -25.0;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
 
     Boolean eventVisibleOnMapFlag = false; //draw bar if there are event visible in map screen
@@ -649,7 +657,7 @@ CGContextRef context;
             if (eventVisibleOnMapFlag)
             {
                 CGContextSetRGBFillColor(context, 0,0.5,0.2, 1);
-                CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
+                CGContextFillRect(context, CGRectMake(x, DOT_Y_POS_GREEN, DOT_SIZE, 8*DOT_SIZE));
                 previouseVisibleEventDrawXPos = x;
             }
             else
@@ -670,7 +678,7 @@ CGContextRef context;
             if (eventVisibleOnMapFlag)
             {
                 CGContextSetRGBFillColor(context, 0,0.5,0.2, 1);
-                CGContextFillRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, 2*DOT_SIZE));
+                CGContextFillRect(context, CGRectMake(x, DOT_Y_POS_GREEN, DOT_SIZE, 8*DOT_SIZE));
                 previouseVisibleEventDrawXPos = x;
                 if (toastFirstTimeDelay > 10 && toastFirstTimeDelay < 1000 )
                 {
@@ -678,7 +686,7 @@ CGContextRef context;
                     float xPos = x - 170;
                     if (xPos < 80)
                         xPos = 100;
-                    [self makeToast:@"Tip: Green dots indicate events currently displayed on map." duration:10.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
+                    [self makeToast:@"Tip: Green dots indicate events currently displayed on screen." duration:10.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
                     self.hidden = false;
                     self.mapViewController.timeScrollWindow.hidden  = false;
                 }
