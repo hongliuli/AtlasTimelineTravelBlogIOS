@@ -36,6 +36,7 @@
 #define MERCATOR_OFFSET 268435456
 #define MERCATOR_RADIUS 85445659.44705395
 #define ZOOM_LEVEL_TO_HIDE_DESC 4
+#define ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE 9
 #define JPEG_QUALITY 0.5
 #define THUMB_JPEG_QUALITY 0.3
 #define DISTANCE_TO_HIDE 80
@@ -81,13 +82,13 @@
     
     NSMutableArray* selectedAnnotationNearestLocationList; //do not add to selectedAnnotationSet if too close
     NSMutableDictionary* selectedAnnotationSet;//hold uilabels for selected annotation's description
+    NSMutableSet* selectedAnnotationViewsFromDidAddAnnotation;
     NSDate* regionChangeTimeStart;
     ATDefaultAnnotation* newAddedPin;
     UIButton *locationbtn;
     CGRect timeScrollWindowFrame;
     ATTutorialView* tutorialView;
     
-    NSMutableDictionary* whiteFlagAnnotationSet;
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
     ATEventAnnotation* selectedEventAnnotation;
     NSMutableDictionary* timeLinkOverlayDepthColorMap; // latlngTimeLinkDepthMapForOverlay;
@@ -149,7 +150,6 @@
     [_mapView addGestureRecognizer:tapgr];
     
     selectedAnnotationSet = [[NSMutableDictionary alloc] init];
-    whiteFlagAnnotationSet = [[NSMutableDictionary alloc] init];
     selectedAnnotationNearestLocationList = [[NSMutableArray alloc] init];
     regionChangeTimeStart = [[NSDate alloc] init];
     [self prepareMapView];
@@ -412,7 +412,6 @@
         [selectedAnnotationSet removeAllObjects];
         [selectedAnnotationNearestLocationList removeAllObjects];
     }
-    [whiteFlagAnnotationSet removeAllObjects];
 }
 - (void)setMapCenter:(ATEventDataStruct*)ent :(int)zoomLevel
 {
@@ -839,15 +838,13 @@
                 [tmpLbl removeFromSuperview];
             }
         }
+        /*
         if ([selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier]])
         {
-            [whiteFlagAnnotationSet setObject:annView forKey:key ];// atIndexedSubscript:<#(NSUInteger)#> addObject:annView];
+            [[annView superview] sendSubviewToBack:annView];
         }
-        else
-        {
-            [whiteFlagAnnotationSet removeObjectForKey:key];
-        }
-        annView.hidden = false;
+         */
+        //annView.hidden = false;
         return annView;
     }
     else if ([annotation isKindOfClass:[ATAnnotationFocused class]])
@@ -864,6 +861,32 @@
 - (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
     //didAddAnnotationViews is called when focused to date or move timewheel caused by addAnnotation:removedAnntationSet
+    //views size usually is the number of ann on screen
+    //NSLog(@"------ view size is %d ",[views count]);
+    for (MKAnnotationView* annView in views)
+    {
+        ATEventAnnotation* ann = [annView annotation];
+        if (![ann isKindOfClass:[ATAnnotationSelected class]])
+            continue;
+        if (ann.eventDate == nil)
+            continue;
+        NSString* identifer = [self getImageIdentifier:ann.eventDate];
+        //NSLog(@"  identifier is %@  date=%@",identifer, ann.eventDate);
+        if ([identifer isEqualToString: [ATConstants WhiteFlagAnnotationIdentifier]])
+            [[annView superview] sendSubviewToBack:annView];
+        if ([identifer isEqualToString: [ATConstants SelectedAnnotationIdentifier]])
+        {
+            if (selectedAnnotationViewsFromDidAddAnnotation == nil)
+            {
+                selectedAnnotationViewsFromDidAddAnnotation = [[NSMutableSet alloc] init]; //cleaned in refreshAnnotation
+            }
+            [selectedAnnotationViewsFromDidAddAnnotation addObject:annView];
+            [[annView superview] bringSubviewToFront:annView];
+        }
+    }
+    //Above is try to hide white flag behind selected, works partially, but still have problem when zoom map. not sure what is reason
+
+        
     [self showDescriptionLabelViews:self.mapView];
 }
 
@@ -878,16 +901,26 @@
 }
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
+    //TODO could set option to enable/disable hide white flag, because if large nmber of selected note, then move map may be slow
+    //     although currently we already have optimized it a lot
+    if (selectedAnnotationViewsFromDidAddAnnotation != nil && [self zoomLevel] >= ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE)
+    {
+        //NSLog(@"    in regionDidChange  size=%d",[selectedAnnotationViewsFromDidAddAnnotation count]);
+        for (MKAnnotationView* annView in selectedAnnotationViewsFromDidAddAnnotation)
+        {
+            [[annView superview] bringSubviewToFront:annView];
+        }
+    }
     
     //NSLog(@"retion didChange, zoom level is %i", [self zoomLevel]);
     [self.timeZoomLine setNeedsDisplay];
     regionChangeTimeStart = [[NSDate alloc] init];
     [self showDescriptionLabelViews:mapView];
+ 
     
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
 {
-    [self hideNearestWhiteFlagAnnotation];
     for (id key in selectedAnnotationSet) {
         NSArray *splitArray = [key componentsSeparatedByString:@"|"];
         UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
@@ -932,16 +965,6 @@
         }
     }
     [selectedAnnotationNearestLocationList removeAllObjects];
-}
-
-
-- (void) hideNearestWhiteFlagAnnotation
-{
-    for (id key in whiteFlagAnnotationSet)
-    {
-        MKAnnotationView* whiteFlagAnn = [whiteFlagAnnotationSet objectForKey:key];
-        [[whiteFlagAnn superview] sendSubviewToBack:whiteFlagAnn];
-    }
 }
 
 - (void) hideDescriptionLabelViews
@@ -1481,6 +1504,7 @@
 //Mostly called from time wheel (ATTimeScrollWindowNew
 - (void) refreshAnnotations //Refresh based on new forcusedDate / selectedPeriodInDays
 {
+    selectedAnnotationViewsFromDidAddAnnotation = nil;
     //NSLog(@"refreshAnnotation called");
     NSMutableArray * annotationsToRemove = [ self.mapView.annotations mutableCopy ] ;
     //TODO filter out those annotation outside the periodRange ...
