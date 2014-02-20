@@ -169,9 +169,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [customView addSubview:shareButton];
         
         UILabel* label2 = [[UILabel alloc] initWithFrame:CGRectMake(220, 0, 100, 40)];
-        label2.font = [UIFont fontWithName:@"Helvetica" size:9];
+        label2.font = [UIFont fontWithName:@"Helvetica" size:10];
         label2.backgroundColor = [UIColor clearColor];
-        label2.text = @"(The 1st 10 photos)";
+        label2.text = @"Share Events";
         [customView addSubview:label2];
     }
     [self.view bringSubviewToFront:self.datePicker];
@@ -292,19 +292,19 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         ActivityProvider.eventEditor = self;
         NSMutableArray *activityItems = [[NSMutableArray alloc] init];
     
-        //int selectedIndex = self.photoScrollView.selectedAsShareIndex;
         if (self.photoScrollView.photoList != nil && [self.photoScrollView.photoList count] > 0)
         {
             for (int selectedIndex = 0; selectedIndex < [self.photoScrollView.photoList count] ; selectedIndex++)
             {
-                if (selectedIndex == 10)
-                    break; //only attache the first 10 photos because facebook will not show
-                NSString* photoForShareName = self.photoScrollView.photoList[selectedIndex];
-                NSString* photoFullPath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:self.eventId] stringByAppendingPathComponent:photoForShareName];
-                if ([photoForShareName hasPrefix:NEW_NOT_SAVED_FILE_PREFIX]) //in case selected a unsaved image for share
-                    photoFullPath = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:photoForShareName];
-                UIImage* img = [UIImage imageWithContentsOfFile:photoFullPath];
-                [activityItems addObject:img];
+                if ([self.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:selectedIndex ]])
+                {
+                    NSString* photoForShareName = self.photoScrollView.photoList[selectedIndex];
+                    NSString* photoFullPath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:self.eventId] stringByAppendingPathComponent:photoForShareName];
+                    if ([photoForShareName hasPrefix:NEW_NOT_SAVED_FILE_PREFIX]) //in case selected a unsaved image for share
+                        photoFullPath = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:photoForShareName];
+                    UIImage* img = [UIImage imageWithContentsOfFile:photoFullPath];
+                    [activityItems addObject:img];
+                }
             }
         } 
         [activityItems addObject:ActivityProvider];

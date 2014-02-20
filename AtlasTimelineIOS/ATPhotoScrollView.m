@@ -57,6 +57,7 @@
         [self addGestureRecognizer:tap];
     }
     self.selectedAsThumbnailIndex = -1;
+    self.selectedAsShareIndexSet = [[NSMutableSet alloc] init];
     return self;
 }
 
@@ -95,10 +96,10 @@
 
         cell.photo.contentMode = UIViewContentModeScaleAspectFit;
         cell.photo.clipsToBounds = YES;
-        //UIImageView* iconShare = (UIImageView*)[cell.photo viewWithTag:SHARE_ICON_TAG];
+        UIImageView* iconShare = (UIImageView*)[cell.photo viewWithTag:SHARE_ICON_TAG];
         UIImageView* iconMapMarker = (UIImageView*)[cell.photo viewWithTag:MAP_MARKER_TAG];
-        /**** folowing is old code for send only one photo when sharing. Now I send all photos
-        if (indexPath.row == self.selectedAsShareIndex)
+
+        if ([self.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:indexPath.row]])
         {
             if (iconShare == nil)
             {
@@ -110,7 +111,7 @@
         }
         else if (iconShare != nil)
             [iconShare removeFromSuperview];
-         */
+        
         
         if (indexPath.row == self.selectedAsThumbnailIndex)
         {

@@ -8,12 +8,15 @@
 #import "BasePhotoViewController.h"
 #import "PhotoViewController.h"
 #import "ATEventEditorTableController.h"
+#import "ATConstants.h"
 
 #define NOT_THUMBNAIL -1;
 
 @implementation BasePhotoViewController
 
 @synthesize pageViewController;
+
+UIImageView* shareIconView;
 
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -61,8 +64,7 @@
     [shareButton setBackgroundImage:shareIcon forState:UIControlStateNormal];
     [shareButton addTarget:self action:@selector(setShareAction:) forControlEvents:UIControlEventTouchUpInside];
     shareButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
-    //sharebutton not used, now I am sending all images
-    //UIBarButtonItem* setShareButton = [[UIBarButtonItem alloc] initWithCustomView:shareButton ];
+    UIBarButtonItem* setShareButton = [[UIBarButtonItem alloc] initWithCustomView:shareButton ];
     
     UIBarButtonItem* deleteButton = [[UIBarButtonItem alloc]
                                      initWithBarButtonSystemItem: UIBarButtonSystemItemTrash target:self action:@selector(deleteAction:)];
@@ -70,7 +72,7 @@
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpace.width = 10;
     
-    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, deleteButton, nil];
+    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
     [self.toolbar setItems:items animated:NO];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
@@ -78,6 +80,10 @@
     [self.pageViewController.view addGestureRecognizer:tap];
     [self.view bringSubviewToFront:self.toolbar];
     [self.view bringSubviewToFront:self.pageControl];
+    
+    shareIconView = [[UIImageView alloc] initWithFrame:CGRectMake(50, [ATConstants screenHeight] - 110 , 30, 30)];
+    shareIconView.image = nil;
+    [self.view addSubview:shareIconView];
 }
 
 
@@ -87,6 +93,10 @@
 {
     NSUInteger index = vc.pageIndex;
     self.pageControl.currentPage = index;
+    if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:index]])
+        shareIconView.image = [UIImage imageNamed:@"share.png"];
+    else
+        shareIconView.image = nil;
     return [PhotoViewController photoViewControllerForPageIndex:(index - 1)];
 }
 
@@ -94,6 +104,10 @@
 {
     NSUInteger index = vc.pageIndex;
     self.pageControl.currentPage =  index;
+    if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:index]])
+        shareIconView.image = [UIImage imageNamed:@"share.png"];
+    else
+        shareIconView.image = nil;
     return[PhotoViewController photoViewControllerForPageIndex:(index + 1)];
 }
 //Following delegate for show page numbers. But the position is too low and no way to customize, so I have to use PageControl
@@ -119,8 +133,8 @@
     int selectedPhotoIdx = self.pageControl.currentPage;
     if (self.eventEditor.photoScrollView.selectedAsThumbnailIndex == selectedPhotoIdx)
         self.eventEditor.photoScrollView.selectedAsThumbnailIndex = NOT_THUMBNAIL;
-    if (self.eventEditor.photoScrollView.selectedAsShareIndex == selectedPhotoIdx)
-        self.eventEditor.photoScrollView.selectedAsShareIndex = 0;
+    if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:selectedPhotoIdx]])
+        [self.eventEditor.photoScrollView.selectedAsShareIndexSet removeObject:[NSNumber numberWithInt:selectedPhotoIdx]];
     
     NSString* deletedFileName =self.eventEditor.photoScrollView.photoList[selectedPhotoIdx];
     //NSLog(@" deleted file = %@",deletedFileName);
@@ -138,10 +152,16 @@
 - (void) setShareAction: (id)sender
 {
     int selectedPhotoIdx = self.pageControl.currentPage;
-    self.eventEditor.photoScrollView.selectedAsShareIndex = selectedPhotoIdx;
+    [self.eventEditor.photoScrollView.selectedAsShareIndexSet addObject:[NSNumber numberWithInt: selectedPhotoIdx]];
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new 
     [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-    [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
+    if (shareIconView.image == nil)
+        shareIconView.image = [UIImage imageNamed:@"share.png"];
+    else
+    {
+        shareIconView.image = nil;
+        [self.eventEditor.photoScrollView.selectedAsShareIndexSet removeObject:[NSNumber numberWithInt: selectedPhotoIdx]];
+    }
 }
 
 - (void)tapToHideShowToolbar:(UIGestureRecognizer *)gestureRecognizer

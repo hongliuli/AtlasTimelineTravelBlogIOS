@@ -16,6 +16,6 @@
 @property (weak, nonatomic) ATEventEditorTableController* eventEditor;
 @property int selectedPhotoIndex;
 @property int selectedAsThumbnailIndex;
-@property int selectedAsShareIndex;
+@property NSMutableSet* selectedAsShareIndexSet;
 
 @end
