@@ -519,7 +519,7 @@
             else
             {
                 uploadAllToDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Replace photos on Dropbox for %@", [ATHelper getSelectedDbFileName]]
-                            message: [NSString stringWithFormat:@"WARNING: All photoes on your dropbox:/ChoronicleMap/%@ will be replaced with %d photos on this device!",_source, totalPhotoCountInDevice]
+                            message: [NSString stringWithFormat:@"WARNING: All photoes on your dropbox:/ChoronicleMap/%@ will be deleted and replaced by %d photos from this device!",_source, totalPhotoCountInDevice]
                             delegate: self
                             cancelButtonTitle:@"Cancel"
                             otherButtonTitles:@"Yes, Continue",nil];
@@ -561,7 +561,7 @@
             else
             {
                 downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Import photos from Dropbox:/ChronicleMap/%@", [ATHelper getSelectedDbFileName]]
-                        message: [NSString stringWithFormat:@"Import %@ photos in Dropbox that are not in your app. This operation is safe and repeatable.",[ATHelper getSelectedDbFileName]]
+                        message: [NSString stringWithFormat:@"Download missing %@ photos from Dropbox. This operation can be repeated until all photos are downloaded.",[ATHelper getSelectedDbFileName]]
                         delegate: self
                         cancelButtonTitle:@"Cancel"
                         otherButtonTitles:@"Yes, Continue",nil];
