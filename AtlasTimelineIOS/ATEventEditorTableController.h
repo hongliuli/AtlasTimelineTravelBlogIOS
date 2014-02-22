@@ -54,6 +54,7 @@
 - (void)showPhotoView:(int)photoFileName image:(UIImage*)image;
 - (void)deleteCallback:(NSString*) photoFileName;
 - (void)resetEventEditor;
+- (void)setShareCount;
 
 //these can easily be assigne to BasePhotoViewController, but ImageScrollView also need, so make them static
 + (NSArray*) photoList;

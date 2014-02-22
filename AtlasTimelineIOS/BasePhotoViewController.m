@@ -17,6 +17,7 @@
 @synthesize pageViewController;
 
 UIImageView* shareIconView;
+UILabel* shareCountLabel;
 
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -82,8 +83,25 @@ UIImageView* shareIconView;
     [self.view bringSubviewToFront:self.pageControl];
     
     shareIconView = [[UIImageView alloc] initWithFrame:CGRectMake(50, [ATConstants screenHeight] - 110 , 30, 30)];
+    shareCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, [ATConstants screenHeight] - 110 , 80, 30)];
     shareIconView.image = nil;
+    shareCountLabel.backgroundColor = [UIColor colorWithRed: 0.95 green: 0.95 blue: 0.95 alpha: 0.5];
+    shareCountLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:shareIconView];
+    [self.view addSubview:shareCountLabel];
+    shareCountLabel.hidden = true;
+    
+    if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:[ATEventEditorTableController selectedPhotoIdx]]])
+    {      
+        shareIconView.image = [UIImage imageNamed:@"share.png"];
+        shareCountLabel.hidden = false;
+        shareCountLabel.text = [NSString stringWithFormat:@"%d selected",self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
+    }
+    else
+    {
+        shareIconView.image = nil;
+        shareCountLabel.hidden = true;
+    }
 }
 
 
@@ -94,9 +112,16 @@ UIImageView* shareIconView;
     NSUInteger index = vc.pageIndex;
     self.pageControl.currentPage = index;
     if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:index]])
+    {
         shareIconView.image = [UIImage imageNamed:@"share.png"];
+        shareCountLabel.hidden = false;
+        shareCountLabel.text = [NSString stringWithFormat:@"%d selected",self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
+    }
     else
+    {
         shareIconView.image = nil;
+        shareCountLabel.hidden = true;
+    }
     return [PhotoViewController photoViewControllerForPageIndex:(index - 1)];
 }
 
@@ -105,9 +130,16 @@ UIImageView* shareIconView;
     NSUInteger index = vc.pageIndex;
     self.pageControl.currentPage =  index;
     if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:index]])
+    {
         shareIconView.image = [UIImage imageNamed:@"share.png"];
+        shareCountLabel.hidden = false;
+        shareCountLabel.text = [NSString stringWithFormat:@"%d selected",self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
+    }
     else
+    {
         shareIconView.image = nil;
+        shareCountLabel.hidden = true;
+    }
     return[PhotoViewController photoViewControllerForPageIndex:(index + 1)];
 }
 //Following delegate for show page numbers. But the position is too low and no way to customize, so I have to use PageControl
@@ -128,6 +160,7 @@ UIImageView* shareIconView;
     [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 }
 
+//TODO delete will cause issue to those marked as share, but I do not want to consider it, it weired that people will do share and delete in the same session
 - (void) deleteAction: (id)sender
 {
     int selectedPhotoIdx = self.pageControl.currentPage;
@@ -155,13 +188,19 @@ UIImageView* shareIconView;
     [self.eventEditor.photoScrollView.selectedAsShareIndexSet addObject:[NSNumber numberWithInt: selectedPhotoIdx]];
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new 
     [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+    shareCountLabel.text = [NSString stringWithFormat:@"%d selected",self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
     if (shareIconView.image == nil)
+    {
         shareIconView.image = [UIImage imageNamed:@"share.png"];
+        shareCountLabel.hidden = false;
+    }
     else
     {
         shareIconView.image = nil;
+        shareCountLabel.hidden = true;
         [self.eventEditor.photoScrollView.selectedAsShareIndexSet removeObject:[NSNumber numberWithInt: selectedPhotoIdx]];
     }
+    [self.eventEditor setShareCount];
 }
 
 - (void)tapToHideShowToolbar:(UIGestureRecognizer *)gestureRecognizer

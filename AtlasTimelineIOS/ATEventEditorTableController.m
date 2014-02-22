@@ -59,6 +59,7 @@ UIView* customViewForPhoto;
 
 UILabel *lblTotalCount;
 UILabel *lblNewAddedCount;
+UILabel *lblShareCount;
 
 UIAlertView *alertDelete;
 UIAlertView *alertCancel;
@@ -109,6 +110,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [self.photoScrollView removeFromSuperview];
         self.photoScrollView = nil;
     }
+    lblShareCount.text = @"Share Event";
     
     //customViewForPhoto = nil;
     
@@ -168,17 +170,21 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [shareButton addTarget:self action:@selector(shareButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:shareButton];
         
-        UILabel* label2 = [[UILabel alloc] initWithFrame:CGRectMake(220, 0, 100, 40)];
-        label2.font = [UIFont fontWithName:@"Helvetica" size:10];
-        label2.backgroundColor = [UIColor clearColor];
-        label2.text = @"Share Events";
-        [customView addSubview:label2];
+        lblShareCount = [[UILabel alloc] initWithFrame:CGRectMake(220, 0, 100, 40)];
+        lblShareCount.font = [UIFont fontWithName:@"Helvetica" size:10];
+        lblShareCount.backgroundColor = [UIColor clearColor];
+        lblShareCount.text = @"Share Events";
+        [customView addSubview:lblShareCount];
     }
     [self.view bringSubviewToFront:self.datePicker];
     [self.view bringSubviewToFront:self.toolbar];
     return customView;
 }
 
+- (void) setShareCount
+{
+    lblShareCount.text = [NSString stringWithFormat:@"%d photo(s)", self.photoScrollView.selectedAsShareIndexSet.count ];
+}
  
 //called by mapView after know eventId
 - (void) createPhotoScrollView:(NSString *)photoDirName
