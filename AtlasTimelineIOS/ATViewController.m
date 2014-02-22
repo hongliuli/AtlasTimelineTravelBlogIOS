@@ -1633,13 +1633,18 @@
         
         //solution in yahoo email, search"non-consumable"
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-        if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
+        NSString* loginSecurityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+        //This part is for test sandbox version, so no limit when test with Mac
+        BOOL noHongliuliFlag = true;
+        if (loginSecurityCode != nil && [loginSecurityCode isEqualToString:@"375151"])
+            noHongliuliFlag = false;
+        if ([userDefault objectForKey:IN_APP_PURCHASED] == nil && noHongliuliFlag)
         {
             purchase = [[ATInAppPurchaseViewController alloc] init];
             [purchase processInAppPurchase];
         }
         //Check again if purchase has really done
-        if ([userDefault objectForKey:IN_APP_PURCHASED] == nil)
+        if ([userDefault objectForKey:IN_APP_PURCHASED] == nil && noHongliuliFlag)
             return;
     }
     
