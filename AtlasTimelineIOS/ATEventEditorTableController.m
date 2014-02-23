@@ -13,6 +13,7 @@
 #import "ATViewImagePickerController.h"
 #import "BasePhotoViewController.h"
 #import "ATHelper.h"
+#import "ATConstants.h"
 #import <QuartzCore/QuartzCore.h>
 #import <Social/Social.h>
 
@@ -64,6 +65,9 @@ UILabel *lblShareCount;
 UIAlertView *alertDelete;
 UIAlertView *alertCancel;
 
+int editorPhotoViewWidth;
+int editorPhotoViewHeight;
+
 #pragma mark UITableViewDelegate
 /*
 - (void)tableView: (UITableView*)tableView
@@ -87,6 +91,25 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     tapper.cancelsTouchesInView = FALSE;
     [self.view addGestureRecognizer:tapper];
     self.dateTxt.delegate = self;
+    editorPhotoViewWidth = EDITOR_PHOTOVIEW_WIDTH;
+    editorPhotoViewHeight = EDITOR_PHOTOVIEW_HEIGHT;
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    {
+        BOOL optionIPADFullScreenEditorFlag = [ATHelper getOptionEditorFullScreen];
+        if (optionIPADFullScreenEditorFlag)
+        {
+            editorPhotoViewWidth = [ATConstants screenWidth];
+            //editorPhotoViewHeight = [ATConstants screenHeight];
+            CGRect frame = self.description.frame;
+            frame.size.width = editorPhotoViewWidth;
+            [self.description setFrame:frame];
+            
+            frame = self.address.frame;
+            frame.size.width = editorPhotoViewWidth;
+            [self.address setFrame:frame];
+        }
+    }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -122,11 +145,11 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     if (section == 0)
     {
         //view for this section. Please refer to heightForHeaderInSection() function
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, EDITOR_PHOTOVIEW_WIDTH, EDITOR_PHOTOVIEW_HEIGHT)];
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, editorPhotoViewWidth, editorPhotoViewHeight)];
         
         // create photo count display
-        lblTotalCount = [[UILabel alloc] initWithFrame:CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 180, EDITOR_PHOTOVIEW_HEIGHT + 15, 20, 20)];
-        lblNewAddedCount = [[UILabel alloc] initWithFrame:CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 160, EDITOR_PHOTOVIEW_HEIGHT + 15, 100, 20)];
+        lblTotalCount = [[UILabel alloc] initWithFrame:CGRectMake(editorPhotoViewWidth - 180, editorPhotoViewHeight + 15, 20, 20)];
+        lblNewAddedCount = [[UILabel alloc] initWithFrame:CGRectMake(editorPhotoViewWidth - 160, editorPhotoViewHeight + 15, 100, 20)];
         lblTotalCount.backgroundColor = [UIColor clearColor];
         lblNewAddedCount.backgroundColor = [UIColor clearColor];
         lblTotalCount.font = [UIFont fontWithName:@"Helvetica" size:13];
@@ -139,7 +162,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         UIImage *thumb2 = [UIImage imageNamed:@"add-button-md.png"];
         [photoBtn setImage:thumb2 forState:UIControlStateNormal];
-        photoBtn.frame = CGRectMake(EDITOR_PHOTOVIEW_WIDTH - 110, EDITOR_PHOTOVIEW_HEIGHT - 25, 35, 35);
+        photoBtn.frame = CGRectMake(editorPhotoViewWidth - 110, editorPhotoViewHeight - 25, 35, 35);
         [photoBtn addTarget:self action:@selector(takePictureAction:) forControlEvents:UIControlEventTouchUpInside];
         photoBtn.tag = ADD_PHOTO_BUTTON_TAG_777;
         [customView addSubview:photoBtn];
@@ -189,7 +212,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 //called by mapView after know eventId
 - (void) createPhotoScrollView:(NSString *)photoDirName
 {
-    self.photoScrollView = [[ATPhotoScrollView alloc] initWithFrame:CGRectMake(0,5,EDITOR_PHOTOVIEW_WIDTH,EDITOR_PHOTOVIEW_HEIGHT)];
+    self.photoScrollView = [[ATPhotoScrollView alloc] initWithFrame:CGRectMake(0,5,editorPhotoViewWidth,editorPhotoViewHeight)];
     self.photoScrollView.tag = ADDED_PHOTOSCROLL_TAG_900;
     self.photoScrollView.eventEditor = self;
     if (self.photoScrollView.photoList == nil && photoDirName != nil) //photoDirName==nil if first drop pin in map
@@ -224,7 +247,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     
     if (section == 0)
-        return EDITOR_PHOTOVIEW_HEIGHT + 15; //IMPORTANT, this will decide where is clickable for my photoScrollView and Add Photo button. 15 is the gap between Date and photo scroll
+        return editorPhotoViewHeight + 15; //IMPORTANT, this will decide where is clickable for my photoScrollView and Add Photo button. 15 is the gap between Date and photo scroll
     else if (section == 1)
         return 0;
     else
@@ -474,21 +497,18 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
 - (IBAction)deleteAction:(id)sender {
     int cnt = [self.photoScrollView.photoList count] ;
+    NSString* promptStr = @"This event will be deleted!";
     if (cnt > 0)
     {
-        alertDelete = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"%d photo(s) will be deleted",cnt]
-                                                       message: [NSString stringWithFormat:@"Delete the event will remove all photo(s) belong to it."]
-                                                      delegate: self
-                                             cancelButtonTitle:@"Cancel"
-                                             otherButtonTitles:@"Delete",nil];
-        
-        
-        [alertDelete show];
+        promptStr = [NSString stringWithFormat:@"%d photo(s) in the event will be deleted as well",cnt];
     }
-    else
-    {
-        [self.delegate deleteEvent];
-    }
+    alertDelete = [[UIAlertView alloc]initWithTitle: @"Confirm to delete the event"
+                                            message: promptStr
+                                           delegate: self
+                                  cancelButtonTitle:@"Cancel"
+                                  otherButtonTitles:@"Delete",nil];
+    [alertDelete show];
+
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex

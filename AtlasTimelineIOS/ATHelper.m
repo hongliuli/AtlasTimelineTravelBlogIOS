@@ -343,23 +343,6 @@ UIPopoverController *verifyViewPopover;
 }
 
 //set/get options
-+ (BOOL) getOptionDateFieldMoveDateMagnifier
-{
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    NSString* flag = [userDefault objectForKey:@"DateFieldDateMagnifier"];
-    if (flag == nil || [flag isEqualToString:@"N"]) //default is N
-        return false;
-    else
-        return true;
-}
-+ (void) setOptionDateFieldMoveDateMagnifier:(BOOL)flag
-{
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    NSString* flagStr = @"N";
-    if (flag)
-        flagStr = @"Y";
-    [userDefault setObject:flagStr forKey:@"DateFieldKeyboardEnable"];
-}
 + (BOOL) getOptionDateFieldKeyboardEnable
 {
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
@@ -424,6 +407,23 @@ UIPopoverController *verifyViewPopover;
     [userDefault setObject:flagStr forKey:@"DateMagnifierMode"];
 }
 
++ (BOOL) getOptionEditorFullScreen
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flag = [userDefault objectForKey:@"EditorFullScreen"];
+    if (flag == nil || [flag isEqualToString:@"N"]) //default is N
+        return false;
+    else
+        return true;
+}
++ (void) setOptionEditorFullScreen:(BOOL)flag
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flagStr = @"N";
+    if (flag)
+        flagStr = @"Y";
+    [userDefault setObject:flagStr forKey:@"EditorFullScreen"];
+}
 
 
 @end

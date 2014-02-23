@@ -36,15 +36,14 @@
 + (UIColor *) colorWithHexString: (NSString *) stringToConvert;
 
 //set/get options
-+ (BOOL) getOptionDateFieldMoveDateMagnifier;
-+ (void) setOptionDateFieldMoveDateMagnifier:(BOOL)flag;
 + (BOOL) getOptionDateFieldKeyboardEnable;
 + (void) setOptionDateFieldKeyboardEnable:(BOOL)flag;
 + (BOOL) getOptionDisplayTimeLink;
 + (void) setOptionDisplayTimeLink:(BOOL)flag;
 + (BOOL) getOptionDateMagnifierModeScroll;
 + (void) setOptionDateMagnifierModeScroll:(BOOL)flag;
-
++ (BOOL) getOptionEditorFullScreen;
++ (void) setOptionEditorFullScreen:(BOOL)flag;
 
 
 @end

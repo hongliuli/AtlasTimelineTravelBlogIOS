@@ -10,8 +10,9 @@
 #import "ATHelper.h"
 
 #define ROW_ENABLE_MOVE_DATE 0
-#define ROW_ENABLE_TIME_LINK 1
-#define ROW_DATE_FIELD_KEYBOARD 2
+#define ROW_IPAD_EDIT_FULLSCREEN 1
+#define ROW_ENABLE_TIME_LINK 2
+#define ROW_DATE_FIELD_KEYBOARD 3
 
 
 @interface ATOptionsTableViewController ()
@@ -19,6 +20,11 @@
 @end
 
 @implementation ATOptionsTableViewController
+
+UISwitch *switchViewTimeLink;
+UISwitch *switchViewEditorFullScreen;
+UISwitch *switchViewKeyboardForDate;
+UISwitch *switchViewMagnifierMove;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -59,9 +65,25 @@
 {
 #warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return 3;
+    return 4;
 }
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView* customView = nil;
+    if (section == 0)
+    {
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 200.0, 60.0)];
+    
+        UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        shareButton.frame = CGRectMake(-15, -15, 200, 60);
+        [shareButton setTitle:@"Reset to Default" forState:UIControlStateNormal];
+        shareButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
+        [shareButton addTarget:self action:@selector(setDefaultAction:) forControlEvents:UIControlEventTouchUpInside];
+        [customView addSubview:shareButton];
+    }
+    return customView;
 
+}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     switch( [indexPath row] ) {
         case ROW_ENABLE_MOVE_DATE: {
@@ -70,13 +92,29 @@
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellMoveDate"];
                 aCell.textLabel.text = @"Date Magnifer Scroll";
                 aCell.selectionStyle = UITableViewCellSelectionStyleNone;
-                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
-                aCell.accessoryView = switchView;
+                switchViewMagnifierMove = [[UISwitch alloc] initWithFrame:CGRectZero];
+                aCell.accessoryView = switchViewMagnifierMove;
                 if ([ATHelper getOptionDateMagnifierModeScroll])
-                    [switchView setOn:YES animated:NO];
+                    [switchViewMagnifierMove setOn:YES animated:NO];
                 else
-                    [switchView setOn:NO animated:NO];
-                [switchView addTarget:self action:@selector(dateMagnifierModeChanged:) forControlEvents:UIControlEventValueChanged];
+                    [switchViewMagnifierMove setOn:NO animated:NO];
+                [switchViewMagnifierMove addTarget:self action:@selector(dateMagnifierModeChanged:) forControlEvents:UIControlEventValueChanged];
+            }
+            return aCell;
+        }
+        case ROW_IPAD_EDIT_FULLSCREEN: { //will not show this row in iPhone
+            UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellEditFullScreen"];
+            if( aCell == nil ) {
+                aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellEditFullScreen"];
+                aCell.textLabel.text = @"Full Screen Event Editor"; //Note: iPad only show this row
+                aCell.selectionStyle = UITableViewCellSelectionStyleNone;
+                switchViewEditorFullScreen = [[UISwitch alloc] initWithFrame:CGRectZero];
+                aCell.accessoryView = switchViewEditorFullScreen;
+                if ([ATHelper getOptionEditorFullScreen])
+                    [switchViewEditorFullScreen setOn:YES animated:NO];
+                else
+                    [switchViewEditorFullScreen setOn:NO animated:NO];
+                [switchViewEditorFullScreen addTarget:self action:@selector(editorFullScreenChanged:) forControlEvents:UIControlEventValueChanged];
             }
             return aCell;
         }
@@ -86,13 +124,13 @@
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellDateField"];
                 aCell.textLabel.text = @"Use keyboard to enter date";
                 aCell.selectionStyle = UITableViewCellSelectionStyleNone;
-                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
-                aCell.accessoryView = switchView;
+                switchViewKeyboardForDate = [[UISwitch alloc] initWithFrame:CGRectZero];
+                aCell.accessoryView = switchViewKeyboardForDate;
                 if ([ATHelper getOptionDateFieldKeyboardEnable])
-                    [switchView setOn:YES animated:NO];
+                    [switchViewKeyboardForDate setOn:YES animated:NO];
                 else
-                    [switchView setOn:NO animated:NO];
-                [switchView addTarget:self action:@selector(dateFieldKeyboardEnableChanged:) forControlEvents:UIControlEventValueChanged];
+                    [switchViewKeyboardForDate setOn:NO animated:NO];
+                [switchViewKeyboardForDate addTarget:self action:@selector(dateFieldKeyboardEnableChanged:) forControlEvents:UIControlEventValueChanged];
             }
             return aCell;
         }
@@ -102,18 +140,45 @@
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellTimeLink"];
                 aCell.textLabel.text = @"Show timelink when focuse event";
                 aCell.selectionStyle = UITableViewCellSelectionStyleNone;
-                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
-                aCell.accessoryView = switchView;
+                switchViewTimeLink = [[UISwitch alloc] initWithFrame:CGRectZero];
+                aCell.accessoryView = switchViewTimeLink;
                 if ([ATHelper getOptionDisplayTimeLink])
-                    [switchView setOn:YES animated:NO];
+                    [switchViewTimeLink setOn:YES animated:NO];
                 else
-                    [switchView setOn:NO animated:NO];
-                [switchView addTarget:self action:@selector(timeLinkEnableChanged:) forControlEvents:UIControlEventValueChanged];
+                    [switchViewTimeLink setOn:NO animated:NO];
+                [switchViewTimeLink addTarget:self action:@selector(timeLinkEnableChanged:) forControlEvents:UIControlEventValueChanged];
             }
             return aCell;
         }
     }
     return nil;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && indexPath.row == ROW_IPAD_EDIT_FULLSCREEN)
+        return 0;
+    else
+        return 40;
+}
+
+- (void) setDefaultAction: (id)sender {
+    UIButton* button = (UIButton*)sender;
+    UIColor* originalColor = button.titleLabel.backgroundColor;
+
+    [ATHelper setOptionDateFieldKeyboardEnable:false];
+    [switchViewKeyboardForDate setOn:NO animated:NO];
+    [ATHelper setOptionDateMagnifierModeScroll:true];
+    [switchViewMagnifierMove setOn:YES animated:NO];
+    [ATHelper setOptionDisplayTimeLink:true];
+    [switchViewTimeLink setOn:YES animated:NO];
+    [ATHelper setOptionEditorFullScreen:false];
+    [switchViewEditorFullScreen setOn:NO animated:NO];
+    
+    [UIView transitionWithView:button.titleLabel duration:0.25 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+        button.titleLabel.backgroundColor = [UIColor blueColor];
+    } completion:^(BOOL finished){button.titleLabel.backgroundColor = originalColor;}];
+
+    
 }
 
 - (void) dateFieldKeyboardEnableChanged:(id)sender {
@@ -138,6 +203,14 @@
         [ATHelper setOptionDateMagnifierModeScroll:true];
     else
         [ATHelper setOptionDateMagnifierModeScroll:false];
+}
+
+- (void) editorFullScreenChanged:(id)sender {
+    UISwitch* switchControl = sender;
+    if (switchControl.on)
+        [ATHelper setOptionEditorFullScreen:true];
+    else
+        [ATHelper setOptionEditorFullScreen:false];
 }
 
 
