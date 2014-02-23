@@ -82,6 +82,8 @@
     
     NSMutableArray* selectedAnnotationNearestLocationList; //do not add to selectedAnnotationSet if too close
     NSMutableDictionary* selectedAnnotationSet;//hold uilabels for selected annotation's description
+    NSMutableDictionary* tmpLblUniqueIdMap;
+    int tmpLblUniqueMapIdx;
     NSMutableSet* selectedAnnotationViewsFromDidAddAnnotation;
     NSDate* regionChangeTimeStart;
     ATDefaultAnnotation* newAddedPin;
@@ -150,6 +152,8 @@
     [_mapView addGestureRecognizer:tapgr];
     
     selectedAnnotationSet = [[NSMutableDictionary alloc] init];
+    tmpLblUniqueIdMap = [[NSMutableDictionary alloc] init];
+    tmpLblUniqueMapIdx = 1;
     selectedAnnotationNearestLocationList = [[NSMutableArray alloc] init];
     regionChangeTimeStart = [[NSDate alloc] init];
     [self prepareMapView];
@@ -412,6 +416,8 @@
         [selectedAnnotationSet removeAllObjects];
         [selectedAnnotationNearestLocationList removeAllObjects];
     }
+    [tmpLblUniqueIdMap removeAllObjects];
+    tmpLblUniqueMapIdx = 1;
 }
 - (void)setMapCenter:(ATEventDataStruct*)ent :(int)zoomLevel
 {
@@ -756,6 +762,7 @@
                     UIImage* img = [self readPhotoThumbFromFile:ann.uniqueId];
                     if (img != nil)
                     {
+                        tmpLbl.userInteractionEnabled = YES;
                         UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
                         [imgView setAlpha:0.85];
                         imgView.tag = 100; //later used to get subview
@@ -776,9 +783,10 @@
                         tmpLbl.layer.cornerRadius = 8;
                         tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
                         tmpLbl.layer.borderWidth = 1;
-                        //[tmpLbl setClipsToBounds:true];
-                        //imgView.center = CGPointMake(tmpLbl.frame.size.width/2, tmpLbl.frame.size.height/2);
                         
+                        [tmpLblUniqueIdMap setObject:annView forKey:[NSNumber numberWithInt:tmpLblUniqueMapIdx ]];
+                        tmpLbl.tag = tmpLblUniqueMapIdx;
+                        tmpLblUniqueMapIdx++;
                     }
                     else
                     {
@@ -855,6 +863,20 @@
     }
     
     return nil;
+}
+
+//All View is a UIResponder, all UIresponder objects can implement touchesBegan
+-(void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
+    //NSLog(@"------ tab");
+    UITouch *touch = [touches anyObject];
+    NSNumber* annViewKey = [NSNumber numberWithInt:touch.view.tag];
+    //NSLog(@" ---- touch key:%@", annViewKey);
+    if ([annViewKey intValue] > 0) //tag is set in viewForAnnotation. search for "[tmpLblUniqueIdMap setObject:annView forKey:"
+    {
+        MKAnnotationView* annView = [tmpLblUniqueIdMap objectForKey:annViewKey];
+        [self startEventEditor:annView];
+    }
+    //[self showPhotoView:[tmpLblUniqueIdMap objectForKey:[NSNumber numberWithInt:tmpLblUniqueMapIdx]]];
 }
 
 
@@ -1075,77 +1097,12 @@
     ATEventAnnotation* ann = [view annotation];
     selectedEventAnnotation = ann;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    UIStoryboard* storyboard = appDelegate.storyBoard;
-    NSDateFormatter *dateFormater = appDelegate.dateFormater;
+
     self.selectedAnnotation = (ATEventAnnotation*)[view annotation];
     //TODO need to see if it is run on iPad or iPhone
     
     if ([control.accessibilityLabel isEqualToString: @"right"]){
-        if (self.eventEditor == nil) {
-            //I just learned from iOS5 tutor pdf, there is a way to create segue for accessory buttons, I do not want to change, Will use it in iPhone storyboard
-            self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
-            self.eventEditor.delegate = self;
-        }
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
-            self.eventEditorPopover.popoverContentSize = CGSizeMake(380,480);
-            [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-        }
-        else {
-            //[self performSegueWithIdentifier:@"eventeditor_segue_id" sender:nil];
-            //[self.navigationController presentModalViewController:self.eventEditor animated:YES]; //pushViewController: self.eventEditor animated:YES];
-            [self.navigationController presentViewController:self.eventEditor animated:YES completion:nil];
-        }
-        //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
-        [self.eventEditor resetEventEditor];
-        
-        /***********************************************
-        //TODO xxxxxx THIS PART is for from ver1.2 to ver3, that is from single photo to multiple photo, to copy old version photo to directory structure
-        //     Should remove this part in later version
-        if (ann.uniqueId != nil)
-        {
-            NSString *photoPath = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:ann.uniqueId];
-            NSString *photoTmpPath = [NSString stringWithFormat:@"%@_tmp",photoPath];
-            NSString *photoNewPath = [photoPath stringByAppendingPathComponent:@"movedFromSinglePhotoVersion"]; //file name does not matter
-            NSString *thumbPath = [photoPath stringByAppendingPathComponent:@"thumbnail"]; //file name does not matter
-            NSError *error;
-            BOOL isDir;
-            NSFileManager *fileMgr = [NSFileManager defaultManager];
-            BOOL eventPhotoExistFlag = [fileMgr fileExistsAtPath:photoPath isDirectory:&isDir];
-            if (eventPhotoExistFlag && !isDir )
-            {
-                [fileMgr moveItemAtPath:photoPath toPath:photoTmpPath error:&error];
-                [fileMgr createDirectoryAtPath:photoPath withIntermediateDirectories:YES attributes:nil error:&error];
-                [fileMgr moveItemAtPath:photoTmpPath toPath:photoNewPath error:&error];
-                
-                UIImage* photo = [UIImage imageWithContentsOfFile: photoNewPath];
-                UIImage* thumbImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
-                NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
-                // NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
-                [imageData writeToFile:thumbPath atomically:NO];
-                [self.dataController insertNewPhotoQueue:[ann.uniqueId stringByAppendingPathComponent:@"movedFromSinglePhotoVersion"]];
-            }
-        }
-        ************************************comment out finally on Feb 1, 2013 *************/
-        
-        
-        self.eventEditor.coordinate = ann.coordinate;
-        if ([ann.description isEqualToString:NEWEVENT_DESC_PLACEHOLD])
-        {
-            self.eventEditor.description.textColor = [UIColor lightGrayColor];
-        }
-        
-        self.eventEditor.description.text = ann.description;
-        self.eventEditor.address.text=ann.address;
-        self.eventEditor.dateTxt.text = [NSString stringWithFormat:@"%@",
-                                         [dateFormater stringFromDate:ann.eventDate]];
-        self.eventEditor.eventType = ann.eventType;
-        self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
-        self.eventEditor.eventId = ann.uniqueId;
-        [ATEventEditorTableController setEventId:ann.uniqueId];
-        //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
-        [self.eventEditor createPhotoScrollView: ann.uniqueId ];
-        
+        [self startEventEditor:view];
     }
     else if ([control.accessibilityLabel isEqualToString: @"left"]){
         //NSLog(@"left button clicked");
@@ -1187,6 +1144,58 @@
         focusedEvent = ent;
         [self showTimeLinkOverlay];
     }
+}
+
+- (void) startEventEditor:(MKAnnotationView*)view
+{
+    ATEventAnnotation* ann = [view annotation];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    UIStoryboard* storyboard = appDelegate.storyBoard;
+    NSDateFormatter *dateFormater = appDelegate.dateFormater;
+    //if (self.eventEditor == nil) {
+        //I just learned from iOS5 tutor pdf, there is a way to create segue for accessory buttons, I do not want to change, Will use it in iPhone storyboard
+        self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
+        self.eventEditor.delegate = self;
+    //}
+
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        BOOL optionIPADFullScreen = [ATHelper getOptionEditorFullScreen];
+        if (optionIPADFullScreen)
+        {
+            [self.navigationController presentViewController:self.eventEditor animated:YES completion:nil];
+        }
+        else
+        {
+            self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
+            self.eventEditorPopover.popoverContentSize = CGSizeMake(380,480);
+            [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        }
+    }
+    else {
+        //[self performSegueWithIdentifier:@"eventeditor_segue_id" sender:nil];
+        //[self.navigationController presentModalViewController:self.eventEditor animated:YES]; //pushViewController: self.eventEditor animated:YES];
+        [self.navigationController presentViewController:self.eventEditor animated:YES completion:nil];
+    }
+    //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
+    [self.eventEditor resetEventEditor];
+    
+    
+    self.eventEditor.coordinate = ann.coordinate;
+    if ([ann.description isEqualToString:NEWEVENT_DESC_PLACEHOLD])
+    {
+        self.eventEditor.description.textColor = [UIColor lightGrayColor];
+    }
+    
+    self.eventEditor.description.text = ann.description;
+    self.eventEditor.address.text=ann.address;
+    self.eventEditor.dateTxt.text = [NSString stringWithFormat:@"%@",
+                                     [dateFormater stringFromDate:ann.eventDate]];
+    self.eventEditor.eventType = ann.eventType;
+    self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
+    self.eventEditor.eventId = ann.uniqueId;
+    [ATEventEditorTableController setEventId:ann.uniqueId];
+    //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
+    [self.eventEditor createPhotoScrollView: ann.uniqueId ];
 }
 
 //always start from focusedEvent
