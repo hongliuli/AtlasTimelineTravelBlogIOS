@@ -15,7 +15,7 @@
                     </mapView>
                     <navigationItem key="navigationItem" id="Ieb-ix-0Y1">
                         <nil key="title"/>
-                        <barButtonItem key="leftBarButtonItem" title="Timeline View" id="bcH-qZ-1el">
+                        <barButtonItem key="leftBarButtonItem" title="List/Search" id="bcH-qZ-1el">
                             <connections>
                                 <segue destination="rCH-rC-6N0" kind="push" identifier="map_to_timeline" id="q8b-Bd-Jvc"/>
                             </connections>
