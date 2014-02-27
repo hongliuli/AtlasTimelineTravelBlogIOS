@@ -49,6 +49,8 @@ NSDate* mEndDateFromParent;
 double frameWidth;
 CGContextRef context;
 
+NSDate* prevYearDate;
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -275,9 +277,14 @@ CGContextRef context;
 }
 
 //have to call this after set text otherwise sizeToFit will not work
-- (void) fitSzie:(UILabel*)label
+- (void) decorateLabel:(UILabel*)label
 {
-    UIColor* bgColor = [UIColor colorWithRed:0.3 green:0.1 blue:0.1 alpha:0.5 ];
+    UIColor* bgColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.8 alpha:0.5 ];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (appDelegate.selectedPeriodInDays == 30)
+        bgColor = [UIColor blueColor];
+    else if (appDelegate.selectedPeriodInDays == 7)
+        bgColor = [UIColor colorWithRed:0.8 green:0.1 blue:0.8 alpha:1 ];
     label.backgroundColor = bgColor;
     label.textColor = [UIColor whiteColor];
     label.font=[UIFont fontWithName:@"Helvetica-Bold" size:13];
@@ -290,6 +297,25 @@ CGContextRef context;
     
 }
 
+- (void) decorateLabelYear:(UILabel*)label
+{
+    UIColor* bgColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.8 alpha:0.5 ];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (appDelegate.selectedPeriodInDays == 30)
+        bgColor = [UIColor blueColor];
+    else if (appDelegate.selectedPeriodInDays == 7)
+        bgColor = [UIColor colorWithRed:0.8 green:0.1 blue:0.8 alpha:1 ];
+    label.backgroundColor = bgColor;
+    label.textColor = [UIColor whiteColor];
+    label.font=[UIFont fontWithName:@"Helvetica-Bold" size:15];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.layer.cornerRadius = 5;
+    label.layer.borderColor = [UIColor brownColor].CGColor;
+    label.layer.borderWidth = 1;
+    
+   // [label sizeToFit];
+    
+}
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
@@ -334,119 +360,117 @@ CGContextRef context;
     int dayInterval = interval/86400;
     double timeSpanInDay = dayInterval;
 
-    /*** comment on 2/16/14, do not want to show segment text
-     float tmp = 0.0;
-    int timeSegment = 0;
-    NSString* timeSegmentUnit = nil;
-    if (timeSpanInDay < 121)
-    {
-        tmp = timeSpanInDay/4;
-        timeSegment = timeSpanInDay/4;
-        timeSegmentUnit = @"days";
-    }
-    else if (timeSpanInDay < 365*4)
-    {
-        tmp = timeSpanInDay/120;
-        timeSegment = timeSpanInDay/120; //divide 30 and 4
-        timeSegmentUnit=@"months";
-    }
-    else
-    {
-        tmp = (timeSpanInDay/365)/4;
-        timeSegment = (timeSpanInDay/365)/4;
-        timeSegmentUnit=@"years";
-    }
-    NSString* plusSign=@"";
-    if (tmp - timeSegment >0.3)
-        plusSign=@"+";
-    labelSeg1.text = [NSString stringWithFormat:@"%i%@ %@",timeSegment,plusSign,timeSegmentUnit];
-    labelSeg2.text = [NSString stringWithFormat:@"%i%@ %@",timeSegment,plusSign,timeSegmentUnit];
-    labelSeg3.text = [NSString stringWithFormat:@"%i%@ %@",timeSegment,plusSign,timeSegmentUnit];
-    labelSeg4.text = [NSString stringWithFormat:@"%i%@ %@",timeSegment,plusSign,timeSegmentUnit];
-    */
     if (calendar == nil)
         calendar = [NSCalendar currentCalendar];
     
-    NSString* yearPart;
-    if (timeSpanInDay <= 30)
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (appDelegate.selectedPeriodInDays <= 30 || timeSpanInDay <= 356)
     {
-        label1.hidden = true;
-        label2.hidden = true;
-        label3.hidden = true;
-        label4.hidden = true;
-        label5.hidden = true;
-        return;
-    }
-    else
-    {
-        label1.hidden = false;
-        label2.hidden = false;
-        label3.hidden = false;
-        label4.hidden = false;
-        label5.hidden = false;
-    }
-    NSDate* tmpDate = startDay;
+        startDay = [ATHelper getYearStartDate:appDelegate.focusedDate];
+        NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+        [dateComponents setYear:1];
+        endDay = [gregorian dateByAddingComponents:dateComponents toDate:startDay  options:0];
 
-    NSDateComponents *dateComponent = [[NSDateComponents alloc] init];
-    if (timeSpanInDay > 30 && timeSpanInDay <=365) //show Label as 01/02/2013
-    {
-        label1.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];
-                       
-        dateComponent.day = timeSpanInDay/4;
-        tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        label2.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];
+        label1.text = [NSString stringWithFormat:@"Jan %@", [ATHelper getYearPartHelper:appDelegate.focusedDate] ];
+        label2.text = @"  Mar  ";
+        label3.text = @"  Jun  ";
+        label4.text = @"  Sep  ";
+        label5.text = @"  Dec  ";
         
-        dateComponent.day = timeSpanInDay/2;
-        tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        label3.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];
         
-        dateComponent.day = 3*timeSpanInDay/4;
-        tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        label4.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];
-        dateComponent.day = timeSpanInDay;
         
-        tmpDate = endDay;
-        label5.text = [NSString stringWithFormat:@" %@ ", [ATHelper getMonthDateInTwoNumber:tmpDate]];;
-        [self fitSzie:label1];
-        [self fitSzie:label2];
-        [self fitSzie:label3];
-        [self fitSzie:label4];
-        [self fitSzie:label5];
+        CGRect label1Frame = label1.frame;
+        CGRect label2Frame = label2.frame;
+        CGRect label3Frame = label3.frame;
+        CGRect label4Frame = label4.frame;
+        CGRect label5Frame = label5.frame;
         
-    }
-    else if (timeSpanInDay > 365 && timeSpanInDay < 5 * 365) //show label as Mar 2013
-    {
         
-        yearPart = [ATHelper getYearPartHelper:tmpDate];
-        label1.text = [NSString stringWithFormat:@" %@, %@ ", [self getThreeLetterMonth:tmpDate], yearPart ];
+        CGRect startFrame = label1.frame;
+        startFrame.size.height=0;
+        startFrame.size.width=0;
+        if ([prevYearDate compare:appDelegate.focusedDate] == NSOrderedDescending) {
+            NSLog(@"date1 is later than date2");
+            startFrame.origin.x = 1800;
+        }
+        else
+            startFrame.origin.x = 0;
         
-        dateComponent.day = timeSpanInDay/4;
-        tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        yearPart = [ATHelper getYearPartHelper:tmpDate];
-        label2.text = [NSString stringWithFormat:@" %@, %@ ", [self getThreeLetterMonth:tmpDate], yearPart ];
+        prevYearDate = appDelegate.focusedDate;
         
-        dateComponent.day = timeSpanInDay/2;
-        tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        yearPart = [ATHelper getYearPartHelper:tmpDate];
-        label3.text = [NSString stringWithFormat:@" %@, %@ ", [self getThreeLetterMonth:tmpDate], yearPart ];
+        [label1 setFrame:startFrame];
+        [label2 setFrame:startFrame];
+        [label3 setFrame:startFrame];
+        [label4 setFrame:startFrame];
+        [label5 setFrame:startFrame];
         
-        dateComponent.day = 3*timeSpanInDay/4;
-        tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
-        yearPart = [ATHelper getYearPartHelper:tmpDate];
-        label4.text = [NSString stringWithFormat:@" %@, %@ ", [self getThreeLetterMonth:tmpDate], yearPart ];
         
-        tmpDate = endDay;
-        yearPart = [ATHelper getYearPartHelper:tmpDate];
-        label5.text = [NSString stringWithFormat:@" %@, %@ ", [self getThreeLetterMonth:tmpDate], yearPart ];
-        [self fitSzie:label1];
-        [self fitSzie:label2];
-        [self fitSzie:label3];
-        [self fitSzie:label4];
-        [self fitSzie:label5];
+        [UIView transitionWithView:label1
+                          duration:0.9f
+                           options: UIViewAnimationCurveEaseIn
+                        animations:^(void) {
+                            label1.frame = label1Frame;
+                        }
+                        completion:^(BOOL finished) {
+                            // Do nothing
+                            [label1 setHidden:false];
+                        }];
+        [UIView transitionWithView:label2
+                          duration:0.9f
+                           options: UIViewAnimationCurveEaseIn
+                        animations:^(void) {
+                            label2.frame = label2Frame;
+                        }
+                        completion:^(BOOL finished) {
+                            // Do nothing
+                            [label2 setHidden:false];
+                        }];
+        [UIView transitionWithView:label3
+                          duration:0.9f
+                           options: UIViewAnimationCurveEaseIn
+                        animations:^(void) {
+                            label3.frame = label3Frame;
+                        }
+                        completion:^(BOOL finished) {
+                            // Do nothing
+                            [label3 setHidden:false];
+                        }];
+        [UIView transitionWithView:label4
+                          duration:0.9f
+                           options: UIViewAnimationCurveEaseIn
+                        animations:^(void) {
+                            label4.frame = label4Frame;
+                        }
+                        completion:^(BOOL finished) {
+                            // Do nothing
+                            [label4 setHidden:false];
+                        }];
 
+        [UIView transitionWithView:label5
+                          duration:0.9f
+                           options: UIViewAnimationCurveEaseIn
+                        animations:^(void) {
+                            label5.frame = label5Frame;
+                        }
+                        completion:^(BOOL finished) {
+                            // Do nothing
+                            [label5 setHidden:false];
+                        }];
+        
+        
+        [self decorateLabelYear:label1];
+        [self decorateLabel:label2];
+        [self decorateLabel:label3];
+        [self decorateLabel:label4];
+        [self decorateLabel:label5];
     }
-    else //> 5 year, always show label as year such as 2003 AD
+    else //always show label as year such as 2003 AD
     {
+        NSDate* tmpDate = startDay;
+
+        NSDateComponents *dateComponent = [[NSDateComponents alloc] init];
+
         label1.text = [NSString stringWithFormat:@" %@ ", [ATHelper getYearPartHelper:tmpDate] ];
         dateComponent.day = timeSpanInDay/4;
         tmpDate = [calendar dateByAddingComponents:dateComponent toDate:startDay options:0];
@@ -459,11 +483,11 @@ CGContextRef context;
         label4.text = [NSString stringWithFormat:@" %@ ", [ATHelper getYearPartHelper:tmpDate] ];
         tmpDate = endDay;
         label5.text = [ATHelper getYearPartHelper:tmpDate];
-        [self fitSzie:label1];
-        [self fitSzie:label2];
-        [self fitSzie:label3];
-        [self fitSzie:label4];
-        [self fitSzie:label5];
+        [self decorateLabel:label1];
+        [self decorateLabel:label2];
+        [self decorateLabel:label3];
+        [self decorateLabel:label4];
+        [self decorateLabel:label5];
         
     }
 }
@@ -576,6 +600,17 @@ CGContextRef context;
             self.scaleLenForDisplay = 10;
         scaleStartAdj = 0; //need compute?
     }
+    //add in 2/21/2014 for zoom to <=30
+    if (periodIndays <= 7)
+    {
+        self.scaleLenForDisplay = 30;
+        scaleStartAdj = -10;
+    }
+    else if (periodIndays == 30)
+    {
+        self.scaleLenForDisplay = 80;
+        scaleStartAdj = -30;
+    }
     timeScaleImageView.frame = CGRectMake(scaleStartInPix + scaleStartAdj, 10, self.scaleLenForDisplay, MOVABLE_VIEW_HEIGHT);
     if (self.scaleLenForDisplay < 150)
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar100.png"]];
@@ -601,10 +636,16 @@ CGContextRef context;
 
 - (void)drawEventDotsBySpan
 {
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     float DOT_SIZE = 5.0;
     float DOT_Y_POS = 3.0;
     float DOT_Y_POS_GREEN = -25.0;
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (appDelegate.selectedPeriodInDays <= 30)
+    {
+        DOT_SIZE = 8.0;
+        DOT_Y_POS_GREEN = -30.0;
+        DOT_Y_POS = 0.0;
+    }
 
     Boolean eventVisibleOnMapFlag = false; //draw bar if there are event visible in map screen
     int size = [appDelegate.eventListSorted count] ;
@@ -662,7 +703,10 @@ CGContextRef context;
             }
             else
             {
-                CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
+                if (appDelegate.selectedPeriodInDays <=30)
+                    CGContextSetRGBFillColor(context, 0.8, 0.3, 0.3, 1);
+                else
+                    CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
                 CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, DOT_SIZE));
             }
             //dt1 = dt;
@@ -697,7 +741,11 @@ CGContextRef context;
                 {
                     if (abs(x - previouseRegularDotXPos) >= DOT_SIZE) //do not draw if too crowd
                     {
-                        CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
+                        if (appDelegate.selectedPeriodInDays <=30)
+                            CGContextSetRGBFillColor(context, 0.8, 0.3, 0.3, 1);
+                        else
+                            CGContextSetRGBFillColor(context, 1.0, 0.4, 0.4, 1);
+                        
                         CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS, DOT_SIZE, DOT_SIZE));
                         previouseRegularDotXPos = x;
                     }

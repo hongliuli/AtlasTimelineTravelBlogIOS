@@ -42,6 +42,7 @@
     
     NSString* prevGroupLabelText;
     NSString* groupLabelBackgroundAlpha;
+    NSString* prevYear;
     
     UIView* rightZoomAnimationView;
     UIView* leftZommAnimationView;
@@ -58,7 +59,7 @@
 }
 
 @synthesize horizontalTableView = _horizontalTableView;
-static int toastFirstTimeDelay = 0;
+
 
 #pragma mark - Table View Data Source
 
@@ -66,6 +67,7 @@ static int toastFirstTimeDelay = 0;
 {
     groupLabelBackgroundAlpha = GROUP_BACKGROUND_COLOR_1;
     prevGroupLabelText = nil;
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if ((self = [super initWithFrame:frame]))
     {
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -182,7 +184,7 @@ static int toastFirstTimeDelay = 0;
     year100View = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
     year100View.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"timeWheel100Years.png"]];
     
-    
+    prevYear = [ATHelper getYearPartHelper:appDelegate.focusedDate];
     return self;
 }
 
@@ -384,8 +386,9 @@ static int toastFirstTimeDelay = 0;
     
     if (daysInPeriod == 7)
     {
-        cell.titleLabel.text = [NSString stringWithFormat:@"%@ %@",month3Letter,shortYear];
-        cell.subLabel.text = [NSString stringWithFormat:@"%@ %@",weekDay3Letter,dayString];
+        //cell.titleLabel.text = [NSString stringWithFormat:@"%@ %@",month3Letter,shortYear];
+        cell.titleLabel.text = [NSString stringWithFormat:@"%@ %@",month3Letter, dayString];
+        cell.subLabel.text = [NSString stringWithFormat:@"%@",weekDay3Letter];
         NSString* str = cell.subLabel.text;
         if ([str hasPrefix:@"Sun"])
         {
@@ -400,7 +403,7 @@ static int toastFirstTimeDelay = 0;
     }
     else if (daysInPeriod == 30)
     {
-        cell.titleLabel.text = [NSString stringWithFormat:@"%@ %@",month3Letter,shortYear];
+        cell.titleLabel.text = [NSString stringWithFormat:@"%@",month3Letter];
         cell.titleLabel.font = [UIFont boldSystemFontOfSize:12];
         cell.subLabel.text =dayString;
     }
@@ -518,81 +521,14 @@ static int toastFirstTimeDelay = 0;
     
     [self.parent.timeZoomLine changeDateText];
     [self.parent.timeZoomLine changeScaleText];
-    
-    //logic to make color gradully
-    /*
-     if (daysInPeriod == 7)
-     {
-     NSString* str = cell.subLabel.text;
-     if ([str hasPrefix:@"Sun"])
-     {
-     gradulColor = 0.0;
-     cell.titleLabel.textColor = [UIColor blueColor];
-     UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
-     av.backgroundColor = [UIColor clearColor];
-     av.opaque = NO;
-     av.image = [UIImage imageNamed:@"scaleEdge.png"];
-     cell.backgroundView = av;
-     }
-     else
-     {
-     float alphaValue = 1.0 - gradulColor/7.0;
-     if (alphaValue < 0.3)
-     alphaValue = 0.3;
-     gradulColor = gradulColor + 1.0;
-     cell.titleLabel.textColor = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:alphaValue];
-     }
-     
-     }
-     else if (daysInPeriod == 30)
-     {
-     NSString* str = cell.subLabel.text;
-     if ([str hasPrefix:@"01"])
-     {
-     gradulColor = 0.0;
-     
-     cell.titleLabel.textColor = [UIColor blueColor];
-     UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
-     av.backgroundColor = [UIColor clearColor];
-     av.opaque = NO;
-     av.image = [UIImage imageNamed:@"scaleDayEdge.png"];
-     cell.backgroundView = av;
-     
-     }
-     else
-     {
-     float alphaValue = 1.0 - gradulColor/7.0;
-     if (alphaValue < 0.3)
-     alphaValue = 0.3;
-     gradulColor = gradulColor + 1.0;
-     cell.titleLabel.textColor = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:alphaValue];
-     }
-     }
-     else if (daysInPeriod == 365)
-     {        NSString* str = cell.subLabel.text;
-     if ([str hasPrefix:@"Jan"])
-     {
-     gradulColor = 0.0;
-     cell.titleLabel.textColor = [UIColor blueColor];
-     
-     UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
-     av.backgroundColor = [UIColor clearColor];
-     av.opaque = NO;
-     av.image = [UIImage imageNamed:@"scaleYearMonthEdge.png"];
-     cell.backgroundView = av;
-     
-     }
-     else
-     {
-     float alphaValue = 1.0 - gradulColor/7.0;
-     if (alphaValue < 0.3)
-     alphaValue = 0.3;
-     gradulColor = gradulColor + 1.0;
-     cell.titleLabel.textColor = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:alphaValue];
-     }
-     
-     }
-     */
+    if (daysInPeriod <= 30)
+    {
+        if (![prevYear isEqualToString:[ATHelper getYearPartHelper:appDelegate.focusedDate]])
+        {
+            prevYear = [ATHelper getYearPartHelper:appDelegate.focusedDate];
+            [self.parent displayZoomLine];
+        }
+    }
     
     return cell;
 }
@@ -631,12 +567,14 @@ static int toastFirstTimeDelay = 0;
     [self.parent changeTimeScaleState];
     [self.parent refreshAnnotations];
     [self.parent showTimeLinkOverlay];
+    [self.parent displayZoomLine];//call this to change time line to whole mode or year mode
     [self showHideZoomAnimation:direction];
 }
 - (void) performSettingFocusedRowForPinch:(NSDate*) newFocusedDate
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int selectedPeriodInDay = appDelegate.selectedPeriodInDays;
+    /**** remove zoom level WEEK for simplicity, may be later have a option
     if (selectedPeriodInDay == 7)
     {
         if (pinchVelocity <0)
@@ -646,10 +584,11 @@ static int toastFirstTimeDelay = 0;
         else if (pinchVelocity > 0 )
         {
             appDelegate.selectedPeriodInDays = 7;
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Zooming in the timeline reached 7-days range limit!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WEEK is the last zoom-in level!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
         }
     }
+     */
     if (selectedPeriodInDay == 30)
     {
         if (pinchVelocity <0)
@@ -661,7 +600,12 @@ static int toastFirstTimeDelay = 0;
         }
         else if (pinchVelocity > 0 )
         {
-            appDelegate.selectedPeriodInDays = 7;
+            NSDateFormatter* df = appDelegate.dateFormater;
+            NSString* dt = [[df stringFromDate:appDelegate.focusedDate] substringToIndex:10];
+            //appDelegate.selectedPeriodInDays = 7;
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"MONTH is the max zoom-in level!" message:[NSString stringWithFormat:@"Tip: In this case, all colored events are within one month of %@, and those that are closest to %@ have the darkest color.",dt, dt] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+            return;
         }
     }
     if (selectedPeriodInDay == 365)
@@ -887,6 +831,7 @@ static int toastFirstTimeDelay = 0;
     [self changeFocusedCellColorToRed ];
     
     //animate button for emphasis
+    /*
     if (toastFirstTimeDelay == 5 || toastFirstTimeDelay == 15 || toastFirstTimeDelay == 35 || toastFirstTimeDelay == 60 )
     {
         
@@ -919,6 +864,7 @@ static int toastFirstTimeDelay = 0;
         
     }
     toastFirstTimeDelay ++;
+     */
 }
 
 - (void) didSelectRowAtIndexPath:(NSIndexPath *)indexPath  //called by tapGesture. This is not in a TableViewController, so no didSelect... delegate mechanism, have to process  by tap gesture
