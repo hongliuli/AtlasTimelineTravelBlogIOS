@@ -99,6 +99,8 @@
     NSMutableArray* timeLinkOverlaysToBeCleaned ;
     ATAnnotationFocused* focusedAnnotationIndicator;
     ATEventDataStruct* focusedEvent;
+    int currentTapTouchKey;
+    bool currentTapTouchMove;
 }
 
 @synthesize mapView = _mapView;
@@ -163,6 +165,12 @@
     [self displayTimelineControls]; //MOTHER FUCKER, I struggled long time when I decide to put timescrollwindow at bottom. Finally figure out have to put this code here in viewDidAppear. If I put it in viewDidLoad, then first time timeScrollWindow will be displayed in other places if I want to display at bottom, have to put it here
     [self.timeZoomLine showHideScaleText:false];
     [ATHelper setOptionDateFieldKeyboardEnable:false]; //always set default to not allow keyboard
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if ([appDelegate.eventListSorted count] == 0)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Add your first event" message:@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Content Import] to learn more." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+    }
 }
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
@@ -441,7 +449,6 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDate* existingFocusedDate = appDelegate.focusedDate;
     
-    CGRect timeZoomLineFrame;
     
     
     int timeWindowWidth = [ATConstants timeScrollWindowWidth];
@@ -452,19 +459,14 @@
     focusedLabelFrame = CGRectMake(timeWindowX - 43 + timeWindowWidth/2, timeWindowY, 50, 30);
     
     timeScrollWindowFrame = CGRectMake(timeWindowX,timeWindowY, timeWindowWidth,[ATConstants timeScrollWindowHeight]);
-    timeZoomLineFrame = CGRectMake(timeWindowX - 15,self.view.bounds.size.height - [ATConstants timeScrollWindowHeight] - 18, timeWindowWidth + 30,10);
+    
     
     //Add scrollable time window
     [self addTimeScrollWindow];
     
-    if (self.timeZoomLine != nil)
-        [self.timeZoomLine removeFromSuperview]; //incase orientation change
-    self.timeZoomLine = [[ATTimeZoomLine alloc] initWithFrame:timeZoomLineFrame];
-    self.timeZoomLine.backgroundColor = [UIColor clearColor];
-    self.timeZoomLine.mapViewController = self;
-    [self.view addSubview:self.timeZoomLine];
     
-    [self changeTimeScaleState];
+    
+
     //add focused Label. it is invisible most time, only used for animation effect when click left callout on annotation
     if (appDelegate.focusedDate == nil)
         appDelegate.focusedDate = [[NSDate alloc] init];
@@ -496,9 +498,25 @@
     [locationbtn setImage:[UIImage imageNamed:@"currentLocation.jpg"] forState:UIControlStateNormal];
     [locationbtn addTarget:self action:@selector(currentLocationClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.mapView addSubview:locationbtn];
-    [self.timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
+    [self displayZoomLine];
 }
 
+//called by above displayTimeLineControls, as well as when zoom time
+- (void) displayZoomLine
+{
+    CGRect timeZoomLineFrame;
+    int timeWindowWidth = [ATConstants timeScrollWindowWidth];
+    int timeWindowX = [ATConstants timeScrollWindowX];
+    timeZoomLineFrame = CGRectMake(timeWindowX - 15,self.view.bounds.size.height - [ATConstants timeScrollWindowHeight] - 18, timeWindowWidth + 30,10);
+    if (self.timeZoomLine != nil)
+        [self.timeZoomLine removeFromSuperview]; //incase orientation change
+    self.timeZoomLine = [[ATTimeZoomLine alloc] initWithFrame:timeZoomLineFrame];
+    self.timeZoomLine.backgroundColor = [UIColor clearColor];
+    self.timeZoomLine.mapViewController = self;
+    [self.view addSubview:self.timeZoomLine];
+    [self.timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
+    [self changeTimeScaleState];
+}
 
 - (void) addTimeScrollWindow
 {
@@ -517,7 +535,18 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     [self setSelectedPeriodLabel];
-    [self.timeZoomLine changeTimeScaleState:self.startDate :self.endDate :appDelegate.selectedPeriodInDays :appDelegate.focusedDate];
+    NSDate* startDate = self.startDate;
+    NSDate* endDate = self.endDate;
+    if (appDelegate.selectedPeriodInDays <=30)
+    {
+        startDate = [ATHelper getYearStartDate:appDelegate.focusedDate];
+        NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+        [dateComponents setYear:1];
+        endDate = [gregorian dateByAddingComponents:dateComponents toDate:startDate  options:0];
+        
+    }
+    [self.timeZoomLine changeTimeScaleState:startDate :endDate :appDelegate.selectedPeriodInDays :appDelegate.focusedDate];
 }
 
 - (void) setSelectedPeriodLabel
@@ -561,22 +590,22 @@
 {
     if ([selectedAnnotationSet count] == 0) //if no selected nodes, use 2 step show/hide to have better user experience
     {
-       if (mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
-       {
-           mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
-           self.timeScrollWindow.hidden = true;
-           self.timeZoomLine.hidden = true;
-           [self hideDescriptionLabelViews];
-           self.navigationController.navigationBarHidden = true;
-       }
-       else if (mapViewShowWhatFlag == MAPVIEW_HIDE_ALL || mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
-       {
-           mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
-           self.timeScrollWindow.hidden=false;
-           self.timeZoomLine.hidden = false;
-           [self showDescriptionLabelViews:self.mapView];
-           self.navigationController.navigationBarHidden = false;
-       }
+        if (mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+        {
+            mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
+            self.timeScrollWindow.hidden = true;
+            self.timeZoomLine.hidden = true;
+            [self hideDescriptionLabelViews];
+            self.navigationController.navigationBarHidden = true;
+        }
+        else if (mapViewShowWhatFlag == MAPVIEW_HIDE_ALL || mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+        {
+            mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+            self.timeScrollWindow.hidden=false;
+            self.timeZoomLine.hidden = false;
+            [self showDescriptionLabelViews:self.mapView];
+            self.navigationController.navigationBarHidden = false;
+        }
     }
     else //if has selected nodes, use 3-step show/hide
     {
@@ -847,10 +876,10 @@
             }
         }
         /*
-        if ([selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier]])
-        {
-            [[annView superview] sendSubviewToBack:annView];
-        }
+         if ([selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier]])
+         {
+         [[annView superview] sendSubviewToBack:annView];
+         }
          */
         //annView.hidden = false;
         return annView;
@@ -867,18 +896,33 @@
 
 //All View is a UIResponder, all UIresponder objects can implement touchesBegan
 -(void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
-    //NSLog(@"------ tab");
+    currentTapTouchKey = 0;
+    currentTapTouchMove = false;
     UITouch *touch = [touches anyObject];
     NSNumber* annViewKey = [NSNumber numberWithInt:touch.view.tag];
     //NSLog(@" ---- touch key:%@", annViewKey);
-    if ([annViewKey intValue] > 0) //tag is set in viewForAnnotation. search for "[tmpLblUniqueIdMap setObject:annView forKey:"
+    if ([annViewKey intValue] > 0) //tag is set in viewForAnnotation when instance tmpLbl
+        currentTapTouchKey = [annViewKey intValue];
+}
+
+//Only tap to start event editor, when swipe map and happen to swipe on photo, do not start event editor
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+    UITouch *touch = [touches anyObject];
+    NSNumber* annViewKey = [NSNumber numberWithInt:touch.view.tag];
+    if ([annViewKey intValue] > 0 && [annViewKey intValue] == currentTapTouchKey)
+        currentTapTouchMove = true;
+}
+//touchesEnded does not work, touchesCancelled works
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [touches anyObject];
+    NSNumber* annViewKey = [NSNumber numberWithInt:touch.view.tag];
+    if ([annViewKey intValue] > 0 && [annViewKey intValue] == currentTapTouchKey && !currentTapTouchMove)
     {
         MKAnnotationView* annView = [tmpLblUniqueIdMap objectForKey:annViewKey];
         [self startEventEditor:annView];
     }
-    //[self showPhotoView:[tmpLblUniqueIdMap objectForKey:[NSNumber numberWithInt:tmpLblUniqueMapIdx]]];
 }
-
 
 - (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
@@ -907,8 +951,8 @@
         }
     }
     //Above is try to hide white flag behind selected, works partially, but still have problem when zoom map. not sure what is reason
-
-        
+    
+    
     [self showDescriptionLabelViews:self.mapView];
 }
 
@@ -938,7 +982,7 @@
     [self.timeZoomLine setNeedsDisplay];
     regionChangeTimeStart = [[NSDate alloc] init];
     [self showDescriptionLabelViews:mapView];
- 
+    
     
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
@@ -1076,12 +1120,12 @@
             rightButton.accessibilityLabel=@"right";
             customPinView.rightCalloutAccessoryView = rightButton;
             
-             UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
-             [leftButton setTintColor:[UIColor clearColor]];
-             [leftButton setBackgroundImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
-
-             leftButton.accessibilityLabel=@"left";
-             customPinView.leftCalloutAccessoryView = leftButton;
+            UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
+            [leftButton setTintColor:[UIColor clearColor]];
+            [leftButton setBackgroundImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
+            
+            leftButton.accessibilityLabel=@"left";
+            customPinView.leftCalloutAccessoryView = leftButton;
             
             return customPinView;
         }
@@ -1095,11 +1139,7 @@
 {
     //need use base class ATEventAnnotation here to handle call out for all type of annotation
     ATEventAnnotation* ann = [view annotation];
-    selectedEventAnnotation = ann;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-
-    self.selectedAnnotation = (ATEventAnnotation*)[view annotation];
-    //TODO need to see if it is run on iPad or iPhone
     
     if ([control.accessibilityLabel isEqualToString: @"right"]){
         [self startEventEditor:view];
@@ -1149,15 +1189,18 @@
 - (void) startEventEditor:(MKAnnotationView*)view
 {
     ATEventAnnotation* ann = [view annotation];
+    selectedEventAnnotation = ann;
+    self.selectedAnnotation = ann;
+    
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
     //if (self.eventEditor == nil) {
-        //I just learned from iOS5 tutor pdf, there is a way to create segue for accessory buttons, I do not want to change, Will use it in iPhone storyboard
-        self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
-        self.eventEditor.delegate = self;
+    //I just learned from iOS5 tutor pdf, there is a way to create segue for accessory buttons, I do not want to change, Will use it in iPhone storyboard
+    self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
+    self.eventEditor.delegate = self;
     //}
-
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         BOOL optionIPADFullScreen = [ATHelper getOptionEditorFullScreen];
         if (optionIPADFullScreen)
@@ -1294,7 +1337,7 @@
         int thisIdx = currEventIdxConstant + linkCount;
         if (directionFuture)
             thisIdx = currEventIdxConstant - linkCount;
-
+        
         BOOL breakFlag = false;
         MKPolyline* timeLinkPolyline = nil;
         if (thisIdx >= 0 && thisIdx < listSize)
@@ -1302,7 +1345,7 @@
             thisEvent = list[thisIdx];
             
             NSTimeInterval interval = [thisEvent.eventDate timeIntervalSinceDate: prevEvent.eventDate];
-
+            
             if (abs(interval/86400.0) > timeLinkMaxNumberOfDaysBtwTwoEvent) //TODO  may need to tie with period lenth
             {
                 if ([eventsInSameDepth count] == 0)
@@ -1312,9 +1355,9 @@
             }
             else
             {
-
+                
                 //NSLog(@"===in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
-            
+                
                 [eventsInSameDepth addObject:prevEvent];
                 [eventsInSameDepth addObject:thisEvent];
             }
@@ -1328,7 +1371,7 @@
                 breakFlag = true; //breakFlag = true;
             //else will continues following to finish remaining draw for nodes in same depth
         }
-
+        
         int numberOfSameDepthLine;
         //Time Link logic 2: put group of events in same time link depth according to time wheel zoom
         BOOL sameDepthFlag = false;
@@ -1422,7 +1465,7 @@
             prevEvent = thisEvent;
             continue;
         }
-
+        
     }
     if (directionFuture)
         timeLinkDepthDirectionFuture = linkDepth;
@@ -1487,7 +1530,7 @@
         // routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:3],[NSNumber numberWithFloat:10], nil];
         routeLineView.lineWidth = 1;
         
-        if (abs(colorHint) <= 1) //color link to blue only when first depth has same 
+        if (abs(colorHint) <= 1) //color link to blue only when first depth has same
             routeLineView.strokeColor = [UIColor colorWithRed:0.7 green:0.6 blue:1.0 alpha:0.5];
         //routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:6],[NSNumber numberWithFloat:15], nil]; //dash line is too slow
         
@@ -1667,7 +1710,7 @@
         newData.uniqueId = newEntity.uniqueId;
     
     [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
-
+    
     NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
     UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
     if (tmpLbl != nil)
@@ -1726,7 +1769,7 @@
     
     //following check if new date is out of range when add.  or if it is update, then check if update on ends event
     if ( (newIndex != NSNotFound && (newIndex == 0 || newIndex == [list count] -1))
-        || [self.startDate compare:newData.eventDate]==NSOrderedDescending || [self.endDate compare:newData.eventDate]==NSOrderedAscending)
+        && ([self.startDate compare:newData.eventDate]==NSOrderedDescending || [self.endDate compare:newData.eventDate]==NSOrderedAscending))
     {
         [self setTimeScrollConfiguration];
         [self displayTimelineControls];
@@ -1793,9 +1836,18 @@
         for (NSString* fileName in deletedList)
         {
             NSString* deletePhotoFinalFileName = [photoFinalDir stringByAppendingPathComponent:fileName];
-            [[NSFileManager defaultManager] removeItemAtPath:deletePhotoFinalFileName error:&error];
-            if (error == nil)
-                [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
+            BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:deletePhotoFinalFileName];
+            //NSLog(@"Path to file: %@", deletePhotoFinalFileName);
+            //NSLog(@"File exists: %d", fileExists);
+            //NSLog(@"Is deletable file at path: %d", [[NSFileManager defaultManager] isDeletableFileAtPath:deletePhotoFinalFileName]);
+            if (fileExists)
+            {
+                BOOL success = [[NSFileManager defaultManager] removeItemAtPath:deletePhotoFinalFileName error:&error];
+                if (!success)
+                    NSLog(@"Error: %@", [error localizedDescription]);
+                else
+                   [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
+            }
         }
     }
 }
@@ -1934,7 +1986,7 @@
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
 {
     //NSLog(@"de-selected anno");
-   // if (mapViewShowWhatFlag == 1) //since select will always show it, deselect will do opposit always
+    // if (mapViewShowWhatFlag == 1) //since select will always show it, deselect will do opposit always
     if (mapViewShowWhatFlag == 3)
         mapViewShowWhatFlag = 1;
     else
