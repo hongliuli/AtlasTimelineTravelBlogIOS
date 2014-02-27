@@ -11,9 +11,8 @@
 
 #define ROW_ENABLE_MOVE_DATE 0
 #define ROW_IPAD_EDIT_FULLSCREEN 1
-#define ROW_ENABLE_TIME_LINK 2
-#define ROW_DATE_FIELD_KEYBOARD 3
-
+#define ROW_DATE_FIELD_KEYBOARD 2
+//#define ROW_ENABLE_TIME_LINK 4
 
 @interface ATOptionsTableViewController ()
 
@@ -65,7 +64,7 @@ UISwitch *switchViewMagnifierMove;
 {
 #warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return 4;
+    return 3;
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
@@ -134,6 +133,7 @@ UISwitch *switchViewMagnifierMove;
             }
             return aCell;
         }
+        /****** comment out option or enable/disable time link
         case ROW_ENABLE_TIME_LINK: {
             UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellTimeLink"];
             if( aCell == nil ) {
@@ -150,6 +150,7 @@ UISwitch *switchViewMagnifierMove;
             }
             return aCell;
         }
+        *******/
     }
     return nil;
 }
@@ -169,8 +170,8 @@ UISwitch *switchViewMagnifierMove;
     [switchViewKeyboardForDate setOn:NO animated:NO];
     [ATHelper setOptionDateMagnifierModeScroll:true];
     [switchViewMagnifierMove setOn:YES animated:NO];
-    [ATHelper setOptionDisplayTimeLink:true];
-    [switchViewTimeLink setOn:YES animated:NO];
+    //[ATHelper setOptionDisplayTimeLink:true];
+    //[switchViewTimeLink setOn:YES animated:NO];
     [ATHelper setOptionEditorFullScreen:false];
     [switchViewEditorFullScreen setOn:NO animated:NO];
     
