@@ -603,7 +603,7 @@
             NSDateFormatter* df = appDelegate.dateFormater;
             NSString* dt = [[df stringFromDate:appDelegate.focusedDate] substringToIndex:10];
             //appDelegate.selectedPeriodInDays = 7;
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"MONTH is the max zoom-in level!" message:[NSString stringWithFormat:@"Tip: In this case, all colored events are within one month of %@, and those that are closest to %@ have the darkest color.",dt, dt] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"MONTH is the last zoom-in level!" message:[NSString stringWithFormat:@"Tip: In this case, all events within one month of %@ are colored, the darker the closer to %@",dt, dt] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
             return;
         }
