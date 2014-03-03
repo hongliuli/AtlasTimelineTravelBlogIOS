@@ -270,7 +270,8 @@
         button.backgroundColor = [UIColor blueColor];
         [button addTarget:self action:@selector(onlineHelpClicked:) forControlEvents:UIControlEventTouchUpInside];
         [tutorialView addSubview: button];
-        
+        [[self.timeScrollWindow superview] bringSubviewToFront:self.timeScrollWindow];
+        [[self.timeZoomLine superview] bringSubviewToFront:self.timeZoomLine];
     }
 }
 
@@ -387,6 +388,9 @@
         dayComponent.month = -5;
         
         NSDate* newStartDt = [theCalendar dateByAddingComponents:dayComponent toDate:eventStart.eventDate options:0];
+        //This is a fix (not perfect) that hunt me today when save edge event in year
+        if (appDelegate.selectedPeriodInDays <= 30 && appDelegate.focusedDate != nil)
+            newStartDt = [ATHelper getYearStartDate:appDelegate.focusedDate];
         self.startDate = [ATHelper getYearStartDate: newStartDt];
         self.endDate = eventEnd.eventDate;
         
@@ -409,7 +413,7 @@
         
     }
     if (self.timeZoomLine != nil)
-        [self.timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
+        [self displayTimelineControls];//which one is better: [self.timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
     //NSLog(@"   ############## setConfigu startDate=%@    endDate=%@   startDateFormated=%@", self.startDate, self.endDate, [appDelegate.dateFormater stringFromDate:self.startDate]);
 }
 
@@ -1564,6 +1568,8 @@
     [ self.mapView removeAnnotations:annotationsToRemove ] ;
     [self.mapView addAnnotations:annotationsToRemove];
     [self cleanSelectedAnnotationSet];
+    if (tutorialView != nil)
+        [tutorialView updateDateText];
     //[2014-01-06]
     //*** By moving following to didAddAnnotation(), I solved the issue that forcuse an event to date cause all image to show, because above [self.mapView addAnnotations:...] will run parallel to bellow [self showDescr..] while this depends on selectedAnnotationSet prepared in viewForAnnotation, thuse cause problem
     //[self showDescriptionLabelViews:self.mapView];
@@ -1768,12 +1774,12 @@
     [self setNewFocusedDateAndUpdateMap:newData needAdjusted:FALSE];
     
     //following check if new date is out of range when add.  or if it is update, then check if update on ends event
-    if ( (newIndex != NSNotFound && (newIndex == 0 || newIndex == [list count] -1))
-        && ([self.startDate compare:newData.eventDate]==NSOrderedDescending || [self.endDate compare:newData.eventDate]==NSOrderedAscending))
-    {
+    //if ( (newIndex != NSNotFound && (newIndex == 0 || newIndex == [list count] -1))
+    //    && ([self.startDate compare:newData.eventDate]==NSOrderedDescending || [self.endDate compare:newData.eventDate]==NSOrderedAscending))
+    //{ //remove the "if" otherwise month zoom level will have problem
         [self setTimeScrollConfiguration];
         [self displayTimelineControls];
-    }
+    //xxxxxxx }
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
     
