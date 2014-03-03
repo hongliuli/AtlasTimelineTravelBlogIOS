@@ -10,4 +10,6 @@
 
 @interface ATTutorialView : UIView
 
+-(void) updateDateText;
+
 @end
