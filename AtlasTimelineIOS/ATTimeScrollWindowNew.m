@@ -206,7 +206,7 @@
     {
         //For day, use timeInterval is more accurate
         NSTimeInterval interval = [timeWindowEndDate timeIntervalSinceDate: timeWindowStartDate];
-        currentNumberOfRow = interval/86400; //better add some extra
+        currentNumberOfRow = interval/86400 +30; //better add some extra
     }
     else if (selectedPeriodInDay == 365)
     {
