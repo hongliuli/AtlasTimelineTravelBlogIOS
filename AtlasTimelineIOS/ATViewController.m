@@ -388,9 +388,7 @@
         dayComponent.month = -5;
         
         NSDate* newStartDt = [theCalendar dateByAddingComponents:dayComponent toDate:eventStart.eventDate options:0];
-        //This is a fix (not perfect) that hunt me today when save edge event in year
-        if (appDelegate.selectedPeriodInDays <= 30 && appDelegate.focusedDate != nil)
-            newStartDt = [ATHelper getYearStartDate:appDelegate.focusedDate];
+
         self.startDate = [ATHelper getYearStartDate: newStartDt];
         self.endDate = eventEnd.eventDate;
         
@@ -1651,6 +1649,7 @@
     [self.mapView removeAnnotation:self.selectedAnnotation];
     ATEventDataStruct* tmp = [[ATEventDataStruct alloc] init];
     tmp.uniqueId = self.selectedAnnotation.uniqueId;
+    tmp.eventDate = self.selectedAnnotation.eventDate;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSMutableArray* list  = appDelegate.eventListSorted;
     
@@ -1770,21 +1769,15 @@
         }];
     }
     
-    appDelegate.focusedDate = ann.eventDate;
+     appDelegate.focusedDate = ann.eventDate;
     [self setNewFocusedDateAndUpdateMap:newData needAdjusted:FALSE];
-    
-    //following check if new date is out of range when add.  or if it is update, then check if update on ends event
-    //if ( (newIndex != NSNotFound && (newIndex == 0 || newIndex == [list count] -1))
-    //    && ([self.startDate compare:newData.eventDate]==NSOrderedDescending || [self.endDate compare:newData.eventDate]==NSOrderedAscending))
-    //{ //remove the "if" otherwise month zoom level will have problem
-        [self setTimeScrollConfiguration];
-        [self displayTimelineControls];
-    //xxxxxxx }
-    if (self.eventEditorPopover != nil)
-        [self.eventEditorPopover dismissPopoverAnimated:true];
+    [self setTimeScrollConfiguration];
+    [self displayTimelineControls];
     
     if (self.timeZoomLine != nil)
         [self.timeZoomLine setNeedsDisplay];
+    if (self.eventEditorPopover != nil)
+        [self.eventEditorPopover dismissPopoverAnimated:true];
 }
 
 //Save photo to file. Called by updateEvent after write event to db
