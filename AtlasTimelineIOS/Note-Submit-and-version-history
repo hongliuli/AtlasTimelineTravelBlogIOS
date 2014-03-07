@@ -2,7 +2,18 @@
 
 Version History
 ---------------
-Version 2.15
+Version 2.16
+
+    1. Re-structured time wheel zooming levels. Learn more from in-app help.
+    2. Select 1+ photos when share event to Facebook/Email/CameraRoll etc.
+    3. Tap photo icon to start event editor on map; Option to use full screen event editor.
+    4. Others: Re-organized Tutorial to be more interactive; 
+       Display larger green dots; 
+       Improved white-Red annotation layer relation;
+       Change [Timeline view] to [list/search view]
+
+
+Version 2.15 [Submitted on Feb 3rd, 2013, Available on Feb 13]
     1. Migrate to iOS 7 (see Note_Tech_Tips for detail)
     2. Add time link to indicate event chronological relationship on map
     3. Add scrolling date magnifier and have option to center it or scroll it. This improves picking date on Timewheel
@@ -11,7 +22,11 @@ Version 2.15
     6. Add an option to enable keyboard for entering BC date
     7. Other changes include add options menu, add scale line to timewheel background; Fixed code warning for presentModalView and dismissModalView in iOS 7; hide mapview's navigator bar as well  when hide time wheel; Solved crowded images issue when focused event by date; put white flag behind selected event note, fixed floating lable when add photo to a selected event and update/delete an selected event
     
-    3. enable to download World History Sample (no photo)
+    Changed app store:
+    1. bunch of image changed
+    2. keywords replaced "chronology" to "location", "planner" to "record", added "note"
+    3. changed desc to emphasis more on photo album:
+    ChronicleMap is an innovative tool to organize events and photos chronologically on map. It is an ideal timeline based photo album on map, it is also a good trip planner. Best of all, these events and photos can be synched to any device, becoming a part of your life story that is easy and fun to browse through!
 
     
 Version 2.14 prepare (Uploaded on Dec 29, 2013)
