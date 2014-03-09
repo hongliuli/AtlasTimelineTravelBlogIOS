@@ -174,9 +174,9 @@ UILabel* updatableLabel2;
     //following are on same y level, so change currentYLocation once:
     currentYLocation = currentYLocation + itemHeight + 50*iPhoneSizeYFactor;
     [self addDoubleTapCenterSection:x_start + [ATConstants timeScrollWindowWidth]/3]; //this first so red shade go under pinch
-    [self addTimeZoomLevelSection:x_start - 50 :@"TimewheelZoomOut.png" :@"Tap to zoom out Time Wheel"];
+    [self addTimeZoomLevelSection:x_start - 50 :@"TimewheelZoomOut.png" :@"Tap (-) or double-tab here to zoom out"];
     [self addTimeZoomLevelSection:x_start + [ATConstants timeScrollWindowWidth]/3-85 :@"gesture-pinch.png" :@"Pinch is another way of zooming Time Wheel"];
-    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 50:@"TimewheelZoomIn.png" :@"Tap to zoom in Time Wheel"];
+    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 50:@"TimewheelZoomIn.png" :@"Tap (+) or double-tab here to zoom in"];
 }
 
 - (void) addLongPressSection
@@ -443,7 +443,7 @@ UILabel* updatableLabel2;
     int lineX = xStart + scrollWindowWidth/3 - 150*iPhoneSizeXFactor;
 
     //Upper Label description
-    CGRect lblFrame = CGRectMake(lineX - 50*iPhoneSizeXFactor, currentYLocation -30, 135*iPhoneSizeXFactor, itemHeight);
+    CGRect lblFrame = CGRectMake(lineX - 50*iPhoneSizeXFactor, currentYLocation -30, 145*iPhoneSizeXFactor, 2*itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:lblFrame];
     lbl.text = text;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -452,7 +452,7 @@ UILabel* updatableLabel2;
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
     if ([lbl.text rangeOfString:@"Pinch"].location != NSNotFound)
-        lbl.textColor = [UIColor grayColor];
+        lbl.textColor = [UIColor lightGrayColor];
     [self addSubview:lbl];
     
     //draw line
@@ -461,7 +461,7 @@ UILabel* updatableLabel2;
     CGContextSetLineWidth(context, 1.0);
     //Draw lines around time window
 
-    CGContextMoveToPoint(context, lineX, currentYLocation);
+    CGContextMoveToPoint(context, lineX, currentYLocation + 20);
     CGContextAddLineToPoint(context, lineX, y_start + 5);
     CGContextStrokePath(context);
     
@@ -487,7 +487,7 @@ UILabel* updatableLabel2;
     int lineX = xStart + scrollWindowWidth/3 - 150*iPhoneSizeXFactor;
     
     //Upper Label description
-    CGRect lblFrame = CGRectMake(lineX - 50*iPhoneSizeXFactor, currentYLocation + 40, 140*iPhoneSizeXFactor, itemHeight);
+    CGRect lblFrame = CGRectMake(lineX - 50*iPhoneSizeXFactor, currentYLocation + 40, 140*iPhoneSizeXFactor, 2*itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:lblFrame];
     lbl.text = @"Double-tap at center to center on today";
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall - 2];
@@ -512,7 +512,7 @@ UILabel* updatableLabel2;
     CGContextSetLineWidth(context, 1.0);
     //Draw lines around time window
     
-    CGContextMoveToPoint(context, lineX, currentYLocation + 60);
+    CGContextMoveToPoint(context, lineX, currentYLocation + 80);
     CGContextAddLineToPoint(context, lineX, y_start + 5);
     CGContextStrokePath(context);
     
