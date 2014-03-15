@@ -772,14 +772,20 @@
     }
     else if ([annotation isKindOfClass:[ATAnnotationSelected class]]) //all that read from db will be ATAnnotationSelected type
     {
-        NSString* markerType = [self getStaticMarkerName: ann.description];
+        NSString* specialMarkerName = [self getStaticMarkerName: ann.description];
         
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate: markerType]; //keep this line here
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate: specialMarkerName]; //keep this line here
         MKAnnotationView* annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
         annView.annotation = annotation;
         NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
         //keey list of red  annotations
-        if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]])
+        BOOL isSpecialMarkerInFocused = false;
+        if (specialMarkerName != nil)
+        {
+            if ([selectedAnnotationIdentifier rangeOfString:@":"].location == NSNotFound)
+                isSpecialMarkerInFocused = true;
+        }
+        if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]] || isSpecialMarkerInFocused)
         {
             UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
             if (tmpLbl == nil)
@@ -940,8 +946,8 @@
             continue;
         if (ann.eventDate == nil)
             continue;
-        NSString* markerType = [self getStaticMarkerName: ann.description];
-        NSString* identifer = [self getImageIdentifier:ann.eventDate :markerType];
+        NSString* specialMarkerName = [self getStaticMarkerName: ann.description];
+        NSString* identifer = [self getImageIdentifier:ann.eventDate :specialMarkerName];
         //NSLog(@"  identifier is %@  date=%@",identifer, ann.eventDate);
         if ([identifer isEqualToString: [ATConstants WhiteFlagAnnotationIdentifier]])
             [[annView superview] sendSubviewToBack:annView];
@@ -1130,7 +1136,6 @@
 {
     {
         MKAnnotationView* annView = (MKAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier:annotationIdentifier];
-        NSLog(@"=== identifier is %@", annotationIdentifier);
         if (!annView)
         {
             MKAnnotationView* customPinView = [[MKAnnotationView alloc]
@@ -1144,7 +1149,7 @@
                 annotationIdentifier = [annotationIdentifier substringToIndex:alphaValueLoc];
                 NSString* alphaValueStr = [origianlStr substringFromIndex:alphaValueLoc + 1];
                 alphaValue = [alphaValueStr floatValue];
-                NSLog(@" ---- ann=%@,  alpha=%@",annotationIdentifier, alphaValueStr);
+                //NSLog(@" ---- ann=%@,  alpha=%@",annotationIdentifier, alphaValueStr);
             }
             UIImage *markerImage = [UIImage imageNamed:annotationIdentifier];
             customPinView.image = markerImage;
@@ -1165,7 +1170,7 @@
             return customPinView;
         }
         else
-            NSLog(@"+++++++++ resuse %@ annotation at %@",annotationIdentifier, [annotation title]);
+            //NSLog(@"+++++++++ resuse %@ annotation at %@",annotationIdentifier, [annotation title]);
             
             return annView;
     }
@@ -1606,7 +1611,7 @@
     //[self showDescriptionLabelViews:self.mapView];
 }
 
-- (NSString*)getImageIdentifier:(NSDate *)eventDate :(NSString*)markerType
+- (NSString*)getImageIdentifier:(NSDate *)eventDate :(NSString*)specialMarkerName
 {
     // NSLog(@"  --------------- %u", debugCount);
     //debugCount = debugCount + 1;
@@ -1614,10 +1619,10 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if (appDelegate.focusedDate == nil) //set in annotation Left button click
         appDelegate.focusedDate = [[NSDate alloc] init];
-    float segmentDistance = [self getDistanceFromFocusedDate:eventDate];
-    if (markerType != nil)
+    float segmentDistance = fabsf([self getDistanceFromFocusedDate:eventDate]);
+    if (specialMarkerName != nil)
     {
-        NSString* pngNameWithAlpha = [NSString stringWithFormat:@"marker_%@", markerType ];
+        NSString* pngNameWithAlpha = [NSString stringWithFormat:@"marker_%@", specialMarkerName ];
         UIImage *tempImage = [UIImage imageNamed:pngNameWithAlpha];
         if (!tempImage) {
             pngNameWithAlpha = @"marker_star.png";
@@ -1634,7 +1639,7 @@
         
         return pngNameWithAlpha;
     }
-    // NSLog(@"--- dist=%f",segmentDistance);
+    // For regular marker, I tried to use alpha instead of different marker image, but the looks on view is bad, so keep it following way
     if (segmentDistance >= -1 && segmentDistance <= 1)
         return [ATConstants SelectedAnnotationIdentifier];
     if (segmentDistance > 1 && segmentDistance <=2)
