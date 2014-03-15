@@ -738,7 +738,7 @@
     // Following will filter out MKUserLocation annotation
     if ([annotation isKindOfClass:[ATDefaultAnnotation class]]) //ATDefaultAnnotation is when longPress
     {
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate]; //keep this line here, do not move inside
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate :nil]; //keep this line here, do not move inside
         // try to dequeue an existing pin view first
         MKPinAnnotationView* pinView = (MKPinAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier:[ATConstants DefaultAnnotationIdentifier]];
         if (!pinView)
@@ -772,7 +772,9 @@
     }
     else if ([annotation isKindOfClass:[ATAnnotationSelected class]]) //all that read from db will be ATAnnotationSelected type
     {
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate]; //keep this line here
+        NSString* markerType = [self getStaticMarkerName: ann.description];
+        
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate: markerType]; //keep this line here
         MKAnnotationView* annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
         annView.annotation = annotation;
         NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
@@ -938,7 +940,8 @@
             continue;
         if (ann.eventDate == nil)
             continue;
-        NSString* identifer = [self getImageIdentifier:ann.eventDate];
+        NSString* markerType = [self getStaticMarkerName: ann.description];
+        NSString* identifer = [self getImageIdentifier:ann.eventDate :markerType];
         //NSLog(@"  identifier is %@  date=%@",identifer, ann.eventDate);
         if ([identifer isEqualToString: [ATConstants WhiteFlagAnnotationIdentifier]])
             [[annView superview] sendSubviewToBack:annView];
@@ -956,6 +959,24 @@
     
     
     [self showDescriptionLabelViews:self.mapView];
+}
+
+//find xxxx in desc text : ...[[xxxx]]...
+- (NSString*) getStaticMarkerName: (NSString*)descTxt
+{
+    NSString* returnStr = nil;
+    NSInteger loc = [descTxt rangeOfString:@"=="].location;
+    if ( loc != NSNotFound) {
+        NSString* str = [descTxt substringFromIndex:loc +2 ];
+        NSInteger loc2 = [str rangeOfString:@"=="].location;
+        if (loc2 != NSNotFound)
+        {
+            str = [str substringToIndex:loc2];
+            if ([str rangeOfString:@" "].location == NSNotFound) //can not have space between == ... == then
+                returnStr = str;
+        }
+    }
+    return returnStr;
 }
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
@@ -1109,13 +1130,25 @@
 {
     {
         MKAnnotationView* annView = (MKAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier:annotationIdentifier];
+        NSLog(@"=== identifier is %@", annotationIdentifier);
         if (!annView)
         {
             MKAnnotationView* customPinView = [[MKAnnotationView alloc]
                                                initWithAnnotation:annotation reuseIdentifier:annotationIdentifier];
             // NSLog(@"========= img %@",annotationIdentifier);
+            NSInteger alphaValueLoc = [annotationIdentifier rangeOfString:@":"].location;
+            float alphaValue = 1.0;
+            if ( alphaValueLoc != NSNotFound)
+            {
+                NSString* origianlStr = annotationIdentifier;
+                annotationIdentifier = [annotationIdentifier substringToIndex:alphaValueLoc];
+                NSString* alphaValueStr = [origianlStr substringFromIndex:alphaValueLoc + 1];
+                alphaValue = [alphaValueStr floatValue];
+                NSLog(@" ---- ann=%@,  alpha=%@",annotationIdentifier, alphaValueStr);
+            }
             UIImage *markerImage = [UIImage imageNamed:annotationIdentifier];
             customPinView.image = markerImage;
+            [customPinView setAlpha:alphaValue]; //introduced when add static marker (hinted by description text ==start== etc
             customPinView.canShowCallout = YES;
             
             UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
@@ -1132,7 +1165,7 @@
             return customPinView;
         }
         else
-            //NSLog(@"+++++++++ resuse %@ annotation at %@",annotationIdentifier, [annotation title]);
+            NSLog(@"+++++++++ resuse %@ annotation at %@",annotationIdentifier, [annotation title]);
             
             return annView;
     }
@@ -1168,7 +1201,7 @@
                             // Do nothing
                             [self.focusedEventLabel setHidden:true];
                         }];
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate];
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate :ann.description];
         ATEventDataStruct* ent = [[ATEventDataStruct alloc] init];
         ent.address = ann.address;
         ent.lat = ann.coordinate.latitude;
@@ -1573,15 +1606,34 @@
     //[self showDescriptionLabelViews:self.mapView];
 }
 
-- (NSString*)getImageIdentifier:(NSDate *)eventDate
+- (NSString*)getImageIdentifier:(NSDate *)eventDate :(NSString*)markerType
 {
     // NSLog(@"  --------------- %u", debugCount);
     //debugCount = debugCount + 1;
+
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if (appDelegate.focusedDate == nil) //set in annotation Left button click
         appDelegate.focusedDate = [[NSDate alloc] init];
     float segmentDistance = [self getDistanceFromFocusedDate:eventDate];
-    
+    if (markerType != nil)
+    {
+        NSString* pngNameWithAlpha = [NSString stringWithFormat:@"marker_%@", markerType ];
+        UIImage *tempImage = [UIImage imageNamed:pngNameWithAlpha];
+        if (!tempImage) {
+            pngNameWithAlpha = @"marker_star.png";
+        }
+        //if off-focuse, append image alpha value
+        if (segmentDistance > 1 && segmentDistance <=2)
+            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.8",pngNameWithAlpha];
+        else if (segmentDistance > 2 && segmentDistance <=3)
+            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.6",pngNameWithAlpha];
+        else if (segmentDistance > 3 && segmentDistance <=4)
+            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.4",pngNameWithAlpha];
+        else if (segmentDistance > 4)
+            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.3",pngNameWithAlpha ];
+        
+        return pngNameWithAlpha;
+    }
     // NSLog(@"--- dist=%f",segmentDistance);
     if (segmentDistance >= -1 && segmentDistance <= 1)
         return [ATConstants SelectedAnnotationIdentifier];
