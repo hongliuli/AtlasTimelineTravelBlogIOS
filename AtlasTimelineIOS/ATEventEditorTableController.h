@@ -17,7 +17,7 @@
 @class ATEventEntity;
 @class ATEventDataStruct;
 
-@interface ATEventEditorTableController : UITableViewController <UITextFieldDelegate, ATImagePickerDelegate>
+@interface ATEventEditorTableController : UITableViewController <UITextFieldDelegate, ATImagePickerDelegate, UIPickerViewDelegate, UIPickerViewDataSource>
 {
     ATEventAnnotation * annotation;
     //id<EventEditorDelegate> delegate;

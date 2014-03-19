@@ -65,6 +65,11 @@ UILabel *lblShareCount;
 UIAlertView *alertDelete;
 UIAlertView *alertCancel;
 
+NSMutableArray* markerPickerTitle;
+NSMutableArray* markerPickerImageName;
+UIPickerView* markerPickerView;
+UIToolbar* markerPickerToolbar; //treat it the same way as self.toolbar
+
 int editorPhotoViewWidth;
 int editorPhotoViewHeight;
 
@@ -119,7 +124,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
        // ### IMPORTANT tick to remove cell background for the section 0's row 0
         cell.backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     }
-    
     return cell;
 }
 -(void) resetEventEditor //called by mapview whenever bring up event editor
@@ -193,14 +197,19 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [shareButton addTarget:self action:@selector(shareButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:shareButton];
         
+        UIButton *markerPicker = [UIButton buttonWithType:UIButtonTypeCustom];
+        markerPicker.frame = CGRectMake(120, 0, 30, 30);
+        [markerPicker setImage:[UIImage imageNamed:@"marker_star.png"] forState:UIControlStateNormal];
+        [markerPicker setAlpha:0.4];
+        [markerPicker addTarget:self action:@selector(markerPickerAction:) forControlEvents:UIControlEventTouchUpInside];
+        [customView addSubview:markerPicker];
+        
         lblShareCount = [[UILabel alloc] initWithFrame:CGRectMake(220, 0, 100, 40)];
         lblShareCount.font = [UIFont fontWithName:@"Helvetica" size:10];
         lblShareCount.backgroundColor = [UIColor clearColor];
         lblShareCount.text = @"Share Events";
         [customView addSubview:lblShareCount];
     }
-    [self.view bringSubviewToFront:self.datePicker];
-    [self.view bringSubviewToFront:self.toolbar];
     return customView;
 }
 
@@ -242,6 +251,34 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [customViewForPhoto bringSubviewToFront:addPhotoBtn];
         [self updatePhotoCountLabel];
     } //else it will process in viewForSectionHeader
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+
+    CGFloat height = cell.contentView.frame.size.height;
+    //in full screen editor, show large description
+    if (indexPath.section == 1 &&  indexPath.row == 0)
+    {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        {
+            BOOL optionIPADFullScreenEditorFlag = [ATHelper getOptionEditorFullScreen];
+            if (optionIPADFullScreenEditorFlag)
+            {
+                height = 200;
+                CGRect frame = cell.contentView.frame;
+                frame.size.height = 200;
+                [cell.contentView setFrame:frame];
+                CGRect frame2 = self.description.frame;
+                frame2.size.height = 200;
+                [self.description setFrame:frame2];
+            }
+        }
+
+    }
+    return height;
+    // return the height of the particular row in the table view
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -361,6 +398,46 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
                                               otherButtonTitles:nil];
         [alert show];
     }
+}
+- (void)markerPickerAction:(id)sender {
+
+    
+    markerPickerTitle = [[NSMutableArray alloc] init];
+    markerPickerImageName = [[NSMutableArray alloc] init];
+    [markerPickerTitle addObject:@"Star"];
+    [markerPickerTitle addObject:@"Food"];
+    [markerPickerTitle addObject:@"Hotel"];
+    [markerPickerTitle addObject:@"School"];
+    [markerPickerTitle addObject:@"Scenary"];
+    [markerPickerTitle addObject:@"Air Port"];
+    [markerPickerTitle addObject:@"History"];
+    [markerPickerTitle addObject:@"Transportation"];
+    
+    [markerPickerImageName addObject:@"marker_star.png"];
+    [markerPickerImageName addObject:@"marker_food.png"];
+    [markerPickerImageName addObject:@"marker_hotel.png"];
+    [markerPickerImageName addObject:@"marker_college.png"];
+    [markerPickerImageName addObject:@"marker_view.png"];
+    [markerPickerImageName addObject:@"marker_airport.png"];
+    [markerPickerImageName addObject:@"marker_history.png"];
+    [markerPickerImageName addObject:@"marker_bus.png"];
+    
+    markerPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 215, 360, 440)];
+    markerPickerView.delegate = self;
+    markerPickerView.showsSelectionIndicator = YES;
+    
+    markerPickerToolbar = [[UIToolbar alloc] initWithFrame: CGRectMake(0, 380, 320, 44)];
+    markerPickerView.backgroundColor = [UIColor colorWithRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0];
+    [markerPickerToolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+    
+    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: @"Done" style: UIBarButtonItemStyleDone target: self action: @selector(markerPicked:)];
+    doneButton.width = 50;
+    doneButton.tintColor = [UIColor blueColor];
+    markerPickerToolbar.items = [NSArray arrayWithObject: doneButton];
+ 
+    [self.view addSubview:markerPickerView];
+    [self.view addSubview: markerPickerToolbar];
+    
 }
 -(void)textFieldDidBeginEditing:(UITextField*)textField
 {
@@ -595,6 +672,17 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
 }
 
+- (void)markerPicked:(id)sender{
+
+    
+        [markerPickerView removeFromSuperview];
+        [markerPickerToolbar removeFromSuperview];
+       // self.datePicker = nil;
+        //self.toolbar = nil;
+
+}
+
+
 //callback from imagePicker Controller
 - (void)doneSelectPictures:(NSMutableArray*)images
 {
@@ -695,6 +783,44 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     [self setDateTxt:nil];
     [super viewDidUnload];
 }
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow: (NSInteger)row inComponent:(NSInteger)component {
+    // Handle the selection
+    NSLog(@"--- Did select ");
+}
+
+- (NSInteger)numberOfComponentsInPickerView:
+(UIPickerView *)pickerView
+{
+    return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView
+numberOfRowsInComponent:(NSInteger)component
+{
+    return markerPickerImageName.count;
+}
+
+
+- (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row
+          forComponent:(NSInteger)component reusingView:(UIView *)view
+{
+    UIImage *img = [UIImage imageNamed:[markerPickerImageName objectAtIndex:row]];
+    UIImageView *icon = [[UIImageView alloc] initWithImage:img];
+    [icon setFrame:CGRectMake(0, 0, 32, 32)];
+    
+    UILabel *firstLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 150, 32)];
+    firstLabel.text = [markerPickerTitle objectAtIndex:row];
+    firstLabel.textAlignment = NSTextAlignmentLeft;
+    firstLabel.backgroundColor = [UIColor clearColor];
+    
+    UIView *tmpView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 32)];
+    [tmpView insertSubview:icon atIndex:0];
+    [tmpView insertSubview:firstLabel atIndex:0];
+    [tmpView setUserInteractionEnabled:NO];
+    [tmpView setTag:row];
+    return tmpView;
+}
+
 @end
 
 
