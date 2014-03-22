@@ -35,11 +35,11 @@
 #define PHOTOVIEW_HEIGHT 768
 
 #define NOT_THUMBNAIL -1
-#define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
 #define ADD_PHOTO_BUTTON_TAG_777 777
 #define DESC_TEXT_TAG_FROM_STORYBOARD_888 888
 #define DATE_TEXT_FROM_STORYBOARD_999 999
 #define ADDED_PHOTOSCROLL_TAG_900 900
+#define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
 @implementation ATEventEditorTableController
@@ -542,10 +542,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 {
     if (textView.tag == DESC_TEXT_TAG_FROM_STORYBOARD_888) //this is description text, emilate placehold situation
     {
-        if (self.description.textColor == [UIColor lightGrayColor])
+        if ([self.description.text hasPrefix: NEWEVENT_DESC_PLACEHOLD])
         {
             self.description.textColor = [UIColor blackColor];
-            self.description.text=@"";
+            self.description.text= [self.description.text stringByReplacingOccurrencesOfString:NEWEVENT_DESC_PLACEHOLD withString:@""];
         }
     }
     return YES;
@@ -568,7 +568,13 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [alert show];
         return;
     }
-    if (self.description.text == nil || self.description.text.length == 0)
+    
+    //A bug fix, "\n" is treated as empty, thus the event became untapable. (a long time bug, just found 03/22/14)
+    NSString* descTxt = self.description.text;
+    descTxt = [descTxt stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    descTxt = [descTxt stringByReplacingOccurrencesOfString:@" " withString:@""];
+    descTxt = [ATHelper clearMakerAllFromDescText:descTxt];
+    if (descTxt == nil || descTxt.length == 0)
     {  //#### have to have this check, otherwise the eventEditor will not popup
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Description field may not be empty"
                 message:@"Please enter description."
