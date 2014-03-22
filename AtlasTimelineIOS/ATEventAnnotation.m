@@ -8,6 +8,7 @@
 
 #import "ATEventAnnotation.h"
 #import "ATAppDelegate.h"
+#import "ATHelper.h"
 
 @implementation ATEventAnnotation
 
@@ -37,7 +38,7 @@
 
 - (NSString *)title
 {
-    return self.description;
+    return [ATHelper clearMakerAllFromDescText: self.description];
 }
 
 

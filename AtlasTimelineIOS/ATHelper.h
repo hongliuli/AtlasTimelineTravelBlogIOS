@@ -34,6 +34,9 @@
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
 + (UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir;
 + (UIColor *) colorWithHexString: (NSString *) stringToConvert;
++ (NSString*) getMarkerNameFromDescText: (NSString*)descTxt;
++ (NSString*) clearMakerFromDescText: (NSString*)desc :(NSString*)markerName;
++ (NSString*) clearMakerAllFromDescText: (NSString*)desc;
 
 //set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable;

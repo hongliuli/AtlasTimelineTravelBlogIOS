@@ -65,6 +65,8 @@
 #define MAPVIEW_SHOW_PHOTO_LABEL_ONLY 2
 #define MAPVIEW_SHOW_ALL 3
 
+#define HAVE_IMAGE_INDICATOR 100
+
 @interface MFTopAlignedLabel : UILabel
 
 @end
@@ -772,7 +774,7 @@
     }
     else if ([annotation isKindOfClass:[ATAnnotationSelected class]]) //all that read from db will be ATAnnotationSelected type
     {
-        NSString* specialMarkerName = [self getStaticMarkerName: ann.description];
+        NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
         
         selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate: specialMarkerName]; //keep this line here
         MKAnnotationView* annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
@@ -782,6 +784,7 @@
         BOOL isSpecialMarkerInFocused = false;
         if (specialMarkerName != nil)
         {
+            //Remember special marker annotation identifier has alpha value after :
             if ([selectedAnnotationIdentifier rangeOfString:@":"].location == NSNotFound)
                 isSpecialMarkerInFocused = true;
         }
@@ -801,10 +804,9 @@
                     UIImage* img = [self readPhotoThumbFromFile:ann.uniqueId];
                     if (img != nil)
                     {
-                        tmpLbl.userInteractionEnabled = YES;
                         UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
                         [imgView setAlpha:0.85];
-                        imgView.tag = 100; //later used to get subview
+                        imgView.tag = HAVE_IMAGE_INDICATOR; //later used to get subview
                         /*
                          imgView.contentMode = UIViewContentModeScaleAspectFill;
                          imgView.clipsToBounds = YES;
@@ -822,10 +824,6 @@
                         tmpLbl.layer.cornerRadius = 8;
                         tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
                         tmpLbl.layer.borderWidth = 1;
-                        
-                        [tmpLblUniqueIdMap setObject:annView forKey:[NSNumber numberWithInt:tmpLblUniqueMapIdx ]];
-                        tmpLbl.tag = tmpLblUniqueMapIdx;
-                        tmpLblUniqueMapIdx++;
                     }
                     else
                     {
@@ -833,7 +831,7 @@
                         //             should display text only and add download request in download queue
                         // ########## This is a important lazy download concept #############
                         tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
-                        tmpLbl.text = [NSString stringWithFormat:@" %@", ann.description ];
+                        tmpLbl.text = [NSString stringWithFormat:@" %@", [ATHelper clearMakerAllFromDescText: ann.description ]];
                         tmpLbl.layer.cornerRadius = 8;
                         tmpLbl.layer.borderColor = [UIColor redColor].CGColor;
                         tmpLbl.layer.borderWidth = 1;
@@ -842,7 +840,7 @@
                 else
                 {
                     tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
-                    tmpLbl.text = [NSString stringWithFormat:@" %@", ann.description ];
+                    tmpLbl.text = [NSString stringWithFormat:@" %@", [ATHelper clearMakerAllFromDescText: ann.description ]];
                     tmpLbl.layer.cornerRadius = 8;
                     //If the event has photo before but the photos do not exist anymore, then show text with red board
                     //If this happen, the photo may in Dropbox. if not  in dropbox, then it lost forever.
@@ -851,6 +849,10 @@
                     tmpLbl.layer.borderWidth = 1;
                 }
                 
+                tmpLbl.userInteractionEnabled = YES;
+                [tmpLblUniqueIdMap setObject:annView forKey:[NSNumber numberWithInt:tmpLblUniqueMapIdx ]];
+                tmpLbl.tag = tmpLblUniqueMapIdx;
+                tmpLblUniqueMapIdx++;
                 //tmpLbl.textAlignment = UITextAlignmentCenter;
                 tmpLbl.lineBreakMode = NSLineBreakByWordWrapping;
                 
@@ -868,7 +870,7 @@
             else //if already in the set, need make sure it will be shown
             {
                 if (ann.eventType == EVENT_TYPE_NO_PHOTO)
-                    tmpLbl.text = ann.description; //need to change to take care of if user updated description in event editor
+                    tmpLbl.text = [ATHelper clearMakerAllFromDescText: ann.description ]; //need to change to take care of if user updated description in event editor
                 
                 if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
                     tmpLbl.hidden = true;
@@ -946,7 +948,7 @@
             continue;
         if (ann.eventDate == nil)
             continue;
-        NSString* specialMarkerName = [self getStaticMarkerName: ann.description];
+        NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
         NSString* identifer = [self getImageIdentifier:ann.eventDate :specialMarkerName];
         //NSLog(@"  identifier is %@  date=%@",identifer, ann.eventDate);
         if ([identifer isEqualToString: [ATConstants WhiteFlagAnnotationIdentifier]])
@@ -967,23 +969,7 @@
     [self showDescriptionLabelViews:self.mapView];
 }
 
-//find xxxx in desc text : ...[[xxxx]]...
-- (NSString*) getStaticMarkerName: (NSString*)descTxt
-{
-    NSString* returnStr = nil;
-    NSInteger loc = [descTxt rangeOfString:@"=="].location;
-    if ( loc != NSNotFound) {
-        NSString* str = [descTxt substringFromIndex:loc +2 ];
-        NSInteger loc2 = [str rangeOfString:@"=="].location;
-        if (loc2 != NSNotFound)
-        {
-            str = [str substringToIndex:loc2];
-            if ([str rangeOfString:@" "].location == NSNotFound) //can not have space between == ... == then
-                returnStr = str;
-        }
-    }
-    return returnStr;
-}
+
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
@@ -1110,7 +1096,7 @@
     tmpLbl.frame = newFrame;
     //if (!CGColorGetPattern(tmpLbl.backgroundColor.CGColor))
     [tmpLbl sizeToFit];
-    UIImageView* imgView = (UIImageView*)[tmpLbl viewWithTag:100];
+    UIImageView* imgView = (UIImageView*)[tmpLbl viewWithTag:HAVE_IMAGE_INDICATOR];
     if (imgView != nil)
     {
         imgView.frame = CGRectMake(imgView.frame.origin.x, imgView.frame.origin.y, tmpLbl.frame.size.width, tmpLbl.frame.size.height);

@@ -45,7 +45,7 @@
 
 
 - (void) prepareMapView;
-- (NSString*) getImageIdentifier:(NSDate*) eventDate;
+- (NSString*) getImageIdentifier:(NSDate*) eventDate :(NSString*) specialMarker;
 - (Boolean) eventInPeriodRange:(NSDate*) eventDate;
 - (float) getDistanceFromFocusedDate:(NSDate*) eventDate;
 - (void) setSelectedPeriodLabel;

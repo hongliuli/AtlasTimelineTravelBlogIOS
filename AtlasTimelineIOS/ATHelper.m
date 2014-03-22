@@ -342,7 +342,47 @@ UIPopoverController *verifyViewPopover;
                            alpha:1.0f];
 }
 
-//set/get options
+//find xxxx in desc text : ...<<xxxx>>...
++ (NSString*) getMarkerNameFromDescText: (NSString*)descTxt
+{
+    NSString* returnStr = nil;
+    NSInteger loc = [descTxt rangeOfString:@"<<"].location;
+    if ( loc != NSNotFound) {
+        NSString* str = [descTxt substringFromIndex:loc +2 ];
+        NSInteger loc2 = [str rangeOfString:@">>"].location;
+        if (loc2 != NSNotFound)
+        {
+            str = [str substringToIndex:loc2];
+            if ([str rangeOfString:@" "].location == NSNotFound) //can not have space between == ... == then
+                returnStr = str;
+        }
+    }
+    return returnStr;
+}
+
++ (NSString*) clearMakerFromDescText: (NSString*)desc :(NSString*)markerName
+{
+    if (markerName != nil)
+    {
+        NSInteger loc = [desc rangeOfString:@"\n<<"].location;
+        if (loc == NSNotFound)
+            markerName = [NSString stringWithFormat:@"<<%@>>",markerName ];
+        else
+            markerName = [NSString stringWithFormat:@"\n<<%@>>",markerName ];
+        return [desc stringByReplacingOccurrencesOfString:markerName withString:@""];
+    }
+    else
+        return desc;
+}
+
++ (NSString*) clearMakerAllFromDescText: (NSString*)desc
+{
+    NSString* markerName = [self getMarkerNameFromDescText:desc];
+    return[self clearMakerFromDescText:desc :markerName];
+}
+
+
+//---- set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable
 {
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];

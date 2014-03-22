@@ -65,8 +65,9 @@ UILabel *lblShareCount;
 UIAlertView *alertDelete;
 UIAlertView *alertCancel;
 
-NSMutableArray* markerPickerTitle;
-NSMutableArray* markerPickerImageName;
+NSMutableArray* markerPickerTitleList;
+NSMutableArray* markerPickerImageNameList;
+NSString* markerPickerSelectedItemName;
 UIPickerView* markerPickerView;
 UIToolbar* markerPickerToolbar; //treat it the same way as self.toolbar
 
@@ -381,7 +382,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
          applicationActivities:nil];
         activityController.excludedActivityTypes = [NSArray arrayWithObjects: UIActivityTypePrint,UIActivityTypeAssignToContact,UIActivityTypeCopyToPasteboard, UIActivityTypeMessage, nil];
         //Finally can set subject in email with following line (01/05/2014)
-        NSString* emailSubject = self.description.text;
+        NSString* emailSubject = [ATHelper clearMakerAllFromDescText: self.description.text];
         if ([emailSubject length] > 50)
             emailSubject = [NSString stringWithFormat:@"%@...",[emailSubject substringToIndex:50]];
         [activityController setValue:emailSubject forKey:@"subject"];
@@ -402,29 +403,56 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 - (void)markerPickerAction:(id)sender {
 
     
-    markerPickerTitle = [[NSMutableArray alloc] init];
-    markerPickerImageName = [[NSMutableArray alloc] init];
-    [markerPickerTitle addObject:@"Star"];
-    [markerPickerTitle addObject:@"Food"];
-    [markerPickerTitle addObject:@"Hotel"];
-    [markerPickerTitle addObject:@"School"];
-    [markerPickerTitle addObject:@"Scenary"];
-    [markerPickerTitle addObject:@"Air Port"];
-    [markerPickerTitle addObject:@"History"];
-    [markerPickerTitle addObject:@"Transportation"];
+    markerPickerTitleList = [[NSMutableArray alloc] init];
+    markerPickerImageNameList = [[NSMutableArray alloc] init];
+    [markerPickerTitleList addObject:@"Default"];
+    [markerPickerTitleList addObject:@"Star"];
+    [markerPickerTitleList addObject:@"Eat/Food"];
+    [markerPickerTitleList addObject:@"Hotel/Bed"];
+    [markerPickerTitleList addObject:@"Transportation"];
+    [markerPickerTitleList addObject:@"Air Port"];
+    [markerPickerTitleList addObject:@"Scenary/View"];
+    [markerPickerTitleList addObject:@"Historical"];
+    [markerPickerTitleList addObject:@"Art/Museum"];
+    [markerPickerTitleList addObject:@"Party"];
+    [markerPickerTitleList addObject:@"Uncertain"];
+    [markerPickerTitleList addObject:@"Information"];
+    [markerPickerTitleList addObject:@"Hiking"];
+    [markerPickerTitleList addObject:@"Wildlife"];
+    [markerPickerTitleList addObject:@"School"];
+    [markerPickerTitleList addObject:@"Hospital"];
     
-    [markerPickerImageName addObject:@"marker_star.png"];
-    [markerPickerImageName addObject:@"marker_food.png"];
-    [markerPickerImageName addObject:@"marker_hotel.png"];
-    [markerPickerImageName addObject:@"marker_college.png"];
-    [markerPickerImageName addObject:@"marker_view.png"];
-    [markerPickerImageName addObject:@"marker_airport.png"];
-    [markerPickerImageName addObject:@"marker_history.png"];
-    [markerPickerImageName addObject:@"marker_bus.png"];
+    [markerPickerImageNameList addObject:@"marker_selected.png"];
+    [markerPickerImageNameList addObject:@"marker_star.png"];
+    [markerPickerImageNameList addObject:@"marker_food.png"];
+    [markerPickerImageNameList addObject:@"marker_bed.png"];
+    [markerPickerImageNameList addObject:@"marker_bus.png"];
+    [markerPickerImageNameList addObject:@"marker_airport.png"];
+    [markerPickerImageNameList addObject:@"marker_view.png"];
+    [markerPickerImageNameList addObject:@"marker_historical.png"];
+    [markerPickerImageNameList addObject:@"marker_art.png"];
+    [markerPickerImageNameList addObject:@"marker_party.png"];
+    [markerPickerImageNameList addObject:@"marker_question.png"];
+    [markerPickerImageNameList addObject:@"marker_info.png"];
+    [markerPickerImageNameList addObject:@"marker_hiking.png"];
+    [markerPickerImageNameList addObject:@"marker_wildlife.png"];
+    [markerPickerImageNameList addObject:@"marker_school.png"];
+    [markerPickerImageNameList addObject:@"marker_hospital.png"];
     
+    markerPickerSelectedItemName = [ATHelper getMarkerNameFromDescText:self.description.text];
     markerPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 215, 360, 440)];
     markerPickerView.delegate = self;
     markerPickerView.showsSelectionIndicator = YES;
+    
+    if (markerPickerSelectedItemName != nil)
+    {
+        NSString* markerImageName = [NSString stringWithFormat:@"marker_%@.png", markerPickerSelectedItemName];
+        int index = [markerPickerImageNameList indexOfObject:markerImageName];
+        if (index != NSNotFound)
+        {
+            [markerPickerView selectRow:index inComponent:0 animated:NO];
+        }
+    }
     
     markerPickerToolbar = [[UIToolbar alloc] initWithFrame: CGRectMake(0, 380, 320, 44)];
     markerPickerView.backgroundColor = [UIColor colorWithRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0];
@@ -437,6 +465,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
  
     [self.view addSubview:markerPickerView];
     [self.view addSubview: markerPickerToolbar];
+    self.saveButton.enabled = false;
     
 }
 -(void)textFieldDidBeginEditing:(UITextField*)textField
@@ -673,12 +702,21 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 
 - (void)markerPicked:(id)sender{
-
+    [markerPickerView removeFromSuperview];
+    [markerPickerToolbar removeFromSuperview];
     
-        [markerPickerView removeFromSuperview];
-        [markerPickerToolbar removeFromSuperview];
-       // self.datePicker = nil;
-        //self.toolbar = nil;
+    self.saveButton.enabled = true;
+    
+    if (markerPickerSelectedItemName == nil)
+        return; //do nothing if previously has no marker and user did not picker any marker
+    
+    NSString* toBeReplacedMarkerName = [ATHelper getMarkerNameFromDescText: self.description.text];
+    if (toBeReplacedMarkerName != nil)
+    {
+        self.description.text = [ATHelper clearMakerFromDescText: self.description.text :toBeReplacedMarkerName];
+    }
+    if (![markerPickerSelectedItemName isEqualToString:@"selected"])
+        self.description.text = [NSString stringWithFormat:@"%@\n<<%@>>",self.description.text,markerPickerSelectedItemName];
 
 }
 
@@ -785,7 +823,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow: (NSInteger)row inComponent:(NSInteger)component {
     // Handle the selection
-    NSLog(@"--- Did select ");
+    NSString* pngName = markerPickerImageNameList[row];
+    markerPickerSelectedItemName = [pngName substringToIndex:[pngName rangeOfString:@"."].location];
+    markerPickerSelectedItemName = [markerPickerSelectedItemName substringFromIndex:[markerPickerSelectedItemName rangeOfString:@"_"].location +1];
 }
 
 - (NSInteger)numberOfComponentsInPickerView:
@@ -797,19 +837,19 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 - (NSInteger)pickerView:(UIPickerView *)pickerView
 numberOfRowsInComponent:(NSInteger)component
 {
-    return markerPickerImageName.count;
+    return markerPickerImageNameList.count;
 }
 
 
 - (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row
           forComponent:(NSInteger)component reusingView:(UIView *)view
 {
-    UIImage *img = [UIImage imageNamed:[markerPickerImageName objectAtIndex:row]];
+    UIImage *img = [UIImage imageNamed:[markerPickerImageNameList objectAtIndex:row]];
     UIImageView *icon = [[UIImageView alloc] initWithImage:img];
     [icon setFrame:CGRectMake(0, 0, 32, 32)];
     
     UILabel *firstLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 150, 32)];
-    firstLabel.text = [markerPickerTitle objectAtIndex:row];
+    firstLabel.text = [markerPickerTitleList objectAtIndex:row];
     firstLabel.textAlignment = NSTextAlignmentLeft;
     firstLabel.backgroundColor = [UIColor clearColor];
     
@@ -831,6 +871,7 @@ numberOfRowsInComponent:(NSInteger)component
 - (id) activityViewController:(UIActivityViewController *)activityViewController
           itemForActivityType:(NSString *)activityType
 {
+    NSString* eventDescText = [ATHelper clearMakerAllFromDescText:self.eventEditor.description.text];
     NSString* dateStr = self.eventEditor.dateTxt.text;
     if ([dateStr rangeOfString:@"AD"].location != NSNotFound)
         dateStr = [dateStr substringWithRange:NSMakeRange(0, 10)];
@@ -841,11 +882,11 @@ numberOfRowsInComponent:(NSInteger)component
     if ( [activityType isEqualToString:UIActivityTypeMail] )
     {
         
-        return [NSString stringWithFormat:@"<html><body>[%@] %@<br><a href='%@'>Map Location</a>&nbsp;&nbsp;&nbsp;<br><br>Organized with <a href='%@'>ChronicleMap</a>.",dateStr, self.eventEditor.description.text,googleMap,appStoreUrl];;
+        return [NSString stringWithFormat:@"<html><body>[%@] %@<br><a href='%@'>Map Location</a>&nbsp;&nbsp;&nbsp;<br><br>Organized with <a href='%@'>ChronicleMap</a>.",dateStr, eventDescText,googleMap,appStoreUrl];;
     }
     else
     {
-        return [NSString stringWithFormat:@"[%@] %@\n\n Map Location:%@      (Organized with ChronicleMap.com)",dateStr, self.eventEditor.description.text,googleMap];
+        return [NSString stringWithFormat:@"[%@] %@\n\n Map Location:%@      (Organized with ChronicleMap.com)",dateStr, eventDescText, googleMap];
     }
 }
 - (id) activityViewControllerPlaceholderItem:(UIActivityViewController *)activityViewController { return @""; }
