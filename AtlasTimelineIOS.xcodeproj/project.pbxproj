@@ -21,6 +21,16 @@
 		CE0E5365168E7B0D00C147FB /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E5364168E7B0D00C147FB /* MapKit.framework */; };
 		CE0E55A4173EEDA700631DB8 /* no_photo.png in Resources */ = {isa = PBXBuildFile; fileRef = CE0E55A3173EEDA700631DB8 /* no_photo.png */; };
 		CE10A8FF18305D6000CB1430 /* timeWindowBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = CE10A8FE18305D6000CB1430 /* timeWindowBackground.png */; };
+		CE11968818D3F13400F65345 /* marker_bed.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11967C18D3F13400F65345 /* marker_bed.png */; };
+		CE11968918D3F13400F65345 /* marker_bus.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11967D18D3F13400F65345 /* marker_bus.png */; };
+		CE11968B18D3F13400F65345 /* marker_food.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11967F18D3F13400F65345 /* marker_food.png */; };
+		CE11968D18D3F13400F65345 /* marker_home.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11968118D3F13400F65345 /* marker_home.png */; };
+		CE11968E18D3F13400F65345 /* marker_hospital.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11968218D3F13400F65345 /* marker_hospital.png */; };
+		CE11969018D3F13400F65345 /* marker_playground.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11968418D3F13400F65345 /* marker_playground.png */; };
+		CE11969118D3F13400F65345 /* marker_school.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11968518D3F13400F65345 /* marker_school.png */; };
+		CE11969318D3F13400F65345 /* marker_view.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11968718D3F13400F65345 /* marker_view.png */; };
+		CE11969518D3F42F00F65345 /* marker_airport.png in Resources */ = {isa = PBXBuildFile; fileRef = CE11969418D3F42F00F65345 /* marker_airport.png */; };
+		CE127B2818D2A79B0037B070 /* marker_star.png in Resources */ = {isa = PBXBuildFile; fileRef = CE127B2718D2A79A0037B070 /* marker_star.png */; };
 		CE13766F169E5938005C8C41 /* ATDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE13766E169E5938005C8C41 /* ATDataController.m */; };
 		CE137676169FB750005C8C41 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE137675169FB750005C8C41 /* CoreData.framework */; };
 		CE17E4E518879FF0003DCD83 /* focusedFlag.png in Resources */ = {isa = PBXBuildFile; fileRef = CE17E4E418879FF0003DCD83 /* focusedFlag.png */; };
@@ -68,6 +78,15 @@
 		CE6A874E16967823006154D2 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CE6A874C16967823006154D2 /* Model.xcdatamodeld */; };
 		CE6A875116967D6A006154D2 /* Note_Project_Specification in Resources */ = {isa = PBXBuildFile; fileRef = CE6A875016967D6A006154D2 /* Note_Project_Specification */; };
 		CE70BF49176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE70BF48176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m */; };
+		CE73D24418DA831C00E61403 /* marker_art.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D23C18DA831C00E61403 /* marker_art.png */; };
+		CE73D24518DA831C00E61403 /* marker_hiking.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D23D18DA831C00E61403 /* marker_hiking.png */; };
+		CE73D24618DA831C00E61403 /* marker_historical.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D23E18DA831C00E61403 /* marker_historical.png */; };
+		CE73D24718DA831C00E61403 /* marker_info.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D23F18DA831C00E61403 /* marker_info.png */; };
+		CE73D24818DA831C00E61403 /* marker_question.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D24018DA831C00E61403 /* marker_question.png */; };
+		CE73D24918DA831C00E61403 /* marker_wildlife.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D24118DA831C00E61403 /* marker_wildlife.png */; };
+		CE73D24A18DA831C00E61403 /* marker-airport.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D24218DA831C00E61403 /* marker-airport.png */; };
+		CE73D24D18DA846500E61403 /* marker_party.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D24C18DA846500E61403 /* marker_party.png */; };
+		CE73D24F18DA973F00E61403 /* marker_selected.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D24E18DA973F00E61403 /* marker_selected.png */; };
 		CE75886A16C352AB00AEE4AF /* ATHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CE75886916C352AB00AEE4AF /* ATHelper.m */; };
 		CE7D62941847C2A900F01B0E /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE7D62931847C2A900F01B0E /* SenTestingKit.framework */; };
 		CE7E3D9C1698F506004E71CD /* ATEventAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7E3D9B1698F506004E71CD /* ATEventAnnotation.m */; };
@@ -165,6 +184,16 @@
 		CE0E5364168E7B0D00C147FB /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		CE0E55A3173EEDA700631DB8 /* no_photo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = no_photo.png; path = images/no_photo.png; sourceTree = "<group>"; };
 		CE10A8FE18305D6000CB1430 /* timeWindowBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = timeWindowBackground.png; path = images/timeWindowBackground.png; sourceTree = "<group>"; };
+		CE11967C18D3F13400F65345 /* marker_bed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_bed.png; path = images/marker_bed.png; sourceTree = "<group>"; };
+		CE11967D18D3F13400F65345 /* marker_bus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_bus.png; path = images/marker_bus.png; sourceTree = "<group>"; };
+		CE11967F18D3F13400F65345 /* marker_food.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_food.png; path = images/marker_food.png; sourceTree = "<group>"; };
+		CE11968118D3F13400F65345 /* marker_home.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_home.png; path = images/marker_home.png; sourceTree = "<group>"; };
+		CE11968218D3F13400F65345 /* marker_hospital.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_hospital.png; path = images/marker_hospital.png; sourceTree = "<group>"; };
+		CE11968418D3F13400F65345 /* marker_playground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_playground.png; path = images/marker_playground.png; sourceTree = "<group>"; };
+		CE11968518D3F13400F65345 /* marker_school.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_school.png; path = images/marker_school.png; sourceTree = "<group>"; };
+		CE11968718D3F13400F65345 /* marker_view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_view.png; path = images/marker_view.png; sourceTree = "<group>"; };
+		CE11969418D3F42F00F65345 /* marker_airport.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_airport.png; path = images/marker_airport.png; sourceTree = "<group>"; };
+		CE127B2718D2A79A0037B070 /* marker_star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_star.png; path = images/marker_star.png; sourceTree = "<group>"; };
 		CE13766D169E5938005C8C41 /* ATDataController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATDataController.h; sourceTree = "<group>"; };
 		CE13766E169E5938005C8C41 /* ATDataController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATDataController.m; sourceTree = "<group>"; };
 		CE137675169FB750005C8C41 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -225,6 +254,15 @@
 		CE6A875016967D6A006154D2 /* Note_Project_Specification */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Note_Project_Specification; sourceTree = "<group>"; };
 		CE70BF47176FFC8C00DB1B3C /* ATInAppPurchaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATInAppPurchaseViewController.h; sourceTree = "<group>"; };
 		CE70BF48176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATInAppPurchaseViewController.m; sourceTree = "<group>"; };
+		CE73D23C18DA831C00E61403 /* marker_art.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_art.png; path = images/marker_art.png; sourceTree = "<group>"; };
+		CE73D23D18DA831C00E61403 /* marker_hiking.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_hiking.png; path = images/marker_hiking.png; sourceTree = "<group>"; };
+		CE73D23E18DA831C00E61403 /* marker_historical.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_historical.png; path = images/marker_historical.png; sourceTree = "<group>"; };
+		CE73D23F18DA831C00E61403 /* marker_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_info.png; path = images/marker_info.png; sourceTree = "<group>"; };
+		CE73D24018DA831C00E61403 /* marker_question.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_question.png; path = images/marker_question.png; sourceTree = "<group>"; };
+		CE73D24118DA831C00E61403 /* marker_wildlife.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_wildlife.png; path = images/marker_wildlife.png; sourceTree = "<group>"; };
+		CE73D24218DA831C00E61403 /* marker-airport.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "marker-airport.png"; path = "images/marker-airport.png"; sourceTree = "<group>"; };
+		CE73D24C18DA846500E61403 /* marker_party.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_party.png; path = images/marker_party.png; sourceTree = "<group>"; };
+		CE73D24E18DA973F00E61403 /* marker_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_selected.png; path = images/marker_selected.png; sourceTree = "<group>"; };
 		CE75886816C352AB00AEE4AF /* ATHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATHelper.h; sourceTree = "<group>"; };
 		CE75886916C352AB00AEE4AF /* ATHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATHelper.m; sourceTree = "<group>"; };
 		CE7D62931847C2A900F01B0E /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -478,6 +516,25 @@
 		CE2A1CF216AD9882004476E8 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CE73D24E18DA973F00E61403 /* marker_selected.png */,
+				CE73D24C18DA846500E61403 /* marker_party.png */,
+				CE73D23C18DA831C00E61403 /* marker_art.png */,
+				CE73D23D18DA831C00E61403 /* marker_hiking.png */,
+				CE73D23E18DA831C00E61403 /* marker_historical.png */,
+				CE73D23F18DA831C00E61403 /* marker_info.png */,
+				CE73D24018DA831C00E61403 /* marker_question.png */,
+				CE73D24118DA831C00E61403 /* marker_wildlife.png */,
+				CE73D24218DA831C00E61403 /* marker-airport.png */,
+				CE11969418D3F42F00F65345 /* marker_airport.png */,
+				CE11967C18D3F13400F65345 /* marker_bed.png */,
+				CE11967D18D3F13400F65345 /* marker_bus.png */,
+				CE11967F18D3F13400F65345 /* marker_food.png */,
+				CE11968118D3F13400F65345 /* marker_home.png */,
+				CE11968218D3F13400F65345 /* marker_hospital.png */,
+				CE11968418D3F13400F65345 /* marker_playground.png */,
+				CE11968518D3F13400F65345 /* marker_school.png */,
+				CE11968718D3F13400F65345 /* marker_view.png */,
+				CE127B2718D2A79A0037B070 /* marker_star.png */,
 				CE17E505189EE2AC003DCD83 /* TimewheelZoomIn.png */,
 				CE17E506189EE2AC003DCD83 /* TimewheelZoomOut.png */,
 				CE17E50318955ECD003DCD83 /* focuseIcon.png */,
@@ -712,8 +769,10 @@
 				CE0E530C168E671F00C147FB /* InfoPlist.strings in Resources */,
 				CE3DF30A187FA39C0065337E /* add-button-md.png in Resources */,
 				CE0E531B168E671F00C147FB /* MainStoryboard_iPhone.storyboard in Resources */,
+				CE11968D18D3F13400F65345 /* marker_home.png in Resources */,
 				CE0E531E168E671F00C147FB /* MainStoryboard_iPad.storyboard in Resources */,
 				CE6053C6168E9D660006F110 /* Note_Tech_Tips_resource.txt in Resources */,
+				CE73D24718DA831C00E61403 /* marker_info.png in Resources */,
 				CE6A875116967D6A006154D2 /* Note_Project_Specification in Resources */,
 				CEBD59D416B76607003BD211 /* app-settings-icon.png in Resources */,
 				CEBD59D516B76607003BD211 /* carat-open.png in Resources */,
@@ -721,6 +780,7 @@
 				CE17E501189351B5003DCD83 /* scaleYearMonth.png in Resources */,
 				CEBD59DA16B76607003BD211 /* marker-af-1.png in Resources */,
 				CEBD59DB16B76607003BD211 /* marker-af-2.png in Resources */,
+				CE11969318D3F13400F65345 /* marker_view.png in Resources */,
 				CE17E4FE189351B5003DCD83 /* scaleYear1.png in Resources */,
 				CEBD59DC16B76607003BD211 /* marker-af-3.png in Resources */,
 				CEBD59DD16B76607003BD211 /* marker-af-4.png in Resources */,
@@ -737,16 +797,21 @@
 				CEDBDF3016EEC96C00ADB0FE /* frame-bottom.png in Resources */,
 				CE17E502189351B5003DCD83 /* scaleYearMonthEdge.png in Resources */,
 				CEDBDF3116EEC96C00ADB0FE /* frame-left.png in Resources */,
+				CE127B2818D2A79B0037B070 /* marker_star.png in Resources */,
 				CEDBDF3216EEC96C00ADB0FE /* frame-right.png in Resources */,
 				CEDBDF3316EEC96C00ADB0FE /* frame-top.png in Resources */,
+				CE11969118D3F13400F65345 /* marker_school.png in Resources */,
 				CEE2ABDD16FF89C3003D6AB9 /* icon.png in Resources */,
 				CE17E4FB189351B5003DCD83 /* scaleDay.png in Resources */,
 				CEE2ABDF16FF89D5003D6AB9 /* icon@2x.png in Resources */,
 				CEE2ABE516FF8A52003D6AB9 /* icon-72.png in Resources */,
+				CE11968918D3F13400F65345 /* marker_bus.png in Resources */,
 				CEE2ABE716FF8F12003D6AB9 /* icon-144.png in Resources */,
 				CE97FC9B170795A600F97A3E /* no_image.gif in Resources */,
 				CE1BC18417165BAA0067BA4A /* currentLocation.jpg in Resources */,
 				CE1BC186171669AF0067BA4A /* help.png in Resources */,
+				CE11969018D3F13400F65345 /* marker_playground.png in Resources */,
+				CE11968818D3F13400F65345 /* marker_bed.png in Resources */,
 				CEE4E836171B221E00628F76 /* info.png in Resources */,
 				CEBD4EAD1724BBDB001B3798 /* TimeScaleBar100.png in Resources */,
 				CEBD4EAE1724BBDB001B3798 /* TimeScaleBar200.png in Resources */,
@@ -757,27 +822,38 @@
 				CEAD5A39172B5BD700CB7082 /* gesture-longpress.png in Resources */,
 				CE17E500189351B5003DCD83 /* scaleYear100.png in Resources */,
 				CEAD5A3A172B5BD700CB7082 /* gesture-pinch.png in Resources */,
+				CE73D24918DA831C00E61403 /* marker_wildlife.png in Resources */,
+				CE11969518D3F42F00F65345 /* marker_airport.png in Resources */,
+				CE73D24518DA831C00E61403 /* marker_hiking.png in Resources */,
 				CEAD5A3B172B5BD700CB7082 /* gesture-tap.png in Resources */,
+				CE73D24818DA831C00E61403 /* marker_question.png in Resources */,
 				CE17E4FC189351B5003DCD83 /* scaleDayEdge.png in Resources */,
 				CEAD5A3F172B610700CB7082 /* gesture-swipe.png in Resources */,
 				CE1D4E4917354CFB00AA603C /* focusedIcon.png in Resources */,
 				CE1D4E4B1738896C00AA603C /* share-icons.png in Resources */,
+				CE73D24A18DA831C00E61403 /* marker-airport.png in Resources */,
 				CE0E55A4173EEDA700631DB8 /* no_photo.png in Resources */,
 				CEF522E9175661530074321E /* Default-568h@2x.png in Resources */,
+				CE73D24D18DA846500E61403 /* marker_party.png in Resources */,
+				CE73D24F18DA973F00E61403 /* marker_selected.png in Resources */,
 				CE17E50418955ECD003DCD83 /* focuseIcon.png in Resources */,
 				CE1A7463175A2516009DE741 /* scaleBkg_5.png in Resources */,
 				CE1A7464175A2516009DE741 /* scaleBkg_10.png in Resources */,
+				CE73D24618DA831C00E61403 /* marker_historical.png in Resources */,
 				CE1A7465175A2516009DE741 /* scaleBkg_15.png in Resources */,
 				CE1A7466175A2516009DE741 /* scaleBkg_20.png in Resources */,
 				CE1A7467175A2516009DE741 /* scaleBkg_25.png in Resources */,
 				CE17E4E518879FF0003DCD83 /* focusedFlag.png in Resources */,
 				CE1A7469175A6E65009DE741 /* scaleBkg_60.png in Resources */,
+				CE11968B18D3F13400F65345 /* marker_food.png in Resources */,
 				CEFE78801783BA5D00BC027D /* share.png in Resources */,
 				CE17E4FF189351B5003DCD83 /* scaleYear10.png in Resources */,
 				CE17E4FD189351B5003DCD83 /* scaleEdge.png in Resources */,
 				CEFE788217859BF800BC027D /* .gitignore in Resources */,
+				CE11968E18D3F13400F65345 /* marker_hospital.png in Resources */,
 				CE10A8FF18305D6000CB1430 /* timeWindowBackground.png in Resources */,
 				CE384F69184062ED0009B6E0 /* Overlay.png in Resources */,
+				CE73D24418DA831C00E61403 /* marker_art.png in Resources */,
 				CE384F6A184062ED0009B6E0 /* Overlay@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
