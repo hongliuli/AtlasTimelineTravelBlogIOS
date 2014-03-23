@@ -138,7 +138,7 @@ UISwitch *switchViewZoomToWeek;
             UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellZoomToWeek"];
             if( aCell == nil ) {
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellZoomToWeek"];
-                aCell.textLabel.text = @"Zoom to Week";
+                aCell.textLabel.text = @"Zoom to Week (Default is Month)";
                 aCell.selectionStyle = UITableViewCellSelectionStyleNone;
                 switchViewZoomToWeek = [[UISwitch alloc] initWithFrame:CGRectZero];
                 aCell.accessoryView = switchViewZoomToWeek;
