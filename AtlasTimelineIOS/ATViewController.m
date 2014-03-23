@@ -782,9 +782,9 @@
         NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
         //keey list of red  annotations
         BOOL isSpecialMarkerInFocused = false;
-        if (specialMarkerName != nil)
+        if (specialMarkerName != nil && ![selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier]] )
         {
-            //Remember special marker annotation identifier has alpha value after :
+            //Remember special marker annotation identifier has alpha value delimited by ":" if not selected. Selected do not have :
             if ([selectedAnnotationIdentifier rangeOfString:@":"].location == NSNotFound)
                 isSpecialMarkerInFocused = true;
         }
@@ -1615,13 +1615,15 @@
         }
         //if off-focuse, append image alpha value
         if (segmentDistance > 1 && segmentDistance <=2)
-            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.8",pngNameWithAlpha];
+            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.7",pngNameWithAlpha];
         else if (segmentDistance > 2 && segmentDistance <=3)
             pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.6",pngNameWithAlpha];
         else if (segmentDistance > 3 && segmentDistance <=4)
-            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.4",pngNameWithAlpha];
-        else if (segmentDistance > 4)
-            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.3",pngNameWithAlpha ];
+            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.5",pngNameWithAlpha];
+        else if (segmentDistance > 4 && segmentDistance <= 5)
+            pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.4",pngNameWithAlpha ];
+        else if (segmentDistance > 5)
+            return [ATConstants WhiteFlagAnnotationIdentifier];
         
         return pngNameWithAlpha;
     }
