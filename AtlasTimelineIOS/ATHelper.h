@@ -47,6 +47,8 @@
 + (void) setOptionDateMagnifierModeScroll:(BOOL)flag;
 + (BOOL) getOptionEditorFullScreen;
 + (void) setOptionEditorFullScreen:(BOOL)flag;
++ (BOOL) getOptionZoomToWeek;
++ (void) setOptionZoomToWeek:(BOOL)flag;
 
 
 @end

@@ -464,6 +464,22 @@ UIPopoverController *verifyViewPopover;
         flagStr = @"Y";
     [userDefault setObject:flagStr forKey:@"EditorFullScreen"];
 }
-
++ (BOOL) getOptionZoomToWeek
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flag = [userDefault objectForKey:@"ZoomToWeek"];
+    if (flag == nil || [flag isEqualToString:@"N"]) //default is N
+        return false;
+    else
+        return true;
+}
++ (void) setOptionZoomToWeek:(BOOL)flag
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* flagStr = @"N";
+    if (flag)
+        flagStr = @"Y";
+    [userDefault setObject:flagStr forKey:@"ZoomToWeek"];
+}
 
 @end

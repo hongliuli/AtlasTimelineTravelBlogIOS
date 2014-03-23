@@ -12,6 +12,7 @@
 #define ROW_ENABLE_MOVE_DATE 0
 #define ROW_IPAD_EDIT_FULLSCREEN 1
 #define ROW_DATE_FIELD_KEYBOARD 2
+#define ROW_ZOOM_TO_WEEK 3
 //#define ROW_ENABLE_TIME_LINK 4
 
 @interface ATOptionsTableViewController ()
@@ -24,6 +25,7 @@ UISwitch *switchViewTimeLink;
 UISwitch *switchViewEditorFullScreen;
 UISwitch *switchViewKeyboardForDate;
 UISwitch *switchViewMagnifierMove;
+UISwitch *switchViewZoomToWeek;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -55,16 +57,15 @@ UISwitch *switchViewMagnifierMove;
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-#warning Potentially incomplete method implementation.
     // Return the number of sections.
     return 1;
 }
 
+////////###### add a new option is simple: 1)change numberOfRowsInSection  2)follow an option to change a few more places in this file
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return 3;
+    return 4;
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
@@ -133,6 +134,22 @@ UISwitch *switchViewMagnifierMove;
             }
             return aCell;
         }
+        case ROW_ZOOM_TO_WEEK: {
+            UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellZoomToWeek"];
+            if( aCell == nil ) {
+                aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellZoomToWeek"];
+                aCell.textLabel.text = @"Zoom to Week";
+                aCell.selectionStyle = UITableViewCellSelectionStyleNone;
+                switchViewZoomToWeek = [[UISwitch alloc] initWithFrame:CGRectZero];
+                aCell.accessoryView = switchViewZoomToWeek;
+                if ([ATHelper getOptionZoomToWeek])
+                    [switchViewZoomToWeek setOn:YES animated:NO];
+                else
+                    [switchViewZoomToWeek setOn:NO animated:NO];
+                [switchViewZoomToWeek addTarget:self action:@selector(zoomToWeekChanged:) forControlEvents:UIControlEventValueChanged];
+            }
+            return aCell;
+        }
         /****** comment out option or enable/disable time link
         case ROW_ENABLE_TIME_LINK: {
             UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellTimeLink"];
@@ -174,6 +191,8 @@ UISwitch *switchViewMagnifierMove;
     //[switchViewTimeLink setOn:YES animated:NO];
     [ATHelper setOptionEditorFullScreen:false];
     [switchViewEditorFullScreen setOn:NO animated:NO];
+    [ATHelper setOptionZoomToWeek:false];
+    [switchViewZoomToWeek setOn:NO animated:NO];
     
     [UIView transitionWithView:button.titleLabel duration:0.25 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
         button.titleLabel.backgroundColor = [UIColor blueColor];
@@ -213,7 +232,13 @@ UISwitch *switchViewMagnifierMove;
     else
         [ATHelper setOptionEditorFullScreen:false];
 }
-
+- (void) zoomToWeekChanged:(id)sender {
+    UISwitch* switchControl = sender;
+    if (switchControl.on)
+        [ATHelper setOptionZoomToWeek:true];
+    else
+        [ATHelper setOptionZoomToWeek:false];
+}
 
 /*
 // Override to support conditional editing of the table view.

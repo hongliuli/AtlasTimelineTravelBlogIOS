@@ -167,22 +167,11 @@
         
     }
     UIImageView *tempImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"timeWindowBackground.png"]];
+    [tempImageView setAlpha:0.75];
     [tempImageView setFrame:self.horizontalTableView.frame];
     
     self.horizontalTableView.backgroundView = tempImageView;
-    
-    year1View = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
-    year1View.backgroundColor = [UIColor clearColor];
-    year1View.opaque = NO;
-    year1View.image = [UIImage imageNamed:@"timeWheel1year.png"];
-    
-    year10View = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
-    year10View.backgroundColor = [UIColor clearColor];
-    year10View.opaque = NO;
-    year10View.image = [UIImage imageNamed:@"timeWheel10Years.png"];
-    
-    year100View = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
-    year100View.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"timeWheel100Years.png"]];
+    self.horizontalTableView.backgroundColor = [UIColor clearColor];
     
     prevYear = [ATHelper getYearPartHelper:appDelegate.focusedDate];
     return self;
@@ -512,7 +501,7 @@
     }
     else
     {
-        cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1];
+        cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:0.7];
     }
     //[self changeBackgroundImage:self year:yearForImages];
     //[self displayTimeElapseinSearchBar];
@@ -574,21 +563,25 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int selectedPeriodInDay = appDelegate.selectedPeriodInDays;
-    /**** remove zoom level WEEK for simplicity, may be later have a option
-    if (selectedPeriodInDay == 7)
-    {
-        if (pinchVelocity <0)
+    bool maxZoomOutReached = false;
+    NSString* maxZoomOutTxt;
+  //  /**** remove zoom level WEEK for simplicity, may be later have a option
+
+        if (selectedPeriodInDay == 7)
         {
-            appDelegate.selectedPeriodInDays = 30 ;
+            if (pinchVelocity <0)
+            {
+                appDelegate.selectedPeriodInDays = 30 ;
+            }
+            else if (pinchVelocity > 0 )
+            {
+                appDelegate.selectedPeriodInDays = 7;
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WEEK is the max zoom-in level!" message:@"You can change to default max level MONTH in Settings -> Options." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert show];
+                return;
+            }
         }
-        else if (pinchVelocity > 0 )
-        {
-            appDelegate.selectedPeriodInDays = 7;
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WEEK is the last zoom-in level!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-            [alert show];
-        }
-    }
-     */
+ 
     if (selectedPeriodInDay == 30)
     {
         if (pinchVelocity <0)
@@ -600,12 +593,17 @@
         }
         else if (pinchVelocity > 0 )
         {
-            NSDateFormatter* df = appDelegate.dateFormater;
-            NSString* dt = [[df stringFromDate:appDelegate.focusedDate] substringToIndex:10];
-            //appDelegate.selectedPeriodInDays = 7;
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"MONTH is the last zoom-in level!" message:[NSString stringWithFormat:@"Tip: In this case, all events within one month of %@ are colored, the darker the closer to %@",dt, dt] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-            [alert show];
-            return;
+            if ([ATHelper getOptionZoomToWeek])
+            {
+                appDelegate.selectedPeriodInDays = 7;
+            }
+            else
+            {
+
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"MONTH is the max zoom-in level!" message:@"You can make WEEK to be the max zoom-in level in Settings -> Options." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert show];
+                return;
+            }
         }
     }
     if (selectedPeriodInDay == 365)
@@ -615,7 +613,11 @@
             if (currentNumberOfRow / 10  > 1)
                 appDelegate.selectedPeriodInDays = 365 * 10;
             else  //no enough total time to zoom out
-                return;
+            {
+                maxZoomOutReached = true;
+                maxZoomOutTxt = @"1 year";
+                //return;
+            }
             //focusedRow = focusedRow/12;
             //focusedRow = abs(components.year);
         }
@@ -632,7 +634,11 @@
             if (currentNumberOfRow / 10 > 1)
                 appDelegate.selectedPeriodInDays = 3650 * 10;
             else
-                return;
+            {
+                maxZoomOutReached = true;
+                maxZoomOutTxt = @"10 years";
+                //return;
+            }
         }
         else if (pinchVelocity > 0 ) //from 10 year to 1 year
         {
@@ -646,7 +652,11 @@
             if (currentNumberOfRow / 10 > 1)
                 appDelegate.selectedPeriodInDays = 36500 * 10;
             else
-                return;
+            {
+                maxZoomOutReached = true;
+                maxZoomOutTxt = @"100 years";
+                //return;
+            }
             //focusedRow = focusedRow/10;
             //focusedRow = abs(components.year /100);
         }
@@ -673,6 +683,14 @@
             //focusedRow = focusedRow * 10;
             //focusedRow = abs(components.year / 10);
         }
+    }
+    if (maxZoomOutReached)
+    {
+        NSDateFormatter* df = appDelegate.dateFormater;
+        NSString* dt = [[df stringFromDate:appDelegate.focusedDate] substringToIndex:10];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Cannot zoom-out anymore!" message:[NSString stringWithFormat:@"In this case, all events within %@ of %@ are colored.",maxZoomOutTxt, dt] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
     }
     [self performSettingFocusedRowForDate:newFocusedDate needAdjusted: FALSE];
 }
@@ -785,7 +803,7 @@
                 cell.scallLabel.backgroundColor = [UIColor cyanColor];
             }
             else
-                cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1];
+                cell.scallLabel.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:0.7];
         }
         else
         {
@@ -795,7 +813,7 @@
             cell.subLabel.textColor = [UIColor blackColor];
             
             float colorDivider = rowDistance + 2;
-            cell.scallLabel.backgroundColor = [UIColor colorWithRed:1.0 green:0.1*colorDivider blue:0.1*colorDivider alpha:1];
+            cell.scallLabel.backgroundColor = [UIColor colorWithRed:1.0 green:0.1*colorDivider blue:0.1*colorDivider alpha:0.7];
             cell.scallLabel.textColor = [UIColor whiteColor];
             if (path.row > focusedRow && ![ATHelper isStringNumber:cell.scallLabel.text])
                 cell.scallLabel.textColor = [UIColor greenColor];
