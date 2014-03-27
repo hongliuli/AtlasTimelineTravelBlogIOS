@@ -266,7 +266,7 @@
         [periodToAddForFocusedDate setDay:focusedRow]; //FocusedRow for day is differently, use 2000 days
         [periodToAddForDisplay setDay:currentRow];
         [nextTimePeriodCompponent setDay:1];
-        cell.scallLabel.text = @"week";
+        cell.scallLabel.text = @"day";
         cell.backgroundView = nil;
     }
     else if (daysInPeriod == 30)
@@ -274,7 +274,7 @@
         [periodToAddForFocusedDate setDay:focusedRow]; //FocusedRow for day is differently, use 2000 days
         [periodToAddForDisplay setDay:currentRow];
         [nextTimePeriodCompponent setDay:1];
-        cell.scallLabel.text = @"month";
+        cell.scallLabel.text = @"day";
         
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
@@ -287,7 +287,7 @@
         [periodToAddForFocusedDate setMonth:focusedRow];
         [periodToAddForDisplay setMonth:currentRow];
         [nextTimePeriodCompponent setMonth:1];
-        cell.scallLabel.text = @"1 yr";
+        cell.scallLabel.text = @"month";
         
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
@@ -301,7 +301,7 @@
         [periodToAddForFocusedDate setYear:focusedRow];
         [periodToAddForDisplay setYear:currentRow];
         [nextTimePeriodCompponent setYear:1];
-        cell.scallLabel.text = @"10 yrs";
+        cell.scallLabel.text = @"1 yr";
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
         av.opaque = NO;
@@ -314,7 +314,7 @@
         [periodToAddForFocusedDate setYear:focusedRow * 10];
         [periodToAddForDisplay setYear:currentRow * 10];
         [nextTimePeriodCompponent setYear:10];
-        cell.scallLabel.text = @"100 yrs";
+        cell.scallLabel.text = @"10 yrs";
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
         av.opaque = NO;
@@ -326,7 +326,7 @@
         [periodToAddForFocusedDate setYear:focusedRow * 100];
         [periodToAddForDisplay setYear:currentRow * 100];
         [nextTimePeriodCompponent setYear:100];
-        cell.scallLabel.text = @"1000qhw yrs";
+        cell.scallLabel.text = @"100 yrs";
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
         av.opaque = NO;
