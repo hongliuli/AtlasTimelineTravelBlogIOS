@@ -102,19 +102,22 @@ UISwitch *switchViewZoomToWeek;
             }
             return aCell;
         }
-        case ROW_IPAD_EDIT_FULLSCREEN: { //will not show this row in iPhone
+        case ROW_IPAD_EDIT_FULLSCREEN: { //Do not show this row in iPhone: 1) chg hight is set to 0 in heightFor...()  2)chg here to not add any textLabel/accessoryView here
             UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellEditFullScreen"];
             if( aCell == nil ) {
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellEditFullScreen"];
-                aCell.textLabel.text = @"Full Screen Event Editor"; //Note: iPad only show this row
-                aCell.selectionStyle = UITableViewCellSelectionStyleNone;
-                switchViewEditorFullScreen = [[UISwitch alloc] initWithFrame:CGRectZero];
-                aCell.accessoryView = switchViewEditorFullScreen;
-                if ([ATHelper getOptionEditorFullScreen])
-                    [switchViewEditorFullScreen setOn:YES animated:NO];
-                else
-                    [switchViewEditorFullScreen setOn:NO animated:NO];
-                [switchViewEditorFullScreen addTarget:self action:@selector(editorFullScreenChanged:) forControlEvents:UIControlEventValueChanged];
+                if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone)
+                {
+                    aCell.textLabel.text = @"Full Screen Event Editor"; //Note: iPad only show this row
+                    aCell.selectionStyle = UITableViewCellSelectionStyleNone;
+                    switchViewEditorFullScreen = [[UISwitch alloc] initWithFrame:CGRectZero];
+                    aCell.accessoryView = switchViewEditorFullScreen;
+                    if ([ATHelper getOptionEditorFullScreen])
+                        [switchViewEditorFullScreen setOn:YES animated:NO];
+                    else
+                        [switchViewEditorFullScreen setOn:NO animated:NO];
+                    [switchViewEditorFullScreen addTarget:self action:@selector(editorFullScreenChanged:) forControlEvents:UIControlEventValueChanged];
+                }
             }
             return aCell;
         }
