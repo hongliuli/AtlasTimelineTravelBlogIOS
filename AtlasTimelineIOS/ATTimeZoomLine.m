@@ -14,12 +14,19 @@
 #import "ATTimeScrollWindowNew.h"
 #import "Toast+UIView.h"
 
-#define MOVABLE_VIEW_HEIGHT 4
+#define MOVABLE_VIEW_HEIGHT 2
+#define LABEL_SCALE_TEXT_CONTAINER_Y -38
+#define ZOOM_LEVEL_TXT_Y -1
+#define ZOOM_LEVEL_BLOCK_HEIGHT 30
 #define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
 
 @implementation ATTimeZoomLine
 
-UIImageView* timeScaleImageView;
+UIView* timeScaleLineView;
+UILabel* timeScaleLeftBlock;
+UILabel* timeScaleRightBlock;
+UILabel* timeScaleZoomLeveText;
+
 //UILabel* labelScaleText;
 UILabel* label1;
 UILabel* label2;
@@ -35,6 +42,7 @@ UILabel* labelSeg4;
 
 static int toastFirstTimeDelay = 0;
 
+UIView* labelScaleTextContainer;
 UILabel* labelScaleText;
 UILabel* labelScaleTextSecondLine;
 UILabel* labelMagnifier;
@@ -57,11 +65,20 @@ NSDate* prevYearDate;
     if (self) {
         frameWidth = frame.size.width;
         // Initialization code
-        timeScaleImageView = [[UIImageView alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, -10, 90, MOVABLE_VIEW_HEIGHT)];
-        [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
-        timeScaleImageView.contentMode = UIViewContentModeScaleToFill; // UIViewContentModeScaleAspectFill;
-        timeScaleImageView.clipsToBounds = YES;
-                
+        timeScaleLineView = [[UIView alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, -10, 90, MOVABLE_VIEW_HEIGHT)];
+        timeScaleZoomLeveText = [[UILabel alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, ZOOM_LEVEL_TXT_Y, 90, 15)];
+        timeScaleZoomLeveText.textColor = [UIColor darkGrayColor];
+        timeScaleZoomLeveText.font = [UIFont fontWithName:@"Helvetica-bold" size:12];
+        timeScaleZoomLeveText.textAlignment = NSTextAlignmentCenter;
+        
+        CGRect frameLeft = CGRectMake(0, -10, 10, ZOOM_LEVEL_BLOCK_HEIGHT);
+        timeScaleLeftBlock = [[UILabel alloc] initWithFrame:frameLeft];
+        [timeScaleLeftBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.15]];
+
+        CGRect frameRight = CGRectMake([ATConstants timeScrollWindowWidth] - 200, -10, 300, ZOOM_LEVEL_BLOCK_HEIGHT);
+        timeScaleRightBlock = [[UILabel alloc] initWithFrame:frameRight];
+        [timeScaleRightBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.15]];
+        
         /*
         self.zoomLabel.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ];
         self.zoomLabel.font=[UIFont fontWithName:@"Helvetica" size:13];
@@ -87,12 +104,16 @@ NSDate* prevYearDate;
             segLabelShift = 40;
 
         
-        [self addSubview:timeScaleImageView];
+        [self addSubview:timeScaleLineView];
+        [self addSubview:timeScaleZoomLeveText];
+
         [self addSubview:label1];
         [self addSubview:label2];
         [self addSubview:label3];
         [self addSubview:label4];
         [self addSubview:label5];
+        [self addSubview:timeScaleLeftBlock];
+        [self addSubview:timeScaleRightBlock];
         
         /*
         labelSeg1 = [[UILabel alloc] initWithFrame:CGRectMake(segLabelShift, -5, 70, 15)];
@@ -121,32 +142,33 @@ NSDate* prevYearDate;
         
         //add the at front
         
-        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(-30,-11, 80, 50)]; //if enlarge it, it will show all text inside, but I think not need.
-        labelScaleText.backgroundColor = [UIColor colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];;
-        labelScaleText.font=[UIFont fontWithName:@"Helvetica" size:20];
-        labelScaleText.layer.borderColor=[UIColor grayColor].CGColor;
-        labelScaleText.layer.borderWidth=1;
-        //labelScaleText.clipsToBounds = NO;
-        labelScaleText.layer.cornerRadius = 20;
-        labelScaleText.numberOfLines = 2;
+        labelScaleTextContainer = [[UIView alloc] initWithFrame:CGRectMake(-30,LABEL_SCALE_TEXT_CONTAINER_Y, 80, 45)];
+        labelScaleTextContainer.backgroundColor = [UIColor  colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];
+        labelScaleTextContainer.layer.borderColor=[UIColor grayColor].CGColor;
+        labelScaleTextContainer.layer.borderWidth=1;
+        labelScaleTextContainer.layer.cornerRadius = 15;
+        
+        labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(0, 5, 80, 20)];
+
+        labelScaleText.textColor = [UIColor blueColor];
+        labelScaleText.font=[UIFont fontWithName:@"Helvetica-bold" size:20];
         labelScaleText.textAlignment = NSTextAlignmentCenter;
         
-        labelScaleTextSecondLine = [[UILabel alloc] initWithFrame:CGRectMake(-30,-11, 80, 50)];
+        labelScaleTextSecondLine = [[UILabel alloc] initWithFrame:CGRectMake(0,25, 80, 20)];
         labelScaleTextSecondLine.backgroundColor = [UIColor clearColor];
+        labelScaleTextSecondLine.textColor = [UIColor blueColor];
         labelScaleTextSecondLine.font=[UIFont fontWithName:@"Helvetica" size:16];
-        labelScaleTextSecondLine.numberOfLines = 2;
         labelScaleTextSecondLine.textAlignment = NSTextAlignmentCenter;
         
         
-        [self addSubview:labelScaleText];
-        [self addSubview:labelScaleTextSecondLine];
+        [labelScaleTextContainer addSubview:labelScaleText];
+        [labelScaleTextContainer addSubview:labelScaleTextSecondLine];
+        [self addSubview:labelScaleTextContainer];
         
-        CGPoint center = timeScaleImageView.center;
+        CGPoint center = timeScaleLineView.center;
         center.y = 100;
-        labelScaleText.hidden=true;
-        labelScaleText.center = center;
-        labelScaleTextSecondLine.hidden=true;
-        labelScaleTextSecondLine.center = center;
+        labelScaleTextContainer.hidden=true;
+        labelScaleTextContainer.center = center;
         
         //UIWindow* theWindow = [[UIApplication sharedApplication] keyWindow];
         //UIViewController* rvc = theWindow.rootViewController;
@@ -212,15 +234,13 @@ NSDate* prevYearDate;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if ([ATHelper getOptionDateMagnifierModeScroll])
     {
-        labelScaleText.hidden = false;
-        labelScaleTextSecondLine.hidden = false;
+        labelScaleTextContainer.hidden = false;
         labelMagnifier.hidden = true;
         labelDateMonthText.hidden = true;
     }
     else
     {
-        labelScaleText.hidden = true;
-        labelScaleTextSecondLine.hidden = true;
+        labelScaleTextContainer.hidden = true;
         labelMagnifier.hidden = false;
         labelDateMonthText.hidden = false;
     }
@@ -229,23 +249,21 @@ NSDate* prevYearDate;
     if (appDelegate.selectedPeriodInDays   < 3650)
         monthDateText = [ATHelper getMonthSlashDateInNumber:appDelegate.focusedDate];
 
-    labelScaleText.text = [NSString stringWithFormat:@"%@\n ", yrTxt ];;
-    labelScaleTextSecondLine.text = [NSString stringWithFormat:@" \n%@", monthDateText ];
+    labelScaleText.text = yrTxt;
+    labelScaleTextSecondLine.text = monthDateText;
 }
 - (void) changeDateText
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if ([ATHelper getOptionDateMagnifierModeScroll])
     {
-        labelScaleText.hidden = true;
-        labelScaleTextSecondLine.hidden = true;
+        labelScaleTextContainer.hidden = true;
         labelMagnifier.hidden = false;
         labelDateMonthText.hidden = false;
     }
     else
     {
-        labelScaleText.hidden = false;
-        labelScaleTextSecondLine.hidden = false;
+        labelScaleTextContainer.hidden = false;
         labelMagnifier.hidden = true;
         labelDateMonthText.hidden = true;
     }
@@ -525,6 +543,9 @@ NSDate* prevYearDate;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
         dateComponent.day = 1;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        timeScaleZoomLeveText.text = @"1mo";
+        if (periodIndays <= 7)
+            timeScaleZoomLeveText.text = @"1wk";
     }
     else if (periodIndays == 365)
     {
@@ -532,6 +553,7 @@ NSDate* prevYearDate;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
         dateComponent.month = 5;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        timeScaleZoomLeveText.text = @"1yr";
     }
     else if (periodIndays == 3650)
     {
@@ -539,6 +561,7 @@ NSDate* prevYearDate;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
         dateComponent.year = 5;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        timeScaleZoomLeveText.text = @"10yr";
     }
     else if (periodIndays == 36500)
     {
@@ -546,6 +569,7 @@ NSDate* prevYearDate;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
         dateComponent.year = 50;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        timeScaleZoomLeveText.text = @"100yr";
     }
     else if (periodIndays == 365000)
     {
@@ -553,6 +577,7 @@ NSDate* prevYearDate;
         scaleStartDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
         dateComponent.year = 500;
         scaleEndDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
+        timeScaleZoomLeveText.text = @"1000yr";
     }
     if ([startDate compare:scaleStartDay] == NSOrderedDescending)
         scaleStartDay = startDate;
@@ -611,7 +636,10 @@ NSDate* prevYearDate;
         self.scaleLenForDisplay = 80;
         scaleStartAdj = -30;
     }
-    timeScaleImageView.frame = CGRectMake(scaleStartInPix + scaleStartAdj, 10, self.scaleLenForDisplay, MOVABLE_VIEW_HEIGHT);
+    
+    timeScaleLineView.frame = CGRectMake(scaleStartInPix + scaleStartAdj, 10, self.scaleLenForDisplay, MOVABLE_VIEW_HEIGHT);
+    [timeScaleLineView setBackgroundColor:[UIColor darkGrayColor]];
+    /*
     if (self.scaleLenForDisplay < 150)
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar100.png"]];
     else if (self.scaleLenForDisplay < 250 )
@@ -622,11 +650,27 @@ NSDate* prevYearDate;
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar400.png"]];
     else //if over 500
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar700.png"]];
+    */
     
-    CGPoint center = timeScaleImageView.center;
+    int x = self.frame.size.width;
+    CGRect frameLeft = CGRectMake(0, -10, scaleStartInPix + scaleStartAdj, 20);
+    CGRect frameRight = CGRectMake(scaleStartInPix + scaleStartAdj + self.scaleLenForDisplay, -10, x - (scaleStartInPix + scaleStartAdj + self.scaleLenForDisplay), 20);
+    
+    [timeScaleLeftBlock setFrame:frameLeft];
+    [timeScaleRightBlock setFrame:frameRight];
+    /*
+    CGPoint center = timeScaleLineView.center;
     center.y = -25;//this value decided y value when scroll time window
     labelScaleText.center = center;
     labelScaleTextSecondLine.center = center;
+    */
+    CGPoint center2 = timeScaleLineView.center;
+    center2.y = ZOOM_LEVEL_TXT_Y;//this value decided y value when scroll time window
+    timeScaleZoomLeveText.center = center2;
+    
+    CGPoint center3 = timeScaleLineView.center;
+    center3.y = LABEL_SCALE_TEXT_CONTAINER_Y;//this value decided y value when scroll time window
+    labelScaleTextContainer.center = center3;
 
     //[labelScaleText setFrame:CGRectMake(
                                   //  floorf((timeScaleImageView.frame.size.width - labelScaleText.frame.size.width) / 2.0), 0,
