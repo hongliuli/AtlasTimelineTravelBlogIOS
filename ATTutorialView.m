@@ -60,6 +60,8 @@ UILabel* updatableLabel2;
         dateFocused = [fmt stringFromDate:appDelegate.focusedDate];
     dateFocused = [dateFocused substringToIndex:10];
     if (appDelegate.selectedPeriodInDays == 30)
+        timeZoomLevelStr = @"1 week";
+    else if (appDelegate.selectedPeriodInDays == 30)
         timeZoomLevelStr = @"1 month";
     else if (appDelegate.selectedPeriodInDays == 365)
         timeZoomLevelStr = @"1 year";
