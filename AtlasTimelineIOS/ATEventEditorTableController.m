@@ -201,7 +201,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         UIButton *markerPicker = [UIButton buttonWithType:UIButtonTypeCustom];
         markerPicker.frame = CGRectMake(120, 0, 30, 30);
         [markerPicker setImage:[UIImage imageNamed:@"marker_star.png"] forState:UIControlStateNormal];
-        [markerPicker setAlpha:0.4];
+        [markerPicker setAlpha:0.8];
         [markerPicker addTarget:self action:@selector(markerPickerAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:markerPicker];
         
@@ -576,7 +576,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     descTxt = [ATHelper clearMakerAllFromDescText:descTxt];
     if (descTxt == nil || descTxt.length == 0)
     {  //#### have to have this check, otherwise the eventEditor will not popup
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Description field may not be empty"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Description field may not be empty. (keep tag <<...>> if there is one)"
                 message:@"Please enter description."
                 delegate:nil
                 cancelButtonTitle:@"OK"
