@@ -16,7 +16,7 @@
 
 #define MOVABLE_VIEW_HEIGHT 2
 #define LABEL_SCALE_TEXT_CONTAINER_Y -38
-#define ZOOM_LEVEL_TXT_Y -1
+#define ZOOM_LEVEL_TXT_Y -5
 #define ZOOM_LEVEL_BLOCK_HEIGHT 30
 #define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
 
@@ -67,7 +67,7 @@ NSDate* prevYearDate;
         // Initialization code
         timeScaleLineView = [[UIView alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, -10, 90, MOVABLE_VIEW_HEIGHT)];
         timeScaleZoomLeveText = [[UILabel alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, ZOOM_LEVEL_TXT_Y, 90, 15)];
-        timeScaleZoomLeveText.textColor = [UIColor darkGrayColor];
+        timeScaleZoomLeveText.textColor = [UIColor colorWithRed:0.6 green:0.2 blue:0.2 alpha:1];
         timeScaleZoomLeveText.font = [UIFont fontWithName:@"Helvetica-bold" size:12];
         timeScaleZoomLeveText.textAlignment = NSTextAlignmentCenter;
         
@@ -638,7 +638,7 @@ NSDate* prevYearDate;
     }
     
     timeScaleLineView.frame = CGRectMake(scaleStartInPix + scaleStartAdj, 10, self.scaleLenForDisplay, MOVABLE_VIEW_HEIGHT);
-    [timeScaleLineView setBackgroundColor:[UIColor darkGrayColor]];
+    [timeScaleLineView setBackgroundColor:[UIColor colorWithRed:1.0 green:0.1 blue:0.1 alpha:1]];
     /*
     if (self.scaleLenForDisplay < 150)
         [timeScaleImageView setImage:[UIImage imageNamed:@"TimeScaleBar100.png"]];
