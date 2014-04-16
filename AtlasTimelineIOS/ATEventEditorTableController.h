@@ -20,7 +20,6 @@
 @interface ATEventEditorTableController : UITableViewController <UITextFieldDelegate, ATImagePickerDelegate, UIPickerViewDelegate, UIPickerViewDataSource>
 {
     ATEventAnnotation * annotation;
-    //id<EventEditorDelegate> delegate;
 }
 @property int hasPhotoFlag;
 @property int eventType;
@@ -66,11 +65,14 @@
 @end
 
 // I can save/delete Core Data here, but I will let these to be done in mapview by delegate since we have pass info back to update annotation view when save/delete
+//ATViewController is designed to conform to this protocal, so it need implement
 @protocol EventEditorDelegate <NSObject>
 @required
 - (void)deleteEvent; //ATViewController will delete the selectedAnnotation, so no need to pass parameter
 - (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList thumbnailFileName:(NSString*)thumbNailFileName;
 - (void)cancelEvent;
+- (void)addToEpisode;
+- (BOOL)isInEpisode;
 
 @end
 

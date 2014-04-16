@@ -167,7 +167,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         UIImage *thumb2 = [UIImage imageNamed:@"add-button-md.png"];
         [photoBtn setImage:thumb2 forState:UIControlStateNormal];
-        photoBtn.frame = CGRectMake(editorPhotoViewWidth - 110, editorPhotoViewHeight - 25, 35, 35);
+        photoBtn.frame = CGRectMake(50, editorPhotoViewHeight - 40, 48, 48);
         [photoBtn addTarget:self action:@selector(takePictureAction:) forControlEvents:UIControlEventTouchUpInside];
         photoBtn.tag = ADD_PHOTO_BUTTON_TAG_777;
         [customView addSubview:photoBtn];
@@ -189,26 +189,35 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         //Label in the view
         UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 100, 40)];
         label.backgroundColor = [UIColor clearColor];
-        label.text = @"Address:";
+        label.text = @"Addr:";
         [customView addSubview:label];
         
         UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        shareButton.frame = CGRectMake(150, 0, 100, 30);
+        shareButton.frame = CGRectMake(240, 0, 40, 30);
         [shareButton setImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
         [shareButton addTarget:self action:@selector(shareButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:shareButton];
         
+        UIButton *episodeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        episodeButton.frame = CGRectMake(170, 0, 40, 30);
+        if ([self.delegate isInEpisode])
+            [episodeButton setImage:[UIImage imageNamed:@"add-to-episode-folder-reverse.png"] forState:UIControlStateNormal];
+        else
+            [episodeButton setImage:[UIImage imageNamed:@"add-to-episode-folder.png"] forState:UIControlStateNormal];
+        [episodeButton addTarget:self action:@selector(addToEpisodeAction:) forControlEvents:UIControlEventTouchUpInside];
+        [customView addSubview:episodeButton];
+        
         UIButton *markerPicker = [UIButton buttonWithType:UIButtonTypeCustom];
-        markerPicker.frame = CGRectMake(120, 0, 30, 30);
+        markerPicker.frame = CGRectMake(100, 0, 30, 30);
         [markerPicker setImage:[UIImage imageNamed:@"marker_star.png"] forState:UIControlStateNormal];
         [markerPicker setAlpha:0.8];
         [markerPicker addTarget:self action:@selector(markerPickerAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:markerPicker];
         
-        lblShareCount = [[UILabel alloc] initWithFrame:CGRectMake(220, 0, 100, 40)];
+        lblShareCount = [[UILabel alloc] initWithFrame:CGRectMake(270, 0, 100, 40)];
         lblShareCount.font = [UIFont fontWithName:@"Helvetica" size:10];
         lblShareCount.backgroundColor = [UIColor clearColor];
-        lblShareCount.text = @"Share Events";
+        lblShareCount.text = @"";
         [customView addSubview:lblShareCount];
     }
     return customView;
@@ -621,6 +630,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
                                   otherButtonTitles:@"Delete",nil];
     [alertDelete show];
 
+    [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
+}
+- (IBAction)addToEpisodeAction:(id)sender {
+    [self.delegate addToEpisode];
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex

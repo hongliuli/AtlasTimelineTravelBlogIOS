@@ -67,6 +67,12 @@
 
 #define HAVE_IMAGE_INDICATOR 100
 
+#define EPISODE_VIEW_WIDTH 350
+#define EPISODE_VIEW_HIGHT_LARGE 400
+#define EPISODE_VIEW_HIGHT_MIDDLE 200
+#define EPISODE_VIEW_HIGHT_SMALL 100
+#define EPISODE_ROW_HEIGHT 30
+
 @interface MFTopAlignedLabel : UILabel
 
 @end
@@ -92,6 +98,10 @@
     UIButton *locationbtn;
     CGRect timeScrollWindowFrame;
     ATTutorialView* tutorialView;
+    UIView* episodeView; //we do not need to have a ATEpisodeView as ATTutorialView because ATTutorialView has to implement drawRect for some customised graph draw
+    UILabel* lblEpisode1;
+    NSString* episodeNameforUpdating; //if user picked a episode to update
+    UITextView* txtNewEpisodeName;
     
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
     ATEventAnnotation* selectedEventAnnotation;
@@ -99,10 +109,13 @@
     int timeLinkDepthDirectionFuture;
     int timeLinkDepthDirectionPast;
     NSMutableArray* timeLinkOverlaysToBeCleaned ;
+    NSMutableArray* eventEpisodeList;
+    NSString* loadedEpisodeName; //if an episode is loaded from setting -> outgoing modify
     ATAnnotationFocused* focusedAnnotationIndicator;
     ATEventDataStruct* focusedEvent;
     int currentTapTouchKey;
     bool currentTapTouchMove;
+    
 }
 
 @synthesize mapView = _mapView;
@@ -302,7 +315,30 @@
         
         NSLog(@"%@%@",@"Failed to open url:",[url description]);
 }
-
+-(void) saveEpisodeClicked:(id)sender
+{
+    NSString* episodeName = episodeNameforUpdating;
+    if (episodeNameforUpdating == nil)
+        episodeName = txtNewEpisodeName.text;
+    
+    episodeName = [episodeName stringByTrimmingCharactersInSet:
+                   [NSCharacterSet whitespaceCharacterSet]];
+        
+    //save all event uniqueId to userDefault
+    if (episodeName == nil || [episodeName isEqual:@""])
+    {
+        //TODO alert and quit
+    }
+    else
+    {
+        if (episodeNameforUpdating == nil)
+        {
+            //TODO check if name duplicate, if duplicate  add version ".x", so final name is name.x.x.x.x
+        }
+        //TODO save to userDefault
+        [self closeEpisodeView];
+    }
+}
 - (void)handleTapOnTutorial:(UIGestureRecognizer *)gestureRecognizer
 {
     [self closeTutorialView];
@@ -777,7 +813,11 @@
         NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
         
         selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate: specialMarkerName]; //keep this line here
-        MKAnnotationView* annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
+        MKAnnotationView* annView;
+        if (eventEpisodeList != nil && [eventEpisodeList containsObject:ann.uniqueId])
+            annView = [self getImageAnnotationView:@"add-to-episode-marker.png" :annotation];
+        else
+            annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
         annView.annotation = annotation;
         NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
         //keey list of red  annotations
@@ -896,7 +936,7 @@
         //annView.hidden = false;
         return annView;
     }
-    else if ([annotation isKindOfClass:[ATAnnotationFocused class]])
+    else if ([annotation isKindOfClass:[ATAnnotationFocused class]]) //Focused annotation is added when tab focused
     {
         MKAnnotationView* annView = [self getImageAnnotationView:@"focusedFlag.png" :annotation];
         annView.annotation = annotation;
@@ -1824,7 +1864,137 @@
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
 }
+//delegate required implementation
+- (void)addToEpisode{
+    //[self mapViewShowHideAction]; //de-select annotation will flip it, so double flip
+    if (eventEpisodeList == nil)
+        eventEpisodeList = [[NSMutableArray alloc] init];
+    
+    NSString* tmpUniqueId = self.selectedAnnotation.uniqueId;
+    if ([eventEpisodeList containsObject:tmpUniqueId])
+        [eventEpisodeList removeObject:tmpUniqueId];
+    else
+        [eventEpisodeList addObject:tmpUniqueId];
+    
+    //Following will do removeAnnotation/addAnnotation for this one, so need to remove tmpLbl otherwise tab on icon/text after
+    //add/remove episode will crash
+    NSString *key=[NSString stringWithFormat:@"%f|%f",self.selectedAnnotation.coordinate.latitude, self.selectedAnnotation.coordinate.longitude];
+    UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+    [tmpLbl removeFromSuperview];
+    [selectedAnnotationSet removeObjectForKey:key];
+    //remove/add so viewForAnnotation will call to redraw the annotation with a new icon
+    [self.mapView removeAnnotation:self.selectedAnnotation];
+    [self.mapView addAnnotation:self.selectedAnnotation];
 
+    if (self.timeZoomLine != nil)
+        [self.timeZoomLine setNeedsDisplay];
+    
+    if ([eventEpisodeList count] == 0)
+        [self closeEpisodeView];
+    else
+        [self startEpisodeView];
+    
+    
+    
+    if (self.eventEditorPopover != nil)
+        [self.eventEditorPopover dismissPopoverAnimated:true];
+}
+- (BOOL)isInEpisode //delegate requried to implement
+{
+    if (eventEpisodeList == nil)
+        return false;
+    else
+        return [eventEpisodeList containsObject:self.selectedAnnotation.uniqueId];
+        
+}
+
+- (void) startEpisodeView
+{
+
+    if (episodeView == nil)
+    {
+        episodeView = [[UIView alloc] initWithFrame:CGRectMake(0,0,0,0)];
+        [episodeView.layer setCornerRadius:10.0f];
+       ////// episodeView setBackgroundColor:xxxx
+        // Do any additional setup after loading the view, typically from a nib.
+        
+        //////[self.mapView addSubview:episodeView];
+        
+    }
+    
+    [UIView transitionWithView:self.mapView
+                      duration:0.5
+                       options:UIViewAnimationTransitionFlipFromRight //any animation
+                    animations:^ {
+                        [episodeView setFrame:CGRectMake(0, 0, EPISODE_VIEW_WIDTH, EPISODE_VIEW_HIGHT_LARGE)];
+                        episodeView.backgroundColor=[UIColor colorWithRed:0.9 green:0.9 blue:0.5 alpha:0.7];
+                        [self.mapView addSubview:episodeView];
+                        //[self partialInitEpisodeView];
+                    }
+                    completion:^(BOOL finished) {[self partialInitEpisodeView];}];
+}
+
+//the purpose to have this to be called in completion:^ is to make animation together with all subviews
+//(ATTutorialView has drawRect so no such issue)
+- (void) partialInitEpisodeView
+{
+    UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeSystem];
+    btnSave.frame = CGRectMake(10, 20, 50, 10);
+    [btnSave.layer setCornerRadius:7.0f];
+    [btnSave setTitle:@"Save" forState:UIControlStateNormal];
+    [btnSave addTarget:self action:@selector(saveEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [episodeView addSubview: btnSave];
+    
+    UIButton *btnClear = [UIButton buttonWithType:UIButtonTypeSystem];
+    btnClear.frame = CGRectMake(80, 20, 50, 10);
+    [btnClear.layer setCornerRadius:7.0f];
+    [btnClear setTitle:@"Clear" forState:UIControlStateNormal];
+    [btnClear addTarget:self action:@selector(clearEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [episodeView addSubview: btnClear];
+    
+    UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 10 + 3*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, 8*EPISODE_ROW_HEIGHT)];
+    lblWording.lineBreakMode = NSLineBreakByWordWrapping;
+    lblWording.numberOfLines = 0;
+    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your followers' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a follower's ChronicleMap app:\n. [Settings->Outgoing] tap Share\n. Select followers to send\nYour followers will see the episode in his/her [Settings->Content Import] which can be downloaded on the map.";
+    [episodeView addSubview:lblWording];
+    
+    if (txtNewEpisodeName == nil)
+    {
+        txtNewEpisodeName = [[UITextView alloc] initWithFrame:CGRectMake(10, 2*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, EPISODE_ROW_HEIGHT)];
+        //[episodeView addSubview:txtNewEpisodeName];
+    }
+    
+    if (lblEpisode1 == nil)
+    {
+        lblEpisode1 = [[UILabel alloc] initWithFrame:CGRectMake(10, 2*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, EPISODE_ROW_HEIGHT)];
+    }
+    [episodeView addSubview:lblEpisode1];
+    int cnt = [eventEpisodeList count];
+    if (episodeNameforUpdating == nil)
+        lblEpisode1.text = [NSString stringWithFormat:@"%d event(s) are picked for new episode", cnt];
+    else
+        lblEpisode1.text = [NSString stringWithFormat:@"%d event(s) are in episode [%@]", cnt, episodeNameforUpdating];
+
+}
+
+- (void) closeEpisodeView
+{
+    if (episodeView != nil)
+    {
+        [UIView transitionWithView:self.mapView
+                          duration:0.5
+                           options:UIViewAnimationTransitionCurlDown
+                        animations:^ {
+                            [episodeView setFrame:CGRectMake(0,0,0,0)];
+                        }
+                        completion:^(BOOL finished) {
+                            [episodeView removeFromSuperview];
+                            episodeView = nil;
+                        }];
+    }
+    [episodeView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    episodeNameforUpdating = nil;
+}
 //Save photo to file. Called by updateEvent after write event to db
 //I should put image process functions such as resize/convert to JPEG etc in ImagePickerController
 //put it here is because we have to save image here since we only have uniqueId and some other info here
