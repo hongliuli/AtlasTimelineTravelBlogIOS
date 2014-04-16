@@ -100,6 +100,8 @@ UILabel* updatableLabel2;
                     }];
 }
 
+//REMEBER: UIView do not have viewDidLoad() method, it is in viewController/
+//         So, avoid using drawRect unless need draw graph, otheriwse addSubview buttons/text/labels in controller to this view
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
