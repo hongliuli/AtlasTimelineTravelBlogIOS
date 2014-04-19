@@ -198,15 +198,18 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [shareButton addTarget:self action:@selector(shareButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:shareButton];
         
-        UIButton *episodeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        episodeButton.frame = CGRectMake(170, 0, 40, 30);
-        if ([self.delegate isInEpisode])
-            [episodeButton setImage:[UIImage imageNamed:@"add-to-episode-folder-reverse.png"] forState:UIControlStateNormal];
-        else
-            [episodeButton setImage:[UIImage imageNamed:@"add-to-episode-folder.png"] forState:UIControlStateNormal];
-        [episodeButton addTarget:self action:@selector(addToEpisodeAction:) forControlEvents:UIControlEventTouchUpInside];
-        [customView addSubview:episodeButton];
-        
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        if ([appDelegate.sourceName isEqual:@"myEvents"]) //can create episode on myEvents only
+        {
+            UIButton *episodeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            episodeButton.frame = CGRectMake(170, 0, 40, 30);
+            if ([self.delegate isInEpisode])
+                [episodeButton setImage:[UIImage imageNamed:@"add-to-episode-folder-reverse.png"] forState:UIControlStateNormal];
+            else
+                [episodeButton setImage:[UIImage imageNamed:@"add-to-episode-folder.png"] forState:UIControlStateNormal];
+            [episodeButton addTarget:self action:@selector(addToEpisodeAction:) forControlEvents:UIControlEventTouchUpInside];
+            [customView addSubview:episodeButton];
+        }
         UIButton *markerPicker = [UIButton buttonWithType:UIButtonTypeCustom];
         markerPicker.frame = CGRectMake(100, 0, 30, 30);
         [markerPicker setImage:[UIImage imageNamed:@"marker_star.png"] forState:UIControlStateNormal];

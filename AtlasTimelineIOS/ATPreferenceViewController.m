@@ -106,6 +106,12 @@
     isRemoveSourceForUploadAll = false;
 }
 
+- (void)sourceChooseViewController: (ATSourceChooseViewController *)controller
+                   didSelectEpisode:(NSString *)episodeName{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    [appDelegate.mapViewController loadEpisode:episodeName];
+}
+
 //called by download window after downloaded a source
 -(void) changeSelectedSource:(NSString*)selectedAtlasName
 {

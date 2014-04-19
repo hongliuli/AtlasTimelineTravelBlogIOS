@@ -57,6 +57,7 @@
 - (void) cleanSelectedAnnotationSet; //see comments in .m file
 - (void) showTimeLinkOverlay;
 - (void) displayZoomLine;
+- (void) loadEpisode:(NSString*)episodeName;
 
 
 @end

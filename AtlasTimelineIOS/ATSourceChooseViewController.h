@@ -11,10 +11,11 @@
 @class ATSourceChooseViewController;
 @protocol SourceChooseViewControllerDelegate <NSObject>
     - (void)sourceChooseViewController:(ATSourceChooseViewController *)controller didSelectSource:(NSString *)source;
+    - (void)sourceChooseViewController:(ATSourceChooseViewController *)controller didSelectEpisode:(NSString *)episodeName;
 @end
 
 
-@interface ATSourceChooseViewController : UITableViewController
+@interface ATSourceChooseViewController : UITableViewController <UIAlertViewDelegate>
     @property (nonatomic, weak) id <SourceChooseViewControllerDelegate> delegate;
     @property (nonatomic, strong) NSString *source;
 @end

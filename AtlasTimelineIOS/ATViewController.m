@@ -10,6 +10,7 @@
 #define SCREEN_HEIGHT ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.height : [[UIScreen mainScreen] bounds].size.width)
 
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
+#define ALERT_FOR_SAVE 1
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -317,26 +318,75 @@
 }
 -(void) saveEpisodeClicked:(id)sender
 {
-    NSString* episodeName = episodeNameforUpdating;
     if (episodeNameforUpdating == nil)
-        episodeName = txtNewEpisodeName.text;
-    
-    episodeName = [episodeName stringByTrimmingCharactersInSet:
-                   [NSCharacterSet whitespaceCharacterSet]];
-        
-    //save all event uniqueId to userDefault
-    if (episodeName == nil || [episodeName isEqual:@""])
     {
-        //TODO alert and quit
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Enter Name for the new episode"
+                                                        message:@"  "
+                                                       delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                              otherButtonTitles:@"OK", nil];
+        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        alert.tag = ALERT_FOR_SAVE;
+        [alert show];
     }
     else
     {
-        if (episodeNameforUpdating == nil)
+        [self saveEpisodeWithName:episodeNameforUpdating renameIfDuplicate:FALSE];
+    }
+}
+-(void) cancelEpisodeClicked:(id)sender
+{
+    if (eventEpisodeList != nil)
+        [eventEpisodeList removeAllObjects];
+    [self refreshAnnotations];
+    [self closeEpisodeView];
+}
+-(void) lessEpisodeClicked:(id)sender
+{
+    CGRect frame = episodeView.frame;
+    frame.size.height = 130;
+    [episodeView setFrame:frame];
+    [self partialInitEpisodeView:false];
+}
+
+-(void) saveEpisodeWithName: (NSString*)episodeName renameIfDuplicate:(BOOL)renameFlag
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary* episodeDictionary = [[userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]] mutableCopy];
+    if (episodeDictionary == nil)
+        episodeDictionary = [[NSMutableDictionary alloc] init];
+    if (renameFlag)
+    {
+        NSArray* nameList = [episodeDictionary allKeys];
+        if ([nameList containsObject:episodeName])
+            episodeName = [NSString stringWithFormat:@"%@ (Copy)",episodeName];//not need check if this dupicated again.
+    }
+    [episodeDictionary setObject:eventEpisodeList forKey:episodeName];
+    [userDefault setObject:episodeDictionary forKey:[ATConstants EpisodeDictionaryKeyName]];
+    
+    if (eventEpisodeList != nil)
+        [eventEpisodeList removeAllObjects];
+    [self refreshAnnotations];
+    [self closeEpisodeView];
+    
+}
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    //if (alertView.tag == ALERT_FOR_SAVE)
+    if (buttonIndex == 1) {
+        NSString *episodeName = [alertView textFieldAtIndex:0].text;
+        episodeName =[episodeName stringByTrimmingCharactersInSet:
+                      [NSCharacterSet whitespaceCharacterSet]];
+        if (![episodeName isEqual:@""])
+            [self saveEpisodeWithName:episodeName renameIfDuplicate:TRUE];
+        else
         {
-            //TODO check if name duplicate, if duplicate  add version ".x", so final name is name.x.x.x.x
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You need to enter an episode name!"
+                                                            message:@"Please tap Save button again!"
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            [alert show];
         }
-        //TODO save to userDefault
-        [self closeEpisodeView];
     }
 }
 - (void)handleTapOnTutorial:(UIGestureRecognizer *)gestureRecognizer
@@ -1931,33 +1981,53 @@
                         [self.mapView addSubview:episodeView];
                         //[self partialInitEpisodeView];
                     }
-                    completion:^(BOOL finished) {[self partialInitEpisodeView];}];
+                    completion:^(BOOL finished) {[self partialInitEpisodeView:TRUE];}];
 }
 
 //the purpose to have this to be called in completion:^ is to make animation together with all subviews
 //(ATTutorialView has drawRect so no such issue)
-- (void) partialInitEpisodeView
+- (void) partialInitEpisodeView:(BOOL)largeFlag
 {
+    [[episodeView subviews]
+     makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    
+    UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 3*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, 9*EPISODE_ROW_HEIGHT)];
+    lblWording.lineBreakMode = NSLineBreakByWordWrapping;
+    lblWording.numberOfLines = 0;
+    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your followers' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a follower's ChronicleMap app, tap the episode in [Settings->Offline Contents]\n\nYour follower will see the episode in his/her [Settings->Content Import] which can be downloaded on the map.";
+    [episodeView addSubview:lblWording];
+    
+    int btnY = 12*EPISODE_ROW_HEIGHT;
+    lblWording.hidden = false;
+    if (!largeFlag)
+    {
+        btnY = 10 + 3*EPISODE_ROW_HEIGHT;
+        lblWording.hidden = true;
+    }
+    
     UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnSave.frame = CGRectMake(10, 20, 50, 10);
-    [btnSave.layer setCornerRadius:7.0f];
+    btnSave.frame = CGRectMake(10, btnY, 60, 10);
     [btnSave setTitle:@"Save" forState:UIControlStateNormal];
+    btnSave.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
     [btnSave addTarget:self action:@selector(saveEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
     [episodeView addSubview: btnSave];
     
     UIButton *btnClear = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnClear.frame = CGRectMake(80, 20, 50, 10);
-    [btnClear.layer setCornerRadius:7.0f];
-    [btnClear setTitle:@"Clear" forState:UIControlStateNormal];
-    [btnClear addTarget:self action:@selector(clearEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
+    btnClear.frame = CGRectMake(80, btnY, 60, 10);
+    [btnClear setTitle:@"Cancel" forState:UIControlStateNormal];
+    btnClear.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
+    [btnClear addTarget:self action:@selector(cancelEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
     [episodeView addSubview: btnClear];
     
-    UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 10 + 3*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, 8*EPISODE_ROW_HEIGHT)];
-    lblWording.lineBreakMode = NSLineBreakByWordWrapping;
-    lblWording.numberOfLines = 0;
-    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your followers' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a follower's ChronicleMap app:\n. [Settings->Outgoing] tap Share\n. Select followers to send\nYour followers will see the episode in his/her [Settings->Content Import] which can be downloaded on the map.";
-    [episodeView addSubview:lblWording];
-    
+    if (largeFlag)
+    {
+        UIButton *btnLess = [UIButton buttonWithType:UIButtonTypeSystem];
+        btnLess.frame = CGRectMake(150, btnY, 60, 10);
+        [btnLess setTitle:@"Less" forState:UIControlStateNormal];
+        btnLess.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
+        [btnLess addTarget:self action:@selector(lessEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [episodeView addSubview: btnLess];
+    }
     if (txtNewEpisodeName == nil)
     {
         txtNewEpisodeName = [[UITextView alloc] initWithFrame:CGRectMake(10, 2*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, EPISODE_ROW_HEIGHT)];
@@ -2260,6 +2330,17 @@
     // create and return the lat/lng span
     MKCoordinateSpan span = MKCoordinateSpanMake(latitudeDelta, longitudeDelta);
     return span;
+}
+
+- (void) loadEpisode:(NSString *)episodeName
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary* episodeDictionary = [[userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]] mutableCopy];
+    
+    if (episodeDictionary != nil)
+        eventEpisodeList = [[episodeDictionary objectForKey:episodeName] mutableCopy];
+    episodeNameforUpdating = episodeName;
+    [self refreshAnnotations];
 }
 
 @end

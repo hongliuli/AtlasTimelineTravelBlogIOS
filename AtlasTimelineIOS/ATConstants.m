@@ -296,4 +296,8 @@
 {
     return @"http://www.chroniclemap.com/atlastimelineapi";
 }
++ (NSString*) EpisodeDictionaryKeyName
+{
+    return @"EpisodeDictionaryKeyName";
+}
 @end

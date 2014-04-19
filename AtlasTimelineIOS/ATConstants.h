@@ -54,5 +54,6 @@
 + (NSString*) UserEmailKeyName;
 + (NSString*) UserSecurityCodeKeyName;
 + (NSString*) ServerURL;
++ (NSString*) EpisodeDictionaryKeyName;
 
 @end
