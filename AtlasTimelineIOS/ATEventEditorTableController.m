@@ -636,6 +636,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 - (IBAction)addToEpisodeAction:(id)sender {
+    if (self.eventId == nil)
+        return;
     [self.delegate addToEpisode];
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }

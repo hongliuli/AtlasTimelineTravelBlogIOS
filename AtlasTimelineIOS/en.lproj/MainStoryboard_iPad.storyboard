@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="12F45" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="ARr-NR-22L">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C64" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="ARr-NR-22L">
     <dependencies>
         <deployment defaultVersion="1536" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <scenes>
         <!--View Controller - Atlas View-->
@@ -426,6 +426,9 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Choose Sources" id="paO-Lt-0IM"/>
                     <value key="contentSizeForViewInPopover" type="size" width="360" height="420"/>
+                    <connections>
+                        <segue destination="eIb-QQ-AWx" kind="push" identifier="pick_friend" id="5Hl-p9-HHL"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tSp-iO-kVt" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -551,7 +554,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yJ4-Kg-WSG" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5074" y="-115"/>
+            <point key="canvasLocation" x="5498" y="165"/>
         </scene>
         <!--Download Table View Controller - Download-->
         <scene sceneID="6GU-PI-at9">
@@ -891,6 +894,82 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9kr-Yn-UFh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4714" y="-2231"/>
+        </scene>
+        <!--Friend Pick View-->
+        <scene sceneID="8r1-ai-N0l">
+            <objects>
+                <tableViewController storyboardIdentifier="add_friend" id="eIb-QQ-AWx" userLabel="Friend Pick View" customClass="ATFriendPickView" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="47" sectionHeaderHeight="22" sectionFooterHeight="22" id="YJo-OS-CKp">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="checkmark" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="EventCellIdentifier" rowHeight="47" id="adb-jn-4wY" customClass="ATCell">
+                                <rect key="frame" x="0.0" y="86" width="768" height="47"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="adb-jn-4wY" id="Pyz-bW-X8a">
+                                    <rect key="frame" x="0.0" y="0.0" width="729" height="46"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="eIb-QQ-AWx" id="490-j3-URl"/>
+                            <outlet property="delegate" destination="eIb-QQ-AWx" id="wwy-J4-RnL"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Pick Friends" id="xcK-Ow-Mst"/>
+                    <value key="contentSizeForViewInPopover" type="size" width="320" height="420"/>
+                    <connections>
+                        <outlet property="searchDisplayController" destination="uJN-qM-cih" id="0A8-27-vBo"/>
+                        <segue destination="qeU-Kg-Jv7" kind="push" identifier="add_friend" id="q4c-kA-NKr"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="MZk-yw-pak" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5387" y="-947"/>
+        </scene>
+        <!--Add Friend View-->
+        <scene sceneID="vRH-Bq-0d3">
+            <objects>
+                <tableViewController id="qeU-Kg-Jv7" userLabel="Add Friend View" customClass="ATFriendAddView" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="47" sectionHeaderHeight="22" sectionFooterHeight="22" id="ae0-o3-A3U">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <searchBar key="tableHeaderView" contentMode="redraw" placeholder="Enter new friend email" id="mYW-8H-HwC">
+                            <rect key="frame" x="0.0" y="64" width="768" height="44"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <outlet property="delegate" destination="qeU-Kg-Jv7" id="U9M-qk-lc6"/>
+                            </connections>
+                        </searchBar>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="checkmark" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="EventCellIdentifier" rowHeight="47" id="LsX-Pf-8yy" customClass="ATCell">
+                                <rect key="frame" x="0.0" y="130" width="768" height="47"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="LsX-Pf-8yy" id="Be0-xJ-TF0">
+                                    <rect key="frame" x="0.0" y="0.0" width="729" height="46"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="qeU-Kg-Jv7" id="PAz-cR-W4i"/>
+                            <outlet property="delegate" destination="qeU-Kg-Jv7" id="mnz-AP-Fxn"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Add Friend View" id="md5-2V-PaU"/>
+                    <value key="contentSizeForViewInPopover" type="size" width="320" height="420"/>
+                    <connections>
+                        <outlet property="searchBar" destination="mYW-8H-HwC" id="2d6-4E-oY9"/>
+                        <outlet property="searchDisplayController" destination="uJN-qM-cih" id="bsU-34-GoT"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="BVn-ZL-cZS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6447" y="-1895"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

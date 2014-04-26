@@ -11,6 +11,7 @@
 #import "ATHelper.h"
 #import "ATAppDelegate.h"
 #import "ATEventDataStruct.h"
+#import "SWTableViewCell.h"
 
 #define EVENT_TYPE_HAS_PHOTO 1
 
@@ -72,14 +73,12 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-#warning Potentially incomplete method implementation.
     // Return the number of sections.
     return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#warning Incomplete method implementation.
     // Return the number of rows in the section.
     int retCount = 0;
     if (section == OFFLINE_CONTENT_SECTION)
@@ -117,16 +116,12 @@
             cell.textLabel.textColor = [UIColor blackColor];
             cell.detailTextLabel.text = @"";
         }
+        return cell;
     }
     else //this is for EPISODE_LIST_SECTION
     {
         CellIdentifier = @"PeriodCell2";
-        cell = [tableView  dequeueReusableCellWithIdentifier:CellIdentifier];
-        if(cell == nil) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
         NSString* episodeName  = _episodeNameList[indexPath.row];
-        cell.textLabel.text = episodeName;
         /*
         cell.accessoryType = UITableViewCellAccessoryDetailButton;
         cell.accessoryView = [[ UIImageView alloc ]
@@ -134,9 +129,36 @@
         cell.textLabel.textColor = [UIColor blackColor];
         cell.detailTextLabel.text = @"";
          */
+        
+        
+        SWTableViewCell *cell = (SWTableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        
+        if (cell == nil) {
+            NSMutableArray *rightUtilityButtons = [NSMutableArray new];
+            
+            [rightUtilityButtons sw_addUtilityButtonWithColor:
+             [UIColor colorWithRed:0.78f green:0.38f blue:0.5f alpha:1.0]
+                                                        title:@"Del"];
+            [rightUtilityButtons sw_addUtilityButtonWithColor:
+             [UIColor colorWithRed:1.0f green:0.231f blue:0.188 alpha:1.0f]
+                                                        title:@"Edit"];
+            [rightUtilityButtons sw_addUtilityButtonWithColor:
+             [UIColor colorWithRed:1.0f green:0.53f blue:0.38 alpha:1.0f]
+                                                        title:@"Share"];
+            
+            cell = [[SWTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+                                          reuseIdentifier:CellIdentifier
+                                      containingTableView:self.tableView // For row height and selection
+                                       leftUtilityButtons:nil
+                                      rightUtilityButtons:rightUtilityButtons];
+            cell.delegate = self;
+            cell.tag = indexPath.row;
+        }
+        cell.textLabel.text = episodeName;
+        cell.detailTextLabel.text = @"Swipe Right";
+        cell.detailTextLabel.textColor = [UIColor darkGrayColor];
+        return cell;
     }
-    
-    return cell;
 
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -147,7 +169,7 @@
     }
     else
     {
-        return @" Share Episodes (Swipe to delete)";
+        return @" Share Episodes (Swipe to act)";
     }
 }
 //change section font
@@ -185,16 +207,17 @@
         NSString *source = _sources[indexPath.row];
         [self.delegate sourceChooseViewController:self didSelectSource:source];
     }
+    /*
     else //EPIDSODE_LIST_SECTION:  //then load episode for modify
     {
         if ([@"myEvents" isEqual:self.source])
         {
             episodeNameForAlertView = _episodeNameList[indexPath.row];
             UIAlertView* alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Episode: %@",episodeNameForAlertView]
-                                                            message:@"Edit episode or Send it to your followers' ChronicleMap app"
+                                                            message:@"Edit episode or Send it to your friends' ChronicleMap app"
                                                            delegate:self
                                                   cancelButtonTitle:@"Cancel"
-                                                  otherButtonTitles:@"Edit", @"Share it to my followers", nil];
+                                                  otherButtonTitles:@"Edit", @"Share it to my friends", nil];
             alert.tag = EPISODE_SELECTED_ALERT;
             [alert show];
         }
@@ -204,6 +227,7 @@
             [alert show];
         }
     }
+     */
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
@@ -212,6 +236,49 @@
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath{
     NSLog(@"reaching accessoryButtonTappedForRowWithIndexPath: section %d   row %d", indexPath.section, indexPath.row);
 }
+
+- (void)swipeableTableViewCell:(SWTableViewCell *)cell didTriggerRightUtilityButtonWithIndex:(NSInteger)index {
+    int row = cell.tag;
+    switch (index) {
+        case 0:
+        {
+            NSLog(@"Del row %d",row);
+            
+            NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+            
+            if (_episodeDictionary != nil)
+                [_episodeDictionary removeObjectForKey:_episodeNameList[row]];
+
+            _episodeNameList = [[_episodeDictionary allKeys] mutableCopy];
+            
+            [userDefault setObject:_episodeDictionary forKey:[ATConstants EpisodeDictionaryKeyName]];
+            
+            [UIView animateWithDuration:0.5 animations:^{
+                [self.tableView reloadData];
+            }];
+            break;
+        }
+        case 1:
+        {
+            NSLog(@"Edit row %d",row);
+            episodeNameForAlertView = _episodeNameList[row];
+            [self.delegate sourceChooseViewController:self didSelectEpisode:episodeNameForAlertView];
+            break;
+        }
+        case 2:
+        {
+            //NSLog(@"Share row %d",row);
+            ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+            appDelegate.episodeToBeShared = _episodeNameList[row];
+            [self performSegueWithIdentifier:@"pick_friend" sender:nil];
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+/*
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section == EPISODE_LIST_SECTION)
@@ -232,6 +299,13 @@
                 [self.tableView reloadData];
             }];
         }
+        else if (editingStyle == UITableViewCellEditingStyleInsert) {
+            NSLog(@"vvvvv");
+        }
+        else if (editingStyle == UITableViewCellEditingStyleNone)
+        {
+            NSLog(@"kkkkkkkk");
+        }
     }
 }
 
@@ -243,6 +317,7 @@
         return NO;
 }
 
+
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (alertView.tag == EPISODE_SELECTED_ALERT)
@@ -250,19 +325,17 @@
         if (buttonIndex == 1) //EDIT episode
         {
          [self.delegate sourceChooseViewController:self didSelectEpisode:episodeNameForAlertView];
-            /*
-         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Episode is loaded" message:[NSString stringWithFormat:@"Episode %@ has been loaded to the map, you can modify and save it.", episodeNameForAlertView] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-         [alert show];
-             */
         }
         else if (buttonIndex == 2) //share
         {
+            [self performSegueWithIdentifier:@"pick_friend" sender:nil];
+            //startShareFrend
             //call server
         }
     }
 
 }
-
+*/
 
 -(void) getStatsForEvent:(NSString*)sourceName tableCell:(UITableViewCell*)cell
 {

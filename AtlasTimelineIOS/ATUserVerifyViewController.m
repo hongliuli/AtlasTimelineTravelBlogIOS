@@ -35,6 +35,8 @@ NSString* receivedSecurityCode; //use this to compare with user entered
     self.verifyButton.enabled = false;
     self.securityCodeText.backgroundColor = [UIColor lightGrayColor];
     self.verifyButton.backgroundColor = [UIColor lightGrayColor];
+    
+    [self.userEmailText setKeyboardType:UIKeyboardTypeEmailAddress];
 
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;

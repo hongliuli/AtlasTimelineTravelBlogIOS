@@ -70,8 +70,7 @@
 
 #define EPISODE_VIEW_WIDTH 350
 #define EPISODE_VIEW_HIGHT_LARGE 400
-#define EPISODE_VIEW_HIGHT_MIDDLE 200
-#define EPISODE_VIEW_HIGHT_SMALL 100
+#define EPISODE_VIEW_HIGHT_SMALL 130
 #define EPISODE_ROW_HEIGHT 30
 
 @interface MFTopAlignedLabel : UILabel
@@ -116,6 +115,7 @@
     ATEventDataStruct* focusedEvent;
     int currentTapTouchKey;
     bool currentTapTouchMove;
+    UIButton *btnLess;
     
 }
 
@@ -343,10 +343,23 @@
 }
 -(void) lessEpisodeClicked:(id)sender
 {
+    NSString* lessMoreTxt = btnLess.titleLabel.text;
     CGRect frame = episodeView.frame;
-    frame.size.height = 130;
+    BOOL flag = false;
+    if ([@"Less" isEqualToString:lessMoreTxt])
+    {
+        frame.size.height = EPISODE_VIEW_HIGHT_SMALL;
+        btnLess.titleLabel.text = @"More";
+        flag = false;
+    }
+    else
+    {
+        frame.size.height = EPISODE_VIEW_HIGHT_LARGE;
+        btnLess.titleLabel.text = @"More";
+        flag = true;
+    }
     [episodeView setFrame:frame];
-    [self partialInitEpisodeView:false];
+    [self partialInitEpisodeView:flag];
 }
 
 -(void) saveEpisodeWithName: (NSString*)episodeName renameIfDuplicate:(BOOL)renameFlag
@@ -1814,7 +1827,10 @@
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
 }
-
+- (void)cancelPreference{
+    if (self.preferencePopover != nil)
+        [self.preferencePopover dismissPopoverAnimated:true];
+}
 - (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList thumbnailFileName:(NSString*)thumbNailFileName{
     //update annotation by remove/add, then update database or added to database depends on if have id field in selectedAnnotation
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -1960,9 +1976,12 @@
 
 - (void) startEpisodeView
 {
-
+    BOOL largeFlag = false;
+    int episodeViewHeight = EPISODE_VIEW_HIGHT_SMALL;
     if (episodeView == nil)
     {
+        largeFlag = TRUE; //only when first show full episode wording
+        episodeViewHeight = EPISODE_VIEW_HIGHT_LARGE;
         episodeView = [[UIView alloc] initWithFrame:CGRectMake(0,0,0,0)];
         [episodeView.layer setCornerRadius:10.0f];
        ////// episodeView setBackgroundColor:xxxx
@@ -1976,12 +1995,12 @@
                       duration:0.5
                        options:UIViewAnimationTransitionFlipFromRight //any animation
                     animations:^ {
-                        [episodeView setFrame:CGRectMake(0, 0, EPISODE_VIEW_WIDTH, EPISODE_VIEW_HIGHT_LARGE)];
+                        [episodeView setFrame:CGRectMake(0, 0, EPISODE_VIEW_WIDTH, episodeViewHeight)];
                         episodeView.backgroundColor=[UIColor colorWithRed:0.9 green:0.9 blue:0.5 alpha:0.7];
                         [self.mapView addSubview:episodeView];
                         //[self partialInitEpisodeView];
                     }
-                    completion:^(BOOL finished) {[self partialInitEpisodeView:TRUE];}];
+                    completion:^(BOOL finished) {[self partialInitEpisodeView:largeFlag];}];
 }
 
 //the purpose to have this to be called in completion:^ is to make animation together with all subviews
@@ -1994,7 +2013,7 @@
     UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 3*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, 9*EPISODE_ROW_HEIGHT)];
     lblWording.lineBreakMode = NSLineBreakByWordWrapping;
     lblWording.numberOfLines = 0;
-    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your followers' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a follower's ChronicleMap app, tap the episode in [Settings->Offline Contents]\n\nYour follower will see the episode in his/her [Settings->Content Import] which can be downloaded on the map.";
+    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your friends' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a friend's ChronicleMap app, tap the episode in [Settings->Offline Contents]\n\nYour friend will see the episode in his/her [Settings->Content Import] which can be downloaded on the map.";
     [episodeView addSubview:lblWording];
     
     int btnY = 12*EPISODE_ROW_HEIGHT;
@@ -2004,30 +2023,40 @@
         btnY = 10 + 3*EPISODE_ROW_HEIGHT;
         lblWording.hidden = true;
     }
-    
+    NSString* btnSaveTitleText = @"Create Episode";
+    if (episodeNameforUpdating != nil)
+    {
+        int nameLength = [episodeNameforUpdating length];
+        if (nameLength >5)
+            btnSaveTitleText = [NSString stringWithFormat:@"Update %@..", [episodeNameforUpdating substringToIndex:5]];
+        else
+            btnSaveTitleText = [NSString stringWithFormat:@"Update %@", episodeNameforUpdating];
+    }
     UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnSave.frame = CGRectMake(10, btnY, 60, 10);
-    [btnSave setTitle:@"Save" forState:UIControlStateNormal];
-    btnSave.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
+    btnSave.frame = CGRectMake(10, btnY, 120, 10);
+    [btnSave setTitle:btnSaveTitleText forState:UIControlStateNormal];
+    btnSave.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
     [btnSave addTarget:self action:@selector(saveEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
     [episodeView addSubview: btnSave];
     
     UIButton *btnClear = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnClear.frame = CGRectMake(80, btnY, 60, 10);
+    btnClear.frame = CGRectMake(140, btnY, 60, 10);
     [btnClear setTitle:@"Cancel" forState:UIControlStateNormal];
     btnClear.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
     [btnClear addTarget:self action:@selector(cancelEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
     [episodeView addSubview: btnClear];
     
+    if (btnLess == nil)
+        btnLess = [UIButton buttonWithType:UIButtonTypeSystem];
+    btnLess.frame = CGRectMake(210, btnY, 60, 10);
     if (largeFlag)
-    {
-        UIButton *btnLess = [UIButton buttonWithType:UIButtonTypeSystem];
-        btnLess.frame = CGRectMake(150, btnY, 60, 10);
         [btnLess setTitle:@"Less" forState:UIControlStateNormal];
-        btnLess.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
-        [btnLess addTarget:self action:@selector(lessEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [episodeView addSubview: btnLess];
-    }
+    else
+        [btnLess setTitle:@"More" forState:UIControlStateNormal];
+    btnLess.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
+    [btnLess addTarget:self action:@selector(lessEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [episodeView addSubview: btnLess];
+    
     if (txtNewEpisodeName == nil)
     {
         txtNewEpisodeName = [[UITextView alloc] initWithFrame:CGRectMake(10, 2*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, EPISODE_ROW_HEIGHT)];
@@ -2058,11 +2087,11 @@
                             [episodeView setFrame:CGRectMake(0,0,0,0)];
                         }
                         completion:^(BOOL finished) {
+                            [episodeView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
                             [episodeView removeFromSuperview];
                             episodeView = nil;
                         }];
     }
-    [episodeView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     episodeNameforUpdating = nil;
 }
 //Save photo to file. Called by updateEvent after write event to db
@@ -2341,6 +2370,22 @@
         eventEpisodeList = [[episodeDictionary objectForKey:episodeName] mutableCopy];
     episodeNameforUpdating = episodeName;
     [self refreshAnnotations];
+    
+    CLLocationCoordinate2D centerCoordinate;
+
+    NSArray* evtList = [ATHelper getEventListWithUniqueIds:eventEpisodeList];
+    if ([evtList count] == 0)
+        return;
+    ATEventDataStruct* evt = evtList[0];
+    centerCoordinate.latitude = evt.lat;
+    centerCoordinate.longitude = evt.lng;
+    MKCoordinateSpan span = self.mapView.region.span;
+    MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
+    
+    // set the region like normal
+    [self.mapView setRegion:region animated:YES];
+    [self startEpisodeView];
+    
 }
 
 @end

@@ -19,6 +19,8 @@
 
 //eventList is the center of performance issue, seems we need to load all events
 @property(strong, nonatomic) NSMutableArray* eventListSorted;
+@property(strong, nonatomic) NSMutableArray* friendList; //just put here to pass it from friendPickerView to friendAddView
+@property(strong, nonatomic) NSString* episodeToBeShared;//just to pass it to FriendPickerView
 @property int selectedPeriodInDays;
 @property(strong, nonatomic) NSDate* focusedDate;
 @property(strong, nonatomic) UIStoryboard* storyBoard;

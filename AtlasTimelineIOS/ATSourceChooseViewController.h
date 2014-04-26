@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SWTableViewCell.h"
 
 @class ATSourceChooseViewController;
 @protocol SourceChooseViewControllerDelegate <NSObject>
@@ -15,7 +16,7 @@
 @end
 
 
-@interface ATSourceChooseViewController : UITableViewController <UIAlertViewDelegate>
+@interface ATSourceChooseViewController : UITableViewController <UIAlertViewDelegate, SWTableViewCellDelegate>
     @property (nonatomic, weak) id <SourceChooseViewControllerDelegate> delegate;
     @property (nonatomic, strong) NSString *source;
 @end

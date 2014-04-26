@@ -20,8 +20,9 @@
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
-#define SECTION_OPTIONS 1
-#define SECTION_LOGIN_EMAIL 2
+#define SECTION_LOGIN_EMAIL 0
+#define SECTION_LOCAL_CONTENTS 1
+#define SECTION_SYNC_SERVER 2
 #define ROW_SYNC_TO_DROPBOX 2
 #define ROW_SYNC_TO_DROPBOX_ALL 3
 #define ROW_SYNC_FROM_DROPBOX 4
@@ -371,12 +372,18 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
+    if (section == SECTION_SYNC_SERVER)
+    {
+        return @"Server Connections";
+    }
     if (section == SECTION_LOGIN_EMAIL)
     {
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         NSString* userEmail = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
         if (userEmail != nil)
             return userEmail;
+        else
+            return @"Not login (Login in Import/Export)";
     }
     
     return @"";
@@ -401,7 +408,7 @@
             }
         }
     }
-    else if (section == SECTION_LOGIN_EMAIL)
+    else if (section == SECTION_SYNC_SERVER)
     {
         if (row == ROW_SYNC_TO_DROPBOX )
         {
@@ -414,7 +421,7 @@
         if (row == ROW_SYNC_FROM_DROPBOX)
             photoFromDropboxCell = cell;
     }
-    else if (section == SECTION_OPTIONS)
+    else if (section == SECTION_LOCAL_CONTENTS)
     {
         
     }
@@ -461,7 +468,7 @@
             
         }
     }
-    if (section == SECTION_LOGIN_EMAIL)
+    if (section == SECTION_SYNC_SERVER)
     {
         if (row == ROW_SYNC_TO_DROPBOX)
         {

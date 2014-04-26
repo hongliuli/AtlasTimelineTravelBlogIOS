@@ -11,6 +11,7 @@
 #import "ATConstants.h"
 #import "ATUserVerifyViewController.h"
 #import "ATViewController.h"
+#import "ATEventDataStruct.h"
 
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
@@ -381,6 +382,18 @@ UIPopoverController *verifyViewPopover;
     return[self clearMakerFromDescText:desc :markerName];
 }
 
++ (NSArray*) getEventListWithUniqueIds: (NSArray*)uniqueIds
+{
+    NSMutableArray* returnList = [[NSMutableArray alloc] initWithCapacity:[uniqueIds count]];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSArray* fullEventList = appDelegate.eventListSorted;
+    for (ATEventDataStruct* evt in fullEventList)
+    {
+        if ([uniqueIds containsObject:evt.uniqueId] )
+            [returnList addObject:evt];
+    }
+    return returnList;
+}
 
 //---- set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable
