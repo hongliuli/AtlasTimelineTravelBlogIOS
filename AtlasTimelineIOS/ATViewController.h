@@ -58,6 +58,7 @@
 - (void) showTimeLinkOverlay;
 - (void) displayZoomLine;
 - (void) loadEpisode:(NSString*)episodeName;
+- (void) cancelPreference;
 
 
 @end

@@ -127,7 +127,7 @@ UIButton *sendButton;
         label.font = [UIFont fontWithName:@"Helvetica" size:14];
         [label setNumberOfLines:0];
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        label.text = [NSString stringWithFormat:@"To share ""%@"":\n    Pick friends -> Tap [Send]\n(Tap [New Friend] if not in the list)",appDelegate.episodeToBeShared ];
+        label.text = [NSString stringWithFormat:@"Episode:  \"%@\"\n- Pick friends to send to their ChronicleMap\n- Add friends if not in the list to pick",appDelegate.episodeToBeShared ];
         [customView addSubview:label];
         
         sendButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -142,7 +142,7 @@ UIButton *sendButton;
         UIButton *addFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         addFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
         addFriendButton.frame = CGRectMake(130, 50, 90, 50);
-        [addFriendButton setTitle:@"New Friend" forState:UIControlStateNormal];
+        [addFriendButton setTitle:@"Add Friend" forState:UIControlStateNormal];
         [addFriendButton.titleLabel setTextColor:[UIColor blueColor]];
         [addFriendButton addTarget:self action:@selector(addFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:addFriendButton];

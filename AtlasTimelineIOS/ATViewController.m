@@ -68,7 +68,7 @@
 
 #define HAVE_IMAGE_INDICATOR 100
 
-#define EPISODE_VIEW_WIDTH 350
+#define EPISODE_VIEW_WIDTH 340
 #define EPISODE_VIEW_HIGHT_LARGE 400
 #define EPISODE_VIEW_HIGHT_SMALL 130
 #define EPISODE_ROW_HEIGHT 30
@@ -340,6 +340,28 @@
         [eventEpisodeList removeAllObjects];
     [self refreshAnnotations];
     [self closeEpisodeView];
+}
+-(void) allEpisodeClicked:(id)sender
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (eventEpisodeList == nil)
+        eventEpisodeList = [[NSMutableArray alloc] initWithCapacity:[appDelegate.eventListSorted count]];
+    else
+        [eventEpisodeList removeAllObjects];
+    for (ATEventDataStruct* evt in appDelegate.eventListSorted)
+    {
+        [eventEpisodeList addObject:evt.uniqueId];
+    }
+    [self refreshAnnotations];
+    ATEventDataStruct* evt = appDelegate.eventListSorted[0];
+    CLLocationCoordinate2D centerCoordinate;
+    centerCoordinate.latitude = evt.lat;
+    centerCoordinate.longitude = evt.lng;
+    MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:2];
+    MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
+    
+    // set the region like normal
+    [self.mapView setRegion:region animated:YES];
 }
 -(void) lessEpisodeClicked:(id)sender
 {
@@ -1996,7 +2018,11 @@
                        options:UIViewAnimationTransitionFlipFromRight //any animation
                     animations:^ {
                         [episodeView setFrame:CGRectMake(0, 0, EPISODE_VIEW_WIDTH, episodeViewHeight)];
-                        episodeView.backgroundColor=[UIColor colorWithRed:0.9 green:0.9 blue:0.5 alpha:0.7];
+                        episodeView.backgroundColor=[UIColor colorWithRed:1 green:1 blue:0.7 alpha:0.6];
+                        episodeView.layer.shadowColor = [UIColor grayColor].CGColor;
+                        episodeView.layer.shadowOffset = CGSizeMake(15,15);
+                        episodeView.layer.shadowOpacity = 1;
+                        episodeView.layer.shadowRadius = 10.0;
                         [self.mapView addSubview:episodeView];
                         //[self partialInitEpisodeView];
                     }
@@ -2013,7 +2039,7 @@
     UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 3*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, 9*EPISODE_ROW_HEIGHT)];
     lblWording.lineBreakMode = NSLineBreakByWordWrapping;
     lblWording.numberOfLines = 0;
-    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your friends' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a friend's ChronicleMap app, tap the episode in [Settings->Offline Contents]\n\nYour friend will see the episode in his/her [Settings->Content Import] which can be downloaded on the map.";
+    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your friends' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a friend's ChronicleMap app, tap the episode in [Settings->Offline/Epidsode..]\n\nYour friend will see the episode in his/her [Settings->Content Import] which can be downloaded on the map.";
     [episodeView addSubview:lblWording];
     
     int btnY = 12*EPISODE_ROW_HEIGHT;
@@ -2032,15 +2058,24 @@
         else
             btnSaveTitleText = [NSString stringWithFormat:@"Update %@", episodeNameforUpdating];
     }
+    if (largeFlag)
+    {
+        UIButton *btnAll = [UIButton buttonWithType:UIButtonTypeSystem];
+        btnAll.frame = CGRectMake(10, 3*EPISODE_ROW_HEIGHT - 4, 120, 20);
+        [btnAll setTitle:@"Select All" forState:UIControlStateNormal];
+        btnAll.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
+        [btnAll addTarget:self action:@selector(allEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [episodeView addSubview: btnAll];
+    }
     UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnSave.frame = CGRectMake(10, btnY, 120, 10);
+    btnSave.frame = CGRectMake(10, btnY, 120, 20);
     [btnSave setTitle:btnSaveTitleText forState:UIControlStateNormal];
     btnSave.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
     [btnSave addTarget:self action:@selector(saveEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
     [episodeView addSubview: btnSave];
     
     UIButton *btnClear = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnClear.frame = CGRectMake(140, btnY, 60, 10);
+    btnClear.frame = CGRectMake(140, btnY, 60, 20);
     [btnClear setTitle:@"Cancel" forState:UIControlStateNormal];
     btnClear.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
     [btnClear addTarget:self action:@selector(cancelEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
@@ -2048,7 +2083,7 @@
     
     if (btnLess == nil)
         btnLess = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnLess.frame = CGRectMake(210, btnY, 60, 10);
+    btnLess.frame = CGRectMake(210, btnY, 60, 20);
     if (largeFlag)
         [btnLess setTitle:@"Less" forState:UIControlStateNormal];
     else
@@ -2281,9 +2316,9 @@
     if ([segue.identifier isEqualToString:@"preference_id"]) {
         self.preferencePopover = [(UIStoryboardPopoverSegue *)segue popoverController];
     }
-    if ([segue.identifier isEqualToString:@"iphone_settings"]) {
-        [self performSegueWithIdentifier:@"iphone_settings" sender:self];
-    }
+    /*if ([segue.identifier isEqualToString:@"iphone_settings"]) {
+        [self performSegueWithIdentifier:@"iphone_settings" sender:self]; //preference_storyboard_id
+    }*/
 }
 
 //select/deselect tap will interfare my tap gesture handler, so try to resume timeline window original show/hide status

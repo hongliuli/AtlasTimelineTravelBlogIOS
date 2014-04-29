@@ -242,6 +242,45 @@ BOOL showSendRequestFlag;
 - (void) requestFriendButtonAction: (id)sender {
     //UIButton* button = (UIButton*)sender;
     NSLog(@" call request friend");
+    NSString* friendString = self.searchBar.text;
+
+    //client side make sure user is a friend or not
+    //         if a user is in wait state, ask user if to resend
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSMutableArray* friendList = appDelegate.friendList;
+    
+    if ([friendList containsObject:friendString])
+    {
+        NSLog(@"alert user is already friend");
+        return;
+    }
+    else if ([friendList containsObject:[NSString stringWithFormat:@"%@(wait)",friendString]])
+    {
+        NSLog(@"alert user has not accepted previous request, do you want send a email again?");
+    }
+    
+    //Server comback with addedToQueue
+    NSString* serverResponse = @"added";
+    if ([@"added" isEqualToString:serverResponse])
+    {
+        [appDelegate.friendList addObject:[NSString stringWithFormat:@"%@(wait)",friendString]];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"An invitation email has been sent to your friend"
+                                                        message:@"After he/she clicks accept link in the email, you can start to send her episode"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
+    else //alreadyFriend, allready in Queue etc should not happen in server, if happen, treat same
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat: @"failed to add %@", friendString]
+                                                        message:@"server may have issue"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
+
     
 }
 

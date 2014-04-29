@@ -48,7 +48,7 @@
     _sources = [ATHelper listFileAtPath:[ATHelper applicationDocumentsDirectory]];
     _selectedIndex = [_sources indexOfObject:self.source];
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    _episodeDictionary = [userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]];
+    _episodeDictionary = [[userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]] mutableCopy];
     if (_episodeDictionary != nil)
     {
         _episodeNameList = [[_episodeDictionary allKeys] mutableCopy];
@@ -135,7 +135,7 @@
         
         if (cell == nil) {
             NSMutableArray *rightUtilityButtons = [NSMutableArray new];
-            
+            //see action in didTriggerRightUtilityButtonWithIndex
             [rightUtilityButtons sw_addUtilityButtonWithColor:
              [UIColor colorWithRed:0.78f green:0.38f blue:0.5f alpha:1.0]
                                                         title:@"Del"];
@@ -169,24 +169,36 @@
     }
     else
     {
-        return @" Share Episodes (Swipe to act)";
+        return @" Share Episodes";
     }
 }
 //change section font
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     
     UILabel *myLabel = [[UILabel alloc] init];
-    myLabel.frame = CGRectMake(0, 0, 400, 40);
+    myLabel.frame = CGRectMake(0, 0, 150, 40);
     myLabel.font = [UIFont boldSystemFontOfSize:17];
     myLabel.text = [self tableView:tableView titleForHeaderInSection:section];
-    myLabel.backgroundColor = [UIColor colorWithRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0];
+    myLabel.backgroundColor = [UIColor clearColor];
 ;
     //myLabel.textAlignment = NSTextAlignmentCenter;
     myLabel.textColor = [UIColor grayColor];
     
     
-    UIView *headerView = [[UIView alloc] init];
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 400, 50)];
+    [headerView setBackgroundColor:[UIColor colorWithRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0]];
     [headerView addSubview:myLabel];
+    
+    if (section == EPISODE_LIST_SECTION)
+    {
+        UIButton *inviteFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        inviteFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
+        inviteFriendButton.frame = CGRectMake(150, 0, 120, 40);
+        [inviteFriendButton setTitle:@"Invite Friend" forState:UIControlStateNormal];
+        [inviteFriendButton.titleLabel setTextColor:[UIColor blueColor]];
+        [inviteFriendButton addTarget:self action:@selector(inviteFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        [headerView addSubview:inviteFriendButton];
+    }
     
     return headerView;
 }
@@ -238,6 +250,7 @@
 }
 
 - (void)swipeableTableViewCell:(SWTableViewCell *)cell didTriggerRightUtilityButtonWithIndex:(NSInteger)index {
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int row = cell.tag;
     switch (index) {
         case 0:
@@ -260,15 +273,21 @@
         }
         case 1:
         {
+            if (![@"myEvents" isEqualToString:appDelegate.sourceName])
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Cannot edit episode" message:@"Edit Episode is available when active content is myEvents" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert show];
+                return;
+            }
             NSLog(@"Edit row %d",row);
             episodeNameForAlertView = _episodeNameList[row];
             [self.delegate sourceChooseViewController:self didSelectEpisode:episodeNameForAlertView];
+            [self dismissViewControllerAnimated:NO completion:nil];
             break;
         }
         case 2:
         {
             //NSLog(@"Share row %d",row);
-            ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
             appDelegate.episodeToBeShared = _episodeNameList[row];
             [self performSegueWithIdentifier:@"pick_friend" sender:nil];
             break;
@@ -278,65 +297,12 @@
     }
 }
 
-/*
--(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (indexPath.section == EPISODE_LIST_SECTION)
-    {
-        if (editingStyle == UITableViewCellEditingStyleDelete)
-        {
-            NSLog(@"delete row %d",indexPath.row);
-            NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-            
-            if (_episodeDictionary != nil)
-                [_episodeDictionary removeObjectForKey:_episodeNameList[indexPath.row]];
-            
-            _episodeNameList = [[_episodeDictionary allKeys] mutableCopy];
-            
-            [userDefault setObject:_episodeDictionary forKey:[ATConstants EpisodeDictionaryKeyName]];
-            
-            [UIView animateWithDuration:0.5 animations:^{
-                [self.tableView reloadData];
-            }];
-        }
-        else if (editingStyle == UITableViewCellEditingStyleInsert) {
-            NSLog(@"vvvvv");
-        }
-        else if (editingStyle == UITableViewCellEditingStyleNone)
-        {
-            NSLog(@"kkkkkkkk");
-        }
-    }
+- (void) inviteFriendButtonAction: (id)sender {
+    //UIButton* button = (UIButton*)sender;
+    NSLog(@" call addFriend");
+    [self performSegueWithIdentifier:@"invite_friend" sender:nil];
+    
 }
-
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (indexPath.section == EPISODE_LIST_SECTION)
-        return YES;
-    else
-        return NO;
-}
-
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (alertView.tag == EPISODE_SELECTED_ALERT)
-    {
-        if (buttonIndex == 1) //EDIT episode
-        {
-         [self.delegate sourceChooseViewController:self didSelectEpisode:episodeNameForAlertView];
-        }
-        else if (buttonIndex == 2) //share
-        {
-            [self performSegueWithIdentifier:@"pick_friend" sender:nil];
-            //startShareFrend
-            //call server
-        }
-    }
-
-}
-*/
-
 -(void) getStatsForEvent:(NSString*)sourceName tableCell:(UITableViewCell*)cell
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
