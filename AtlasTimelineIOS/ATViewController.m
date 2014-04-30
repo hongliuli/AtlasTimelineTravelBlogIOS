@@ -1037,7 +1037,6 @@
     currentTapTouchMove = false;
     UITouch *touch = [touches anyObject];
     NSNumber* annViewKey = [NSNumber numberWithInt:touch.view.tag];
-    //NSLog(@" ---- touch key:%@", annViewKey);
     if ([annViewKey intValue] > 0) //tag is set in viewForAnnotation when instance tmpLbl
         currentTapTouchKey = [annViewKey intValue];
 }
@@ -1342,7 +1341,6 @@
     ATEventAnnotation* ann = [view annotation];
     selectedEventAnnotation = ann;
     self.selectedAnnotation = ann;
-    
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
@@ -1362,7 +1360,19 @@
         {
             self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
             self.eventEditorPopover.popoverContentSize = CGSizeMake(380,480);
-            [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+            
+            //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user preventing system crash
+            if (view.window != nil)
+                [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+            else
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Some issue tapping on text/image to start event editor"
+                                                                message:@"Please tap on marker instead, or move timewheel a little and try again!"
+                                                               delegate:nil
+                                                      cancelButtonTitle:@"OK"
+                                                      otherButtonTitles:nil];
+                [alert show];
+            }
         }
     }
     else {
