@@ -11,6 +11,7 @@
 
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
 #define ALERT_FOR_SAVE 1
+#define ALERT_FOR_POPOVER_ERROR 2
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -407,7 +408,7 @@
 }
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     //if (alertView.tag == ALERT_FOR_SAVE)
-    if (buttonIndex == 1) {
+    if (buttonIndex == 1 && alertView.tag == ALERT_FOR_SAVE) {
         NSString *episodeName = [alertView textFieldAtIndex:0].text;
         episodeName =[episodeName stringByTrimmingCharactersInSet:
                       [NSCharacterSet whitespaceCharacterSet]];
@@ -422,6 +423,11 @@
                                                   otherButtonTitles:nil];
             [alert show];
         }
+    }
+    if (buttonIndex == 0 && alertView.tag == ALERT_FOR_POPOVER_ERROR)
+    {
+        NSLog(@"----- refreshAnn after popover error");
+        [self refreshAnnotations];
     }
 }
 - (void)handleTapOnTutorial:(UIGestureRecognizer *)gestureRecognizer
@@ -1361,16 +1367,17 @@
             self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
             self.eventEditorPopover.popoverContentSize = CGSizeMake(380,480);
             
-            //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user preventing system crash
+            //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user and call refreshAnn in alert delegate to fix it. (will not work without put into alert delegate)
             if (view.window != nil)
                 [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
             else
             {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Some issue tapping on text/image to start event editor"
-                                                                message:@"Please tap on marker instead, or move timewheel a little and try again!"
-                                                               delegate:nil
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"A minor error occurs"
+                                                                message:@"Please try again!"
+                                                               delegate:self
                                                       cancelButtonTitle:@"OK"
                                                       otherButtonTitles:nil];
+                alert.tag = ALERT_FOR_POPOVER_ERROR;
                 [alert show];
             }
         }
