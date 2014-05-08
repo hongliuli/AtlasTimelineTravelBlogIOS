@@ -38,6 +38,7 @@
 + (NSString*) clearMakerFromDescText: (NSString*)desc :(NSString*)markerName;
 + (NSString*) clearMakerAllFromDescText: (NSString*)desc;
 + (NSArray*) getEventListWithUniqueIds: (NSArray*)uniqueIds;
++ (NSString*) httpGetFromServer:(NSString*)serverUrl;
 
 //set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable;

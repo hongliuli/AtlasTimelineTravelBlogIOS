@@ -412,12 +412,18 @@
         NSString *episodeName = [alertView textFieldAtIndex:0].text;
         episodeName =[episodeName stringByTrimmingCharactersInSet:
                       [NSCharacterSet whitespaceCharacterSet]];
-        if (![episodeName isEqual:@""])
+        if (![episodeName isEqual:@""] //remember episode Name is saved in saver as xxx|email|date
+                                        // and may passed to here with prefix 1* if not readed yet
+                                        // so should not conttains * | etc
+            && [episodeName rangeOfString:@"*"].location == NSNotFound
+            && [episodeName rangeOfString:@"@"].location == NSNotFound
+            && [episodeName rangeOfString:@"&"].location == NSNotFound
+            && [episodeName rangeOfString:@"|"].location == NSNotFound )
             [self saveEpisodeWithName:episodeName renameIfDuplicate:TRUE];
         else
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You need to enter an episode name!"
-                                                            message:@"Please tap Save button again!"
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Episode name is empty or contains some special char"
+                                                            message:@"Episode name should not be empty, and should not contains '@', '*','&' or '|'. Tap Create Episode again to enter valid name!"
                                                            delegate:nil
                                                   cancelButtonTitle:@"OK"
                                                   otherButtonTitles:nil];

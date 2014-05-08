@@ -8,6 +8,7 @@
 
 #import "ATUserVerifyViewController.h"
 #import "ATConstants.h"
+#import "ATHelper.h"
 
 @interface ATUserVerifyViewController ()
 
@@ -59,20 +60,12 @@ NSString* receivedSecurityCode; //use this to compare with user entered
         return;
     }
     //continues to get from server
-    NSURL* serviceUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@/verifyusersetup?user_id=%@",[ATConstants ServerURL], self.userEmailText.text]];
-    NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl];
-
-    //Get Responce hear----------------------
-    NSURLResponse *response;
-    NSError *error;
-    NSData *urlData=[NSURLConnection sendSynchronousRequest:serviceRequest returningResponse:&response error:&error];
-    if (urlData == nil || [urlData length] >20)
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connect Server Fail!" message:@"Metwork problem, Please try again!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
+    NSString* serviceUrl = [NSString stringWithFormat:@"%@/verifyusersetup?user_id=%@",[ATConstants ServerURL], self.userEmailText.text];
+    NSString* responseStr  = [ATHelper httpGetFromServer:serviceUrl];
+    if (responseStr == nil)
         return;
-    }
-    receivedSecurityCode = [[NSString alloc]initWithData:urlData encoding:NSUTF8StringEncoding];
+    else
+        receivedSecurityCode = responseStr;
     NSLog(@"received security code: %@",receivedSecurityCode);
     self.securityCodeText.enabled = true;
     self.verifyButton.enabled = true;

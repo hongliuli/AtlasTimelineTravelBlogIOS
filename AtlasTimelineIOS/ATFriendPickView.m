@@ -10,6 +10,9 @@
 #define DOWNLOAD_AGAIN_ALERT 3
 #define DOWNLOAD_CONFIRM 4
 
+#define EVENT_TYPE_NO_PHOTO 0
+#define EVENT_TYPE_HAS_PHOTO 1
+
 #import "ATFriendPickView.h"
 #import "ATConstants.h"
 #import "ATHelper.h"
@@ -40,6 +43,12 @@ UIButton *sendButton;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    Boolean successFlag = [ATHelper checkUserEmailAndSecurityCode:self];
+    if (!successFlag)
+    {
+        //if user not login, then network not availbe case will be alert
+        return;
+    }
     pickedEmails = [[NSMutableArray alloc] init];
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     /*********  here is test for test *****/
@@ -50,30 +59,14 @@ UIButton *sendButton;
 
     NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
     NSString *securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
-    /*
-    NSURL* serviceUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@/retreivelistofcontents?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode]];
-    NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl];
-    NSLog(@"%@",serviceUrl);
-    //Get Responce hear----------------------
-    NSURLResponse *response;
-    NSError *error;
-    NSData *urlData=[NSURLConnection sendSynchronousRequest:serviceRequest returningResponse:&response error:&error];
-    if (urlData == nil)
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connect Server Fail!" message:@"Metwork may not be available, Please try later!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
+
+    NSString* serviceUrl = [NSString stringWithFormat:@"%@/retreivefriendlist?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode];
+    NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
+    if (responseStr == nil)
         return;
-    }
-    NSString* responseStr = [[NSString alloc]initWithData:urlData encoding:NSUTF8StringEncoding];
-    if ([responseStr hasPrefix:@"<html>"])
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Need Retry!" message:@"Metwork problem, Please try again!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
-        return;
-    }
-    friendList = [[responseStr componentsSeparatedByString:@"|"] mutableCopy];
-     */
-    friendList = [NSMutableArray arrayWithObjects:@"A", @"B", @"C", @"D", @"E", nil];
+    else
+        friendList = [[responseStr componentsSeparatedByString:@"|"] mutableCopy];
+
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.friendList = friendList; //pass to friendAddView
    
@@ -105,15 +98,13 @@ UIButton *sendButton;
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"friendcell"];
     NSString* friendStr = friendList[indexPath.row];
     //Friend String should be "aa@bb.com" or "aa@bb.com (wait)"
-    if ([@"(Wait)" rangeOfString:friendStr].location != NSNotFound)
+    if ([friendStr rangeOfString:@"(wait)"].location != NSNotFound)
         cell.textLabel.textColor = [UIColor grayColor];
     else
         cell.textLabel.textColor = [UIColor blackColor];
     
     cell.textLabel.text = friendStr;
-    
-    cell.textLabel.textColor = [UIColor blackColor];
-        //cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+
     return cell;
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
@@ -164,7 +155,8 @@ UIButton *sendButton;
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:[NSIndexPath
                                                               indexPathForRow:indexPath.row inSection:0]];
     NSString* friendStr = cell.textLabel.text;
-    if ([@"(Wait)" rangeOfString:friendStr].location != NSNotFound)
+    friendStr = [friendStr lowercaseString];
+    if ([friendStr rangeOfString:@"(wait)"].location != NSNotFound)
         return;
     // http://stackoverflow.com/questions/4616345/select-multiple-rows-in-uitableview
     if([tableView cellForRowAtIndexPath:indexPath].accessoryType == UITableViewCellAccessoryCheckmark){
@@ -200,11 +192,135 @@ UIButton *sendButton;
 }
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == 1) //EDIT episode
+    if (buttonIndex == 1) //send episode
     {
-        NSLog(@"call server url");
+        //send lanquage to server so server know what language
+        NSString *pickedFriendsStr = [pickedEmails componentsJoinedByString:@"|"];
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        NSString* dbName = [appDelegate sourceName];
+        if (![dbName isEqualToString:@"myEvents"])
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You active content is not myEvents!" message:@"please switch to myEvents as active content!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+            return;
+        }
+        [self startUploadJson:pickedFriendsStr];
     }
 }
-//TODO  send episode button action etc
+
+//following function is almost identical that in ATPreferenceViewController which upload content
+-(void)startUploadJson:(NSString*)startUploadJson
+{
+    //[spinner startAnimating];
+    // [self dismissViewControllerAnimated:true completion:nil]; does not dismiss preference itself here
+    
+    Boolean successFlag = [ATHelper checkUserEmailAndSecurityCode:self];
+    if (!successFlag)
+    {
+        //Need alert again?  checkUserEmailAndSecurityCode already alerted
+        return;
+    }
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* userEmail = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
+    NSString* securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+    if (userEmail == nil || securityCode == nil)
+    {
+        //should never come here
+        return;
+    }
+    
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSDateFormatter* formater = appDelegate.dateFormater;
+    NSString* episodeName = appDelegate.episodeToBeShared;
+    
+    NSDictionary* episodeDictionary = [userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]];
+    NSArray* episodeEventIdList = nil;
+    if (episodeDictionary != nil)
+        episodeEventIdList = [episodeDictionary objectForKey:episodeName];
+    
+    NSArray *allEvents = appDelegate.eventListSorted;
+    NSMutableArray* episodeEventList = [[NSMutableArray alloc] init];
+    NSString* eventId = nil;
+    for (ATEventDataStruct* event in allEvents)
+    {
+        eventId = event.uniqueId;
+        if ([episodeEventIdList containsObject:eventId])
+            [episodeEventList addObject:event];
+    }
+    if ([episodeEventList count] == 0)
+    {
+        //this may happen if event still in episodeIdList, but already removed from myEvents
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"This episode is empty!" message:@"Then events in this episode is no longer in myEvents, please remove this episode." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+        
+    }
+    int eventCount = [episodeEventList count];
+    NSMutableArray* dictArray = [[NSMutableArray alloc] initWithCapacity:eventCount];
+    for (ATEventDataStruct* item in episodeEventList)
+    {
+        NSNumber* eventType = [NSNumber numberWithInt: item.eventType]; //not initialized in code, need fix
+        if (eventType == nil)
+            eventType = [NSNumber numberWithInt:EVENT_TYPE_NO_PHOTO];
+        
+        NSMutableDictionary* itemDict = [[NSMutableDictionary alloc] init];
+        [itemDict setObject:item.uniqueId forKey:@"uniqueId"];
+        [itemDict setObject:item.eventDesc forKey:@"eventDesc"];
+        [itemDict setObject:[formater stringFromDate:item.eventDate] forKey:@"eventDate"]; //NSDate is not serializable
+        [itemDict setObject:eventType forKey:@"eventType"];
+        [itemDict setObject:item.address forKey:@"address"];
+        [itemDict setObject:[NSNumber numberWithDouble:item.lat] forKey:@"lat"];
+        [itemDict setObject:[NSNumber numberWithDouble:item.lng] forKey:@"lng"];
+        
+        [dictArray addObject:itemDict];
+    }
+    NSArray *info = [NSArray arrayWithArray:dictArray];
+    NSError* error;
+    NSData* eventData = [NSJSONSerialization dataWithJSONObject:info options:0 error:&error];
+    
+    //"application/x-www-form-urlencoded" is used, need encode % and & sign (spend long time to figure out)
+    NSMutableString *longStr = [[NSMutableString alloc] initWithData:eventData encoding:NSUTF8StringEncoding];
+    [longStr replaceOccurrencesOfString:@"%" withString:@"%25" options:0 range:NSMakeRange(0, [longStr length])];
+    [longStr replaceOccurrencesOfString:@"&" withString:@"%26" options:0 range:NSMakeRange(0, [longStr length])];
+    
+    //NSString* eventStr= @"百科 abc 2012/02/34";//test post chinese
+    NSString* postStr = [NSString stringWithFormat:@"user_id=%@&security_code=%@&friend_email_list=%@&episode_name=%@&json_content=%@", userEmail, securityCode
+                         ,startUploadJson, episodeName, longStr];
+//NSLog(@"============post body = %@", postStr);
+    NSData *postData = [postStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    NSURL* serviceUrl = [NSURL URLWithString: [NSString stringWithFormat:@"%@/shareepisode",[ATConstants ServerURL]]];
+    
+NSLog(@"============post url = %@", serviceUrl.absoluteString);
+    NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:serviceUrl];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody:postData];
+    
+    //Get Responce hear----------------------
+    NSURLResponse *response;
+    
+    NSData *urlData=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    NSString* returnStatus = [[NSString alloc] initWithData:urlData encoding:NSUTF8StringEncoding];
+    //NSLog(@"upload response  urlData = %@", returnStatus);
+    //Event Editor should exclude & char which will cause partial upload until &
+    //[spinner stopAnimating];
+    if (![returnStatus isEqual:@"SUCCESS"])
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Share Episode Failed!" message:@"Fail reason could be network issue or data issue!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+    else
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Share Episode Success!"
+                                                        message: [NSString stringWithFormat:@"Episode [%@], with %i events, has been uploaded to server successfully!",episodeName,eventCount]
+                                                       delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+}
+
 
 @end

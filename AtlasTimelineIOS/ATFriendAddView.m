@@ -243,25 +243,58 @@ BOOL showSendRequestFlag;
     //UIButton* button = (UIButton*)sender;
     NSLog(@" call request friend");
     NSString* friendString = self.searchBar.text;
-
+    friendString = [friendString lowercaseString];
     //client side make sure user is a friend or not
     //         if a user is in wait state, ask user if to resend
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSMutableArray* friendList = appDelegate.friendList;
+    if (friendList == nil || [friendList count] == 0)
+    {
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];        
+        NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
+        NSString *securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+        
+        NSString* serviceUrl = [NSString stringWithFormat:@"%@/retreivefriendlist?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode];
+        NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
+        if (responseStr == nil)
+            return;
+        else
+            friendList = [[responseStr componentsSeparatedByString:@"|"] mutableCopy];
+        
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        appDelegate.friendList = friendList; //pass to friendAddView
+    }
     
     if ([friendList containsObject:friendString])
     {
-        NSLog(@"alert user is already friend");
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ is already your friend", friendString]
+                            message:@""
+                            delegate:nil
+                            cancelButtonTitle:@"OK"
+                            otherButtonTitles:nil];
+        [alert show];
         return;
     }
     else if ([friendList containsObject:[NSString stringWithFormat:@"%@(wait)",friendString]])
     {
-        NSLog(@"alert user has not accepted previous request, do you want send a email again?");
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ has been invited before", friendString]
+                                                        message:@"A new invitation email is sent again."
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
     }
     
-    //Server comback with addedToQueue
-    NSString* serverResponse = @"added";
-    if ([@"added" isEqualToString:serverResponse])
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
+    NSString *securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+    if (userId == nil)
+        return;
+    NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
+    NSString* serviceUrl = [NSString stringWithFormat:@"%@/sendfriendrequest?user_id=%@&security_code=%@&friend_email=%@&language=%@",[ATConstants ServerURL],userId , securityCode, friendString, language];
+    NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
+
+    if ([@"SUCCESS" isEqualToString:responseStr])
     {
         [appDelegate.friendList addObject:[NSString stringWithFormat:@"%@(wait)",friendString]];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"An invitation email has been sent to your friend"
@@ -270,11 +303,12 @@ BOOL showSendRequestFlag;
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];
         [alert show];
+        [appDelegate.friendList addObject:[NSString stringWithFormat:@"%@(wait)", friendString]];
     }
     else //alreadyFriend, allready in Queue etc should not happen in server, if happen, treat same
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat: @"failed to add %@", friendString]
-                                                        message:@"server may have issue"
+                                                        message:@"server may have issue, or already be friend"
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];

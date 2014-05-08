@@ -53,27 +53,13 @@ UIActivityIndicatorView* spinner;
     NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
     NSString *securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
     
-    NSURL* serviceUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@/retreivelistofcontents?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode]];
-    NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl];
-    NSLog(@"%@",serviceUrl);
-    //Get Responce hear----------------------
-    NSURLResponse *response;
-    NSError *error;
-    NSData *urlData=[NSURLConnection sendSynchronousRequest:serviceRequest returningResponse:&response error:&error];
-    if (urlData == nil)
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connect Server Fail!" message:@"Metwork may not be available, Please try later!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
+    NSString* serviceUrl = [NSString stringWithFormat:@"%@/retreivelistofcontents?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode];
+    NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
+    NSArray* libraryList = nil;
+    if (responseStr == nil)
         return;
-    }
-    NSString* responseStr = [[NSString alloc]initWithData:urlData encoding:NSUTF8StringEncoding];
-    if ([responseStr hasPrefix:@"<html>"])
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Need Retry!" message:@"Metwork problem, Please try again!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
-        return;
-    }
-    NSArray* libraryList = [responseStr componentsSeparatedByString:@"|"];
+    else
+         libraryList = [responseStr componentsSeparatedByString:@"|"];
     filteredList = [[NSMutableArray alloc] init];
     //should use predicate to filter nil
     for (int i=0; i< [libraryList count]; i++)
@@ -100,15 +86,13 @@ UIActivityIndicatorView* spinner;
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-#warning Potentially incomplete method implementation.
     // Return the number of sections.
     return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#warning Incomplete method implementation.
-    // Return the number of rows in the section.
+   // Return the number of rows in the section.
     return [filteredList count];
 }
 
@@ -117,19 +101,36 @@ UIActivityIndicatorView* spinner;
     static NSString *CellIdentifier = @"downloadcell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
-    // Configure the cell...
-    cell.textLabel.text = filteredList[indexPath.row];
+    // Configure the cell... 
+    NSString* tmpAtlasName = filteredList[indexPath.row];
+    BOOL unreadEpisode = false;
+    if ([tmpAtlasName hasPrefix:@"1*"]) //1* means unreaded episode. see java serverside code
+    {
+        unreadEpisode = true;//so bold it as new message
+        tmpAtlasName = [tmpAtlasName substringFromIndex:2]; //remove 1* when display in text, and this text will be used when download from server
+    }
+    if ([tmpAtlasName rangeOfString:@"*"].location != NSNotFound)
+    {
+        NSArray* nameList = [tmpAtlasName componentsSeparatedByString:@"*"];
+        cell.textLabel.text = nameList[0];
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@    %@",nameList[2], nameList[1]];
+    }
+    else
+    {
+        cell.textLabel.text = tmpAtlasName;
+        cell.detailTextLabel.text = @"";
+    }
     if ([localList containsObject:filteredList[indexPath.row]]){
         if ([filteredList[indexPath.row] isEqual:[ATConstants defaultSourceName]])
             cell.textLabel.textColor = [UIColor blueColor];
         else
-        {
             cell.textLabel.textColor = [UIColor lightGrayColor];
-            //cell.accessoryType = UITableViewCellAccessoryNone;
-        }
     }
     else{
-        cell.textLabel.textColor = [UIColor blackColor];
+        if (unreadEpisode)
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:17.0];
+        else
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size:16.0];
         //cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
     }
     
@@ -143,9 +144,11 @@ UIActivityIndicatorView* spinner;
 {
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:[NSIndexPath
                                                               indexPathForRow:indexPath.row inSection:0]];
+    selectedAtlasName = filteredList[indexPath.row];
+    if ([selectedAtlasName hasPrefix:@"1*"])
+        selectedAtlasName = [selectedAtlasName substringFromIndex:2];
     if ([cell.textLabel.textColor isEqual:[UIColor lightGrayColor]])
     {
-        selectedAtlasName = cell.textLabel.text;
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"%@ was downloaded before",selectedAtlasName]
                                                        message: @"Are you sure to replace your offline copy?"
                                                       delegate: self
@@ -156,7 +159,6 @@ UIActivityIndicatorView* spinner;
     }
     else
     {
-        selectedAtlasName = cell.textLabel.text;
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Import %@",selectedAtlasName]
                                                        message: @"Import may take a few minutes, continue?."
                                                       delegate: self

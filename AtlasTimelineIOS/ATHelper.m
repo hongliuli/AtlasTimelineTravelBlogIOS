@@ -395,6 +395,31 @@ UIPopoverController *verifyViewPopover;
     return returnList;
 }
 
++(NSString*) httpGetFromServer:(NSString *)serverUrl
+{
+    NSURL* serviceUrl = [NSURL URLWithString:serverUrl];
+    NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl];
+    NSLog(@"request is: %@",serviceUrl);
+    //Get Responce hear----------------------
+    NSURLResponse *response;
+    NSError *error;
+    NSData *urlData=[NSURLConnection sendSynchronousRequest:serviceRequest returningResponse:&response error:&error];
+    if (urlData == nil)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connect Server Fail!" message:@"Metwork may not be available, Please try later!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return nil;
+    }
+    NSString* responseStr = [[NSString alloc]initWithData:urlData encoding:NSUTF8StringEncoding];
+    if ([responseStr hasPrefix:@"<html>"])
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Need Retry!" message:@"Metwork problem, Please try again!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return nil;
+    }
+    return responseStr;
+}
+
 //---- set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable
 {

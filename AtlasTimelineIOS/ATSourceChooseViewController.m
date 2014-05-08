@@ -47,20 +47,19 @@
     
     _sources = [ATHelper listFileAtPath:[ATHelper applicationDocumentsDirectory]];
     _selectedIndex = [_sources indexOfObject:self.source];
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    _episodeDictionary = [[userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]] mutableCopy];
-    if (_episodeDictionary != nil)
+    
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSString* dbName = [appDelegate sourceName];
+    if ([dbName isEqualToString:@"myEvents"])
     {
-        _episodeNameList = [[_episodeDictionary allKeys] mutableCopy];
-        _episodeNameList = [_episodeNameList sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        _episodeDictionary = [[userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]] mutableCopy];
+        if (_episodeDictionary != nil)
+        {
+            _episodeNameList = [[_episodeDictionary allKeys] mutableCopy];
+            _episodeNameList = [_episodeNameList sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+        }
     }
-    //NSLog(@"   number of episode %d", [_episodeNameList count]);
-
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
 - (void)didReceiveMemoryWarning

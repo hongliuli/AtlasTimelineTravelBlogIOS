@@ -342,7 +342,7 @@
     //NSString* eventStr= @"百科 abc 2012/02/34";//test post chinese
     NSString* postStr = [NSString stringWithFormat:@"user_id=%@&security_code=%@&atlas_name=%@&json_contents=%@", userEmail, securityCode
                          ,[ATHelper getSelectedDbFileName], longStr];
-    //NSLog(@"============post body = %@", postStr);
+NSLog(@"============post body = %@", postStr);
     NSData *postData = [postStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
     NSURL* serviceUrl = [NSURL URLWithString: [ATConstants ServerURL]];
@@ -492,7 +492,7 @@
         [customView setBackgroundColor:[UIColor clearColor]];
         UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, -10, 400, 50)];
         label.text = [NSString stringWithFormat:@"Active: %@", _source];
-        label.textColor = [UIColor darkGrayColor];
+        label.textColor = [UIColor grayColor];
         [customView addSubview:label];
     }
     if (section == SECTION_LOGIN_EMAIL)
@@ -508,7 +508,7 @@
         [customView setBackgroundColor:[UIColor clearColor]];
         loginEmailLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, -10, 180, 50)];
         loginEmailLabel.text = loginEmail;
-        loginEmailLabel.textColor = [UIColor darkGrayColor];
+        loginEmailLabel.textColor = [UIColor grayColor];
         [customView addSubview:loginEmailLabel];
         
         if (userEmail != nil)
