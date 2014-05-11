@@ -15,9 +15,10 @@
 
 #define EVENT_TYPE_HAS_PHOTO 1
 
-#define OFFLINE_CONTENT_SECTION 0
-#define EPISODE_LIST_SECTION 1
 #define EPISODE_SELECTED_ALERT 1
+
+#define FOR_CHOOSE_ACTIVE 0
+#define FOR_SHARE_MY_EVENTS 1
 
 @interface ATSourceChooseViewController ()
 
@@ -25,7 +26,7 @@
 
 @implementation ATSourceChooseViewController
 {
-    NSArray* _sources;
+    NSMutableArray* _sources;
     NSUInteger _selectedIndex;
     NSMutableDictionary* _episodeDictionary;
     NSArray* _episodeNameList;
@@ -45,7 +46,10 @@
 {
     [super viewDidLoad];
     
-    _sources = [ATHelper listFileAtPath:[ATHelper applicationDocumentsDirectory]];
+    _sources = [[ATHelper listFileAtPath:[ATHelper applicationDocumentsDirectory]] mutableCopy];
+    _sources = [[_sources sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
+    [_sources removeObject:@"myEvents"];
+    [_sources insertObject:@"myEvents" atIndex:0];
     _selectedIndex = [_sources indexOfObject:self.source];
     
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -73,16 +77,16 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return 2;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
     int retCount = 0;
-    if (section == OFFLINE_CONTENT_SECTION)
+    if (self.requestType == FOR_CHOOSE_ACTIVE)
         retCount = [_sources count];
-    else if (section == EPISODE_LIST_SECTION)
+    else if (self.requestType == FOR_SHARE_MY_EVENTS)
     {
         if (_episodeNameList != nil)
             retCount = [_episodeNameList count];
@@ -95,29 +99,42 @@
     static NSString *CellIdentifier;
     // Configure the cell...
     UITableViewCell *cell;
-    if (indexPath.section == OFFLINE_CONTENT_SECTION)
+    if (self.requestType == FOR_CHOOSE_ACTIVE)
     {
         CellIdentifier = @"PeriodCell";
         cell = [tableView  dequeueReusableCellWithIdentifier:CellIdentifier];
-        NSString* source  = _sources[indexPath.row];
+        NSString* sourceName  = _sources[indexPath.row];
         //do not display ".sqlite" in the Source tableview
-        cell.textLabel.text = source;
         
+        if ([sourceName rangeOfString:@"*"].location != NSNotFound)
+        {
+            NSArray* nameList = [sourceName componentsSeparatedByString:@"*"];
+            cell.textLabel.text = nameList[0];
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"%@    %@",nameList[2], nameList[1]];
+        }
+        else
+        {
+            cell.textLabel.text = sourceName;
+            cell.detailTextLabel.text = @"";
+        }
+
+        if ([@"myEvents" isEqualToString:sourceName])
+        {
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:19.0];
+            cell.detailTextLabel.text = @" - All your life stories are here!";
+        }
+        else
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size:17.0];
         if (indexPath.row == _selectedIndex)
         {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
             cell.textLabel.textColor = [UIColor blueColor];
-            [self getStatsForEvent:source tableCell:cell];
+            [self getStatsForEvent:sourceName tableCell:cell];
         }
-        else
-        {
-            cell.accessoryType = UITableViewCellAccessoryNone;
-            cell.textLabel.textColor = [UIColor blackColor];
-            cell.detailTextLabel.text = @"";
-        }
+ 
         return cell;
     }
-    else //this is for EPISODE_LIST_SECTION
+    else //this is for FOR_SHARE_MY_EPISODE
     {
         CellIdentifier = @"PeriodCell2";
         NSString* episodeName  = _episodeNameList[indexPath.row];
@@ -154,7 +171,7 @@
             cell.tag = indexPath.row;
         }
         cell.textLabel.text = episodeName;
-        cell.detailTextLabel.text = @"Swipe Right";
+        //cell.detailTextLabel.text = @"Swipe Right";
         cell.detailTextLabel.textColor = [UIColor darkGrayColor];
         return cell;
     }
@@ -162,20 +179,20 @@
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if(section == OFFLINE_CONTENT_SECTION)
+    if(self.requestType == FOR_CHOOSE_ACTIVE)
     {
-        return @" Offline Contents";
+        return @" Set Active Contents";
     }
     else
     {
-        return @" Share Episodes";
+        return @" Swipe one to Share";
     }
 }
 //change section font
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     
     UILabel *myLabel = [[UILabel alloc] init];
-    myLabel.frame = CGRectMake(0, 0, 150, 40);
+    myLabel.frame = CGRectMake(0, 0, 250, 40);
     myLabel.font = [UIFont boldSystemFontOfSize:17];
     myLabel.text = [self tableView:tableView titleForHeaderInSection:section];
     myLabel.backgroundColor = [UIColor clearColor];
@@ -188,11 +205,11 @@
     [headerView setBackgroundColor:[UIColor colorWithRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0]];
     [headerView addSubview:myLabel];
     
-    if (section == EPISODE_LIST_SECTION)
+    if (self.requestType == FOR_SHARE_MY_EVENTS)
     {
         UIButton *inviteFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         inviteFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
-        inviteFriendButton.frame = CGRectMake(150, 0, 120, 40);
+        inviteFriendButton.frame = CGRectMake(180, 0, 120, 40);
         [inviteFriendButton setTitle:@"Invite Friend" forState:UIControlStateNormal];
         [inviteFriendButton.titleLabel setTextColor:[UIColor blueColor]];
         [inviteFriendButton addTarget:self action:@selector(inviteFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -204,7 +221,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == OFFLINE_CONTENT_SECTION)
+    if (self.requestType == FOR_CHOOSE_ACTIVE)
     {
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         if (_selectedIndex != NSNotFound) {
@@ -335,6 +352,8 @@
     [formatter setRoundingMode: NSNumberFormatterRoundDown];
     NSString *numberString = [formatter stringFromNumber:[NSNumber numberWithFloat:totalSizeInM]];
     cell.detailTextLabel.text = [NSString stringWithFormat:@"%d events, %d photos, %@MB ",[eventList count], totalPhotoCount, numberString ];
+    if ([@"myEvents" isEqualToString:sourceName])
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ - Your life stories",cell.detailTextLabel.text];
 }
 /*
 // Override to support conditional editing of the table view.
