@@ -185,7 +185,7 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if ([appDelegate.eventListSorted count] == 0)
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Add your first event" message:@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Content Import] to learn more." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Add your first event" message:@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Incoming Contents/Episodes] to learn more." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
 }
@@ -2062,7 +2062,7 @@
     UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 3*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, 9*EPISODE_ROW_HEIGHT)];
     lblWording.lineBreakMode = NSLineBreakByWordWrapping;
     lblWording.numberOfLines = 0;
-    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your friends' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a friend's ChronicleMap app, tap the episode in [Settings->Offline/Epidsode..]\n\nYour friend will see the episode in his/her [Settings->Content Import] which can be downloaded on the map.";
+    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your friends' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a friend's ChronicleMap app, tap the episode in [Settings->Share my Episodes]\n\nThe episode will be visible to your friend in the app's [Settings->Incoming Contents/Episodes] which can be downloaded onto the map.";
     [episodeView addSubview:lblWording];
     
     int btnY = 12*EPISODE_ROW_HEIGHT;

@@ -19,4 +19,5 @@
 @interface ATSourceChooseViewController : UITableViewController <UIAlertViewDelegate, SWTableViewCellDelegate>
     @property (nonatomic, weak) id <SourceChooseViewControllerDelegate> delegate;
     @property (nonatomic, strong) NSString *source;
+    @property int requestType;
 @end

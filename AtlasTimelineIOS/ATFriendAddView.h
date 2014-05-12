@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ATFriendAddView : UITableViewController
+@interface ATFriendAddView : UITableViewController<UIAlertViewDelegate>
 @property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 
 

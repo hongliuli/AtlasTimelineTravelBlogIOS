@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SWTableViewCell.h"
 
 @class ATPreferenceViewController;
 
-@interface ATDownloadTableViewController : UITableViewController
+@interface ATDownloadTableViewController : UITableViewController<SWTableViewCellDelegate>
 
 @property (nonatomic, strong) ATPreferenceViewController* parent;
 

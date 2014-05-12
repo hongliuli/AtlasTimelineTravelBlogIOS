@@ -397,9 +397,11 @@ UIPopoverController *verifyViewPopover;
 
 +(NSString*) httpGetFromServer:(NSString *)serverUrl
 {
+    serverUrl = [serverUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
     NSURL* serviceUrl = [NSURL URLWithString:serverUrl];
     NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl];
-    NSLog(@"request is: %@",serviceUrl);
+    NSLog(@"request is: %@",serverUrl);
     //Get Responce hear----------------------
     NSURLResponse *response;
     NSError *error;
@@ -419,6 +421,46 @@ UIPopoverController *verifyViewPopover;
     }
     return responseStr;
 }
+
++ (void)startReplaceDb:(NSString*)selectedAtlasName :(NSArray*)downloadedJsonArray :(UIActivityIndicatorView*)spinner
+{
+    NSLog(@"Start replace db called");
+    if (spinner != nil)
+        [spinner startAnimating];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    int cnt = [downloadedJsonArray count];
+    NSMutableArray* newEventList = [[NSMutableArray alloc] initWithCapacity:cnt];
+    for (NSDictionary* dict in downloadedJsonArray)
+    {
+        ATEventDataStruct* evt = [[ATEventDataStruct alloc] init];
+        evt.uniqueId = [dict objectForKey:@"uniqueId"];
+        evt.eventDesc = [dict objectForKey:@"eventDesc"];
+        evt.eventDate = [appDelegate.dateFormater dateFromString:[dict objectForKey:@"eventDate"]];
+        evt.address = [dict objectForKey:@"address"];
+        evt.lat = [[dict objectForKey:@"lat"] doubleValue];
+        evt.lng = [[dict objectForKey:@"lng"] doubleValue];
+        evt.eventType = [[dict objectForKey:@"eventType"] intValue];
+        [newEventList addObject:evt];
+        // NSLog(@"%@    desc %@", [dict objectForKey:@"eventDate"],[dict objectForKey:@"eventDesc"]);
+    }
+    
+    [ATHelper setSelectedDbFileName:selectedAtlasName];
+    ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
+    [appDelegate.eventListSorted removeAllObjects];
+    appDelegate.eventListSorted = newEventList;
+    [dataController deleteAllEvent]; //only meaniful for myTrips database
+    
+    for (ATEventDataStruct* evt in newEventList)
+    {
+        [dataController addEventEntityAddress:evt.address description:evt.eventDesc date:evt.eventDate lat:evt.lat lng:evt.lng type:evt.eventType uniqueId:evt.uniqueId];
+    }
+    [appDelegate emptyEventList];
+    [appDelegate.mapViewController cleanSelectedAnnotationSet];
+    [appDelegate.mapViewController prepareMapView];
+    if (spinner != nil)
+        [spinner stopAnimating];
+}
+
 
 //---- set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable

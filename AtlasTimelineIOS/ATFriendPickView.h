@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SWTableViewCell.h"
 
 @class ATFriendPickView;
 
-@interface ATFriendPickView : UITableViewController<UIAlertViewDelegate>
+@interface ATFriendPickView : UITableViewController<UIAlertViewDelegate,SWTableViewCellDelegate>
 
 
 @end

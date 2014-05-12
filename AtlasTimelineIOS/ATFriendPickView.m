@@ -31,6 +31,14 @@ NSArray* downloadedJson;
 NSMutableArray* pickedEmails;
 UIButton *sendButton;
 
+UIAlertView* alertSend;
+UIAlertView* alertDelete;
+
+NSString* userId;
+NSString* securityCode;
+NSString* deleteFriendEmailToServer;
+NSString* deleteFriend_wait;
+
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
@@ -57,8 +65,8 @@ UIButton *sendButton;
    // [userDefault synchronize];
     /**********************************/
 
-    NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
-    NSString *securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+    userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
+    securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
 
     NSString* serviceUrl = [NSString stringWithFormat:@"%@/retreivefriendlist?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode];
     NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
@@ -66,6 +74,7 @@ UIButton *sendButton;
         return;
     else
         friendList = [[responseStr componentsSeparatedByString:@"|"] mutableCopy];
+    [friendList removeObject:@""];
 
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.friendList = friendList; //pass to friendAddView
@@ -93,9 +102,22 @@ UIButton *sendButton;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"friendcell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if( cell == nil )
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"friendcell"];
+    SWTableViewCell *cell = (SWTableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    //if (cell == nil) {
+        NSMutableArray *leftUtilityButtons = [NSMutableArray new];
+        //see action in didTriggerRightUtilityButtonWithIndex
+        [leftUtilityButtons sw_addUtilityButtonWithColor:
+         [UIColor redColor]
+        title:@"Delete"];
+        cell = [[SWTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                      reuseIdentifier:CellIdentifier
+                                  containingTableView:self.tableView // For row height and selection
+                                   leftUtilityButtons:leftUtilityButtons
+                                  rightUtilityButtons:nil];
+        cell.delegate = self;
+        cell.tag = indexPath.row;
+    //}
+    
     NSString* friendStr = friendList[indexPath.row];
     //Friend String should be "aa@bb.com" or "aa@bb.com (wait)"
     if ([friendStr rangeOfString:@"(wait)"].location != NSNotFound)
@@ -113,17 +135,17 @@ UIButton *sendButton;
     // create the parent view that will hold header Label
     if (section == 0)
     {
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 380, 90)];
-        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(5,0,340,60)];
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 380, 60)];
+        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(5,0,340,30)];
         label.font = [UIFont fontWithName:@"Helvetica" size:14];
         [label setNumberOfLines:0];
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        label.text = [NSString stringWithFormat:@"Episode:  \"%@\"\n- Pick friends to send to their ChronicleMap\n- Add friends if not in the list to pick",appDelegate.episodeToBeShared ];
+        label.text = [NSString stringWithFormat:@"Share:  \"%@\" to fiends",appDelegate.episodeToBeShared ];
         [customView addSubview:label];
         
         sendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         sendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
-        sendButton.frame = CGRectMake(30, 50, 60, 50);
+        sendButton.frame = CGRectMake(15, 30, 60, 30);
         [sendButton setTitle:@"Send" forState:UIControlStateNormal];
         [sendButton.titleLabel setTextColor:[UIColor blueColor]];
         [sendButton addTarget:self action:@selector(sendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -132,18 +154,19 @@ UIButton *sendButton;
         
         UIButton *addFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         addFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
-        addFriendButton.frame = CGRectMake(130, 50, 90, 50);
+        addFriendButton.frame = CGRectMake(175, 30, 90, 30);
         [addFriendButton setTitle:@"Add Friend" forState:UIControlStateNormal];
         [addFriendButton.titleLabel setTextColor:[UIColor blueColor]];
         [addFriendButton addTarget:self action:@selector(addFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:addFriendButton];
+
     }
     return customView;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     
     if (section == 0)
-        return 90;
+        return 60;
     else
         return [super tableView:tableView heightForHeaderInSection:section];
 }
@@ -152,7 +175,8 @@ UIButton *sendButton;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView cellForRowAtIndexPath:[NSIndexPath
+    NSLog(@"   section %d   row %d", indexPath.section, indexPath.row);
+    SWTableViewCell *cell = (SWTableViewCell*)[tableView cellForRowAtIndexPath:[NSIndexPath
                                                               indexPathForRow:indexPath.row inSection:0]];
     NSString* friendStr = cell.textLabel.text;
     friendStr = [friendStr lowercaseString];
@@ -172,6 +196,32 @@ UIButton *sendButton;
     else
         [sendButton setEnabled:false];
 }
+
+//swapable delegate
+- (void)swipeableTableViewCell:(SWTableViewCell *)cell didTriggerLeftUtilityButtonWithIndex:(NSInteger)index {
+    int row = cell.tag;
+    deleteFriend_wait = friendList[row];
+    deleteFriendEmailToServer = deleteFriend_wait;
+    int loc = [deleteFriend_wait rangeOfString:@"(wait)"].location;
+    if (loc != NSNotFound)
+        deleteFriendEmailToServer = [deleteFriend_wait substringToIndex:loc];
+    
+    switch (index) {
+        case 0:
+        {
+            alertDelete = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Delete friend %@", deleteFriendEmailToServer]
+                                                   message:@"Are you sure?"
+                                                  delegate:self
+                                         cancelButtonTitle:@"Cancel"
+                                         otherButtonTitles:@"DELETE", nil];
+            [alertDelete show];
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 - (void) addFriendButtonAction: (id)sender {
     //UIButton* button = (UIButton*)sender;
     NSLog(@" call addFriend");
@@ -182,29 +232,60 @@ UIButton *sendButton;
     //UIButton* button = (UIButton*)sender;
     NSString *pickedFriendsStr = [pickedEmails componentsJoinedByString:@"\n"];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Send Episode %@ to following friend(s)",appDelegate.episodeToBeShared]
+    alertSend = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Send Episode %@ to following friend(s)",appDelegate.episodeToBeShared]
                                                     message:[NSString stringWithFormat:@"%@",pickedFriendsStr]
                                                    delegate:self
                                           cancelButtonTitle:@"Cancel"
                                           otherButtonTitles:@"Send it", nil];
-    [alert show];
+    [alertSend show];
     
 }
+
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == 1) //send episode
+    if (alertView == alertSend)
     {
-        //send lanquage to server so server know what language
-        NSString *pickedFriendsStr = [pickedEmails componentsJoinedByString:@"|"];
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSString* dbName = [appDelegate sourceName];
-        if (![dbName isEqualToString:@"myEvents"])
+        if (buttonIndex == 1) //send episode
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You active content is not myEvents!" message:@"please switch to myEvents as active content!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-            [alert show];
-            return;
+            //send lanquage to server so server know what language
+            NSString *pickedFriendsStr = [pickedEmails componentsJoinedByString:@"|"];
+            ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+            NSString* dbName = [appDelegate sourceName];
+            if (![dbName isEqualToString:@"myEvents"])
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You active content is not myEvents!" message:@"please switch to myEvents as active content!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert show];
+                return;
+            }
+            [self startUploadJson:pickedFriendsStr];
         }
-        [self startUploadJson:pickedFriendsStr];
+    }
+    else
+    {
+        if (buttonIndex == 1) //delete friend
+        {
+            NSString* serviceUrl = [NSString stringWithFormat:@"%@/deletefriend?user_id=%@&security_code=%@&friend_email=%@",[ATConstants ServerURL], userId, securityCode, deleteFriendEmailToServer];
+            NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
+            if ([@"SUCCESS" isEqualToString:responseStr])
+            {
+                [friendList removeObject:deleteFriend_wait];
+                [self cleanCheckedFriendEmail];
+                [self.tableView reloadData];
+            }
+            else{
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete friend failed" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alert show];
+            }
+        }
+    }
+
+}
+-(void) cleanCheckedFriendEmail
+{
+    [pickedEmails removeAllObjects];
+    for (int row = 0, rowCount = [self.tableView numberOfRowsInSection:0]; row < rowCount; ++row) {
+        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+        cell.accessoryType = UITableViewCellAccessoryNone;
     }
 }
 
@@ -315,9 +396,10 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
     else
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Share Episode Success!"
-                                                        message: [NSString stringWithFormat:@"Episode [%@], with %i events, has been uploaded to server successfully!",episodeName,eventCount]
+                                                        message: [NSString stringWithFormat:@"Episode [%@], with %i events, has been sent.\n Using ChronicleMap app, your friends can check it at Settings -> Incoming Contents/Episodes!",episodeName,eventCount]
                                                        delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
+        [self cleanCheckedFriendEmail];
         return;
     }
 }

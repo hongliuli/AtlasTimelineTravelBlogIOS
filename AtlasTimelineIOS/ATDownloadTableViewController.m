@@ -9,6 +9,7 @@
 #define DOWNLOAD_REPLACE_MY_SOURCE_ALERT 2
 #define DOWNLOAD_AGAIN_ALERT 3
 #define DOWNLOAD_CONFIRM 4
+#define DELETE_INCOMING_ON_SERVER_CONFIRM 5
 
 #import "ATDownloadTableViewController.h"
 #import "ATConstants.h"
@@ -27,6 +28,7 @@ NSMutableArray* localList;
 NSString* selectedAtlasName;
 NSArray* downloadedJson;
 UIActivityIndicatorView* spinner;
+int swipPromptCount;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -40,7 +42,7 @@ UIActivityIndicatorView* spinner;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+    swipPromptCount = 0;
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     /*********  here is test for test *****/
    // [userDefault removeObjectForKey:[ATConstants UserEmailKeyName]];
@@ -68,6 +70,10 @@ UIActivityIndicatorView* spinner;
         if (item != nil && [item length]>0)
             [filteredList addObject:libraryList[i]];
     }
+    [filteredList removeObject:@"myEvents"]; //myEvents backup/restore is done in Settings->Backup/Restore myEvents data section
+    
+    filteredList = [[filteredList sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
+
     spinner = [[UIActivityIndicatorView alloc]
                initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     spinner.center = CGPointMake(160, 200);
@@ -98,10 +104,32 @@ UIActivityIndicatorView* spinner;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"downloadcell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    static NSString *CellIdentifier = @"downloadcellswap";
+    //UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
-    // Configure the cell... 
+    SWTableViewCell *cell = (SWTableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    
+    if (cell == nil) {
+        NSMutableArray *rightUtilityButtons = [NSMutableArray new];
+        //see action in didTriggerRightUtilityButtonWithIndex
+        [rightUtilityButtons sw_addUtilityButtonWithColor:
+         [UIColor colorWithRed:0.78f green:0.38f blue:0.5f alpha:1.0]
+                                                    title:@"Delete"];
+        [rightUtilityButtons sw_addUtilityButtonWithColor:
+         [UIColor colorWithRed:1.0f green:0.231f blue:0.188 alpha:1.0f]
+                                                    title:@"Download"];
+        cell = [[SWTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+                                      reuseIdentifier:CellIdentifier
+                                  containingTableView:self.tableView // For row height and selection
+                                   leftUtilityButtons:nil
+                                  rightUtilityButtons:rightUtilityButtons];
+        cell.delegate = self;
+        cell.tag = indexPath.row;
+        cell.detailTextLabel.textColor = [UIColor darkGrayColor];
+    }
+
+    
+    // Configure the cell...
     NSString* tmpAtlasName = filteredList[indexPath.row];
     BOOL unreadEpisode = false;
     if ([tmpAtlasName hasPrefix:@"1*"]) //1* means unreaded episode. see java serverside code
@@ -109,6 +137,8 @@ UIActivityIndicatorView* spinner;
         unreadEpisode = true;//so bold it as new message
         tmpAtlasName = [tmpAtlasName substringFromIndex:2]; //remove 1* when display in text, and this text will be used when download from server
     }
+    
+    
     if ([tmpAtlasName rangeOfString:@"*"].location != NSNotFound)
     {
         NSArray* nameList = [tmpAtlasName componentsSeparatedByString:@"*"];
@@ -122,9 +152,14 @@ UIActivityIndicatorView* spinner;
     }
     if ([localList containsObject:filteredList[indexPath.row]]){
         if ([filteredList[indexPath.row] isEqual:[ATConstants defaultSourceName]])
+        {
             cell.textLabel.textColor = [UIColor blueColor];
+        }
         else
+        {
             cell.textLabel.textColor = [UIColor lightGrayColor];
+            cell.detailTextLabel.textColor = [UIColor lightGrayColor];
+        }
     }
     else{
         if (unreadEpisode)
@@ -136,39 +171,81 @@ UIActivityIndicatorView* spinner;
     
     return cell;
 }
-
-
-#pragma mark - Table view delegate
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView cellForRowAtIndexPath:[NSIndexPath
-                                                              indexPathForRow:indexPath.row inSection:0]];
-    selectedAtlasName = filteredList[indexPath.row];
-    if ([selectedAtlasName hasPrefix:@"1*"])
-        selectedAtlasName = [selectedAtlasName substringFromIndex:2];
-    if ([cell.textLabel.textColor isEqual:[UIColor lightGrayColor]])
-    {
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"%@ was downloaded before",selectedAtlasName]
-                                                       message: @"Are you sure to replace your offline copy?"
-                                                      delegate: self
-                                             cancelButtonTitle:@"Cancel"
-                                             otherButtonTitles:@"Continue",nil];
-        alert.tag = DOWNLOAD_AGAIN_ALERT;
-        [alert show];
-    }
-    else
-    {
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Import %@",selectedAtlasName]
-                                                       message: @"Import may take a few minutes, continue?."
-                                                      delegate: self
-                                             cancelButtonTitle:@"Cancel"
-                                             otherButtonTitles:@"Continue",nil];
-        alert.tag = DOWNLOAD_START_ALERT;
-        [alert show];
-        
+
+        if (swipPromptCount >= 2)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Please swipe right" message:[NSString stringWithFormat:@""] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+            swipPromptCount = 0;
+        }
+        else
+        {
+            swipPromptCount++;
+        }
+}
+
+//swapable delegate
+- (void)swipeableTableViewCell:(SWTableViewCell *)cell didTriggerRightUtilityButtonWithIndex:(NSInteger)index {
+    int row = cell.tag;
+    selectedAtlasName = filteredList[row];
+    switch (index) {
+        case 0:
+        {
+            if ([selectedAtlasName hasPrefix:@"1*"])
+                selectedAtlasName = [selectedAtlasName substringFromIndex:2];
+            NSString* tmpAtlasName = selectedAtlasName;
+            if ([tmpAtlasName rangeOfString:@"*"].location != NSNotFound)
+            {
+                NSArray* nameList = [tmpAtlasName componentsSeparatedByString:@"*"];
+                tmpAtlasName = nameList[0];
+
+            }
+            
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Delete [%@] From Server",tmpAtlasName]
+                                                           message: @"If you have downloaded it before, the offline one will stay until you remove the app. Are you sure to delete it from server?"
+                                                          delegate: self
+                                                 cancelButtonTitle:@"Cancel"
+                                                 otherButtonTitles:@"Continue",nil];
+            alert.tag = DELETE_INCOMING_ON_SERVER_CONFIRM;
+            [alert show];
+
+            break;
+        }
+        case 1:
+        {
+            if ([selectedAtlasName hasPrefix:@"1*"])
+                selectedAtlasName = [selectedAtlasName substringFromIndex:2];
+            if ([cell.textLabel.textColor isEqual:[UIColor lightGrayColor]])
+            {
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"%@ was downloaded before",selectedAtlasName]
+                                                               message: @"Are you sure to replace your offline copy?"
+                                                              delegate: self
+                                                     cancelButtonTitle:@"Cancel"
+                                                     otherButtonTitles:@"Continue",nil];
+                alert.tag = DOWNLOAD_AGAIN_ALERT;
+                [alert show];
+            }
+            else
+            {
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Import %@",selectedAtlasName]
+                                                               message: @"Import may take a few minutes, continue?."
+                                                              delegate: self
+                                                     cancelButtonTitle:@"Cancel"
+                                                     otherButtonTitles:@"Continue",nil];
+                alert.tag = DOWNLOAD_START_ALERT;
+                [alert show];
+                
+            }
+
+            break;
+        }
+        default:
+            break;
     }
 }
+
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -177,12 +254,31 @@ UIActivityIndicatorView* spinner;
         UITextField *agree = [alertView textFieldAtIndex:0];
         if ([agree.text caseInsensitiveCompare:@"agree"] == NSOrderedSame)
         {
-            [self startReplaceDb];
+            [ATHelper startReplaceDb:selectedAtlasName :downloadedJson :spinner];
+            [_parent changeSelectedSource: selectedAtlasName];
+            downloadedJson = nil;
         }
         else
         {
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled replacing offline content!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
+        }
+    }
+    else if (alertView.tag == DELETE_INCOMING_ON_SERVER_CONFIRM)
+    {
+        if (buttonIndex == 0)
+            return;
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
+        NSString *securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+        if (userId == nil)
+            return;
+        NSString* serviceUrl = [NSString stringWithFormat:@"%@/deleteincomingepisode?user_id=%@&security_code=%@&episode_name=%@",[ATConstants ServerURL], userId, securityCode,selectedAtlasName];
+        NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
+        if ([@"SUCCESS" isEqualToString:responseStr])
+        {
+            [filteredList removeObject:selectedAtlasName];
+            [self.tableView reloadData];
         }
     }
     else
@@ -243,43 +339,5 @@ UIActivityIndicatorView* spinner;
     [alert show];
 }
 
--(void)startReplaceDb
-{
-    NSLog(@"Start replace db called");
-    [spinner startAnimating];
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    int cnt = [downloadedJson count];
-    NSMutableArray* newEventList = [[NSMutableArray alloc] initWithCapacity:cnt];
-    for (NSDictionary* dict in downloadedJson)
-    {
-        ATEventDataStruct* evt = [[ATEventDataStruct alloc] init];
-        evt.uniqueId = [dict objectForKey:@"uniqueId"];
-        evt.eventDesc = [dict objectForKey:@"eventDesc"];
-        evt.eventDate = [appDelegate.dateFormater dateFromString:[dict objectForKey:@"eventDate"]];
-        evt.address = [dict objectForKey:@"address"];
-        evt.lat = [[dict objectForKey:@"lat"] doubleValue];
-        evt.lng = [[dict objectForKey:@"lng"] doubleValue];
-        evt.eventType = [[dict objectForKey:@"eventType"] intValue];
-        [newEventList addObject:evt];
-        // NSLog(@"%@    desc %@", [dict objectForKey:@"eventDate"],[dict objectForKey:@"eventDesc"]);
-    }
-    
-    [ATHelper setSelectedDbFileName:selectedAtlasName];
-    [_parent changeSelectedSource: selectedAtlasName];
-    ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
-    [appDelegate.eventListSorted removeAllObjects];
-    appDelegate.eventListSorted = newEventList;
-    [dataController deleteAllEvent]; //only meaniful for myTrips database
-    
-    for (ATEventDataStruct* evt in newEventList)
-    {
-        [dataController addEventEntityAddress:evt.address description:evt.eventDesc date:evt.eventDate lat:evt.lat lng:evt.lng type:evt.eventType uniqueId:evt.uniqueId];
-    }
-    [appDelegate emptyEventList];
-    [appDelegate.mapViewController cleanSelectedAnnotationSet];
-    [appDelegate.mapViewController prepareMapView];
-    downloadedJson = nil;
-    [spinner stopAnimating];
-}
 
 @end

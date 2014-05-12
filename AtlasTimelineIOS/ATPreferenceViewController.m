@@ -22,20 +22,32 @@
 #define EVENT_TYPE_HAS_PHOTO 1
 
 #define SECTION_LOGIN_EMAIL 0
-#define SECTION_LOCAL_CONTENTS 1
-#define SECTION_SYNC_SERVER 2
-#define SECTION_MISC 3
+#define SECTION_CONTENT_MANAGE 1
+#define SECTION_SYNC_MYEVENTS_TO_SERVER 2
+#define SECTION_SYNC_MYEVENTS_PHOTO_TO_DROPBOX 3
+#define SECTION_MISC 4
 
-#define ROW_SYNC_IMPORT 0
-#define ROW_SYNC_EXPORT 1
-#define ROW_SYNC_TO_DROPBOX 2
-#define ROW_SYNC_TO_DROPBOX_ALL 3
-#define ROW_SYNC_FROM_DROPBOX 4
+#define ROW_SYNC_BACKUP_MYEVENTS 0
+#define ROW_SYNC_RESTORE_MYEVENTS 1
+#define ROW_SYNC_TO_DROPBOX 0
+#define ROW_SYNC_TO_DROPBOX_ALL 1
+#define ROW_SYNC_FROM_DROPBOX 2
+
+#define ROW_CONTENT_MG_SWITCH_ACTIVE 0
+#define ROW_CONTENT_MG_MY_EPISODE 1
+#define ROW_CONTENT_MG_EPISODE_FROM_FRIEND 2
 
 #define ROW_VIDEO_TUTORIAL 0
 #define ROW_PURCHASE 1
 #define ROW_RESTORE_PURCHASE 2
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
+#define RESTORE_PHOTO_TITLE @"Restore Photos"
+
+#define FOR_CHOOSE_ACTIVE 0
+#define FOR_SHARE_MY_EVENTS 1
+
+#define DOWNLOAD_REPLACE_MY_SOURCE_TO_MYEVENTS_ALERT 100
+#define DOWNLOAD_MYEVENTS_CONFIRM 101
 
 @interface ATPreferenceViewController ()
 
@@ -49,6 +61,7 @@
     ATDataController* privateDataController;
     NSString* currentEventId;
     NSString* currentPhotoName;
+    NSArray* downloadedMyEventsJsonArray;
     int uploadSuccessExcludeThumbnailCount;
     int deleteCount;
     int downloadFromDropboxStartCount;
@@ -76,6 +89,8 @@
     
     UIButton* logoutButton;
     UILabel* loginEmailLabel;
+    
+    BOOL hasNewIncomingShareFlag;
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -90,6 +105,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    hasNewIncomingShareFlag = false;
     spinner = [[UIActivityIndicatorView alloc]
                initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     spinner.frame = CGRectMake(0,0,60,60);
@@ -97,6 +113,29 @@
     //spinner.hidesWhenStopped = YES;
     [[self  view] addSubview:spinner];
     self.detailLabel.text = _source;
+    
+    //Check if there are new incoming. This logic is duplicated from ATDownloadViewController
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
+    NSString *securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+    if (userId == nil)
+        return;
+    NSString* serviceUrl = [NSString stringWithFormat:@"%@/retreivelistofcontents?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode];
+    NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
+    NSArray* libraryList = nil;
+    if (responseStr == nil)
+        return;
+    else
+        libraryList = [responseStr componentsSeparatedByString:@"|"];
+    for (int i=0; i< [libraryList count]; i++)
+    {
+        NSString* item = libraryList[i];
+        if (item != nil && [item hasPrefix:@"1*"])
+        {
+            hasNewIncomingShareFlag = true;
+            break;
+        }
+    }
 }
 
 - (void)sourceChooseViewController: (ATSourceChooseViewController *)controller
@@ -141,10 +180,17 @@
 //prepareForSegue() is useful for pass values to called storyboard objects
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    if ([segue.identifier isEqualToString:@"choose_offline_content"]) {
+    if ([segue.identifier isEqualToString:@"choose_active_offline_content"]) {
         ATSourceChooseViewController *sourceChooseViewController = segue.destinationViewController;
         sourceChooseViewController.delegate = self;
         sourceChooseViewController.source = _source;
+        sourceChooseViewController.requestType = FOR_CHOOSE_ACTIVE;
+    }
+    if ([segue.identifier isEqualToString:@"share_my_episode"]) {
+        ATSourceChooseViewController *sourceChooseViewController = segue.destinationViewController;
+        sourceChooseViewController.delegate = self;
+        sourceChooseViewController.source = _source;
+        sourceChooseViewController.requestType = FOR_SHARE_MY_EVENTS;
     }
     if ([segue.identifier isEqualToString:@"options_id"]) {
         ATOptionsTableViewController *optionPage = segue.destinationViewController;
@@ -171,8 +217,20 @@
 
 - (void)startExport:(UITableView*)tableView :(NSIndexPath *)indexPath
 {
+    Boolean successFlag = [ATHelper checkUserEmailAndSecurityCode:self];
+    if (!successFlag)
+    {
+        //Need alert again?  checkUserEmailAndSecurityCode already alerted
+        return;
+    }
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    
+    NSString* sourceName = appDelegate.sourceName;
+    if (![@"myEvents" isEqualToString:sourceName])
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"myEvents need to be Active" message:@"Please set myEvents as active content and try again" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
     int cnt = [appDelegate.eventListSorted count];
     
     uploadAlertView = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Sync %i events to %@ on server",cnt, [ATHelper getSelectedDbFileName]]
@@ -188,12 +246,39 @@
 }
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+    if (alertView.tag == DOWNLOAD_REPLACE_MY_SOURCE_TO_MYEVENTS_ALERT )
+    {
+        if (buttonIndex == 0)
+            return; //user clicked cancel button
+        UIAlertView* alert  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Confirm to replace %@ contents in your device!",[ATHelper getSelectedDbFileName]]
+                                                         message:@"Enter agree to continue:" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
+        UITextField * aa = [alert textFieldAtIndex:0];
+        aa.placeholder = @"agree";
+        alert.tag = DOWNLOAD_MYEVENTS_CONFIRM;
+        [alert show];
+    }
+    if (alertView.tag == DOWNLOAD_MYEVENTS_CONFIRM)
+    {
+        UITextField *agree = [alertView textFieldAtIndex:0];
+        if ([agree.text caseInsensitiveCompare:@"agree"] == NSOrderedSame)
+        {
+            [ATHelper startReplaceDb:@"myEvents" :downloadedMyEventsJsonArray :spinner];
+            [self changeSelectedSource: @"myEvents"];
+            downloadedMyEventsJsonArray = nil;
+        }
+        else
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled replacing offline content!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }
+    }
     if (alertView == uploadAlertView)
     {
         if (buttonIndex == 0)
         {
             NSLog(@"user canceled upload");
-            // Any action can be performed here
+            // Any action can be perfhttp://www.wenxuecity.com/news/2014/05/10/3255854.htmlormed here
         }
         else if (buttonIndex == 1)
         {
@@ -342,7 +427,7 @@
     //NSString* eventStr= @"百科 abc 2012/02/34";//test post chinese
     NSString* postStr = [NSString stringWithFormat:@"user_id=%@&security_code=%@&atlas_name=%@&json_contents=%@", userEmail, securityCode
                          ,[ATHelper getSelectedDbFileName], longStr];
-NSLog(@"============post body = %@", postStr);
+    //NSLog(@"============post body = %@", postStr);
     NSData *postData = [postStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
     NSURL* serviceUrl = [NSURL URLWithString: [ATConstants ServerURL]];
@@ -382,7 +467,7 @@ NSLog(@"============post body = %@", postStr);
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return 4;
+    return 5;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -391,10 +476,12 @@ NSLog(@"============post body = %@", postStr);
     int retCount = 0;
     if (section == SECTION_LOGIN_EMAIL)
         retCount = 1;
-    else if (section == SECTION_LOCAL_CONTENTS)
-        retCount = 1;
-    else if (section == SECTION_SYNC_SERVER)
-        retCount = 5;
+    else if (section == SECTION_CONTENT_MANAGE)
+        retCount = 3;
+    else if (section == SECTION_SYNC_MYEVENTS_TO_SERVER)
+        retCount = 2;
+    else if (section == SECTION_SYNC_MYEVENTS_PHOTO_TO_DROPBOX)
+        retCount = 3;
     else  //SECTION_SUPPORT...
         retCount = 3;
 
@@ -403,16 +490,56 @@ NSLog(@"============post body = %@", postStr);
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"prefCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-
-    if( cell == nil )
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     int section = indexPath.section;
-    int row = indexPath.row;
-    if (section == SECTION_LOCAL_CONTENTS)
+    UITableViewCell *cell = nil;
+    if (section == SECTION_CONTENT_MANAGE)
     {
-        cell.textLabel.text = @"Offline/Episode/Friend";
+        NSString* cellIdentifier = @"cell_type_mg";
+        cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+
+        if( cell == nil )
+        {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
+            cell.detailTextLabel.textColor = [UIColor grayColor];
+        }
+    }
+    else
+    {
+        NSString* cellIdentifier = @"cell_type_other";
+        cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        
+        if( cell == nil )
+        {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        }
+    }
+
+    int row = indexPath.row;
+    if (section == SECTION_CONTENT_MANAGE)
+    {
+        if (row == ROW_CONTENT_MG_SWITCH_ACTIVE)
+        {
+            cell.textLabel.text = @"Switch Active Contents";
+            cell.detailTextLabel.text = @"Select Active from offline contents";
+        }
+        if (row == ROW_CONTENT_MG_MY_EPISODE)
+        {
+            cell.textLabel.text = @"Share my Episodes to Friends";
+            cell.detailTextLabel.text = @"Send episodes / Invite Friends";
+        }
+        if (row == ROW_CONTENT_MG_EPISODE_FROM_FRIEND)
+        {
+            cell.textLabel.text = @"Incoming Contents/Episodes";
+            cell.detailTextLabel.text = @"Download from server to offline";
+            if (hasNewIncomingShareFlag)
+            {
+                UIImage *img = [UIImage imageNamed:@"new-message-red-dot"];
+                UIImageView *icon = [[UIImageView alloc] initWithImage:img];
+                [icon setFrame:CGRectMake(0, 0, 18, 18)];
+                cell.textLabel.text = [NSString stringWithFormat:@"    %@", cell.textLabel.text ];
+                [cell.textLabel addSubview:icon];
+            }
+        }
     }
     else if (section == SECTION_LOGIN_EMAIL)
     {
@@ -444,23 +571,30 @@ NSLog(@"============post body = %@", postStr);
             }
         }
     }
-    else if (section == SECTION_SYNC_SERVER)
+    else if (section == SECTION_SYNC_MYEVENTS_TO_SERVER)
     {
         switch (row) {
-            case ROW_SYNC_IMPORT:
-                cell.textLabel.text = @"Content Import (Restore)";
+            case ROW_SYNC_RESTORE_MYEVENTS:
+                cell.textLabel.text = @"Restore myEvents from server";
                 break;
-            case ROW_SYNC_EXPORT:
-                cell.textLabel.text = @"Content Export (Backup)";
+            case ROW_SYNC_BACKUP_MYEVENTS:
+                cell.textLabel.text = @"Backup myEvents to server";
                 break;
+            default:
+                break;
+        }
+    }
+    else if (section == SECTION_SYNC_MYEVENTS_PHOTO_TO_DROPBOX)
+    {
+        switch (row) {
             case ROW_SYNC_TO_DROPBOX:
-                cell.textLabel.text = @"Photo Export";
+                cell.textLabel.text = @"Backup Photos (Incremental)";
                 break;
             case ROW_SYNC_TO_DROPBOX_ALL:
-                cell.textLabel.text = @"Photo Export(All)";
+                cell.textLabel.text = @"Backup Photos (Full)";
                 break;
             case ROW_SYNC_FROM_DROPBOX:
-                cell.textLabel.text = @"Photo Import";
+                cell.textLabel.text = RESTORE_PHOTO_TITLE;
                 break;
             default:
                 break;
@@ -470,13 +604,13 @@ NSLog(@"============post body = %@", postStr);
             ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
             int numberOfNewPhotos = [dataController getNewPhotoQueueSizeExcludeThumbNail];
             int numberOfDeletedPhoto = [dataController getDeletedPhotoQueueSize];
-            cell.textLabel.text = [NSString stringWithFormat:@"Photo Export - New:%d  Del:%d",numberOfNewPhotos,numberOfDeletedPhoto ];
+            cell.textLabel.text = [NSString stringWithFormat:@"Photo Backup - New:%d  Del:%d",numberOfNewPhotos,numberOfDeletedPhoto ];
             PhotoToDropboxCell = cell;
         }
         if (row == ROW_SYNC_FROM_DROPBOX)
             photoFromDropboxCell = cell;
     }
-    cell.textLabel.font = [UIFont fontWithName:@"Helvetica-italic" size:12];
+    //cell.textLabel.font = [UIFont fontWithName:@"Helvetica-italic" size:12];
     return cell;
 }
 
@@ -484,16 +618,19 @@ NSLog(@"============post body = %@", postStr);
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     //UITableView section is aleays in cap, I need to do something speicial here
-    UIView* customView = nil;
+    UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(0, 10, tableView.bounds.size.width, 70)];
+    [customView setBackgroundColor:[UIColor colorWithRed: 0.85 green: 0.85 blue: 0.85 alpha: 0.0]];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, tableView.bounds.size.width, 30)];
+    label.font = [UIFont fontWithName:@"Helvetica" size:18.0];
+    label.textColor = [UIColor colorWithRed: 0.55 green: 0.55 blue: 0.95 alpha: 1.0];
     // create the parent view that will hold header Label
-    if (section == SECTION_LOCAL_CONTENTS)
+    if (section == SECTION_CONTENT_MANAGE)
     {
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 400, 50)];
-        [customView setBackgroundColor:[UIColor clearColor]];
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, -10, 400, 50)];
-        label.text = [NSString stringWithFormat:@"Active: %@", _source];
-        label.textColor = [UIColor grayColor];
-        [customView addSubview:label];
+        int loc = [_source rangeOfString:@"*"].location;
+        NSString* namePart = _source;
+        if (loc != NSNotFound)
+            namePart =  [_source substringToIndex:loc];
+        label.text = [NSString stringWithFormat:@"Active: %@", namePart];
     }
     if (section == SECTION_LOGIN_EMAIL)
     {
@@ -504,12 +641,8 @@ NSLog(@"============post body = %@", postStr);
             loginEmail = userEmail;
         else
             loginEmail = @"";
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 400, 50)];
-        [customView setBackgroundColor:[UIColor clearColor]];
-        loginEmailLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, -10, 180, 50)];
-        loginEmailLabel.text = loginEmail;
-        loginEmailLabel.textColor = [UIColor grayColor];
-        [customView addSubview:loginEmailLabel];
+
+        label.text = loginEmail;
         
         if (userEmail != nil)
         {
@@ -521,28 +654,39 @@ NSLog(@"============post body = %@", postStr);
             [logoutButton addTarget:self action:@selector(logoutButtonAction:) forControlEvents:UIControlEventTouchUpInside];
             [customView addSubview:logoutButton];
         }
-        
     }
+    if (section == SECTION_SYNC_MYEVENTS_TO_SERVER)
+    {
+        label.text = @"Backup/Restore myEvents data";
+    }
+    if (section == SECTION_SYNC_MYEVENTS_PHOTO_TO_DROPBOX)
+    {
+        label.text = @"Backup/Restore Photos to Dropbox";
+    }
+    if (section == SECTION_MISC)
+    {
+        label.text = @"Misc";
+    }
+    [customView addSubview:label];
     return customView;
 }
-
+/*
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if (section == SECTION_SYNC_SERVER)
-        return @"Content / Photos Sync to Server";
-    if (section == SECTION_LOCAL_CONTENTS)
-        return @""; //see viewForHeaderInS
+    if (section == SECTION_SYNC_MYEVENTS_TO_SERVER)
+        return @"Backup/Restore myEvents data";
+    if (section == SECTION_SYNC_MYEVENTS_PHOTO_TO_DROPBOX)
+        return @"Backup/Restore Photos to Dropbox";
     if (section == SECTION_MISC)
         return @"Misc";
-    if (section == SECTION_LOGIN_EMAIL)
-        return @"";
+
     
     return @"";
 }
-
+*/
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    return 32;
+    return 30;
 }
 
 - (ATDataController*)getDataController
@@ -555,14 +699,16 @@ NSLog(@"============post body = %@", postStr);
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     int section = indexPath.section;
-    if (section == SECTION_LOCAL_CONTENTS)
-        [self handleOfflineSection:tableView :indexPath ];
+    if (section == SECTION_CONTENT_MANAGE)
+        [self handleContentManageSection:tableView :indexPath ];
     if (section == SECTION_LOGIN_EMAIL)
         [self handleLoginEmailSection:tableView :indexPath ];
     if (section == SECTION_MISC)
         [self handleMiscSection:tableView :indexPath ];
-    if (section == SECTION_SYNC_SERVER)
+    if (section == SECTION_SYNC_MYEVENTS_TO_SERVER)
         [self handleSynchServerSection:tableView :indexPath];
+    if (section == SECTION_SYNC_MYEVENTS_PHOTO_TO_DROPBOX)
+        [self handleSynchPhotoSection:tableView :indexPath];
 }
 -(void) handleMiscSection:(UITableView*)tableView :(NSIndexPath *)indexPath
 {
@@ -593,10 +739,31 @@ NSLog(@"============post body = %@", postStr);
         
     }
 }
--(void) handleOfflineSection:(UITableView*)tableView :(NSIndexPath *)indexPath
+-(void) handleContentManageSection:(UITableView*)tableView :(NSIndexPath *)indexPath
 {
-    //also see prepareForSeque() where pass values
-    [self performSegueWithIdentifier:@"choose_offline_content" sender:nil];
+    //also see prepareForSegue() where pass values
+    if (indexPath.row == ROW_CONTENT_MG_SWITCH_ACTIVE)
+        [self performSegueWithIdentifier:@"choose_active_offline_content" sender:nil];
+    if (indexPath.row == ROW_CONTENT_MG_MY_EPISODE)
+    {
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        if ([@"myEvents" isEqualToString:appDelegate.sourceName])
+            [self performSegueWithIdentifier:@"share_my_episode" sender:nil];
+        else
+        {
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Please set myEvents to be active"
+                                                           message: @"You can share your episode only when myEvents is active"
+                                                          delegate: self
+                                                 cancelButtonTitle:@"OK"
+                                                 otherButtonTitles:nil,nil];
+            
+            
+            [alert show];
+        }
+    }
+    else if (indexPath.row == ROW_CONTENT_MG_EPISODE_FROM_FRIEND)
+        [self performSegueWithIdentifier:@"download" sender:nil];
+   
 }
 -(void) handleLoginEmailSection:(UITableView*)tableView :(NSIndexPath *)indexPath
 {
@@ -606,16 +773,60 @@ NSLog(@"============post body = %@", postStr);
 -(void) handleSynchServerSection:(UITableView*)tableView :(NSIndexPath *)indexPath
 {
     int row = indexPath.row;
-    if (row == ROW_SYNC_IMPORT)
+    if (row == ROW_SYNC_RESTORE_MYEVENTS)
     {
-        //also see prepareForSeque() where pass values
-        [self performSegueWithIdentifier:@"download" sender:nil];
+        [self startDownloadMyEventsJson];
     }
-    else if (row == ROW_SYNC_EXPORT)
+    else if (row == ROW_SYNC_BACKUP_MYEVENTS)
     {
         [self startExport: tableView :indexPath];
     }
-    else if (row == ROW_SYNC_TO_DROPBOX)
+
+}
+
+//this function is almost identical in ATDownloadTableViewController's startDownload function
+-(void) startDownloadMyEventsJson
+{
+    Boolean successFlag = [ATHelper checkUserEmailAndSecurityCode:self];
+    if (!successFlag)
+    {
+        //Need alert again?  checkUserEmailAndSecurityCode already alerted
+        return;
+    }
+    [spinner startAnimating];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    int localListCnt = [appDelegate.eventListSorted count];
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* userEmail = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
+    NSString* securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+    //continues to get from server
+    NSString* userId = userEmail;
+    
+    NSString* atlasName = @"myEvents";
+    NSURL* serviceUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@/downloadjsoncontents?user_id=%@&security_code=%@&atlas_name=%@",[ATConstants ServerURL], userId, securityCode, atlasName]];
+    
+    NSData* downloadedData = [NSData dataWithContentsOfURL:serviceUrl];
+    NSString* displayLocalCnt = @"";
+    if ([[ATHelper getSelectedDbFileName] isEqualToString :atlasName])
+        displayLocalCnt = [NSString stringWithFormat:@"%i", localListCnt];
+    
+    NSError* error;
+    downloadedMyEventsJsonArray = [NSJSONSerialization JSONObjectWithData:downloadedData options:kNilOptions error:&error];
+    
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Downloaded %@ has %i events",atlasName,[downloadedMyEventsJsonArray count]]
+        message: [NSString stringWithFormat:@"WARNING: Local %@'s %@ events will be replaced!",@"myEvents",displayLocalCnt]
+        delegate: self
+        cancelButtonTitle:@"Cancel"
+        otherButtonTitles:@"Replace",nil];
+    alert.tag = DOWNLOAD_REPLACE_MY_SOURCE_TO_MYEVENTS_ALERT;
+    [spinner stopAnimating];
+    [alert show];
+}
+-(void) handleSynchPhotoSection:(UITableView*)tableView :(NSIndexPath *)indexPath
+{
+    int row = indexPath.row;
+    if (row == ROW_SYNC_TO_DROPBOX)
     {
         if (![[DBSession sharedSession] isLinked]) {
             [[DBSession sharedSession] linkFromController:self];
@@ -625,7 +836,7 @@ NSLog(@"============post body = %@", postStr);
         int dbDeletedPhotoCount = [[self getDataController] getDeletedPhotoQueueSize];
         //set cell count again (already done in celFor...) here, is to refresh count after user clicked this row and already synched
         UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
-        cell.textLabel.text = [NSString stringWithFormat:@"Photo Export - New:%d  Del:%d",dbNewPhotoCount,dbDeletedPhotoCount ];
+        cell.textLabel.text = [NSString stringWithFormat:@"Photo Backup - New:%d  Del:%d",dbNewPhotoCount,dbDeletedPhotoCount ];
         if (dbNewPhotoCount + dbDeletedPhotoCount > 0)
         {
             [spinner startAnimating]; //stop when chain complete or any error
@@ -894,7 +1105,7 @@ NSLog(@"============post body = %@", postStr);
     if (![currentPhotoName isEqualToString:@"thumbnail"])
     {
         uploadSuccessExcludeThumbnailCount++;
-        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo Export - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
+        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo Backup - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
     }
     [self startProcessNewPhotoQueueChainAction]; //start upload next file until
 }
@@ -975,7 +1186,7 @@ NSLog(@"============post body = %@", postStr);
     {
         [spinner stopAnimating]; //TODO? seems weired here. but need it when only have item in deleteQueue
         deleteCount++;
-        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo Export - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
+        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo Backup - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
     }
     [self processEmptyDeletedPhotoQueue];
 }
@@ -1039,7 +1250,7 @@ NSLog(@"============post body = %@", postStr);
             }
         }
         //following is to prompt user that device already has all photos in dropbox
-        if ( [photoFromDropboxCell.textLabel.text isEqualToString:@"Photo Import (All)"])
+        if ( [photoFromDropboxCell.textLabel.text isEqualToString:RESTORE_PHOTO_TITLE])
                 photoFromDropboxCell.textLabel.text = @"All photos are already downloaded";
     }
 }

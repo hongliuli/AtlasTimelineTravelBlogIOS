@@ -31,6 +31,7 @@
     NSMutableDictionary* _episodeDictionary;
     NSArray* _episodeNameList;
     NSString* episodeNameForAlertView;
+    int swipPromptCount;
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -46,6 +47,7 @@
 {
     [super viewDidLoad];
     
+    swipPromptCount = 0;
     _sources = [[ATHelper listFileAtPath:[ATHelper applicationDocumentsDirectory]] mutableCopy];
     _sources = [[_sources sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
     [_sources removeObject:@"myEvents"];
@@ -235,27 +237,21 @@
         NSString *source = _sources[indexPath.row];
         [self.delegate sourceChooseViewController:self didSelectSource:source];
     }
-    /*
+    
     else //EPIDSODE_LIST_SECTION:  //then load episode for modify
     {
-        if ([@"myEvents" isEqual:self.source])
+        if (swipPromptCount >= 2)
         {
-            episodeNameForAlertView = _episodeNameList[indexPath.row];
-            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Episode: %@",episodeNameForAlertView]
-                                                            message:@"Edit episode or Send it to your friends' ChronicleMap app"
-                                                           delegate:self
-                                                  cancelButtonTitle:@"Cancel"
-                                                  otherButtonTitles:@"Edit", @"Share it to my friends", nil];
-            alert.tag = EPISODE_SELECTED_ALERT;
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Please swipe right" message:[NSString stringWithFormat:@""] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
+            swipPromptCount = 0;
         }
         else
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Load episode to edit" message:[NSString stringWithFormat:@"Please select myEvents first."] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-            [alert show];
+            swipPromptCount++;
         }
     }
-     */
+    
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {

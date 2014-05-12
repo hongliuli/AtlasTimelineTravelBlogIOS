@@ -241,7 +241,6 @@ BOOL showSendRequestFlag;
 
 - (void) requestFriendButtonAction: (id)sender {
     //UIButton* button = (UIButton*)sender;
-    NSLog(@" call request friend");
     NSString* friendString = self.searchBar.text;
     friendString = [friendString lowercaseString];
     //client side make sure user is a friend or not
@@ -250,10 +249,16 @@ BOOL showSendRequestFlag;
     NSMutableArray* friendList = appDelegate.friendList;
     if (friendList == nil || [friendList count] == 0)
     {
+        Boolean successFlag = [ATHelper checkUserEmailAndSecurityCode:self];
+        if (!successFlag)
+        {
+            //Need alert again?  checkUserEmailAndSecurityCode already alerted
+            return;
+        }
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];        
         NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
         NSString *securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
-        
+
         NSString* serviceUrl = [NSString stringWithFormat:@"%@/retreivefriendlist?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode];
         NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
         if (responseStr == nil)
@@ -277,13 +282,30 @@ BOOL showSendRequestFlag;
     }
     else if ([friendList containsObject:[NSString stringWithFormat:@"%@(wait)",friendString]])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ has been invited before", friendString]
-                                                        message:@"A new invitation email is sent again."
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ has not accepted your request yet", friendString]
+                                                        message:@"You have invited him/her before, do you want to send another invitation email?"
+                                                       delegate:self
+                                              cancelButtonTitle:@"No"
+                                              otherButtonTitles:@"Yes", nil];
         [alert show];
+        return;
     }
+    
+    [self sendFriendRequestToServer:friendString];
+    
+}
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) //send episode
+    {
+        NSString* friendString = self.searchBar.text;
+        friendString = [friendString lowercaseString];
+        [self sendFriendRequestToServer:friendString];
+    }
+}
+-(void) sendFriendRequestToServer:(NSString*) friendString
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     NSString *userId = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
@@ -293,7 +315,7 @@ BOOL showSendRequestFlag;
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
     NSString* serviceUrl = [NSString stringWithFormat:@"%@/sendfriendrequest?user_id=%@&security_code=%@&friend_email=%@&language=%@",[ATConstants ServerURL],userId , securityCode, friendString, language];
     NSString* responseStr = [ATHelper httpGetFromServer:serviceUrl];
-
+    
     if ([@"SUCCESS" isEqualToString:responseStr])
     {
         [appDelegate.friendList addObject:[NSString stringWithFormat:@"%@(wait)",friendString]];
@@ -304,6 +326,8 @@ BOOL showSendRequestFlag;
                                               otherButtonTitles:nil];
         [alert show];
         [appDelegate.friendList addObject:[NSString stringWithFormat:@"%@(wait)", friendString]];
+        self.searchBar.text = @"";
+        self.searchBar.placeholder = @"Enter email";
     }
     else //alreadyFriend, allready in Queue etc should not happen in server, if happen, treat same
     {
@@ -315,7 +339,6 @@ BOOL showSendRequestFlag;
         [alert show];
     }
 
-    
 }
 
 /*
