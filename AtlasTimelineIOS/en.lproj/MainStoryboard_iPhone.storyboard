@@ -147,8 +147,9 @@
                     <connections>
                         <segue destination="csw-GM-jKy" kind="push" identifier="user_verify_seque_id" id="xwS-vu-mqX"/>
                         <segue destination="rd5-Dh-fsi" kind="push" identifier="download" id="oV1-wV-yQQ"/>
-                        <segue destination="oTu-NL-xds" kind="push" identifier="choose_offline_content" id="Xce-HP-e9y"/>
+                        <segue destination="oTu-NL-xds" kind="push" identifier="share_my_episode" id="Xce-HP-e9y"/>
                         <segue destination="6q7-Uu-AoE" kind="push" identifier="options" id="FUi-Vr-YW0"/>
+                        <segue destination="lIB-ut-Hq6" kind="push" identifier="choose_active_offline_content" id="b8K-Av-Hmm"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="B0O-Yx-Wzk" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -204,7 +205,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="evL-CS-UNo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2377" y="-992"/>
+            <point key="canvasLocation" x="2285" y="-848"/>
         </scene>
         <!--Download Table View Controller - Download-->
         <scene sceneID="kOg-LO-kc1">
@@ -776,29 +777,29 @@
             <point key="canvasLocation" x="3280" y="-1409"/>
         </scene>
         <!--Choose Source Table View Controller - Select Source-->
-        <scene sceneID="Vmh-Ms-sf3">
+        <scene sceneID="ZGg-no-175">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="PQo-jV-WiR" userLabel="Choose Source Table View Controller - Select Source" customClass="ATSourceChooseViewController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="QJW-pW-3z8">
+                <tableViewController modalPresentationStyle="currentContext" id="lIB-ut-Hq6" userLabel="Choose Source Table View Controller - Select Source" customClass="ATSourceChooseViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="43K-Gp-wwA">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PeriodCell" textLabel="YXC-Cs-geq" detailTextLabel="RBN-vb-Iq4" style="IBUITableViewCellStyleSubtitle" id="TDu-JY-nLG">
-                                <rect key="frame" x="0.0" y="22" width="320" height="44"/>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PeriodCell" textLabel="4IN-iG-LbW" detailTextLabel="C6Y-2w-k7U" style="IBUITableViewCellStyleSubtitle" id="Aor-TD-TOi">
+                                <rect key="frame" x="0.0" y="86" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="TDu-JY-nLG" id="skZ-Hf-MBm">
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Aor-TD-TOi" id="LRv-Zb-33i">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="YXC-Cs-geq">
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="4IN-iG-LbW">
                                             <rect key="frame" x="15" y="2" width="36" height="22"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="RBN-vb-Iq4">
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="C6Y-2w-k7U">
                                             <rect key="frame" x="15" y="24" width="50" height="17"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -810,17 +811,17 @@
                             </tableViewCell>
                         </prototypes>
                         <connections>
-                            <outlet property="dataSource" destination="PQo-jV-WiR" id="rfj-cP-Ph1"/>
-                            <outlet property="delegate" destination="PQo-jV-WiR" id="aL3-86-2fN"/>
+                            <outlet property="dataSource" destination="lIB-ut-Hq6" id="8Bt-g3-Y3g"/>
+                            <outlet property="delegate" destination="lIB-ut-Hq6" id="BrR-Ks-a4W"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Choose Sources" id="2gV-ba-Bch"/>
+                    <navigationItem key="navigationItem" title="Choose Sources" id="TPT-tO-xWc"/>
                     <value key="contentSizeForViewInPopover" type="size" width="360" height="420"/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                 </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="fdX-HE-WOs" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1yR-Pd-AGb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2244" y="-956"/>
+            <point key="canvasLocation" x="2244" y="-1116"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
