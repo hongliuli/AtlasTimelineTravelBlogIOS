@@ -61,6 +61,10 @@
 		CE1D4E4B1738896C00AA603C /* share-icons.png in Resources */ = {isa = PBXBuildFile; fileRef = CE1D4E4A1738896B00AA603C /* share-icons.png */; };
 		CE1D4E4D173890FA00AA603C /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1D4E4C173890FA00AA603C /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		CE2A1D0D16ADA956004476E8 /* ATAnnotationSelected.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2A1D0C16ADA956004476E8 /* ATAnnotationSelected.m */; };
+		CE2D586519073A0500764E14 /* ATFriendAddView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2D586419073A0500764E14 /* ATFriendAddView.m */; };
+		CE320A4C18F986CB00D5DFE1 /* add-to-episode-folder.png in Resources */ = {isa = PBXBuildFile; fileRef = CE320A4A18F986CB00D5DFE1 /* add-to-episode-folder.png */; };
+		CE320A4D18F986CB00D5DFE1 /* add-to-episode-marker.png in Resources */ = {isa = PBXBuildFile; fileRef = CE320A4B18F986CB00D5DFE1 /* add-to-episode-marker.png */; };
+		CE320A4F18F99AC600D5DFE1 /* add-to-episode-folder-reverse.png in Resources */ = {isa = PBXBuildFile; fileRef = CE320A4E18F99AC600D5DFE1 /* add-to-episode-folder-reverse.png */; };
 		CE3361731839709000250D66 /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3361721839709000250D66 /* Toast+UIView.m */; };
 		CE384F69184062ED0009B6E0 /* Overlay.png in Resources */ = {isa = PBXBuildFile; fileRef = CE384F67184062ED0009B6E0 /* Overlay.png */; };
 		CE384F6A184062ED0009B6E0 /* Overlay@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE384F68184062ED0009B6E0 /* Overlay@2x.png */; };
@@ -68,6 +72,7 @@
 		CE3DF30A187FA39C0065337E /* add-button-md.png in Resources */ = {isa = PBXBuildFile; fileRef = CE3DF309187FA39C0065337E /* add-button-md.png */; };
 		CE3DF30D188785300065337E /* ATDefaultAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3DF30C188785300065337E /* ATDefaultAnnotation.m */; };
 		CE3DF3101887890C0065337E /* ATAnnotationFocused.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3DF30F1887890C0065337E /* ATAnnotationFocused.m */; };
+		CE4712BD190BFFD600631C53 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE4712BC190BFFD600631C53 /* AddressBookUI.framework */; };
 		CE4DDC1016A7AC2300911CE2 /* ATEventEditorTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE4DDC0F16A7AC2300911CE2 /* ATEventEditorTableController.m */; };
 		CE56B1AD1775217700DB9FB7 /* ATPhotoScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE56B1AC1775217700DB9FB7 /* ATPhotoScrollView.m */; };
 		CE56B1B0177522AD00DB9FB7 /* ATPhotoScrollCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CE56B1AF177522AD00DB9FB7 /* ATPhotoScrollCell.m */; };
@@ -75,6 +80,8 @@
 		CE6053C6168E9D660006F110 /* Note_Tech_Tips_resource.txt in Resources */ = {isa = PBXBuildFile; fileRef = CE6053C5168E9D660006F110 /* Note_Tech_Tips_resource.txt */; };
 		CE6053CC168F3D1B0006F110 /* ATCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6053CB168F3D1B0006F110 /* ATCell.m */; };
 		CE6053CF168F3E380006F110 /* ATimelineTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6053CE168F3E380006F110 /* ATimelineTableViewController.m */; };
+		CE696E6B191FE115002BB309 /* new-message-red-dot.png in Resources */ = {isa = PBXBuildFile; fileRef = CE696E6A191FE115002BB309 /* new-message-red-dot.png */; };
+		CE6A5FB11905FD630074007D /* ATFriendPickView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6A5FB01905FD630074007D /* ATFriendPickView.m */; };
 		CE6A874E16967823006154D2 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CE6A874C16967823006154D2 /* Model.xcdatamodeld */; };
 		CE6A875116967D6A006154D2 /* Note_Project_Specification in Resources */ = {isa = PBXBuildFile; fileRef = CE6A875016967D6A006154D2 /* Note_Project_Specification */; };
 		CE70BF49176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE70BF48176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m */; };
@@ -87,6 +94,13 @@
 		CE73D24A18DA831C00E61403 /* marker-airport.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D24218DA831C00E61403 /* marker-airport.png */; };
 		CE73D24D18DA846500E61403 /* marker_party.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D24C18DA846500E61403 /* marker_party.png */; };
 		CE73D24F18DA973F00E61403 /* marker_selected.png in Resources */ = {isa = PBXBuildFile; fileRef = CE73D24E18DA973F00E61403 /* marker_selected.png */; };
+		CE754EAF19085A0B00D4EF82 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE754EAE19085A0B00D4EF82 /* AddressBook.framework */; };
+		CE754EBA190B46FD00D4EF82 /* SWCellScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE754EB1190B46FD00D4EF82 /* SWCellScrollView.m */; };
+		CE754EBB190B46FD00D4EF82 /* SWLongPressGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE754EB3190B46FD00D4EF82 /* SWLongPressGestureRecognizer.m */; };
+		CE754EBC190B46FD00D4EF82 /* SWTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CE754EB5190B46FD00D4EF82 /* SWTableViewCell.m */; };
+		CE754EBD190B46FD00D4EF82 /* SWUtilityButtonTapGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE754EB7190B46FD00D4EF82 /* SWUtilityButtonTapGestureRecognizer.m */; };
+		CE754EBE190B46FD00D4EF82 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE754EB9190B46FD00D4EF82 /* SWUtilityButtonView.m */; };
+		CE754EC1190B4F4D00D4EF82 /* NSMutableArray+SWUtilityButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = CE754EC0190B4F4D00D4EF82 /* NSMutableArray+SWUtilityButtons.m */; };
 		CE75886A16C352AB00AEE4AF /* ATHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CE75886916C352AB00AEE4AF /* ATHelper.m */; };
 		CE7D62941847C2A900F01B0E /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE7D62931847C2A900F01B0E /* SenTestingKit.framework */; };
 		CE7E3D9C1698F506004E71CD /* ATEventAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7E3D9B1698F506004E71CD /* ATEventAnnotation.m */; };
@@ -227,6 +241,11 @@
 		CE1D4E4C173890FA00AA603C /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		CE2A1D0B16ADA956004476E8 /* ATAnnotationSelected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATAnnotationSelected.h; sourceTree = "<group>"; };
 		CE2A1D0C16ADA956004476E8 /* ATAnnotationSelected.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATAnnotationSelected.m; sourceTree = "<group>"; };
+		CE2D586319073A0500764E14 /* ATFriendAddView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATFriendAddView.h; sourceTree = "<group>"; };
+		CE2D586419073A0500764E14 /* ATFriendAddView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATFriendAddView.m; sourceTree = "<group>"; };
+		CE320A4A18F986CB00D5DFE1 /* add-to-episode-folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "add-to-episode-folder.png"; path = "images/add-to-episode-folder.png"; sourceTree = "<group>"; };
+		CE320A4B18F986CB00D5DFE1 /* add-to-episode-marker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "add-to-episode-marker.png"; path = "images/add-to-episode-marker.png"; sourceTree = "<group>"; };
+		CE320A4E18F99AC600D5DFE1 /* add-to-episode-folder-reverse.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "add-to-episode-folder-reverse.png"; path = "images/add-to-episode-folder-reverse.png"; sourceTree = "<group>"; };
 		CE3361711839709000250D66 /* Toast+UIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Toast+UIView.h"; sourceTree = "<group>"; };
 		CE3361721839709000250D66 /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Toast+UIView.m"; sourceTree = "<group>"; };
 		CE384F67184062ED0009B6E0 /* Overlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Overlay.png; path = images/Overlay.png; sourceTree = "<group>"; };
@@ -238,6 +257,7 @@
 		CE3DF30C188785300065337E /* ATDefaultAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATDefaultAnnotation.m; sourceTree = "<group>"; };
 		CE3DF30E1887890C0065337E /* ATAnnotationFocused.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATAnnotationFocused.h; sourceTree = "<group>"; };
 		CE3DF30F1887890C0065337E /* ATAnnotationFocused.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATAnnotationFocused.m; sourceTree = "<group>"; };
+		CE4712BC190BFFD600631C53 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		CE4DDC0E16A7AC2300911CE2 /* ATEventEditorTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATEventEditorTableController.h; sourceTree = "<group>"; };
 		CE4DDC0F16A7AC2300911CE2 /* ATEventEditorTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATEventEditorTableController.m; sourceTree = "<group>"; };
 		CE56B1AB1775217700DB9FB7 /* ATPhotoScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATPhotoScrollView.h; sourceTree = "<group>"; };
@@ -250,6 +270,9 @@
 		CE6053CB168F3D1B0006F110 /* ATCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATCell.m; sourceTree = "<group>"; };
 		CE6053CD168F3E380006F110 /* ATimelineTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATimelineTableViewController.h; sourceTree = "<group>"; };
 		CE6053CE168F3E380006F110 /* ATimelineTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATimelineTableViewController.m; sourceTree = "<group>"; };
+		CE696E6A191FE115002BB309 /* new-message-red-dot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "new-message-red-dot.png"; path = "images/new-message-red-dot.png"; sourceTree = "<group>"; };
+		CE6A5FAF1905FD630074007D /* ATFriendPickView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATFriendPickView.h; sourceTree = "<group>"; };
+		CE6A5FB01905FD630074007D /* ATFriendPickView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATFriendPickView.m; sourceTree = "<group>"; };
 		CE6A874D16967823006154D2 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		CE6A875016967D6A006154D2 /* Note_Project_Specification */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Note_Project_Specification; sourceTree = "<group>"; };
 		CE70BF47176FFC8C00DB1B3C /* ATInAppPurchaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATInAppPurchaseViewController.h; sourceTree = "<group>"; };
@@ -263,6 +286,19 @@
 		CE73D24218DA831C00E61403 /* marker-airport.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "marker-airport.png"; path = "images/marker-airport.png"; sourceTree = "<group>"; };
 		CE73D24C18DA846500E61403 /* marker_party.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_party.png; path = images/marker_party.png; sourceTree = "<group>"; };
 		CE73D24E18DA973F00E61403 /* marker_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = marker_selected.png; path = images/marker_selected.png; sourceTree = "<group>"; };
+		CE754EAE19085A0B00D4EF82 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		CE754EB0190B46FD00D4EF82 /* SWCellScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWCellScrollView.h; sourceTree = "<group>"; };
+		CE754EB1190B46FD00D4EF82 /* SWCellScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWCellScrollView.m; sourceTree = "<group>"; };
+		CE754EB2190B46FD00D4EF82 /* SWLongPressGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWLongPressGestureRecognizer.h; sourceTree = "<group>"; };
+		CE754EB3190B46FD00D4EF82 /* SWLongPressGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWLongPressGestureRecognizer.m; sourceTree = "<group>"; };
+		CE754EB4190B46FD00D4EF82 /* SWTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewCell.h; sourceTree = "<group>"; };
+		CE754EB5190B46FD00D4EF82 /* SWTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWTableViewCell.m; sourceTree = "<group>"; };
+		CE754EB6190B46FD00D4EF82 /* SWUtilityButtonTapGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWUtilityButtonTapGestureRecognizer.h; sourceTree = "<group>"; };
+		CE754EB7190B46FD00D4EF82 /* SWUtilityButtonTapGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWUtilityButtonTapGestureRecognizer.m; sourceTree = "<group>"; };
+		CE754EB8190B46FD00D4EF82 /* SWUtilityButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWUtilityButtonView.h; sourceTree = "<group>"; };
+		CE754EB9190B46FD00D4EF82 /* SWUtilityButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWUtilityButtonView.m; sourceTree = "<group>"; };
+		CE754EBF190B4F4D00D4EF82 /* NSMutableArray+SWUtilityButtons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+SWUtilityButtons.h"; sourceTree = "<group>"; };
+		CE754EC0190B4F4D00D4EF82 /* NSMutableArray+SWUtilityButtons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+SWUtilityButtons.m"; sourceTree = "<group>"; };
 		CE75886816C352AB00AEE4AF /* ATHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATHelper.h; sourceTree = "<group>"; };
 		CE75886916C352AB00AEE4AF /* ATHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATHelper.m; sourceTree = "<group>"; };
 		CE7D62931847C2A900F01B0E /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -377,6 +413,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE4712BD190BFFD600631C53 /* AddressBookUI.framework in Frameworks */,
+				CE754EAF19085A0B00D4EF82 /* AddressBook.framework in Frameworks */,
 				CE7D62941847C2A900F01B0E /* SenTestingKit.framework in Frameworks */,
 				CED46F5B178E3739008397D6 /* Security.framework in Frameworks */,
 				CE1D4E4D173890FA00AA603C /* Social.framework in Frameworks */,
@@ -452,6 +490,8 @@
 		CE0E5300168E671F00C147FB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CE4712BC190BFFD600631C53 /* AddressBookUI.framework */,
+				CE754EAE19085A0B00D4EF82 /* AddressBook.framework */,
 				CE0E5301168E671F00C147FB /* UIKit.framework */,
 				CE0E5303168E671F00C147FB /* Foundation.framework */,
 				CE0E5305168E671F00C147FB /* CoreGraphics.framework */,
@@ -475,6 +515,10 @@
 				CEBD4EB6172757C4001B3798 /* ATUserVerifyViewController.m */,
 				CEC3580B16D13374009A833C /* ATDownloadTableViewController.h */,
 				CEC3580C16D13375009A833C /* ATDownloadTableViewController.m */,
+				CE6A5FAF1905FD630074007D /* ATFriendPickView.h */,
+				CE6A5FB01905FD630074007D /* ATFriendPickView.m */,
+				CE2D586319073A0500764E14 /* ATFriendAddView.h */,
+				CE2D586419073A0500764E14 /* ATFriendAddView.m */,
 				CE17E4E6188F5D25003DCD83 /* ATOptionsTableViewController.h */,
 				CE17E4E7188F5D25003DCD83 /* ATOptionsTableViewController.m */,
 				CECECE3816B31D3D00FD7C17 /* ATPreferenceViewController.h */,
@@ -516,6 +560,10 @@
 		CE2A1CF216AD9882004476E8 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CE696E6A191FE115002BB309 /* new-message-red-dot.png */,
+				CE320A4E18F99AC600D5DFE1 /* add-to-episode-folder-reverse.png */,
+				CE320A4A18F986CB00D5DFE1 /* add-to-episode-folder.png */,
+				CE320A4B18F986CB00D5DFE1 /* add-to-episode-marker.png */,
 				CE73D24E18DA973F00E61403 /* marker_selected.png */,
 				CE73D24C18DA846500E61403 /* marker_party.png */,
 				CE73D23C18DA831C00E61403 /* marker_art.png */,
@@ -631,6 +679,18 @@
 		CE336159183804C800250D66 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				CE754EBF190B4F4D00D4EF82 /* NSMutableArray+SWUtilityButtons.h */,
+				CE754EC0190B4F4D00D4EF82 /* NSMutableArray+SWUtilityButtons.m */,
+				CE754EB0190B46FD00D4EF82 /* SWCellScrollView.h */,
+				CE754EB1190B46FD00D4EF82 /* SWCellScrollView.m */,
+				CE754EB2190B46FD00D4EF82 /* SWLongPressGestureRecognizer.h */,
+				CE754EB3190B46FD00D4EF82 /* SWLongPressGestureRecognizer.m */,
+				CE754EB4190B46FD00D4EF82 /* SWTableViewCell.h */,
+				CE754EB5190B46FD00D4EF82 /* SWTableViewCell.m */,
+				CE754EB6190B46FD00D4EF82 /* SWUtilityButtonTapGestureRecognizer.h */,
+				CE754EB7190B46FD00D4EF82 /* SWUtilityButtonTapGestureRecognizer.m */,
+				CE754EB8190B46FD00D4EF82 /* SWUtilityButtonView.h */,
+				CE754EB9190B46FD00D4EF82 /* SWUtilityButtonView.m */,
 				CEE84D99183EF7CB003725C1 /* ELCAlbumPickerController.h */,
 				CEE84D9A183EF7CB003725C1 /* ELCAlbumPickerController.m */,
 				CEE84D9B183EF7CB003725C1 /* ELCAsset.h */,
@@ -765,6 +825,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE320A4C18F986CB00D5DFE1 /* add-to-episode-folder.png in Resources */,
 				CE17E507189EE2AD003DCD83 /* TimewheelZoomIn.png in Resources */,
 				CE0E530C168E671F00C147FB /* InfoPlist.strings in Resources */,
 				CE3DF30A187FA39C0065337E /* add-button-md.png in Resources */,
@@ -787,6 +848,7 @@
 				CEBD59DE16B76607003BD211 /* marker-bf-1.png in Resources */,
 				CEBD59DF16B76607003BD211 /* marker-bf-2.png in Resources */,
 				CEBD59E016B76607003BD211 /* marker-bf-3.png in Resources */,
+				CE320A4F18F99AC600D5DFE1 /* add-to-episode-folder-reverse.png in Resources */,
 				CEBD59E116B76607003BD211 /* marker-bf-4.png in Resources */,
 				CEBD59E216B76607003BD211 /* marker-selected.png in Resources */,
 				CE5B308216B8E19600D943EB /* small-white-flag.png in Resources */,
@@ -833,6 +895,7 @@
 				CE1D4E4B1738896C00AA603C /* share-icons.png in Resources */,
 				CE73D24A18DA831C00E61403 /* marker-airport.png in Resources */,
 				CE0E55A4173EEDA700631DB8 /* no_photo.png in Resources */,
+				CE696E6B191FE115002BB309 /* new-message-red-dot.png in Resources */,
 				CEF522E9175661530074321E /* Default-568h@2x.png in Resources */,
 				CE73D24D18DA846500E61403 /* marker_party.png in Resources */,
 				CE73D24F18DA973F00E61403 /* marker_selected.png in Resources */,
@@ -854,6 +917,7 @@
 				CE10A8FF18305D6000CB1430 /* timeWindowBackground.png in Resources */,
 				CE384F69184062ED0009B6E0 /* Overlay.png in Resources */,
 				CE73D24418DA831C00E61403 /* marker_art.png in Resources */,
+				CE320A4D18F986CB00D5DFE1 /* add-to-episode-marker.png in Resources */,
 				CE384F6A184062ED0009B6E0 /* Overlay@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -866,6 +930,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE0E530E168E671F00C147FB /* main.m in Sources */,
+				CE754EBD190B46FD00D4EF82 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
+				CE754EBC190B46FD00D4EF82 /* SWTableViewCell.m in Sources */,
 				CE0E5312168E671F00C147FB /* ATAppDelegate.m in Sources */,
 				CE0E5321168E671F00C147FB /* ATViewController.m in Sources */,
 				CE3DF3101887890C0065337E /* ATAnnotationFocused.m in Sources */,
@@ -877,6 +943,7 @@
 				CE6A874E16967823006154D2 /* Model.xcdatamodeld in Sources */,
 				CE7E3D9C1698F506004E71CD /* ATEventAnnotation.m in Sources */,
 				CE7E3D9F1698F523004E71CD /* ATEventAnnotationView.m in Sources */,
+				CE6A5FB11905FD630074007D /* ATFriendPickView.m in Sources */,
 				CE7E3DA21698F55B004E71CD /* ATUnsavedAnnotationView.m in Sources */,
 				CE13766F169E5938005C8C41 /* ATDataController.m in Sources */,
 				CE4DDC1016A7AC2300911CE2 /* ATEventEditorTableController.m in Sources */,
@@ -890,6 +957,7 @@
 				CEC3580316CB28AA009A833C /* ATTimeZoomLine.m in Sources */,
 				CEC3580A16CCA213009A833C /* ATEventEntity.m in Sources */,
 				CEC3580D16D13376009A833C /* ATDownloadTableViewController.m in Sources */,
+				CE754EBB190B46FD00D4EF82 /* SWLongPressGestureRecognizer.m in Sources */,
 				CECD5EAB16DF14F100286F5F /* ATHelpWebView.m in Sources */,
 				CE049EBC16EB7491009F6404 /* ATTimeScrollCell.m in Sources */,
 				CE049EBE16EB7491009F6404 /* ATTimeScrollWindowNew.m in Sources */,
@@ -897,8 +965,10 @@
 				CEBD4EB7172757C4001B3798 /* ATUserVerifyViewController.m in Sources */,
 				CEBD4EBA17277D46001B3798 /* ATTutorialView.m in Sources */,
 				CE70BF49176FFC8C00DB1B3C /* ATInAppPurchaseViewController.m in Sources */,
+				CE754EC1190B4F4D00D4EF82 /* NSMutableArray+SWUtilityButtons.m in Sources */,
 				CE56B1AD1775217700DB9FB7 /* ATPhotoScrollView.m in Sources */,
 				CE56B1B0177522AD00DB9FB7 /* ATPhotoScrollCell.m in Sources */,
+				CE2D586519073A0500764E14 /* ATFriendAddView.m in Sources */,
 				CEFC9185179ACB2400BADAFB /* iRate.m in Sources */,
 				CE3361731839709000250D66 /* Toast+UIView.m in Sources */,
 				CEE84DA5183EF7CB003725C1 /* ELCAlbumPickerController.m in Sources */,
@@ -909,7 +979,9 @@
 				CEF416E7184105FA003A5383 /* ATCameraAction.m in Sources */,
 				CEA41D3A18580C410034F1C3 /* BasePhotoViewController.m in Sources */,
 				CE3DF30D188785300065337E /* ATDefaultAnnotation.m in Sources */,
+				CE754EBE190B46FD00D4EF82 /* SWUtilityButtonView.m in Sources */,
 				CE17E4E8188F5D25003DCD83 /* ATOptionsTableViewController.m in Sources */,
+				CE754EBA190B46FD00D4EF82 /* SWCellScrollView.m in Sources */,
 				CEA41D3B18580C410034F1C3 /* ImageScrollView.m in Sources */,
 				CEA41D3C18580C410034F1C3 /* PhotoViewController.m in Sources */,
 			);
