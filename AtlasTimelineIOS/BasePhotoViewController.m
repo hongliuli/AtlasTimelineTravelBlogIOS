@@ -95,7 +95,7 @@ UILabel* shareCountLabel;
     {      
         shareIconView.image = [UIImage imageNamed:@"share.png"];
         shareCountLabel.hidden = false;
-        shareCountLabel.text = [NSString stringWithFormat:@"%d selected",self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
+        shareCountLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d selected",nil),self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
     }
     else
     {
@@ -115,7 +115,7 @@ UILabel* shareCountLabel;
     {
         shareIconView.image = [UIImage imageNamed:@"share.png"];
         shareCountLabel.hidden = false;
-        shareCountLabel.text = [NSString stringWithFormat:@"%d selected",self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
+        shareCountLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d selected",nil),self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
     }
     else
     {
@@ -133,7 +133,7 @@ UILabel* shareCountLabel;
     {
         shareIconView.image = [UIImage imageNamed:@"share.png"];
         shareCountLabel.hidden = false;
-        shareCountLabel.text = [NSString stringWithFormat:@"%d selected",self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
+        shareCountLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d selected",nil),self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
     }
     else
     {
@@ -188,7 +188,7 @@ UILabel* shareCountLabel;
     [self.eventEditor.photoScrollView.selectedAsShareIndexSet addObject:[NSNumber numberWithInt: selectedPhotoIdx]];
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new 
     [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-    shareCountLabel.text = [NSString stringWithFormat:@"%d selected",self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
+    shareCountLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d selected",nil),self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
     if (shareIconView.image == nil)
     {
         shareIconView.image = [UIImage imageNamed:@"share.png"];

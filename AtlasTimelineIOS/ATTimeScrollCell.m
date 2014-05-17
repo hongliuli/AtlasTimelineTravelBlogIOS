@@ -34,7 +34,7 @@
         self.titleLabel.textColor = [UIColor whiteColor];
         self.titleLabel.font = [UIFont boldSystemFontOfSize:14];
         self.titleLabel.backgroundColor = [UIColor clearColor];
-        self.titleLabel.textAlignment = UITextAlignmentCenter;
+        self.titleLabel.textAlignment = NSTextAlignmentCenter;
         //self.titleLabel.numberOfLines = 3;
         [self.contentView addSubview:self.titleLabel];
         
@@ -43,14 +43,14 @@
         self.subLabel.textColor = [UIColor whiteColor];
         self.subLabel.font = [UIFont boldSystemFontOfSize:15];
         self.subLabel.backgroundColor = [UIColor clearColor];
-        self.subLabel.textAlignment = UITextAlignmentCenter;
+        self.subLabel.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:self.subLabel];
     
         self.scallLabel = [[UILabel alloc] initWithFrame:scallFrame];
         self.scallLabel.textColor = [UIColor whiteColor];
         self.scallLabel.font = [UIFont boldSystemFontOfSize:14];
         self.scallLabel.backgroundColor = [UIColor clearColor];
-        self.scallLabel.textAlignment = UITextAlignmentCenter;
+        self.scallLabel.textAlignment = NSTextAlignmentCenter;
         self.scallLabel.layer.borderColor=[UIColor whiteColor].CGColor;
         self.scallLabel.layer.borderWidth = 1;
         [self.contentView addSubview:self.scallLabel];

@@ -52,7 +52,7 @@
 
 #define EDITOR_PHOTOVIEW_WIDTH 190
 #define EDITOR_PHOTOVIEW_HEIGHT 160
-#define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
+#define NEWEVENT_DESC_PLACEHOLD NSLocalizedString(@"Write notes here",nil)
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
 #define TIME_LINK_DASH_LINE_STYLE_FOR_SAME_DEPTH 1
@@ -71,7 +71,7 @@
 
 #define EPISODE_VIEW_WIDTH 340
 #define EPISODE_VIEW_HIGHT_LARGE 400
-#define EPISODE_VIEW_HIGHT_SMALL 130
+#define EPISODE_VIEW_HIGHT_SMALL 140
 #define EPISODE_ROW_HEIGHT 30
 
 @interface MFTopAlignedLabel : UILabel
@@ -143,13 +143,13 @@
     
     // create a custom navigation bar button and set it to always says "Back"
 	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
-	temporaryBarButtonItem.title = @"Back";
+	temporaryBarButtonItem.title = NSLocalizedString(@"Back",nil);
 	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
     
     //add two button at right (can not do in storyboard for multiple button): setting and Help, available in iOS5
     //   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     //   {
-    UIBarButtonItem *settringButton = [[UIBarButtonItem alloc] initWithTitle:@"Settings" style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
+    UIBarButtonItem *settringButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Settings",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
     
     //NOTE the trick to set background image for a bar buttonitem
     UIButton *helpbtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -185,7 +185,7 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if ([appDelegate.eventListSorted count] == 0)
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Add your first event" message:@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Incoming Contents/Episodes] to learn more." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Add your first event",nil) message:NSLocalizedString(@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Incoming Contents/Episodes] to learn more.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
     }
 }
@@ -205,10 +205,10 @@
     {
         if ([returnStr rangeOfString:currentVer].length == 0)
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"There is a new version!"
-                                                            message:@"Please update from App Store"
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"There is a new version!",nil)
+                                                            message:NSLocalizedString(@"Please update from App Store",nil)
                                                            delegate:nil
-                                                  cancelButtonTitle:@"OK"
+                                                  cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                                   otherButtonTitles:nil];
             [alert show];
         }
@@ -282,7 +282,7 @@
         
         [button.layer setCornerRadius:7.0f];
         //[button.layer:YES];
-        [button setTitle:@"Online Help" forState:UIControlStateNormal];
+        [button setTitle:NSLocalizedString(@"Online Help",nil) forState:UIControlStateNormal];
         button.titleLabel.backgroundColor = [UIColor blueColor];
         button.backgroundColor = [UIColor blueColor];
         [button addTarget:self action:@selector(onlineHelpClicked:) forControlEvents:UIControlEventTouchUpInside];
@@ -321,11 +321,11 @@
 {
     if (episodeNameforUpdating == nil)
     {
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Enter Name for the new episode"
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Enter Name for the new episode",nil)
                                                         message:@"  "
                                                        delegate:self
-                                              cancelButtonTitle:@"Cancel"
-                                              otherButtonTitles:@"OK", nil];
+                                              cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                              otherButtonTitles:NSLocalizedString(@"OK",nil), nil];
         alert.alertViewStyle = UIAlertViewStylePlainTextInput;
         alert.tag = ALERT_FOR_SAVE;
         [alert show];
@@ -369,16 +369,16 @@
     NSString* lessMoreTxt = btnLess.titleLabel.text;
     CGRect frame = episodeView.frame;
     BOOL flag = false;
-    if ([@"Less" isEqualToString:lessMoreTxt])
+    if ([NSLocalizedString(@"Less",nil) isEqualToString:lessMoreTxt])
     {
         frame.size.height = EPISODE_VIEW_HIGHT_SMALL;
-        btnLess.titleLabel.text = @"More";
+        btnLess.titleLabel.text = NSLocalizedString(@"More",nil);
         flag = false;
     }
     else
     {
         frame.size.height = EPISODE_VIEW_HIGHT_LARGE;
-        btnLess.titleLabel.text = @"More";
+        btnLess.titleLabel.text = NSLocalizedString(@"More",nil);
         flag = true;
     }
     [episodeView setFrame:frame];
@@ -395,7 +395,7 @@
     {
         NSArray* nameList = [episodeDictionary allKeys];
         if ([nameList containsObject:episodeName])
-            episodeName = [NSString stringWithFormat:@"%@ (Copy)",episodeName];//not need check if this dupicated again.
+            episodeName = [NSString stringWithFormat:NSLocalizedString(@"%@ (Copy)",nil),episodeName];//not need check if this dupicated again.
     }
     [episodeDictionary setObject:eventEpisodeList forKey:episodeName];
     [userDefault setObject:episodeDictionary forKey:[ATConstants EpisodeDictionaryKeyName]];
@@ -422,10 +422,10 @@
             [self saveEpisodeWithName:episodeName renameIfDuplicate:TRUE];
         else
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Episode name is empty or contains some special char"
-                                                            message:@"Episode name should not be empty, and should not contains '@', '*','&' or '|'. Tap Create Episode again to enter valid name!"
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Episode name is empty or contains some special char",nil)
+                                                            message:NSLocalizedString(@"Episode name should not be empty, and should not contains '@', '*','&' or '|'. Tap Create Episode again to enter valid name!",nil)
                                                            delegate:nil
-                                                  cancelButtonTitle:@"OK"
+                                                  cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                                   otherButtonTitles:nil];
             [alert show];
         }
@@ -448,7 +448,7 @@
     [ self.mapView removeAnnotations:annotationsToRemove ] ;
     
     
-    NSLog(@"=============== Map View loaded");
+    //NSLog(@"=============== Map View loaded");
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.searchBar.delegate = self;
     self.mapView.delegate = self; //##### HONG #####: without this, vewForAnnotation() will not be called, google it
@@ -468,7 +468,8 @@
         CLLocationCoordinate2D coord = CLLocationCoordinate2DMake((CLLocationDegrees)ent.lat, (CLLocationDegrees)ent.lng);
         ATAnnotationSelected *eventAnnotation = [[ATAnnotationSelected alloc] initWithLocation:coord];
         eventAnnotation.uniqueId = ent.uniqueId;
-        
+        if (ent.eventDate == nil)
+            NSLog(@"---- nil date");
         eventAnnotation.address = ent.address;
         eventAnnotation.description=ent.eventDesc;
         eventAnnotation.eventDate=ent.eventDate;
@@ -690,7 +691,7 @@
 {
     [self.timeZoomLine changeScaleText];
 }
-
+/*
 - (NSString*) getSelectedPeriodLabel
 {
     
@@ -722,7 +723,7 @@
     }
     return retStr;
 }
-
+*/
 - (void) mapViewShowHideAction
 {
     if ([selectedAnnotationSet count] == 0) //if no selected nodes, use 2 step show/hide to have better user experience
@@ -1378,10 +1379,10 @@
                 [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
             else
             {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"A minor error occurs"
-                                                                message:@"Please try again!"
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"A minor error occurs",nil)
+                                                                message:NSLocalizedString(@"Please try again!",nil)
                                                                delegate:self
-                                                      cancelButtonTitle:@"OK"
+                                                      cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                                       otherButtonTitles:nil];
                 alert.tag = ALERT_FOR_POPOVER_ERROR;
                 [alert show];
@@ -2059,33 +2060,33 @@
     [[episodeView subviews]
      makeObjectsPerformSelector:@selector(removeFromSuperview)];
     
-    UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 3*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, 9*EPISODE_ROW_HEIGHT)];
+    UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 3*EPISODE_ROW_HEIGHT + 10, EPISODE_VIEW_WIDTH - 20, 9*EPISODE_ROW_HEIGHT)];
     lblWording.lineBreakMode = NSLineBreakByWordWrapping;
     lblWording.numberOfLines = 0;
-    lblWording.text = @"An episode is a collection of events, such as an itinerary, that you can share to your friends' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a friend's ChronicleMap app, tap the episode in [Settings->Share my Episodes]\n\nThe episode will be visible to your friend in the app's [Settings->Incoming Contents/Episodes] which can be downloaded onto the map.";
+    lblWording.text = NSLocalizedString(@"An episode is a collection of events, such as an itinerary, that you can share to your friends' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a friend's ChronicleMap app, tap the episode in [Settings->Share my Episodes]\n\nYour friend can check the incoming episode in the app's [Settings->Incoming Contents/Episodes] and download to display on map.",nil);
     [episodeView addSubview:lblWording];
     
-    int btnY = 12*EPISODE_ROW_HEIGHT;
+    int btnY = 12*EPISODE_ROW_HEIGHT + 10;
     lblWording.hidden = false;
     if (!largeFlag)
     {
         btnY = 10 + 3*EPISODE_ROW_HEIGHT;
         lblWording.hidden = true;
     }
-    NSString* btnSaveTitleText = @"Create Episode";
+    NSString* btnSaveTitleText = NSLocalizedString(@"Create Episode",nil);
     if (episodeNameforUpdating != nil)
     {
         int nameLength = [episodeNameforUpdating length];
         if (nameLength >5)
-            btnSaveTitleText = [NSString stringWithFormat:@"Update %@..", [episodeNameforUpdating substringToIndex:5]];
+            btnSaveTitleText = [NSString stringWithFormat:NSLocalizedString(@"Update %@..",nil), [episodeNameforUpdating substringToIndex:5]];
         else
-            btnSaveTitleText = [NSString stringWithFormat:@"Update %@", episodeNameforUpdating];
+            btnSaveTitleText = [NSString stringWithFormat:NSLocalizedString(@"Update %@",nil), episodeNameforUpdating];
     }
     if (largeFlag)
     {
         UIButton *btnAll = [UIButton buttonWithType:UIButtonTypeSystem];
         btnAll.frame = CGRectMake(10, 3*EPISODE_ROW_HEIGHT - 4, 120, 20);
-        [btnAll setTitle:@"Select All" forState:UIControlStateNormal];
+        [btnAll setTitle:NSLocalizedString(@"Select All",nil) forState:UIControlStateNormal];
         btnAll.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
         [btnAll addTarget:self action:@selector(allEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
         [episodeView addSubview: btnAll];
@@ -2099,7 +2100,7 @@
     
     UIButton *btnClear = [UIButton buttonWithType:UIButtonTypeSystem];
     btnClear.frame = CGRectMake(140, btnY, 60, 20);
-    [btnClear setTitle:@"Cancel" forState:UIControlStateNormal];
+    [btnClear setTitle:NSLocalizedString(@"Cancel",nil) forState:UIControlStateNormal];
     btnClear.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
     [btnClear addTarget:self action:@selector(cancelEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
     [episodeView addSubview: btnClear];
@@ -2108,9 +2109,9 @@
         btnLess = [UIButton buttonWithType:UIButtonTypeSystem];
     btnLess.frame = CGRectMake(210, btnY, 60, 20);
     if (largeFlag)
-        [btnLess setTitle:@"Less" forState:UIControlStateNormal];
+        [btnLess setTitle:NSLocalizedString(@"Less",nil) forState:UIControlStateNormal];
     else
-        [btnLess setTitle:@"More" forState:UIControlStateNormal];
+        [btnLess setTitle:NSLocalizedString(@"More",nil) forState:UIControlStateNormal];
     btnLess.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
     [btnLess addTarget:self action:@selector(lessEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
     [episodeView addSubview: btnLess];
@@ -2128,9 +2129,9 @@
     [episodeView addSubview:lblEpisode1];
     int cnt = [eventEpisodeList count];
     if (episodeNameforUpdating == nil)
-        lblEpisode1.text = [NSString stringWithFormat:@"%d event(s) are picked for new episode", cnt];
+        lblEpisode1.text = [NSString stringWithFormat:NSLocalizedString(@"%d event(s) are picked for new episode",nil), cnt];
     else
-        lblEpisode1.text = [NSString stringWithFormat:@"%d event(s) are in episode [%@]", cnt, episodeNameforUpdating];
+        lblEpisode1.text = [NSString stringWithFormat:NSLocalizedString(@"%d event(s) are in episode [%@]",nil), cnt, episodeNameforUpdating];
 
 }
 
@@ -2325,7 +2326,7 @@
         MKCoordinateSpan span;
         double radius = placemark.region.radius / 1000; // convert to km
         
-        NSLog(@"[searchBarSearchButtonClicked] Radius is %f", radius);
+        //NSLog(@"[searchBarSearchButtonClicked] Radius is %f", radius);
         span.latitudeDelta = radius / 112.0;
         
         region.span = span;

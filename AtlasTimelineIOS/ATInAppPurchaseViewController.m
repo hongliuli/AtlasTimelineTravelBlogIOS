@@ -26,8 +26,8 @@ UILabel *purchaseStatusLabel;
 - (void) processInAppPurchase
 {
     askToPurchase = [[UIAlertView alloc]
-                     initWithTitle:@"Purchase Full Version"
-                     message:@"Free version allows you to store as many as 50 events and unlimited photos, do you want to support us by purchasing unlimited version for USD$2.99 now?"
+                     initWithTitle:NSLocalizedString(@"Purchase Full Version",nil)
+                     message:NSLocalizedString(@"Free version allows you to store as many as 50 events and unlimited photos, do you want to support us by purchasing unlimited version for USD$2.99 now?",nil)
                      delegate:self
                      cancelButtonTitle:nil
                      otherButtonTitles:@"Yes", @"No", nil];
@@ -108,7 +108,7 @@ UILabel *purchaseStatusLabel;
             case SKPaymentTransactionStateRestored:
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 [purchaseStatusLabel removeFromSuperview];
-                alertMsg = @"The product restored, no charge is applied";
+                alertMsg = NSLocalizedString(@"The product is restored, no charge is applied",nil);
                 [self setPurchasedInLocal];
                 break;
                 
@@ -128,11 +128,11 @@ UILabel *purchaseStatusLabel;
         if (alertMsg != nil)
         {
             UIAlertView *tmp1 = [[UIAlertView alloc]
-                                 initWithTitle:@"Complete"
+                                 initWithTitle:NSLocalizedString(@"Complete",nil)
                                  message:alertMsg
                                  delegate:self
                                  cancelButtonTitle:nil
-                                 otherButtonTitles:@"Ok", nil];
+                                 otherButtonTitles:NSLocalizedString(@"Ok",nil), nil];
             [tmp1 show];
         }
     }

@@ -123,7 +123,7 @@
         if ([@"myEvents" isEqualToString:sourceName])
         {
             cell.textLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:19.0];
-            cell.detailTextLabel.text = @" - All your life stories are here!";
+            cell.detailTextLabel.text = NSLocalizedString(@" - All your life stories are here!",nil);
         }
         else
             cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size:17.0];
@@ -156,13 +156,13 @@
             //see action in didTriggerRightUtilityButtonWithIndex
             [rightUtilityButtons sw_addUtilityButtonWithColor:
              [UIColor colorWithRed:0.78f green:0.38f blue:0.5f alpha:1.0]
-                                                        title:@"Del"];
+                                                        title:NSLocalizedString(@"Del",nil)];
             [rightUtilityButtons sw_addUtilityButtonWithColor:
              [UIColor colorWithRed:1.0f green:0.231f blue:0.188 alpha:1.0f]
-                                                        title:@"Edit"];
+                                                        title:NSLocalizedString(@"Edit",nil)];
             [rightUtilityButtons sw_addUtilityButtonWithColor:
              [UIColor colorWithRed:1.0f green:0.53f blue:0.38 alpha:1.0f]
-                                                        title:@"Share"];
+                                                        title:NSLocalizedString(@"Share",nil)];
             
             cell = [[SWTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                           reuseIdentifier:CellIdentifier
@@ -183,11 +183,11 @@
 {
     if(self.requestType == FOR_CHOOSE_ACTIVE)
     {
-        return @" Set Active Contents";
+        return NSLocalizedString(@" Set Active Contents",nil);
     }
     else
     {
-        return @" Swipe one to Share";
+        return NSLocalizedString(@" Pick Episode to Share",nil);
     }
 }
 //change section font
@@ -212,7 +212,7 @@
         UIButton *inviteFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         inviteFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
         inviteFriendButton.frame = CGRectMake(180, 0, 120, 40);
-        [inviteFriendButton setTitle:@"Invite Friend" forState:UIControlStateNormal];
+        [inviteFriendButton setTitle:NSLocalizedString(@"Invite Friend",nil) forState:UIControlStateNormal];
         [inviteFriendButton.titleLabel setTextColor:[UIColor blueColor]];
         [inviteFriendButton addTarget:self action:@selector(inviteFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [headerView addSubview:inviteFriendButton];
@@ -240,9 +240,9 @@
     
     else //EPIDSODE_LIST_SECTION:  //then load episode for modify
     {
-        if (swipPromptCount >= 2)
+        if (swipPromptCount >= 1)
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Please swipe right" message:[NSString stringWithFormat:@""] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Please swipe right",nil) message:[NSString stringWithFormat:@""] delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [alert show];
             swipPromptCount = 0;
         }
@@ -258,7 +258,7 @@
     return 40;
 }
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"reaching accessoryButtonTappedForRowWithIndexPath: section %d   row %d", indexPath.section, indexPath.row);
+    //NSLog(@"reaching accessoryButtonTappedForRowWithIndexPath: section %d   row %d", indexPath.section, indexPath.row);
 }
 
 - (void)swipeableTableViewCell:(SWTableViewCell *)cell didTriggerRightUtilityButtonWithIndex:(NSInteger)index {
@@ -267,7 +267,7 @@
     switch (index) {
         case 0:
         {
-            NSLog(@"Del row %d",row);
+            //NSLog(@"Del row %d",row);
             
             NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
             
@@ -287,11 +287,11 @@
         {
             if (![@"myEvents" isEqualToString:appDelegate.sourceName])
             {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Cannot edit episode" message:@"Edit Episode is available when active content is myEvents" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Edit is not allowed now!",nil) message:NSLocalizedString(@"Only when myEvents is active can you edit episode",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
                 [alert show];
                 return;
             }
-            NSLog(@"Edit row %d",row);
+            //NSLog(@"Edit row %d",row);
             episodeNameForAlertView = _episodeNameList[row];
             [self.delegate sourceChooseViewController:self didSelectEpisode:episodeNameForAlertView];
             [self dismissViewControllerAnimated:NO completion:nil];
@@ -310,10 +310,7 @@
 }
 
 - (void) inviteFriendButtonAction: (id)sender {
-    //UIButton* button = (UIButton*)sender;
-    NSLog(@" call addFriend");
     [self performSegueWithIdentifier:@"invite_friend" sender:nil];
-    
 }
 -(void) getStatsForEvent:(NSString*)sourceName tableCell:(UITableViewCell*)cell
 {
@@ -347,9 +344,9 @@
     [formatter setMaximumFractionDigits:1];
     [formatter setRoundingMode: NSNumberFormatterRoundDown];
     NSString *numberString = [formatter stringFromNumber:[NSNumber numberWithFloat:totalSizeInM]];
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"%d events, %d photos, %@MB ",[eventList count], totalPhotoCount, numberString ];
+    cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d events, %d photos, %@MB ",nil),[eventList count], totalPhotoCount, numberString ];
     if ([@"myEvents" isEqualToString:sourceName])
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ - Your life stories",cell.detailTextLabel.text];
+        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%@ - Your life stories",nil),cell.detailTextLabel.text];
 }
 /*
 // Override to support conditional editing of the table view.

@@ -55,24 +55,24 @@ UILabel* updatableLabel2;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDateFormatter* fmt = appDelegate.dateFormater;
     dateFocused = @"[NO EVENT YET]";
-    timeZoomLevelStr = @"1000 Years";
+    timeZoomLevelStr = NSLocalizedString(@"1000 Years",nil);
     if (appDelegate.focusedDate != nil)
         dateFocused = [fmt stringFromDate:appDelegate.focusedDate];
     dateFocused = [dateFocused substringToIndex:10];
     if (appDelegate.selectedPeriodInDays == 7)
-        timeZoomLevelStr = @"1 week";
+        timeZoomLevelStr = NSLocalizedString(@"1 Week",nil);
     else if (appDelegate.selectedPeriodInDays == 30)
-        timeZoomLevelStr = @"1 month";
+        timeZoomLevelStr = NSLocalizedString(@"1 Month",nil);
     else if (appDelegate.selectedPeriodInDays == 365)
-        timeZoomLevelStr = @"1 year";
+        timeZoomLevelStr = NSLocalizedString(@"1 Year",nil);
     else if (appDelegate.selectedPeriodInDays == 3650)
-        timeZoomLevelStr = @"10 years";
+        timeZoomLevelStr = NSLocalizedString(@"10 Years",nil);
     else if(appDelegate.selectedPeriodInDays == 36500)
-        timeZoomLevelStr = @"100 years";
+        timeZoomLevelStr = NSLocalizedString(@"100 Years",nil);
     if (updatableLabel != nil)
     {
-        updatableLabel.text = [NSString stringWithFormat: @"2.   The selected date is %@ and the time zoom level is %@", dateFocused, timeZoomLevelStr];
-        updatableLabel2.text = [NSString stringWithFormat: @"      So all events within %@ of %@ are colored as bellow, the darker the closer to it", timeZoomLevelStr, dateFocused];
+        updatableLabel.text = [NSString stringWithFormat: NSLocalizedString(@"2.   The selected date is %@ and the time zoom level is %@",nil), dateFocused, timeZoomLevelStr];
+        updatableLabel2.text = [NSString stringWithFormat: NSLocalizedString(@"      So all events within %@ of %@ are colored as bellow, the darker the closer to it",nil), timeZoomLevelStr, dateFocused];
     }
     CGRect originalFrame = updatableLabel.frame;
     [updatableLabel setFrame:CGRectMake(0, originalFrame.origin.y, 0, 0)];
@@ -159,7 +159,7 @@ UILabel* updatableLabel2;
     
     CGRect titleFrame = CGRectMake(initialX, initialY - 120, itemWidth + 100, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:titleFrame];
-    lbl.text = @"Record/navigate events on map in chronological order!";
+    lbl.text = NSLocalizedString(@"Record/navigate events on map in chronological order!",nil);
     lbl.font = [UIFont fontWithName:@"Arial" size:24];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor lightTextColor];
@@ -178,9 +178,9 @@ UILabel* updatableLabel2;
     //following are on same y level, so change currentYLocation once:
     currentYLocation = currentYLocation + itemHeight + 50*iPhoneSizeYFactor;
     [self addDoubleTapCenterSection:x_start + [ATConstants timeScrollWindowWidth]/3]; //this first so red shade go under pinch
-    [self addTimeZoomLevelSection:x_start - 50 :@"TimewheelZoomOut.png" :@"Tap (-) or double-tab here to zoom out"];
-    [self addTimeZoomLevelSection:x_start + [ATConstants timeScrollWindowWidth]/3-85 :@"gesture-pinch.png" :@"Pinch is another way of zooming Time Wheel"];
-    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 50:@"TimewheelZoomIn.png" :@"Tap (+) or double-tab here to zoom in"];
+    [self addTimeZoomLevelSection:x_start - 50 :@"TimewheelZoomOut.png" :NSLocalizedString(@"Tap (-) or double-tab here to zoom out",nil)];
+    [self addTimeZoomLevelSection:x_start + [ATConstants timeScrollWindowWidth]/3-85 :@"gesture-pinch.png" :NSLocalizedString(@"Pinch is another way of zooming Time Wheel",nil)];
+    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 50:@"TimewheelZoomIn.png" :NSLocalizedString(@"Tap (+) or double-tab here to zoom in",nil)];
 }
 
 - (void) addLongPressSection
@@ -188,14 +188,14 @@ UILabel* updatableLabel2;
     currentYLocation = initialY;
     CGRect frm = CGRectMake(initialX, currentYLocation, itemWidth * iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = @"Add event:";
+    lbl.text = NSLocalizedString(@"Add event:",nil);
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
     [self addSubview:lbl];
     
     UILabel* lblSearchAddress = [[UILabel alloc] initWithFrame:CGRectMake(frm.origin.x + 150*iPhoneSizeXFactor, frm.origin.y, 220*iPhoneSizeXFactor, 80*iPhoneSizeYFactor)];
-    lblSearchAddress.text = @"Search Address     OR  ";
+    lblSearchAddress.text = NSLocalizedString(@"Search Address     OR  ",nil);
     lblSearchAddress.font = [UIFont fontWithName:@"Arial" size:20];
     lblSearchAddress.backgroundColor = [UIColor clearColor];
     lblSearchAddress.textColor = [UIColor whiteColor];
@@ -220,7 +220,7 @@ UILabel* updatableLabel2;
     [self addSubview:imgView];
     
     UILabel* lblLongPress = [[UILabel alloc] initWithFrame:CGRectMake(frm.origin.x + 410*iPhoneSizeXFactor, frm.origin.y, 250*iPhoneSizeXFactor, 80*iPhoneSizeYFactor)];
-    lblLongPress.text = @"Long-press on a map location.";
+    lblLongPress.text = NSLocalizedString(@"Long-press on a map location.",nil);
     lblLongPress.font = [UIFont fontWithName:@"Arial" size:fontSmall];
     lblLongPress.backgroundColor = [UIColor clearColor];
     lblLongPress.textColor = [UIColor whiteColor];
@@ -235,34 +235,38 @@ UILabel* updatableLabel2;
     NSDateFormatter* fmt = appDelegate.dateFormater;
     NSString* date1 = @"N/A";
     NSString* date2 = @"N/A";
+    ATEventDataStruct* evt1 = nil;
+    ATEventDataStruct* evt2 = nil;
 
     int eventCnt = [appDelegate.eventListSorted count];
     if (eventCnt > 1)
     {
-        ATEventDataStruct* evt1 = appDelegate.eventListSorted[eventCnt - 1];
-        ATEventDataStruct* evt2 = appDelegate.eventListSorted[0];
+        evt1 = appDelegate.eventListSorted[eventCnt - 1];
+        evt2 = appDelegate.eventListSorted[0];
         
         date1 = [fmt stringFromDate:evt1.eventDate];
         date2 = [fmt stringFromDate:evt2.eventDate];
     }
     else if (eventCnt == 1)
     {
-        ATEventDataStruct* evt1 = appDelegate.eventListSorted[0];
-        ATEventDataStruct* evt2 = appDelegate.eventListSorted[0];
+        evt1 = appDelegate.eventListSorted[0];
+        evt2 = appDelegate.eventListSorted[0];
         
         date1 = [fmt stringFromDate:evt1.eventDate];
         date2 = [fmt stringFromDate:evt2.eventDate];
     }
-    
-    if ([date1 rangeOfString:@"AD"].location != NSNotFound)
-        date1 = [date1 substringToIndex:10];
-    if ([date2 rangeOfString:@"AD"].location != NSNotFound)
-        date2 = [date2 substringToIndex:10];
+    if (evt1 != nil)
+    {
+        if (![ATHelper isBCDate:evt1.eventDate])
+            date1 = [date1 substringToIndex:10];
+        if (![ATHelper isBCDate:evt2.eventDate])
+            date2 = [date2 substringToIndex:10];
+    }
 
     currentYLocation = currentYLocation + 2.5 *itemHeight - 5 *iPhoneSizeYFactor;
     CGRect frm = CGRectMake(initialX, currentYLocation, itemWidth * iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = @"This is what is happening on your screen:";
+    lbl.text = NSLocalizedString(@"This is what is happening on your screen:",nil);
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
@@ -271,7 +275,7 @@ UILabel* updatableLabel2;
     currentYLocation = currentYLocation + 2 * itemHeight;
     frm = CGRectMake(initialX+ 20*iPhoneSizeXFactor , currentYLocation - 30*iPhoneSizeYFactor, 600*iPhoneSizeXFactor, itemHeight);
     lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = [NSString stringWithFormat: @"1.   Totally there are %d events span from %@ to %@", eventCnt, date1, date2];
+    lbl.text = [NSString stringWithFormat: NSLocalizedString(@"1.   Totally there are %d events span from %@ to %@",nil), eventCnt, date1, date2];
     lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=3;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -282,7 +286,7 @@ UILabel* updatableLabel2;
     currentYLocation = currentYLocation + itemHeight;
     frm = CGRectMake(initialX+ 20*iPhoneSizeXFactor , currentYLocation - 30*iPhoneSizeYFactor, 600*iPhoneSizeXFactor, itemHeight);
     updatableLabel = [[UILabel alloc] initWithFrame:frm];
-    updatableLabel.text = [NSString stringWithFormat: @"2.   The selected date is %@ and the time zoom level is %@", dateFocused, timeZoomLevelStr];
+    updatableLabel.text = [NSString stringWithFormat: NSLocalizedString(@"2.   The selected date is %@ and the time zoom level is %@",nil), dateFocused, timeZoomLevelStr];
     updatableLabel.lineBreakMode = NSLineBreakByWordWrapping;
     updatableLabel.numberOfLines=3;
     updatableLabel.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -293,7 +297,7 @@ UILabel* updatableLabel2;
     currentYLocation = currentYLocation + 0.6*itemHeight;
     frm = CGRectMake(initialX+ 20*iPhoneSizeXFactor , currentYLocation - 30*iPhoneSizeYFactor, 700*iPhoneSizeXFactor, itemHeight);
     updatableLabel2 = [[UILabel alloc] initWithFrame:frm];
-    updatableLabel2.text = [NSString stringWithFormat: @"      So all events within %@ of %@ are colored as bellow, the darker the closer to it", timeZoomLevelStr, dateFocused];
+    updatableLabel2.text = [NSString stringWithFormat: NSLocalizedString(@"      So all events within %@ of %@ are colored as bellow, the darker the closer to it",nil), timeZoomLevelStr, dateFocused];
     updatableLabel2.lineBreakMode = NSLineBreakByWordWrapping;
     updatableLabel2.numberOfLines=3;
     updatableLabel2.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -337,7 +341,7 @@ UILabel* updatableLabel2;
     currentYLocation = currentYLocation + itemHeight + 10;
     CGRect frm = CGRectMake(initialX, currentYLocation, itemWidth*iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, initialY + 3 * itemHeight, itemWidth * iphoneSizeSpecialFactor, itemHeight)];
-    lbl.text = @"Red Dot and Green Dot on Time Wheel";
+    lbl.text = NSLocalizedString(@"Red Dot and Green Dot on Time Wheel",nil);
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
@@ -347,7 +351,7 @@ UILabel* updatableLabel2;
     currentYLocation = currentYLocation + itemHeight;
     frm = CGRectMake(initialX+ 20*iPhoneSizeXFactor , currentYLocation , 600*iPhoneSizeXFactor, itemHeight);
     lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = [NSString stringWithFormat: @"1.   A red dot indicates the existence of events at that point of time"];
+    lbl.text = [NSString stringWithFormat: NSLocalizedString(@"1.   A red dot indicates the existence of events at that point of time",nil)];
     lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=3;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -357,7 +361,7 @@ UILabel* updatableLabel2;
     currentYLocation = currentYLocation + itemHeight;
     frm = CGRectMake(initialX+ 20*iPhoneSizeXFactor , currentYLocation , 600*iPhoneSizeXFactor, itemHeight);
     lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = [NSString stringWithFormat: @"2.   A green dot means the events at that point of time are currently on screen"];
+    lbl.text = [NSString stringWithFormat: NSLocalizedString(@"2.   A green dot means the events at that point of time are currently on screen",nil)];
     lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=3;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -367,7 +371,7 @@ UILabel* updatableLabel2;
     currentYLocation = currentYLocation + 0.6 * itemHeight;
     frm = CGRectMake(initialX+ 20*iPhoneSizeXFactor , currentYLocation , 700*iPhoneSizeXFactor, itemHeight);
     lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = [NSString stringWithFormat: @"     Green dot is helpful to find events/photos quickly. Learn more from Tip 2 in [Online Help]"];
+    lbl.text = [NSString stringWithFormat: NSLocalizedString(@"     Green dot is helpful to find events/photos quickly. Learn more from Tip 2 in [Online Help]",nil)];
     lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=3;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -382,7 +386,7 @@ UILabel* updatableLabel2;
     CGRect frm = CGRectMake(initialX, currentYLocation, itemWidth*iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, currentYLocation, itemWidth * iphoneSizeSpecialFactor, itemHeight)];
 
-    lbl.text = @"Zoom the time:";
+    lbl.text = NSLocalizedString(@"Zoom the time:",nil);
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
@@ -391,7 +395,7 @@ UILabel* updatableLabel2;
     
     frm = CGRectMake(initialX+ 180*iPhoneSizeXFactor , currentYLocation , 500*iPhoneSizeXFactor, itemHeight);
     lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = [NSString stringWithFormat: @"Zoom-out to reach far-away time more quickly."];
+    lbl.text = [NSString stringWithFormat:NSLocalizedString(@"Zoom-out to reach far-away time more quickly.",nil)];
     lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=3;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -402,7 +406,7 @@ UILabel* updatableLabel2;
     currentYLocation = currentYLocation + 0.6 * itemHeight;
     frm = CGRectMake(initialX+ 180*iPhoneSizeXFactor , currentYLocation , 500*iPhoneSizeXFactor, itemHeight);
     lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = [NSString stringWithFormat: @"Available zoom-levels: Month / Year  /10 Yrs / 100 Yrs / 1000 Yrs"];
+    lbl.text = [NSString stringWithFormat: NSLocalizedString(@"Available zoom-levels: Month / Year  /10 Yrs / 100 Yrs / 1000 Yrs",nil)];
     lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=3;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
@@ -493,7 +497,7 @@ UILabel* updatableLabel2;
     //Upper Label description
     CGRect lblFrame = CGRectMake(lineX - 50*iPhoneSizeXFactor, currentYLocation + 40, 140*iPhoneSizeXFactor, 2*itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:lblFrame];
-    lbl.text = @"Double-tap at center to center on today";
+    lbl.text = NSLocalizedString(@"Double-tap at center to center on today",nil);
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall - 2];
     lbl.lineBreakMode = NSLineBreakByWordWrapping;
     lbl.numberOfLines=2;
@@ -504,7 +508,7 @@ UILabel* updatableLabel2;
     //Time Window Label description
     CGRect timeWindowFrame = CGRectMake(initialX, y_start - 40, itemWidth + 100, itemHeight);
     UILabel* timeWindowLbl = [[UILabel alloc] initWithFrame:timeWindowFrame];
-    timeWindowLbl.text = @"Time Wheel";
+    timeWindowLbl.text = NSLocalizedString(@"Time Wheel",nil);
     timeWindowLbl.font = [UIFont fontWithName:@"Arial" size:24];
     timeWindowLbl.backgroundColor = [UIColor clearColor];
     timeWindowLbl.textColor = [UIColor whiteColor];

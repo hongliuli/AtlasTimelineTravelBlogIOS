@@ -271,7 +271,7 @@ NSDate* prevYearDate;
     NSString* monthDateText  = @"";
     if (appDelegate.selectedPeriodInDays < 3650)
         monthDateText = [ATHelper getMonthSlashDateInNumber:appDelegate.focusedDate];
-    if ([yearText rangeOfString:@"BC"].location == NSNotFound)
+    if (![ATHelper isBCDate:appDelegate.focusedDate])
     {
         labelMagnifier.text=[yearText substringToIndex:4];
         labelMagnifier.textColor = [UIColor blackColor];
@@ -390,11 +390,11 @@ NSDate* prevYearDate;
         [dateComponents setYear:1];
         endDay = [gregorian dateByAddingComponents:dateComponents toDate:startDay  options:0];
 
-        label1.text = [NSString stringWithFormat:@"Jan %@", [ATHelper getYearPartHelper:appDelegate.focusedDate] ];
-        label2.text = @"  Mar  ";
-        label3.text = @"  Jun  ";
-        label4.text = @"  Sep  ";
-        label5.text = @"  Dec  ";
+        label1.text = [NSString stringWithFormat:NSLocalizedString(@"Jan %@",nil), [ATHelper getYearPartHelper:appDelegate.focusedDate] ];
+        label2.text = NSLocalizedString(@"  Mar  ",nil);
+        label3.text = NSLocalizedString(@"  Jun  ",nil);
+        label4.text = NSLocalizedString(@"  Sep  ",nil);
+        label5.text = NSLocalizedString(@"  Dec  ",nil);
         
         
         
@@ -409,7 +409,7 @@ NSDate* prevYearDate;
         startFrame.size.height=0;
         startFrame.size.width=0;
         if ([prevYearDate compare:appDelegate.focusedDate] == NSOrderedDescending) {
-            NSLog(@"date1 is later than date2");
+            //NSLog(@"date1 is later than date2");
             startFrame.origin.x = 1800;
         }
         else
@@ -543,9 +543,9 @@ NSDate* prevYearDate;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
         dateComponent.day = 1;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = @"1mo";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"1mo",nil);
         if (periodIndays <= 7)
-            timeScaleZoomLeveText.text = @"1wk";
+            timeScaleZoomLeveText.text = NSLocalizedString(@"1wk",nil);
     }
     else if (periodIndays == 365)
     {
@@ -553,7 +553,7 @@ NSDate* prevYearDate;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
         dateComponent.month = 5;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = @"1yr";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"1yr",nil);
     }
     else if (periodIndays == 3650)
     {
@@ -561,7 +561,7 @@ NSDate* prevYearDate;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
         dateComponent.year = 5;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = @"10yr";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"10yr",nil);
     }
     else if (periodIndays == 36500)
     {
@@ -569,7 +569,7 @@ NSDate* prevYearDate;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
         dateComponent.year = 50;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = @"100yr";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"100yr",nil);
     }
     else if (periodIndays == 365000)
     {
@@ -577,7 +577,7 @@ NSDate* prevYearDate;
         scaleStartDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
         dateComponent.year = 500;
         scaleEndDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = @"1000yr";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"1000yr",nil);
     }
     if ([startDate compare:scaleStartDay] == NSOrderedDescending)
         scaleStartDay = startDate;
@@ -774,7 +774,7 @@ NSDate* prevYearDate;
                     float xPos = x - 170;
                     if (xPos < 80)
                         xPos = 100;
-                    [self makeToast:@"Tip: Green dots indicate events currently displayed on screen." duration:10.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
+                    [self makeToast:NSLocalizedString(@"Tip: Green dots indicate events currently displayed on screen.",nil) duration:10.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
                     self.hidden = false;
                     self.mapViewController.timeScrollWindow.hidden  = false;
                 }

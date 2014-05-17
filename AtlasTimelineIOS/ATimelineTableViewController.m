@@ -90,10 +90,10 @@ NSMutableArray* originalEventListSorted;
     originalEventListSorted = appDelegate.eventListSorted;
     if ([originalEventListSorted count] == 0)
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"No events to list!"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No events to list!",nil)
                                                         message:@""
                                                        delegate:nil
-                                              cancelButtonTitle:@"OK"
+                                              cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                               otherButtonTitles:nil];
         [alert show];
         return;

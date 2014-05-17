@@ -16,6 +16,7 @@
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) ATViewController *mapViewController; //my way of share the objects, used in ATHelper
 @property(strong, nonatomic) NSDateFormatter* dateFormater;
+@property(strong, nonatomic) NSString* localizedAD;
 
 //eventList is the center of performance issue, seems we need to load all events
 @property(strong, nonatomic) NSMutableArray* eventListSorted;

@@ -40,6 +40,7 @@
 + (NSArray*) getEventListWithUniqueIds: (NSArray*)uniqueIds;
 + (NSString*) httpGetFromServer:(NSString*)serverUrl;
 + (void)startReplaceDb:(NSString*)selectedAtlasName :(NSArray*)downloadedJsonArray :(UIActivityIndicatorView*)spinner;
++ (BOOL)isBCDate:(NSDate*)date;
 
 //set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable;

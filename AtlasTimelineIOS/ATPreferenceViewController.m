@@ -41,7 +41,7 @@
 #define ROW_PURCHASE 1
 #define ROW_RESTORE_PURCHASE 2
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
-#define RESTORE_PHOTO_TITLE @"Restore Photos"
+#define RESTORE_PHOTO_TITLE NSLocalizedString(@"Restore Photos",nil)
 
 #define FOR_CHOOSE_ACTIVE 0
 #define FOR_SHARE_MY_EVENTS 1
@@ -227,17 +227,17 @@
     NSString* sourceName = appDelegate.sourceName;
     if (![@"myEvents" isEqualToString:sourceName])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"myEvents need to be Active" message:@"Please set myEvents as active content and try again" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"myEvents need to be Active",nil) message:NSLocalizedString(@"Please set myEvents as active content and try again",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         return;
     }
     int cnt = [appDelegate.eventListSorted count];
     
-    uploadAlertView = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Sync %i events to %@ on server",cnt, [ATHelper getSelectedDbFileName]]
-                                                   message: [NSString stringWithFormat:@"WARNING: Export will replace existing %@ event data on server.",_source]
+    uploadAlertView = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Sync %i events to %@ on server",nil),cnt, [ATHelper getSelectedDbFileName]]
+                                                   message: [NSString stringWithFormat:NSLocalizedString(@"WARNING: Export will replace existing %@ event data on server.",nil),_source]
                                                   delegate: self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"Export & Replace",nil];
+                                         cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                         otherButtonTitles:NSLocalizedString(@"Export & Replace",nil),nil];
     
     
     [uploadAlertView show];
@@ -250,8 +250,8 @@
     {
         if (buttonIndex == 0)
             return; //user clicked cancel button
-        UIAlertView* alert  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Confirm to replace %@ contents in your device!",[ATHelper getSelectedDbFileName]]
-                                                         message:@"Enter agree to continue:" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView* alert  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Confirm to replace %@ contents in your device!",nil),[ATHelper getSelectedDbFileName]]
+                                                         message:NSLocalizedString(@"Enter agree to continue:",nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
         UITextField * aa = [alert textFieldAtIndex:0];
         aa.placeholder = @"agree";
@@ -269,7 +269,7 @@
         }
         else
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled replacing offline content!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"You canceled replacing offline content!",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [alert show];
         }
     }
@@ -277,13 +277,13 @@
     {
         if (buttonIndex == 0)
         {
-            NSLog(@"user canceled upload");
+            //NSLog(@"user canceled upload");
             // Any action can be perfhttp://www.wenxuecity.com/news/2014/05/10/3255854.htmlormed here
         }
         else if (buttonIndex == 1)
         {
-            confirmUploadContentAlertView  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Confirm to replace %@ content on server!",[ATHelper getSelectedDbFileName]]
-                message:@"Enter agree to continue:" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            confirmUploadContentAlertView  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Confirm to replace %@ contents on server!",nil),[ATHelper getSelectedDbFileName]]
+                message:NSLocalizedString(@"Enter agree to continue:",nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [confirmUploadContentAlertView setAlertViewStyle:UIAlertViewStylePlainTextInput];
             UITextField * aa = [confirmUploadContentAlertView textFieldAtIndex:0];
             aa.placeholder = @"agree";
@@ -299,7 +299,7 @@
         }
         else
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled uploading the content to server" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"You canceled uploading the content to server",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [alert show];
         }
     }
@@ -312,8 +312,8 @@
         }
         else if (buttonIndex == 1)
         {
-            confirmUploadAllPhotoAlertView  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Confirm to replace all %@ photos on Dropbox!",[ATHelper getSelectedDbFileName]]
-                message:@"Enter agree to continue:" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            confirmUploadAllPhotoAlertView  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Confirm to replace all %@ photos on Dropbox!",nil),[ATHelper getSelectedDbFileName]]
+                message:NSLocalizedString(@"Enter agree to continue:",nil) delegate:self cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [confirmUploadAllPhotoAlertView setAlertViewStyle:UIAlertViewStylePlainTextInput];
             UITextField * aa = [confirmUploadAllPhotoAlertView textFieldAtIndex:0];
             aa.placeholder = @"agree";
@@ -331,7 +331,7 @@
         }
         else
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled uploading all photos to Dropbox" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"You Canceled uploading all photos to Dropbox",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [alert show];
         }
     }
@@ -448,15 +448,15 @@
     [spinner stopAnimating];
     if (![returnStatus isEqual:@"SUCCESS"])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Export Failed!" message:@"Fail reason could be network issue or data issue!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Export Failed!",nil) message:NSLocalizedString(@"Fail reason could be network issue or data issue!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         return;
     }
     else
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Export Success!"
-                                                        message: [NSString stringWithFormat:@"%i %@ events have been uploaded to server successfully!",eventCount,[ATHelper getSelectedDbFileName]]
-                                                       delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Export Success!",nil)
+                                                        message: [NSString stringWithFormat:NSLocalizedString(@"%i %@ events have been uploaded to server successfully!",nil),eventCount,[ATHelper getSelectedDbFileName]]
+                                                       delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         return;
     }
@@ -519,18 +519,18 @@
     {
         if (row == ROW_CONTENT_MG_SWITCH_ACTIVE)
         {
-            cell.textLabel.text = @"Switch Active Contents";
-            cell.detailTextLabel.text = @"Select Active from offline contents";
+            cell.textLabel.text = NSLocalizedString(@"Set Active Contents",nil);
+            cell.detailTextLabel.text = NSLocalizedString(@"Select Active from offline contents",nil);
         }
         if (row == ROW_CONTENT_MG_MY_EPISODE)
         {
-            cell.textLabel.text = @"Share my Episodes to Friends";
-            cell.detailTextLabel.text = @"Send episodes / Invite Friends";
+            cell.textLabel.text = NSLocalizedString(@"Share my Episodes to Friends",nil);
+            cell.detailTextLabel.text = NSLocalizedString(@"Send episodes / Invite Friends",nil);
         }
         if (row == ROW_CONTENT_MG_EPISODE_FROM_FRIEND)
         {
-            cell.textLabel.text = @"Incoming Contents/Episodes";
-            cell.detailTextLabel.text = @"Download from server to offline";
+            cell.textLabel.text = NSLocalizedString(@"Incoming Contents/Episodes",nil);
+            cell.detailTextLabel.text = NSLocalizedString(@"Download from server to offline",nil);
             if (hasNewIncomingShareFlag)
             {
                 UIImage *img = [UIImage imageNamed:@"new-message-red-dot"];
@@ -543,19 +543,19 @@
     }
     else if (section == SECTION_LOGIN_EMAIL)
     {
-        cell.textLabel.text = @"Options";
+        cell.textLabel.text = NSLocalizedString(@"Options",nil);
     }
     else if (section == SECTION_MISC)
     {
         switch (row) {
             case ROW_PURCHASE:
-                cell.textLabel.text = @"Support Us";
+                cell.textLabel.text = NSLocalizedString(@"Support Us",nil);
                 break;
             case ROW_RESTORE_PURCHASE:
-                cell.textLabel.text = @"Restore Purchase";
+                cell.textLabel.text = NSLocalizedString(@"Restore Purchase",nil);
                 break;
             case ROW_VIDEO_TUTORIAL:
-                cell.textLabel.text = @"Video Tutorial and FAQ";
+                cell.textLabel.text = NSLocalizedString(@"Video Tutorial and FAQ",nil);
                 break;
             default:
                 break;
@@ -575,10 +575,10 @@
     {
         switch (row) {
             case ROW_SYNC_RESTORE_MYEVENTS:
-                cell.textLabel.text = @"Restore myEvents from server";
+                cell.textLabel.text = NSLocalizedString(@"Restore myEvents from server",nil);
                 break;
             case ROW_SYNC_BACKUP_MYEVENTS:
-                cell.textLabel.text = @"Backup myEvents to server";
+                cell.textLabel.text = NSLocalizedString(@"Backup myEvents to server",nil);
                 break;
             default:
                 break;
@@ -588,10 +588,10 @@
     {
         switch (row) {
             case ROW_SYNC_TO_DROPBOX:
-                cell.textLabel.text = @"Backup Photos (Incremental)";
+                cell.textLabel.text = NSLocalizedString(@"Backup Photos (Incremental)",nil);
                 break;
             case ROW_SYNC_TO_DROPBOX_ALL:
-                cell.textLabel.text = @"Backup Photos (Full)";
+                cell.textLabel.text = NSLocalizedString(@"Backup Photos (Full)",nil);
                 break;
             case ROW_SYNC_FROM_DROPBOX:
                 cell.textLabel.text = RESTORE_PHOTO_TITLE;
@@ -604,7 +604,7 @@
             ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
             int numberOfNewPhotos = [dataController getNewPhotoQueueSizeExcludeThumbNail];
             int numberOfDeletedPhoto = [dataController getDeletedPhotoQueueSize];
-            cell.textLabel.text = [NSString stringWithFormat:@"Photo Backup - New:%d  Del:%d",numberOfNewPhotos,numberOfDeletedPhoto ];
+            cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Photo Backup - New:%d  Del:%d",nil),numberOfNewPhotos,numberOfDeletedPhoto ];
             PhotoToDropboxCell = cell;
         }
         if (row == ROW_SYNC_FROM_DROPBOX)
@@ -630,7 +630,7 @@
         NSString* namePart = _source;
         if (loc != NSNotFound)
             namePart =  [_source substringToIndex:loc];
-        label.text = [NSString stringWithFormat:@"Active: %@", namePart];
+        label.text = [NSString stringWithFormat:NSLocalizedString(@"Active: %@",nil), namePart];
     }
     if (section == SECTION_LOGIN_EMAIL)
     {
@@ -649,7 +649,7 @@
             logoutButton = [UIButton buttonWithType:UIButtonTypeSystem];
             logoutButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
             logoutButton.frame = CGRectMake(260, -10, 60, 50);
-            [logoutButton setTitle:@"Logout" forState:UIControlStateNormal];
+            [logoutButton setTitle:NSLocalizedString(@"Logout",nil) forState:UIControlStateNormal];
             [logoutButton.titleLabel setTextColor:[UIColor blueColor]];
             [logoutButton addTarget:self action:@selector(logoutButtonAction:) forControlEvents:UIControlEventTouchUpInside];
             [customView addSubview:logoutButton];
@@ -657,15 +657,15 @@
     }
     if (section == SECTION_SYNC_MYEVENTS_TO_SERVER)
     {
-        label.text = @"Backup/Restore myEvents data";
+        label.text = NSLocalizedString(@"Backup/Restore myEvents data",nil);
     }
     if (section == SECTION_SYNC_MYEVENTS_PHOTO_TO_DROPBOX)
     {
-        label.text = @"Backup/Restore Photos to Dropbox";
+        label.text = NSLocalizedString(@"Backup/Restore Photos to Dropbox",nil);
     }
     if (section == SECTION_MISC)
     {
-        label.text = @"Misc";
+        label.text = NSLocalizedString(@"Misc",nil);
     }
     [customView addSubview:label];
     return customView;
@@ -751,10 +751,10 @@
             [self performSegueWithIdentifier:@"share_my_episode" sender:nil];
         else
         {
-            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Please set myEvents to be active"
-                                                           message: @"You can share your episode only when myEvents is active"
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Please set myEvents to be active",nil)
+                                                           message: NSLocalizedString(@"You can share your episode only when myEvents is active",nil)
                                                           delegate: self
-                                                 cancelButtonTitle:@"OK"
+                                                 cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                                  otherButtonTitles:nil,nil];
             
             
@@ -814,11 +814,11 @@
     NSError* error;
     downloadedMyEventsJsonArray = [NSJSONSerialization JSONObjectWithData:downloadedData options:kNilOptions error:&error];
     
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Downloaded %@ has %i events",atlasName,[downloadedMyEventsJsonArray count]]
-        message: [NSString stringWithFormat:@"WARNING: Local %@'s %@ events will be replaced!",@"myEvents",displayLocalCnt]
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Downloaded %@ has %i events",nil),atlasName,[downloadedMyEventsJsonArray count]]
+        message: [NSString stringWithFormat:NSLocalizedString(@"WARNING: Local %@'s %@ events will be replaced!",nil),@"myEvents",displayLocalCnt]
         delegate: self
-        cancelButtonTitle:@"Cancel"
-        otherButtonTitles:@"Replace",nil];
+        cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+        otherButtonTitles:NSLocalizedString(@"Replace",nil),nil];
     alert.tag = DOWNLOAD_REPLACE_MY_SOURCE_TO_MYEVENTS_ALERT;
     [spinner stopAnimating];
     [alert show];
@@ -836,7 +836,7 @@
         int dbDeletedPhotoCount = [[self getDataController] getDeletedPhotoQueueSize];
         //set cell count again (already done in celFor...) here, is to refresh count after user clicked this row and already synched
         UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
-        cell.textLabel.text = [NSString stringWithFormat:@"Photo Backup - New:%d  Del:%d",dbNewPhotoCount,dbDeletedPhotoCount ];
+        cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Photo Backup - New:%d  Del:%d",nil),dbNewPhotoCount,dbDeletedPhotoCount ];
         if (dbNewPhotoCount + dbDeletedPhotoCount > 0)
         {
             [spinner startAnimating]; //stop when chain complete or any error
@@ -876,10 +876,10 @@
         }
         if (totalPhotoCountInDevice == 0)
         {
-            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"No photos to export to your Dropbox!"
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"No photos to export to your Dropbox!",nil)
                                                            message: @""
                                                           delegate: self
-                                                 cancelButtonTitle:@"OK"
+                                                 cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                                  otherButtonTitles:nil,nil];
             
             
@@ -887,11 +887,11 @@
         }
         else
         {
-            uploadAllToDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Replace photos on Dropbox for %@", [ATHelper getSelectedDbFileName]]
-                                                                message: [NSString stringWithFormat:@"WARNING: All photoes on your dropbox:/ChoronicleMap/%@ will be deleted and replaced by %d photos from this device!",_source, totalPhotoCountInDevice]
+            uploadAllToDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Replace photos on Dropbox for %@",nil), [ATHelper getSelectedDbFileName]]
+                                                                message: [NSString stringWithFormat:NSLocalizedString(@"WARNING: All photoes on your dropbox:/ChoronicleMap/%@ will be deleted and replaced by %d photos from this device!",nil),_source, totalPhotoCountInDevice]
                                                                delegate: self
-                                                      cancelButtonTitle:@"Cancel"
-                                                      otherButtonTitles:@"Yes, Continue",nil];
+                                                      cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                                      otherButtonTitles:NSLocalizedString(@"Yes, Continue",nil),nil];
             [uploadAllToDropboxAlert show];
         }
     }
@@ -918,10 +918,10 @@
         }
         if (totalEventWithPhoto == 0)
         {
-            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Content %@ is empty or do not have photos to download.", [ATHelper getSelectedDbFileName]]
-                                                           message: @"This content may not have photos."
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Content %@ is empty or do not have photos to download.",nil), [ATHelper getSelectedDbFileName]]
+                                                           message: NSLocalizedString(@"This content may not have photos.",nil)
                                                           delegate: self
-                                                 cancelButtonTitle:@"OK"
+                                                 cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                                  otherButtonTitles:nil,nil];
             
             
@@ -929,11 +929,11 @@
         }
         else
         {
-            downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Import photos from Dropbox:/ChronicleMap/%@", [ATHelper getSelectedDbFileName]]
-                                                                    message: [NSString stringWithFormat:@"Download missing %@ photos from Dropbox. This operation can be repeated until all photos are downloaded.",[ATHelper getSelectedDbFileName]]
-                                                                   delegate: self
-                                                          cancelButtonTitle:@"Cancel"
-                                                          otherButtonTitles:@"Yes, Continue",nil];
+            downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Import photos from Dropbox:/ChronicleMap/%@",nil), [ATHelper getSelectedDbFileName]]
+                            message: [NSString stringWithFormat:NSLocalizedString(@"Download missing %@ photos from Dropbox. This operation can be repeated until all photos are downloaded.",nil),[ATHelper getSelectedDbFileName]]
+                            delegate: self
+                            cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                            otherButtonTitles:NSLocalizedString(@"Yes, Continue",nil),nil];
             [downloadAllFromDropboxAlert show];
         }
     }
@@ -944,7 +944,7 @@
     [userDefault removeObjectForKey:[ATConstants UserEmailKeyName]];
     [userDefault removeObjectForKey:[ATConstants UserSecurityCodeKeyName]];
     [logoutButton setTitle:@"" forState: UIControlStateNormal];
-    [loginEmailLabel setText:@"Not login"];
+    [loginEmailLabel setText:NSLocalizedString(@"Not login",nil)];
 }
 
 //Because of the DBRestClient's asynch nature, I have to implement a synchronous way:
@@ -1014,11 +1014,11 @@
     }
     else
     {
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not copy to Dropbox"
-                                                       message: @"May be the network is not available"
-                                                      delegate: self
-                                             cancelButtonTitle:@"OK"
-                                             otherButtonTitles:nil,nil];
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Could not copy to Dropbox",nil)
+                            message: NSLocalizedString(@"May be the network is not available",nil)
+                            delegate: self
+                            cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                            otherButtonTitles:nil,nil];
         
         
         [alert show];
@@ -1083,11 +1083,11 @@
     else if (uploadSuccessExcludeThumbnailCount > 0 || deleteCount > 0)
     {
         [spinner stopAnimating];
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Copy to Dropbox completed!"
-                                                       message: [NSString stringWithFormat:@"Add:%d/Delete:%d files in Dropbox succesfully.",uploadSuccessExcludeThumbnailCount,deleteCount]
-                                                      delegate: self
-                                             cancelButtonTitle:@"OK"
-                                             otherButtonTitles:nil,nil];
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Copy to Dropbox completed!",nil)
+                    message: [NSString stringWithFormat:NSLocalizedString(@"Add:%d/Delete:%d files in Dropbox succesfully.",nil),uploadSuccessExcludeThumbnailCount,deleteCount]
+                    delegate: self
+                    cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                     otherButtonTitles:nil,nil];
         
         
         [alert show];
@@ -1105,18 +1105,18 @@
     if (![currentPhotoName isEqualToString:@"thumbnail"])
     {
         uploadSuccessExcludeThumbnailCount++;
-        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo Backup - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
+        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Photo Backup - New:%d  Del:%d",nil),dbNewPhotoCount, dbDeletedPhotoCount];
     }
     [self startProcessNewPhotoQueueChainAction]; //start upload next file until
 }
 
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error {
     [spinner stopAnimating];
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not copy file to Dropbox"
-                                                   message: @"May be the network is not available"
-                                                  delegate: self
-                                         cancelButtonTitle:@"OK"
-                                         otherButtonTitles:nil,nil];
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Could not copy file to Dropbox",nil)
+                message: NSLocalizedString(@"May be the network is not available",nil)
+                delegate: self
+                cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                otherButtonTitles:nil,nil];
     
     
     [alert show];
@@ -1186,7 +1186,7 @@
     {
         [spinner stopAnimating]; //TODO? seems weired here. but need it when only have item in deleteQueue
         deleteCount++;
-        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:@"Photo Backup - New:%d  Del:%d",dbNewPhotoCount, dbDeletedPhotoCount];
+        PhotoToDropboxCell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Photo Backup - New:%d  Del:%d",nil),dbNewPhotoCount, dbDeletedPhotoCount];
     }
     [self processEmptyDeletedPhotoQueue];
 }
@@ -1212,11 +1212,11 @@
     else
     {
         [spinner stopAnimating];
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not access Dropbox"
-                                                       message: @"May be the network is not available"
-                                                      delegate: self
-                                             cancelButtonTitle:@"OK"
-                                             otherButtonTitles:nil,nil];
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Could not access Dropbox",nil)
+                message: NSLocalizedString(@"May be the network is not available",nil)
+                delegate: self
+                cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                otherButtonTitles:nil,nil];
         
         
         [alert show];
@@ -1251,7 +1251,7 @@
         }
         //following is to prompt user that device already has all photos in dropbox
         if ( [photoFromDropboxCell.textLabel.text isEqualToString:RESTORE_PHOTO_TITLE])
-                photoFromDropboxCell.textLabel.text = @"All photos are already downloaded";
+                photoFromDropboxCell.textLabel.text = NSLocalizedString(@"All photos are already downloaded",nil);
     }
 }
 - (void)restClient:(DBRestClient*)client loadMetadataFailedWithError:(NSError*)error
@@ -1275,11 +1275,11 @@
             return;
         }
 
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @"Could not import from Dropbox"
-                                                   message: @"May be the network is not available"
-                                                  delegate: self
-                                         cancelButtonTitle:@"OK"
-                                         otherButtonTitles:nil,nil];
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Could not import from Dropbox",nil)
+               message: NSLocalizedString(@"May be the network is not available",nil)
+               delegate: self
+               cancelButtonTitle:NSLocalizedString(@"OK",nil)
+               otherButtonTitles:nil,nil];
     
     
         [alert show];
@@ -1290,14 +1290,14 @@
     if (![localPath hasSuffix:@"thumbnail" ])
     {
         downloadFromDropboxSuccessCount++;
-        photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading .. %d success, %d warnings", totalDownloadFromDropboxSuccessCount + downloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
+        photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Downloading .. %d success, %d warnings",nil), totalDownloadFromDropboxSuccessCount + downloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
     }
 	[self promptCopyFromDropboxStatus];
 }
 
 - (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
     downloadFromDropboxFailCount++;
-    photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:@"Downloading ... %d success, %d warnings", totalDownloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
+    photoFromDropboxCell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Downloading ... %d success, %d warnings",nil), totalDownloadFromDropboxSuccessCount, downloadFromDropboxFailCount];
     [self promptCopyFromDropboxStatus];
 }
 
@@ -1316,20 +1316,20 @@
         [spinner stopAnimating];
         NSString* message;
         if (downloadFromDropboxFailCount == 0)
-            message = [NSString stringWithFormat: @"%d photos have been downloaded to your device from Dropbox!", totalDownloadFromDropboxSuccessCount ];
+            message = [NSString stringWithFormat: NSLocalizedString(@"%d photos have been downloaded to your device from Dropbox!",nil), totalDownloadFromDropboxSuccessCount ];
         else if (downloadFromDropboxSuccessCount == 0)
-            message = [NSString stringWithFormat:@"Import failed, please check if network is available, or if your Dropbox has photos in /ChronicleMap/%@ directory.", [ATHelper getSelectedDbFileName]];
+            message = [NSString stringWithFormat:NSLocalizedString(@"Import failed, please check if network is available, or if your Dropbox has photos in /ChronicleMap/%@ directory.",nil), [ATHelper getSelectedDbFileName]];
         else
-            message = [NSString stringWithFormat:@"Import photos from Dropbox: %d success, %d fail. Please make sure you have a good wifi connection and try again.", totalDownloadFromDropboxSuccessCount,downloadFromDropboxFailCount];
+            message = [NSString stringWithFormat:NSLocalizedString(@"Import photos from Dropbox: %d success, %d fail. Please make sure you have a good wifi connection and try again.",nil), totalDownloadFromDropboxSuccessCount,downloadFromDropboxFailCount];
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Import photos from Dropbox finished" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Import photos from Dropbox finished",nil) message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
     }
     else if (downloadFromDropboxLoadMedadataFailCount > 0 && downloadFromDropboxSuccessCount + downloadFromDropboxFailCount == 0 && onlyShowOnceForIssueWithDropbox)
     { //this condition is used when loadMetadataWithError called the function
         onlyShowOnceForIssueWithDropbox = false;
-        NSString* message = [NSString stringWithFormat:@"This may happen if the app was uninstalled before export all photos to dropbox /ChronicleMap/%@ folder!", [ATHelper getSelectedDbFileName]];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Dropbox may not have some photos you are looking for." message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        NSString* message = [NSString stringWithFormat:NSLocalizedString(@"This may happen if the app was uninstalled before export all photos to dropbox /ChronicleMap/%@ folder!",nil), [ATHelper getSelectedDbFileName]];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Dropbox may not have some photos you are looking for.",nil) message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
     }
 }

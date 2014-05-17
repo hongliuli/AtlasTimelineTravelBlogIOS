@@ -20,27 +20,27 @@
 }
 + (NSString*)period7Day;
 {
-    return @"7 Days";
+    return NSLocalizedString(@"7 Days",nil);
 }
 + (NSString*)periodMonth;
 {
-    return @"Month";
+    return NSLocalizedString(@"Month",nil);
 }
 + (NSString*)periodYear
 {
-    return @"Year";
+    return NSLocalizedString(@"Year",nil);
 }
 + (NSString*)period10Year
 {
-    return @"10 Years";
+    return NSLocalizedString(@"10 Years",nil);
 }
 + (NSString*)period100Year
 {
-    return @"100 Years";
+    return NSLocalizedString(@"100 Years",nil);
 }
 + (NSString*)period1000Year
 {
-    return @"1000 Years";
+    return NSLocalizedString(@"1000 Years",nil);
 }
 
 //IMAGE NAME

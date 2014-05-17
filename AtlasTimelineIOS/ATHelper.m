@@ -21,6 +21,7 @@ NSDateFormatter* dateFormaterForMonth;
 NSDateFormatter* dateLiterFormat;
 NSCalendar* calendar;
 
+
 UIPopoverController *verifyViewPopover;
 + (NSString *)applicationDocumentsDirectory {
 	
@@ -59,9 +60,13 @@ UIPopoverController *verifyViewPopover;
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDateFormatter* format = appDelegate.dateFormater;
-    NSDate* smallDate = [format dateFromString:@"01/01/0010 AD"];
+    NSString* ADStr = appDelegate.localizedAD;
+    NSString* smallDateStr = [NSString stringWithFormat:@"01/01/0010 %@", ADStr];
+    NSDate* smallDate = [format dateFromString:smallDateStr];
     NSString *dateString = [NSString stringWithFormat:@" %@", [format stringFromDate:date]];
-    NSString* yearPart = [dateString substringFromIndex:[dateString length]-7];
+
+    NSString* yearPart = [dateString substringFromIndex:7];
+        //NSLog(@"   --- dateString is %@  yearPart=%@", dateString,yearPart);
     if ([smallDate compare:date] == NSOrderedAscending)
         yearPart = [yearPart substringWithRange:NSMakeRange(0,4)];
     return yearPart;
@@ -78,7 +83,9 @@ UIPopoverController *verifyViewPopover;
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDateFormatter* format = appDelegate.dateFormater;
-    NSDate* smallDate = [format dateFromString:@"01/01/0010 AD"];
+    NSString* ADStr = appDelegate.localizedAD;
+    NSString* smallDateStr = [NSString stringWithFormat:@"01/01/0010 %@", ADStr];
+    NSDate* smallDate = [format dateFromString:smallDateStr];
     NSString *dateString = [NSString stringWithFormat:@" %@", [format stringFromDate:date]];
     NSString* yearPart = [dateString substringFromIndex:[dateString length]-7];
     NSString* monthPart = [dateString substringToIndex:3];
@@ -401,21 +408,21 @@ UIPopoverController *verifyViewPopover;
 
     NSURL* serviceUrl = [NSURL URLWithString:serverUrl];
     NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl];
-    NSLog(@"request is: %@",serverUrl);
+    //NSLog(@"request is: %@",serverUrl);
     //Get Responce hear----------------------
     NSURLResponse *response;
     NSError *error;
     NSData *urlData=[NSURLConnection sendSynchronousRequest:serviceRequest returningResponse:&response error:&error];
     if (urlData == nil)
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connect Server Fail!" message:@"Metwork may not be available, Please try later!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Connect Server Fail!",nil) message:NSLocalizedString(@"Network may not be available, Please try later!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         return nil;
     }
     NSString* responseStr = [[NSString alloc]initWithData:urlData encoding:NSUTF8StringEncoding];
     if ([responseStr hasPrefix:@"<html>"])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Need Retry!" message:@"Metwork problem, Please try again!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Connect Server Fail!",nil) message:NSLocalizedString(@"Temporary network problem, Please try again!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         return nil;
     }
@@ -424,7 +431,7 @@ UIPopoverController *verifyViewPopover;
 
 + (void)startReplaceDb:(NSString*)selectedAtlasName :(NSArray*)downloadedJsonArray :(UIActivityIndicatorView*)spinner
 {
-    NSLog(@"Start replace db called");
+    //NSLog(@"Start replace db called");
     if (spinner != nil)
         [spinner startAnimating];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -459,6 +466,16 @@ UIPopoverController *verifyViewPopover;
     [appDelegate.mapViewController prepareMapView];
     if (spinner != nil)
         [spinner stopAnimating];
+}
++ (BOOL)isBCDate:(NSDate*)date
+{
+    NSDateComponents *otherDay = [[NSCalendar currentCalendar] components:NSEraCalendarUnit|NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit fromDate:date];
+ 
+    //era value 1 for AD, 0 for BC
+    if ([otherDay era] <= 0)
+        return true;
+    else
+        return false;
 }
 
 

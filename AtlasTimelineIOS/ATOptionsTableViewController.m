@@ -76,7 +76,7 @@ UISwitch *switchViewZoomToWeek;
     
         UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeSystem];
         shareButton.frame = CGRectMake(-15, -15, 200, 60);
-        [shareButton setTitle:@"Reset to Default" forState:UIControlStateNormal];
+        [shareButton setTitle:NSLocalizedString(@"Reset to Default",nil) forState:UIControlStateNormal];
         shareButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
         [shareButton addTarget:self action:@selector(setDefaultAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:shareButton];
@@ -90,7 +90,7 @@ UISwitch *switchViewZoomToWeek;
             UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellMoveDate"];
             if( aCell == nil ) {
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellMoveDate"];
-                aCell.textLabel.text = @"Date Magnifer Scroll";
+                aCell.textLabel.text = NSLocalizedString(@"Scroll Date Magnifer",nil);
                 aCell.selectionStyle = UITableViewCellSelectionStyleNone;
                 switchViewMagnifierMove = [[UISwitch alloc] initWithFrame:CGRectZero];
                 aCell.accessoryView = switchViewMagnifierMove;
@@ -108,7 +108,7 @@ UISwitch *switchViewZoomToWeek;
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellEditFullScreen"];
                 if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone)
                 {
-                    aCell.textLabel.text = @"Full Screen Event Editor"; //Note: iPad only show this row
+                    aCell.textLabel.text = NSLocalizedString(@"Full Screen Event Editor",nil); //Note: iPad only show this row
                     aCell.selectionStyle = UITableViewCellSelectionStyleNone;
                     switchViewEditorFullScreen = [[UISwitch alloc] initWithFrame:CGRectZero];
                     aCell.accessoryView = switchViewEditorFullScreen;
@@ -125,7 +125,7 @@ UISwitch *switchViewZoomToWeek;
             UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellDateField"];
             if( aCell == nil ) {
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellDateField"];
-                aCell.textLabel.text = @"Use keyboard to enter date";
+                aCell.textLabel.text = NSLocalizedString(@"Use keyboard to enter date",nil);
                 aCell.selectionStyle = UITableViewCellSelectionStyleNone;
                 switchViewKeyboardForDate = [[UISwitch alloc] initWithFrame:CGRectZero];
                 aCell.accessoryView = switchViewKeyboardForDate;
@@ -141,7 +141,7 @@ UISwitch *switchViewZoomToWeek;
             UITableViewCell* aCell = [tableView dequeueReusableCellWithIdentifier:@"SwitchCellZoomToWeek"];
             if( aCell == nil ) {
                 aCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"SwitchCellZoomToWeek"];
-                aCell.textLabel.text = @"Zoom to Week (Default is Month)";
+                aCell.textLabel.text = NSLocalizedString(@"Zoom to Week (Default is Month)",nil);
                 aCell.selectionStyle = UITableViewCellSelectionStyleNone;
                 switchViewZoomToWeek = [[UISwitch alloc] initWithFrame:CGRectZero];
                 aCell.accessoryView = switchViewZoomToWeek;

@@ -47,14 +47,14 @@ NSString* receivedSecurityCode; //use this to compare with user entered
 }
 
 - (IBAction)getEmailAction:(id)sender {
-    NSLog(@"getemail clicked");
+    //NSLog(@"getemail clicked");
 
     NSString *emailRegEx = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
     NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegEx];
     
     if ([emailTest evaluateWithObject:self.userEmailText.text] == NO) {
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid Email Format!" message:@"Please Enter Valid Email Address." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Invalid Email Format!",nil) message:NSLocalizedString(@"Please Enter Valid Email Address.",nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         
         return;
@@ -66,19 +66,19 @@ NSString* receivedSecurityCode; //use this to compare with user entered
         return;
     else
         receivedSecurityCode = responseStr;
-    NSLog(@"received security code: %@",receivedSecurityCode);
+    //NSLog(@"received security code: %@",receivedSecurityCode);
     self.securityCodeText.enabled = true;
     self.verifyButton.enabled = true;
     self.securityCodeText.backgroundColor = [UIColor whiteColor];
     self.verifyButton.backgroundColor = [UIColor whiteColor];
     
     verifyingUserEmail = self.userEmailText.text;
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Check Your Email!" message:@"Please enter the security code you received in your email!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Check Your Email!",nil) message:NSLocalizedString(@"Please enter the security code you received in your email!",nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
 }
 
 - (IBAction)verifySecurityCodeAction:(id)sender {
-    NSLog(@"verify email clicked");
+    //NSLog(@"verify email clicked");
     NSString* scStr = [self.securityCodeText.text stringByReplacingOccurrencesOfString:@" " withString:@""];
     NSString* emailStr = [self.userEmailText.text stringByReplacingOccurrencesOfString:@" " withString:@""];
 
@@ -90,13 +90,13 @@ NSString* receivedSecurityCode; //use this to compare with user entered
        [userDefault setObject:receivedSecurityCode forKey:[ATConstants UserSecurityCodeKeyName]];
        [userDefault synchronize];
 
-       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Verify Success!" message:@"You can import/export from any device with the same email address!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Verify Success!",nil) message:NSLocalizedString(@"You can import/export from any device with the same email address!",nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
        [self dismissViewControllerAnimated:true completion:nil];
        [alert show];
    }
    else
    {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Verify Failed!" message:@"Make sure you entered correct Security Code received in you email" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Verify Failed!",nil) message:NSLocalizedString(@"Make sure you entered correct Security Code received in you email",nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
    }
 }

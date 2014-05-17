@@ -140,13 +140,13 @@ NSString* deleteFriend_wait;
         label.font = [UIFont fontWithName:@"Helvetica" size:14];
         [label setNumberOfLines:0];
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        label.text = [NSString stringWithFormat:@"Share:  \"%@\" to fiends",appDelegate.episodeToBeShared ];
+        label.text = [NSString stringWithFormat:NSLocalizedString(@"Share:  \"%@\" to fiends",nil),appDelegate.episodeToBeShared ];
         [customView addSubview:label];
         
         sendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         sendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
         sendButton.frame = CGRectMake(15, 30, 60, 30);
-        [sendButton setTitle:@"Send" forState:UIControlStateNormal];
+        [sendButton setTitle:NSLocalizedString(@"Send",nil) forState:UIControlStateNormal];
         [sendButton.titleLabel setTextColor:[UIColor blueColor]];
         [sendButton addTarget:self action:@selector(sendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [sendButton setEnabled:false];
@@ -155,7 +155,7 @@ NSString* deleteFriend_wait;
         UIButton *addFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         addFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
         addFriendButton.frame = CGRectMake(175, 30, 90, 30);
-        [addFriendButton setTitle:@"Add Friend" forState:UIControlStateNormal];
+        [addFriendButton setTitle:NSLocalizedString(@"Add Friend",nil) forState:UIControlStateNormal];
         [addFriendButton.titleLabel setTextColor:[UIColor blueColor]];
         [addFriendButton addTarget:self action:@selector(addFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:addFriendButton];
@@ -175,7 +175,7 @@ NSString* deleteFriend_wait;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"   section %d   row %d", indexPath.section, indexPath.row);
+    NSLog(NSLocalizedString(@"   section %d   row %d",nil), indexPath.section, indexPath.row);
     SWTableViewCell *cell = (SWTableViewCell*)[tableView cellForRowAtIndexPath:[NSIndexPath
                                                               indexPathForRow:indexPath.row inSection:0]];
     NSString* friendStr = cell.textLabel.text;
@@ -209,11 +209,11 @@ NSString* deleteFriend_wait;
     switch (index) {
         case 0:
         {
-            alertDelete = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Delete friend %@", deleteFriendEmailToServer]
-                                                   message:@"Are you sure?"
+            alertDelete = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Delete friend %@",nil), deleteFriendEmailToServer]
+                                                   message:NSLocalizedString(@"Are you sure?",nil)
                                                   delegate:self
-                                         cancelButtonTitle:@"Cancel"
-                                         otherButtonTitles:@"DELETE", nil];
+                                         cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                         otherButtonTitles:NSLocalizedString(@"Delete",nil), nil];
             [alertDelete show];
             break;
         }
@@ -232,11 +232,11 @@ NSString* deleteFriend_wait;
     //UIButton* button = (UIButton*)sender;
     NSString *pickedFriendsStr = [pickedEmails componentsJoinedByString:@"\n"];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    alertSend = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Send Episode %@ to following friend(s)",appDelegate.episodeToBeShared]
+    alertSend = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Send Episode %@ to following friend(s)",nil),appDelegate.episodeToBeShared]
                                                     message:[NSString stringWithFormat:@"%@",pickedFriendsStr]
                                                    delegate:self
-                                          cancelButtonTitle:@"Cancel"
-                                          otherButtonTitles:@"Send it", nil];
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                          otherButtonTitles:NSLocalizedString(@"Send",nil), nil];
     [alertSend show];
     
 }
@@ -253,7 +253,7 @@ NSString* deleteFriend_wait;
             NSString* dbName = [appDelegate sourceName];
             if (![dbName isEqualToString:@"myEvents"])
             {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You active content is not myEvents!" message:@"please switch to myEvents as active content!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Your active content is not myEvents!",nil) message:NSLocalizedString(@"Please set myEvents as active content!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
                 [alert show];
                 return;
             }
@@ -273,7 +273,7 @@ NSString* deleteFriend_wait;
                 [self.tableView reloadData];
             }
             else{
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete friend failed" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Delete friend failed",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
                 [alert show];
             }
         }
@@ -331,7 +331,7 @@ NSString* deleteFriend_wait;
     if ([episodeEventList count] == 0)
     {
         //this may happen if event still in episodeIdList, but already removed from myEvents
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"This episode is empty!" message:@"Then events in this episode is no longer in myEvents, please remove this episode." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"This episode is empty!",nil) message:NSLocalizedString(@"The events in this episode is no longer in myEvents, please remove this episode.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         return;
         
@@ -389,15 +389,15 @@ NSLog(@"============post url = %@", serviceUrl.absoluteString);
     //[spinner stopAnimating];
     if (![returnStatus isEqual:@"SUCCESS"])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Share Episode Failed!" message:@"Fail reason could be network issue or data issue!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Share Episode Failed!",nil) message:NSLocalizedString(@"Fail reason could be network issue or data issue!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         return;
     }
     else
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Share Episode Success!"
-                                                        message: [NSString stringWithFormat:@"Episode [%@], with %i events, has been sent.\n Using ChronicleMap app, your friends can check it at Settings -> Incoming Contents/Episodes!",episodeName,eventCount]
-                                                       delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Share Episode Success!",nil)
+                                                        message: [NSString stringWithFormat:NSLocalizedString(@"Episode [%@], with %i events, has been sent.\n Using ChronicleMap app, your friends can check it at Settings -> Incoming Contents/Episodes!",nil),episodeName,eventCount]
+                                                       delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         [self cleanCheckedFriendEmail];
         return;

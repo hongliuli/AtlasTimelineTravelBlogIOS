@@ -40,6 +40,16 @@
     [_dateFormater setDateFormat:@"MM/dd/yyyy GG"];
     return _dateFormater;
 }
+- (NSString *)localizedAD {
+	
+    if (_localizedAD != nil) {
+        return _localizedAD;
+    }
+    NSDate* today = [NSDate date];
+    NSString* todayStr = [self.dateFormater stringFromDate:today];
+    //NSLog(@"######### AD is %@",[todayStr substringFromIndex:11]);
+    return [todayStr substringFromIndex:11];
+}
 
 + (void)initialize
 {

@@ -35,12 +35,12 @@ UIPopoverController *popoverController;
 
 	// Do any additional setup after loading the view.
     UIBarButtonItem *cameraButton = [[UIBarButtonItem alloc]
-                                     initWithTitle:@"Camera"
+                                     initWithTitle:NSLocalizedString(@"Camera",nil)
                                      style:UIBarButtonItemStyleBordered
                                      target:self
                                      action:@selector(useCamera:)];
     UIBarButtonItem *cameraRollButton = [[UIBarButtonItem alloc]
-                                         initWithTitle:@"Camera Roll"
+                                         initWithTitle:NSLocalizedString(@"Camera Roll",nil)
                                          style:UIBarButtonItemStyleBordered
                                          target:self
                                          action:@selector(useCameraRoll:)];
@@ -96,10 +96,10 @@ finishedSavingWithError:(NSError *)error
 {
     if (error) {
         UIAlertView *alert = [[UIAlertView alloc]
-                              initWithTitle: @"Save failed"
-                              message: @"Failed to save image"\
+                              initWithTitle: NSLocalizedString(@"Save failed",nil)
+                              message: NSLocalizedString(@"Failed to save image",nil)
                               delegate: nil
-                              cancelButtonTitle:@"OK"
+                              cancelButtonTitle:NSLocalizedString(@"OK",nil)
                               otherButtonTitles:nil];
         [alert show];
     }

@@ -114,10 +114,10 @@ int swipPromptCount;
         //see action in didTriggerRightUtilityButtonWithIndex
         [rightUtilityButtons sw_addUtilityButtonWithColor:
          [UIColor colorWithRed:0.78f green:0.38f blue:0.5f alpha:1.0]
-                                                    title:@"Delete"];
+                                                    title:NSLocalizedString(@"Delete",nil)];
         [rightUtilityButtons sw_addUtilityButtonWithColor:
          [UIColor colorWithRed:1.0f green:0.231f blue:0.188 alpha:1.0f]
-                                                    title:@"Download"];
+                                                    title:NSLocalizedString(@"Download",nil)];
         cell = [[SWTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                       reuseIdentifier:CellIdentifier
                                   containingTableView:self.tableView // For row height and selection
@@ -174,9 +174,9 @@ int swipPromptCount;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 
-        if (swipPromptCount >= 2)
+        if (swipPromptCount >= 1)
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Please swipe right" message:[NSString stringWithFormat:@""] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Please swipe right",nil) message:[NSString stringWithFormat:@""] delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [alert show];
             swipPromptCount = 0;
         }
@@ -203,11 +203,11 @@ int swipPromptCount;
 
             }
             
-            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Delete [%@] From Server",tmpAtlasName]
-                                                           message: @"If you have downloaded it before, the offline one will stay until you remove the app. Are you sure to delete it from server?"
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Delete [%@] From Server",nil),tmpAtlasName]
+                                                           message: NSLocalizedString(@"If you have downloaded it before, the offline one will stay until you remove the app. Are you sure to delete it from server?",nil)
                                                           delegate: self
-                                                 cancelButtonTitle:@"Cancel"
-                                                 otherButtonTitles:@"Continue",nil];
+                                                 cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                                 otherButtonTitles:NSLocalizedString(@"Continue",nil),nil];
             alert.tag = DELETE_INCOMING_ON_SERVER_CONFIRM;
             [alert show];
 
@@ -219,21 +219,21 @@ int swipPromptCount;
                 selectedAtlasName = [selectedAtlasName substringFromIndex:2];
             if ([cell.textLabel.textColor isEqual:[UIColor lightGrayColor]])
             {
-                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"%@ was downloaded before",selectedAtlasName]
-                                                               message: @"Are you sure to replace your offline copy?"
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"%@ was downloaded before",nil),selectedAtlasName]
+                                                               message: NSLocalizedString(@"Are you sure to replace your offline copy?",nil)
                                                               delegate: self
-                                                     cancelButtonTitle:@"Cancel"
-                                                     otherButtonTitles:@"Continue",nil];
+                                                     cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                                     otherButtonTitles:NSLocalizedString(@"Continue",nil),nil];
                 alert.tag = DOWNLOAD_AGAIN_ALERT;
                 [alert show];
             }
             else
             {
-                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Import %@",selectedAtlasName]
-                                                               message: @"Import may take a few minutes, continue?."
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Import %@",nil),selectedAtlasName]
+                                                               message: NSLocalizedString(@"Import may take a few minutes, continue?.",nil)
                                                               delegate: self
-                                                     cancelButtonTitle:@"Cancel"
-                                                     otherButtonTitles:@"Continue",nil];
+                                                     cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                                     otherButtonTitles:NSLocalizedString(@"Continue",nil),nil];
                 alert.tag = DOWNLOAD_START_ALERT;
                 [alert show];
                 
@@ -252,7 +252,7 @@ int swipPromptCount;
     if (alertView.tag == DOWNLOAD_CONFIRM)
     {
         UITextField *agree = [alertView textFieldAtIndex:0];
-        if ([agree.text caseInsensitiveCompare:@"agree"] == NSOrderedSame)
+        if ([agree.text caseInsensitiveCompare:NSLocalizedString(@"agree",nil)] == NSOrderedSame)
         {
             [ATHelper startReplaceDb:selectedAtlasName :downloadedJson :spinner];
             [_parent changeSelectedSource: selectedAtlasName];
@@ -260,7 +260,7 @@ int swipPromptCount;
         }
         else
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"You Canceled replacing offline content!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"You Canceled replacing offline content!",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [alert show];
         }
     }
@@ -294,11 +294,11 @@ int swipPromptCount;
                 [self startDownload];
             if (alertView.tag == DOWNLOAD_REPLACE_MY_SOURCE_ALERT )
             {
-                UIAlertView* alert  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Confirm to replace %@ contents in your device!",[ATHelper getSelectedDbFileName]]
-                    message:@"Enter agree to continue:" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                UIAlertView* alert  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Confirm to replace %@ contents in your device!",nil),[ATHelper getSelectedDbFileName]]
+                    message:NSLocalizedString(@"Enter agree to continue:",nil) delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
                 [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
                 UITextField * aa = [alert textFieldAtIndex:0];
-                aa.placeholder = @"agree";
+                aa.placeholder = NSLocalizedString(@"agree",nil);
                 alert.tag = DOWNLOAD_CONFIRM;
                 [alert show];
             }
@@ -329,11 +329,11 @@ int swipPromptCount;
     NSError* error;
     downloadedJson = [NSJSONSerialization JSONObjectWithData:downloadedData options:kNilOptions error:&error];
     
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"Downloaded %@ has %i events",selectedAtlasName,[downloadedJson count]]
-                                message: [NSString stringWithFormat:@"WARNING: Local %@'s %@ events will be replaced!",selectedAtlasName,displayLocalCnt]
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Downloaded %@ has %i events",nil),selectedAtlasName,[downloadedJson count]]
+                                message: [NSString stringWithFormat:NSLocalizedString(@"WARNING: Local %@'s %@ events will be replaced!",nil),selectedAtlasName,displayLocalCnt]
                                 delegate: self
-                                cancelButtonTitle:@"Cancel"
-                                otherButtonTitles:@"Replace",nil];
+                                cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                otherButtonTitles:NSLocalizedString(@"Replace",nil),nil];
     alert.tag = DOWNLOAD_REPLACE_MY_SOURCE_ALERT;
     [spinner stopAnimating];
     [alert show];

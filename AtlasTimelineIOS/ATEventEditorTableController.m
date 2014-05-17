@@ -138,7 +138,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [self.photoScrollView removeFromSuperview];
         self.photoScrollView = nil;
     }
-    lblShareCount.text = @"Share Event";
+    lblShareCount.text = NSLocalizedString(@"Share Event",nil);
     
     //customViewForPhoto = nil;
     
@@ -189,7 +189,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         //Label in the view
         UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 100, 40)];
         label.backgroundColor = [UIColor clearColor];
-        label.text = @"Addr:";
+        label.text = NSLocalizedString(@"Addr:",nil);
         [customView addSubview:label];
         
         UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -228,7 +228,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
 - (void) setShareCount
 {
-    lblShareCount.text = [NSString stringWithFormat:@"%d photo(s)", self.photoScrollView.selectedAsShareIndexSet.count ];
+    lblShareCount.text = [NSString stringWithFormat:NSLocalizedString(@"%d photo(s)",nil), self.photoScrollView.selectedAsShareIndexSet.count ];
 }
  
 //called by mapView after know eventId
@@ -470,7 +470,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     markerPickerView.backgroundColor = [UIColor colorWithRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0];
     [markerPickerToolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
     
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: @"Done" style: UIBarButtonItemStyleDone target: self action: @selector(markerPicked:)];
+    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: NSLocalizedString(@"Done",nil) style: UIBarButtonItemStyleDone target: self action: @selector(markerPicked:)];
     doneButton.width = 50;
     doneButton.tintColor = [UIColor blueColor];
     markerPickerToolbar.items = [NSArray arrayWithObject: doneButton];
@@ -488,11 +488,13 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 -(BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
     if (textField.tag == DATE_TEXT_FROM_STORYBOARD_999) { //999 is for date textField in storyboard
         NSString* bcDate = self.dateTxt.text;
-        //if date is already a a BC date, datePicker will crash, so do not show date picker if is a BC date
-        if (bcDate != nil && [bcDate rangeOfString:@"BC"].location!=NSNotFound)
-            return true;
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         NSDateFormatter *dateFormater = appDelegate.dateFormater;
+        NSDate* tmpDate = [dateFormater dateFromString:bcDate];
+        //if date is already a a BC date, datePicker will crash, so do not show date picker if is a BC date
+        if (bcDate != nil && [ATHelper isBCDate:tmpDate])
+            return true;
+
         if (self.datePicker == nil) //will be nill if clicked Done button
         {
             self.datePicker = [[UIDatePicker alloc] init];
@@ -572,8 +574,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     NSDate* dt = [dateFormater dateFromString:self.dateTxt.text ];
     if (dt == nil)  //this could happen if edit a BC date where DatePicker is not allowed popup
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Wrong Date Format"
-                message:@"The correct date format is MM/dd/yyyy AD or BC"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Wrong Date Format",nil)
+                                                        message:[NSString stringWithFormat:NSLocalizedString(@"The correct date format is MM/dd/yyyy Era (such as %@)",nil),appDelegate.localizedAD]
                 delegate:nil
                 cancelButtonTitle:@"OK"
                 otherButtonTitles:nil];
@@ -588,8 +590,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     descTxt = [ATHelper clearMakerAllFromDescText:descTxt];
     if (descTxt == nil || descTxt.length == 0)
     {  //#### have to have this check, otherwise the eventEditor will not popup
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Description field may not be empty. (keep tag <<...>> if there is one)"
-                message:@"Please enter description."
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Description field may not be empty. (keep tag <<...>> if there is one)",nil)
+                message:NSLocalizedString(@"Please enter description.",nil)
                 delegate:nil
                 cancelButtonTitle:@"OK"
                 otherButtonTitles:nil];
@@ -621,12 +623,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
 - (IBAction)deleteAction:(id)sender {
     int cnt = [self.photoScrollView.photoList count] ;
-    NSString* promptStr = @"This event will be deleted!";
+    NSString* promptStr = NSLocalizedString(@"This event will be deleted!",nil);
     if (cnt > 0)
     {
-        promptStr = [NSString stringWithFormat:@"%d photo(s) in the event will be deleted as well",cnt];
+        promptStr = [NSString stringWithFormat:NSLocalizedString(@"%d photo(s) in the event will be deleted as well",nil),cnt];
     }
-    alertDelete = [[UIAlertView alloc]initWithTitle: @"Confirm to delete the event"
+    alertDelete = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Confirm to delete the event",nil)
                                             message: promptStr
                                            delegate: self
                                   cancelButtonTitle:@"Cancel"
@@ -675,11 +677,11 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     int cnt = [photoNewAddedList count] ;
     if (cnt > 0)
     {
-        alertCancel = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:@"%d new photo(s) are not saved",cnt]
-                                                message: [NSString stringWithFormat:@"Cancel will lose your new photos."]
+        alertCancel = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"%d new photo(s) are not saved",nil),cnt]
+                                                message: [NSString stringWithFormat:NSLocalizedString(@"Cancel will lose your new photos.",nil)]
                                                delegate: self
-                                      cancelButtonTitle:@"Do not cancel"
-                                      otherButtonTitles:@"Quit w/o save",nil];
+                                      cancelButtonTitle:NSLocalizedString(@"Do not cancel",nil)
+                                      otherButtonTitles:NSLocalizedString(@"Quit w/o save",nil),nil];
         
         
         [alertCancel show];
@@ -716,8 +718,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     else
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Wrong Date Format"
-                message:@"The correct date format is MM/dd/yyyy AD or BC"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Wrong Date Format",nil)
+                message:[NSString stringWithFormat:NSLocalizedString(@"The correct date format is MM/dd/yyyy Era (such as %@)",nil),appDelegate.localizedAD]
                 delegate:nil
                 cancelButtonTitle:@"OK"
                 otherButtonTitles:nil];
@@ -834,7 +836,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 {
     //Change total/new added photos count
     lblTotalCount.text = [NSString stringWithFormat:@"%d", [self.photoScrollView.photoList count] ];
-    lblNewAddedCount.text = [NSString stringWithFormat:@"[+%d/-%d unsaved!]", [photoNewAddedList count], [photoDeletedList count] ];//color is red so use separate lbl
+    lblNewAddedCount.text = [NSString stringWithFormat:NSLocalizedString(@"[+%d/-%d unsaved!]",nil), [photoNewAddedList count], [photoDeletedList count] ];//color is red so use separate lbl
     if ([photoNewAddedList count] == 0 && [photoDeletedList count] == 0)
         lblNewAddedCount.hidden = true;
     else
@@ -897,7 +899,10 @@ numberOfRowsInComponent:(NSInteger)component
 {
     NSString* eventDescText = [ATHelper clearMakerAllFromDescText:self.eventEditor.description.text];
     NSString* dateStr = self.eventEditor.dateTxt.text;
-    if ([dateStr rangeOfString:@"AD"].location != NSNotFound)
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSDateFormatter *dateFormater = appDelegate.dateFormater;
+    NSDate* date = [dateFormater dateFromString:self.eventEditor.dateTxt.text];
+    if (![ATHelper isBCDate:date])
         dateStr = [dateStr substringWithRange:NSMakeRange(0, 10)];
         
     NSString *googleMap = [NSString stringWithFormat:@"https://maps.google.com/maps?q=%f,%f&spn=65.61535,79.013672",self.eventEditor.coordinate.latitude, self.eventEditor.coordinate.longitude ];
@@ -910,7 +915,7 @@ numberOfRowsInComponent:(NSInteger)component
     }
     else
     {
-        return [NSString stringWithFormat:@"[%@] %@\n\n Map Location:%@      (Organized with ChronicleMap.com)",dateStr, eventDescText, googleMap];
+        return [NSString stringWithFormat:NSLocalizedString(@"[%@] %@\n\n Map Location:%@      (Organized with ChronicleMap.com)",nil),dateStr, eventDescText, googleMap];
     }
 }
 - (id) activityViewControllerPlaceholderItem:(UIActivityViewController *)activityViewController { return @""; }

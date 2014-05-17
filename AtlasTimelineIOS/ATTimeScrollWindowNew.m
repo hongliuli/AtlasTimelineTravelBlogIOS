@@ -266,7 +266,7 @@
         [periodToAddForFocusedDate setDay:focusedRow]; //FocusedRow for day is differently, use 2000 days
         [periodToAddForDisplay setDay:currentRow];
         [nextTimePeriodCompponent setDay:1];
-        cell.scallLabel.text = @"day";
+        cell.scallLabel.text = NSLocalizedString(@"day",nil);
         cell.backgroundView = nil;
     }
     else if (daysInPeriod == 30)
@@ -274,7 +274,7 @@
         [periodToAddForFocusedDate setDay:focusedRow]; //FocusedRow for day is differently, use 2000 days
         [periodToAddForDisplay setDay:currentRow];
         [nextTimePeriodCompponent setDay:1];
-        cell.scallLabel.text = @"day";
+        cell.scallLabel.text = NSLocalizedString(@"day",nil);
         
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
@@ -287,7 +287,7 @@
         [periodToAddForFocusedDate setMonth:focusedRow];
         [periodToAddForDisplay setMonth:currentRow];
         [nextTimePeriodCompponent setMonth:1];
-        cell.scallLabel.text = @"month";
+        cell.scallLabel.text = NSLocalizedString(@"month",nil);
         
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
@@ -301,7 +301,7 @@
         [periodToAddForFocusedDate setYear:focusedRow];
         [periodToAddForDisplay setYear:currentRow];
         [nextTimePeriodCompponent setYear:1];
-        cell.scallLabel.text = @"1 yr";
+        cell.scallLabel.text = NSLocalizedString(@"1 yr",nil);
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
         av.opaque = NO;
@@ -314,7 +314,7 @@
         [periodToAddForFocusedDate setYear:focusedRow * 10];
         [periodToAddForDisplay setYear:currentRow * 10];
         [nextTimePeriodCompponent setYear:10];
-        cell.scallLabel.text = @"10 yrs";
+        cell.scallLabel.text = NSLocalizedString(@"10 yrs",nil);
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
         av.opaque = NO;
@@ -326,7 +326,7 @@
         [periodToAddForFocusedDate setYear:focusedRow * 100];
         [periodToAddForDisplay setYear:currentRow * 100];
         [nextTimePeriodCompponent setYear:100];
-        cell.scallLabel.text = @"100 yrs";
+        cell.scallLabel.text = NSLocalizedString(@"100 yrs",nil);
         UIImageView *av = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
         av.backgroundColor = [UIColor clearColor];
         av.opaque = NO;
@@ -353,7 +353,7 @@
     NSString* dateString = [NSString stringWithFormat:@" %@", [format stringFromDate:displayDate]];
     NSString* shortYear = [dateString substringWithRange:NSMakeRange(7, 4)];
     
-    if ([dateString rangeOfString:@"AD"].location == NSNotFound )
+    if ([ATHelper isBCDate:displayDate] )
     {
         cell.titleLabel.text =[dateString substringWithRange:NSMakeRange(7, 7)];
         yearForImages = -yearForImages ;
@@ -576,7 +576,7 @@
             else if (pinchVelocity > 0 )
             {
                 appDelegate.selectedPeriodInDays = 7;
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Reached the max Zoom-In level Week!" message:@"You can reset max Zoom-In level to MONTH in Settings -> Options.\n(MONTH zoom level is detailed enough for most uses)" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Reached the max Zoom-In level Week!",nil) message:NSLocalizedString(@"You can reset max Zoom-In level to MONTH in Settings -> Options.\n(MONTH zoom level is detailed enough for most uses)",nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
                 [alert show];
                 return;
             }
@@ -600,7 +600,7 @@
             else
             {
 
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Reached the max Zoom-In level Month!" message:@"You can set max Zoom-In to  WEEK in Settings -> Options.\n(Zoom to week may be useful only when plan a short trip)" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Reached the max Zoom-In level Month!",nil) message:NSLocalizedString(@"You can set max Zoom-In to  WEEK in Settings -> Options.\n(Zoom to week may be useful only when plan a short trip)",nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
                 [alert show];
                 return;
             }
@@ -615,7 +615,7 @@
             else  //no enough total time to zoom out
             {
                 maxZoomOutReached = true;
-                maxZoomOutTxt = @"1 year";
+                maxZoomOutTxt = NSLocalizedString(@"1 Year",nil);
                 //return;
             }
             //focusedRow = focusedRow/12;
@@ -636,7 +636,7 @@
             else
             {
                 maxZoomOutReached = true;
-                maxZoomOutTxt = @"10 years";
+                maxZoomOutTxt = NSLocalizedString(@"10 Years",nil);
                 //return;
             }
         }
@@ -654,7 +654,7 @@
             else
             {
                 maxZoomOutReached = true;
-                maxZoomOutTxt = @"100 years";
+                maxZoomOutTxt = NSLocalizedString(@"100 Years",nil);
                 //return;
             }
             //focusedRow = focusedRow/10;
@@ -673,7 +673,7 @@
         {
             if (currentNumberOfRow / 10 > 1)
                 appDelegate.selectedPeriodInDays = 365000;
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Zooming out the timeline reached 1000-years range limit!" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Zooming out the timeline reached 1000-years range limit!",nil) message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
             return;
         }
@@ -688,7 +688,7 @@
     {
         NSDateFormatter* df = appDelegate.dateFormater;
         NSString* dt = [[df stringFromDate:appDelegate.focusedDate] substringToIndex:10];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Cannot zoom-out anymore!" message:[NSString stringWithFormat:@"In this case, all events within %@ of %@ are colored.",maxZoomOutTxt, dt] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Cannot zoom-out anymore!",nil) message:[NSString stringWithFormat:NSLocalizedString(@"In this case, all events within %@ of %@ are colored.",nil),maxZoomOutTxt, dt] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         return;
     }
@@ -941,113 +941,6 @@
     
 }
 
--(void) displayTimeElapseinSearchBar
-{
-    self.parent.searchBar.text = [self getTimeElapsedFromFocusedDate];
-}
-
-
-- (NSString*)getTimeElapsedFromFocusedDate
-{
-    NSDate* today = [[NSDate alloc] init];
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSTimeInterval interval = [appDelegate.focusedDate timeIntervalSinceDate: today];
-    int dayInterval = interval/86400;
-    /** These logic is for my previouse thining that all point be shown, and color phase depends on selectedPeriodInDays
-     float segmentDistance = dayInterval/segmentInDays;
-     ***/
-    
-    //Here, only show events withing selectedPeriodInDays, color phase will be selectedPeriodInDays/8
-    int year = dayInterval/365 ;
-    yearElapsedFromToday = year; //used in time scroll logic
-    int month = dayInterval/30;
-    int monthInYear = abs((dayInterval - year*365)/30);
-    int dayInMonth = abs((dayInterval - year*365 - month*30));
-    NSString* beforeAgo;
-    NSString* returnStr;
-    int finalDisplayNumber;
-    if (year != 0)
-    {
-        if (year < -1 )
-        {
-            if (abs(year) < 5 && monthInYear != 0)
-                beforeAgo = [NSString stringWithFormat: @"years %i mo ago", monthInYear];
-            else
-                beforeAgo = [NSString stringWithFormat: @"years ago"];
-        }
-        else if (year == -1)
-            if (monthInYear !=0)
-                beforeAgo = [NSString stringWithFormat: @"year %i mo ago", monthInYear];
-            else
-                beforeAgo = [NSString stringWithFormat: @"year ago"];
-            else if (year == 1)
-                if (monthInYear !=0)
-                    beforeAgo = [NSString stringWithFormat: @"year %i mo later", monthInYear];
-                else
-                    beforeAgo = [NSString stringWithFormat: @"year later"];
-                else
-                {
-                    if (abs(year) < 5 && monthInYear != 0)
-                        beforeAgo = [NSString stringWithFormat: @"years %i mo later", monthInYear];
-                    else
-                        beforeAgo = [NSString stringWithFormat: @"years later"];
-                }
-        finalDisplayNumber = year;
-    }
-    else if (month != 0 && year == 0)
-    {
-        NSString* dayW = @"day";
-        if (dayInMonth > 1)
-            dayW = @"days";
-        if (month < -1)
-            beforeAgo = [NSString stringWithFormat: @"mo %i %@ ago", dayInMonth, dayW];
-        else if (month == -1)
-            beforeAgo = [NSString stringWithFormat: @"mo %i %@ ago", dayInMonth, dayW];
-        else if (month == 1)
-            beforeAgo =[NSString stringWithFormat: @"mo %i %@ later", dayInMonth, dayW];
-        else
-            beforeAgo = [NSString stringWithFormat: @"mo %i %@ later", dayInMonth, dayW];
-        finalDisplayNumber = month;
-    }
-    else if (dayInterval != 0 && month == 0 && year == 0)
-    {
-        if (dayInterval < -1)
-            beforeAgo = @"days ago";
-        else if (dayInterval == -1)
-            beforeAgo = @"day ago";
-        else if (dayInterval == 1)
-            beforeAgo =@"day later";
-        else
-            beforeAgo = @"days later";
-        finalDisplayNumber = dayInterval;
-    }
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        if (dayInterval == 0)
-            returnStr = @"                          Today";
-        else
-            returnStr = [NSString stringWithFormat:@"               %i %@",abs(finalDisplayNumber), beforeAgo];
-        return returnStr;
-    }
-    else
-    {
-        UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-        if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)
-        {
-            if (dayInterval == 0)
-                returnStr = @"             Today";
-            else
-                returnStr = [NSString stringWithFormat:@"         %i %@",abs(finalDisplayNumber), beforeAgo];
-        }
-        else
-        {
-            if (dayInterval == 0)
-                returnStr = @"     Today";
-            else
-                returnStr = [NSString stringWithFormat:@" %i %@",abs(finalDisplayNumber), beforeAgo];
-        }
-        return returnStr;
-    }
-}
 
 #pragma mark - Memory Management
 
@@ -1055,7 +948,7 @@
 {
     return @"HorizontalCell";
 }
-
+/*
 - (void) changeBackgroundImage:(UIView*)view year:(int)year
 {
     NSString* tmpImg = nil;
@@ -1122,7 +1015,7 @@
     }
     
 }
-
+*/
 -(void) setNewFocusedDateFromAnnotation:(NSDate *)newFocusedDate needAdjusted:(BOOL)needAdjusted
 {
     //NSDateComponents *dateComponents = [[NSDateComponents alloc] init];

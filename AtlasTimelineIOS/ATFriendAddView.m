@@ -62,10 +62,10 @@ BOOL showSendRequestFlag;
                 // First time access has been granted, add the contact
                 [self getEmails];
             } else {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Access Denied"
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Access Denied",nil)
                                                                 message:@""
                                                                delegate:nil
-                                                      cancelButtonTitle:@"OK"
+                                                      cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                                       otherButtonTitles:nil];
                 [alert show];
             }
@@ -78,10 +78,10 @@ BOOL showSendRequestFlag;
     else {
         // The user has previously denied access
         // Send an alert telling user to change privacy setting in settings app
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"The access has previously been denied"
-                                                        message:@"Please change privacy setting in settings app"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"The access has previously been denied",nil)
+                                                        message:NSLocalizedString(@"Please change privacy setting in settings app",nil)
                                                        delegate:nil
-                                              cancelButtonTitle:@"OK"
+                                              cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                               otherButtonTitles:nil];
         [alert show];
     }
@@ -175,7 +175,7 @@ BOOL showSendRequestFlag;
         UIButton *addFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         addFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
         addFriendButton.frame = CGRectMake(30, 0, 200, 50);
-        [addFriendButton setTitle:@"Send Request to Friend" forState:UIControlStateNormal];
+        [addFriendButton setTitle:NSLocalizedString(@"Send Request to Friend",nil) forState:UIControlStateNormal];
         [addFriendButton.titleLabel setTextColor:[UIColor blueColor]];
         [addFriendButton addTarget:self action:@selector(requestFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:addFriendButton];
@@ -272,21 +272,21 @@ BOOL showSendRequestFlag;
     
     if ([friendList containsObject:friendString])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ is already your friend", friendString]
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ is already your friend",nil), friendString]
                             message:@""
                             delegate:nil
-                            cancelButtonTitle:@"OK"
+                            cancelButtonTitle:NSLocalizedString(@"OK",nil)
                             otherButtonTitles:nil];
         [alert show];
         return;
     }
     else if ([friendList containsObject:[NSString stringWithFormat:@"%@(wait)",friendString]])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ has not accepted your request yet", friendString]
-                                                        message:@"You have invited him/her before, do you want to send another invitation email?"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ has not accepted your request yet",nil), friendString]
+                                                        message:NSLocalizedString(@"You have invited him/her before, do you want to send another invitation email?",nil)
                                                        delegate:self
-                                              cancelButtonTitle:@"No"
-                                              otherButtonTitles:@"Yes", nil];
+                                              cancelButtonTitle:NSLocalizedString(@"No",nil)
+                                              otherButtonTitles:NSLocalizedString(@"Yes",nil), nil];
         [alert show];
         return;
     }
@@ -319,20 +319,20 @@ BOOL showSendRequestFlag;
     if ([@"SUCCESS" isEqualToString:responseStr])
     {
         [appDelegate.friendList addObject:[NSString stringWithFormat:@"%@(wait)",friendString]];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"An invitation email has been sent to your friend"
-                                                        message:@"After he/she clicks accept link in the email, you can start to send her episode"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"An invitation email has been sent to your friend",nil)
+                                                        message:NSLocalizedString(@"After he/she clicks accept link in the email, you can start to send her episode",nil)
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];
         [alert show];
         [appDelegate.friendList addObject:[NSString stringWithFormat:@"%@(wait)", friendString]];
         self.searchBar.text = @"";
-        self.searchBar.placeholder = @"Enter email";
+        self.searchBar.placeholder = NSLocalizedString(@"Enter email",nil);
     }
     else //alreadyFriend, allready in Queue etc should not happen in server, if happen, treat same
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat: @"failed to add %@", friendString]
-                                                        message:@"server may have issue, or already be friend"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat: NSLocalizedString(@"failed to add %@",nil), friendString]
+                                                        message:NSLocalizedString(@"server may have issue, or already be friend",nil)
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];
