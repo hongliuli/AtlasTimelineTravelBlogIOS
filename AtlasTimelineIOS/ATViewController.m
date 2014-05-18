@@ -183,6 +183,8 @@
     [self.timeZoomLine showHideScaleText:false];
     [ATHelper setOptionDateFieldKeyboardEnable:false]; //always set default to not allow keyboard
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    [self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"Timeline/Search",nil)];
+    [self.searchBar setPlaceholder:NSLocalizedString(@"Address", nil)];
     if ([appDelegate.eventListSorted count] == 0)
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Add your first event",nil) message:NSLocalizedString(@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Incoming Contents/Episodes] to learn more.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
