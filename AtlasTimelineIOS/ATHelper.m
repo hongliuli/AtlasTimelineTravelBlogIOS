@@ -154,6 +154,8 @@ UIPopoverController *verifyViewPopover;
         return true;
     else
     {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Login to access server",nil) message:NSLocalizedString(@"Enter your email and send a security code to your email. Then enter the security code to login. Your email address will be your login ID!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+        [alert show];
         [self startCreateUser: sender];
         return false;
     }
@@ -437,15 +439,30 @@ UIPopoverController *verifyViewPopover;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int cnt = [downloadedJsonArray count];
     NSMutableArray* newEventList = [[NSMutableArray alloc] initWithCapacity:cnt];
+    NSDateFormatter* usDateformater = [appDelegate.dateFormater copy];
+    //always use USLocale to save date in JSON, so always use it to read. this resolve a big issue when user upload with one local and download with another local setting.
+    // See ATPreferenceViewController startUploadJson
+    [usDateformater setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"]];
+    NSNumberFormatter *numFormatter = [[NSNumberFormatter alloc] init];
+    [numFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"]];
+    
+    if (downloadedJsonArray!=nil && [downloadedJsonArray count]>0)
+    {//This part is for backward compability in case user already saved localized NSDate string to server
+        NSDictionary* tmpDic = downloadedJsonArray[0];
+        NSString* dateStr =[tmpDic objectForKey:@"eventDate"];
+        if ([dateStr rangeOfString:@" AD"].location == NSNotFound)
+            usDateformater = appDelegate.dateFormater; //do not apply USLocalize
+    }
+
     for (NSDictionary* dict in downloadedJsonArray)
     {
         ATEventDataStruct* evt = [[ATEventDataStruct alloc] init];
         evt.uniqueId = [dict objectForKey:@"uniqueId"];
         evt.eventDesc = [dict objectForKey:@"eventDesc"];
-        evt.eventDate = [appDelegate.dateFormater dateFromString:[dict objectForKey:@"eventDate"]];
+        evt.eventDate = [usDateformater dateFromString:[dict objectForKey:@"eventDate"]];
         evt.address = [dict objectForKey:@"address"];
-        evt.lat = [[dict objectForKey:@"lat"] doubleValue];
-        evt.lng = [[dict objectForKey:@"lng"] doubleValue];
+        evt.lat = [[numFormatter numberFromString:[dict objectForKey:@"lat"]] doubleValue];
+        evt.lng = [[numFormatter numberFromString:[dict objectForKey:@"lng"]] doubleValue];
         evt.eventType = [[dict objectForKey:@"eventType"] intValue];
         [newEventList addObject:evt];
         // NSLog(@"%@    desc %@", [dict objectForKey:@"eventDate"],[dict objectForKey:@"eventDesc"]);
