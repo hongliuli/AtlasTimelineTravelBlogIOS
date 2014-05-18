@@ -154,7 +154,7 @@ NSString* deleteFriend_wait;
         
         UIButton *addFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         addFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
-        addFriendButton.frame = CGRectMake(175, 30, 90, 30);
+        addFriendButton.frame = CGRectMake(0, 30, 90, 30);
         [addFriendButton setTitle:NSLocalizedString(@"Add Friend",nil) forState:UIControlStateNormal];
         [addFriendButton.titleLabel setTextColor:[UIColor blueColor]];
         [addFriendButton addTarget:self action:@selector(addFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];

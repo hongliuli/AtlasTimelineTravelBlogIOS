@@ -190,6 +190,11 @@ UIPopoverController *verifyViewPopover;
         
     }
 }
++ (void) closeCreateUserPopover
+{
+    if (verifyViewPopover != nil)
+        [verifyViewPopover dismissPopoverAnimated:false];
+}
 + (NSDate *)getYearStartDate:(NSDate*)date
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -406,10 +411,10 @@ UIPopoverController *verifyViewPopover;
 
 +(NSString*) httpGetFromServer:(NSString *)serverUrl
 {
-    serverUrl = [serverUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    serverUrl = [serverUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]; //will handle chinese etc
 
     NSURL* serviceUrl = [NSURL URLWithString:serverUrl];
-    NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl];
+    NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl cachePolicy:0 timeoutInterval:5];
     //NSLog(@"request is: %@",serverUrl);
     //Get Responce hear----------------------
     NSURLResponse *response;
@@ -461,8 +466,10 @@ UIPopoverController *verifyViewPopover;
         evt.eventDesc = [dict objectForKey:@"eventDesc"];
         evt.eventDate = [usDateformater dateFromString:[dict objectForKey:@"eventDate"]];
         evt.address = [dict objectForKey:@"address"];
-        evt.lat = [[numFormatter numberFromString:[dict objectForKey:@"lat"]] doubleValue];
-        evt.lng = [[numFormatter numberFromString:[dict objectForKey:@"lng"]] doubleValue];
+        //evt.lat = [[numFormatter numberFromString:[dict objectForKey:@"lat"]] doubleValue];
+        //evt.lng = [[numFormatter numberFromString:[dict objectForKey:@"lng"]] doubleValue];
+        evt.lat = [[dict objectForKey:@"lat"] doubleValue];
+        evt.lng = [[dict objectForKey:@"lng"] doubleValue];
         evt.eventType = [[dict objectForKey:@"eventType"] intValue];
         [newEventList addObject:evt];
         // NSLog(@"%@    desc %@", [dict objectForKey:@"eventDate"],[dict objectForKey:@"eventDesc"]);

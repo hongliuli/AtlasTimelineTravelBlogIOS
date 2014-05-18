@@ -526,7 +526,7 @@
         if (row == ROW_CONTENT_MG_SWITCH_ACTIVE)
         {
             cell.textLabel.text = NSLocalizedString(@"Set Active Contents",nil);
-            cell.detailTextLabel.text = NSLocalizedString(@"Select Active from offline contents",nil);
+            cell.detailTextLabel.text = NSLocalizedString(@"Select Active from the downloaded contents/episodes",nil);
         }
         if (row == ROW_CONTENT_MG_MY_EPISODE)
         {
@@ -616,7 +616,7 @@
         if (row == ROW_SYNC_FROM_DROPBOX)
             photoFromDropboxCell = cell;
     }
-    //cell.textLabel.font = [UIFont fontWithName:@"Helvetica-italic" size:12];
+    cell.textLabel.font = [UIFont fontWithName:@"Helvetica-italic" size:16];//no effect to chinese
     return cell;
 }
 

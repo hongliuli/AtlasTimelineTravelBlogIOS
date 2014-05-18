@@ -78,8 +78,8 @@ BOOL showSendRequestFlag;
     else {
         // The user has previously denied access
         // Send an alert telling user to change privacy setting in settings app
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"The access has previously been denied",nil)
-                                                        message:NSLocalizedString(@"Please change privacy setting in settings app",nil)
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"The access to Address Book has previously been denied",nil)
+                                                        message:NSLocalizedString(@"Please grant access in iOS Settings->Privacy->Contacts->Chronicle Map\n(This is optional. Address Book is used for you to find friend easily)",nil)
                                                        delegate:nil
                                               cancelButtonTitle:NSLocalizedString(@"OK",nil)
                                               otherButtonTitles:nil];
@@ -174,8 +174,8 @@ BOOL showSendRequestFlag;
         customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 200, 50)];
         UIButton *addFriendButton = [UIButton buttonWithType:UIButtonTypeSystem];
         addFriendButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
-        addFriendButton.frame = CGRectMake(30, 0, 200, 50);
-        [addFriendButton setTitle:NSLocalizedString(@"Send Request to Friend",nil) forState:UIControlStateNormal];
+        addFriendButton.frame = CGRectMake(0, 0, 200, 50);
+        [addFriendButton setTitle:NSLocalizedString(@"Send Invitation",nil) forState:UIControlStateNormal];
         [addFriendButton.titleLabel setTextColor:[UIColor blueColor]];
         [addFriendButton addTarget:self action:@selector(requestFriendButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:addFriendButton];

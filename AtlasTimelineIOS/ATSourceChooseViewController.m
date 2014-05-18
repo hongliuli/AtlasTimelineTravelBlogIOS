@@ -183,7 +183,7 @@
 {
     if(self.requestType == FOR_CHOOSE_ACTIVE)
     {
-        return NSLocalizedString(@" Set Active Contents",nil);
+        return NSLocalizedString(@" Set Active from the Downloaded List",nil);
     }
     else
     {
@@ -194,8 +194,8 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     
     UILabel *myLabel = [[UILabel alloc] init];
-    myLabel.frame = CGRectMake(0, 0, 250, 40);
-    myLabel.font = [UIFont boldSystemFontOfSize:17];
+    myLabel.frame = CGRectMake(0, 0, 400, 40);
+    myLabel.font = [UIFont boldSystemFontOfSize:15];
     myLabel.text = [self tableView:tableView titleForHeaderInSection:section];
     myLabel.backgroundColor = [UIColor clearColor];
 ;

@@ -18,6 +18,7 @@
 + (NSString*) getMonthDateInTwoNumber:(NSDate*)date;
 + (NSString*) getMonthSlashDateInNumber:(NSDate *)date;
 + (Boolean)checkUserEmailAndSecurityCode:(UIViewController*)sender;
++ (void) closeCreateUserPopover;
 + (NSString*) getSelectedDbFileName;
 + (void) setSelectedDbFileName:(NSString*)fileName;
 + (UIColor *)darkerColorForColor:(UIColor *)c;

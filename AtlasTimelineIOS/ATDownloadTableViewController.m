@@ -319,7 +319,11 @@ int swipPromptCount;
     NSString* userId = userEmail;
 
     NSString* atlasName = [selectedAtlasName stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-    NSURL* serviceUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@/downloadjsoncontents?user_id=%@&security_code=%@&atlas_name=%@",[ATConstants ServerURL], userId, securityCode, atlasName]];
+    NSString* urlString = [NSString stringWithFormat:@"%@/downloadjsoncontents?user_id=%@&security_code=%@&atlas_name=%@",[ATConstants ServerURL], userId, securityCode, atlasName];
+    //NSLog(@"-- bf encoding%@",urlString);
+    urlString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];//so atlasName is other language will work
+    //NSLog(@"-- after encoding%@",urlString);
+    NSURL* serviceUrl = [NSURL URLWithString:urlString];
 
     NSData* downloadedData = [NSData dataWithContentsOfURL:serviceUrl];
     NSString* displayLocalCnt = @"";

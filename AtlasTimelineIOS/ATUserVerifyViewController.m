@@ -91,8 +91,9 @@ NSString* receivedSecurityCode; //use this to compare with user entered
        [userDefault synchronize];
 
        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Verify Success!",nil) message:NSLocalizedString(@"You can import/export from any device with the same email address!",nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-       [self dismissViewControllerAnimated:true completion:nil];
+       //[self dismissViewControllerAnimated:true completion:nil];
        [alert show];
+       [ATHelper closeCreateUserPopover];
    }
    else
    {
@@ -101,9 +102,6 @@ NSString* receivedSecurityCode; //use this to compare with user entered
    }
 }
 
-- (IBAction)dismiss:(id)sender {
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
 
 - (void)didReceiveMemoryWarning
 {
