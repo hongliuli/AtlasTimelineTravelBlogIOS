@@ -774,7 +774,7 @@ NSDate* prevYearDate;
                     float xPos = x - 170;
                     if (xPos < 80)
                         xPos = 100;
-                    [self makeToast:NSLocalizedString(@"Tip: Green dots indicate events currently displayed on screen.",nil) duration:10.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
+                    [self makeToast:NSLocalizedString(@"Tip: Green dots - events in this period is on screen.",nil) duration:10.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
                     self.hidden = false;
                     self.mapViewController.timeScrollWindow.hidden  = false;
                 }
