@@ -394,7 +394,13 @@
     }
     
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSDateFormatter* formater = appDelegate.dateFormater;
+    
+    
+    NSDateFormatter* usDateFormater = [appDelegate.dateFormater copy];
+    //always use USLocale to save date in JSON, so always use it to read. this resolve a big issue when user upload with one local and download with another local setting.
+    // See ATHelper startDownload
+    [usDateFormater setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"]];
+    
     NSArray *myAtlasList = appDelegate.eventListSorted;
     int eventCount = [myAtlasList count];
     NSMutableArray* dictArray = [[NSMutableArray alloc] initWithCapacity:eventCount];
@@ -407,7 +413,7 @@
         NSMutableDictionary* itemDict = [[NSMutableDictionary alloc] init];
         [itemDict setObject:item.uniqueId forKey:@"uniqueId"];
         [itemDict setObject:item.eventDesc forKey:@"eventDesc"];
-        [itemDict setObject:[formater stringFromDate:item.eventDate] forKey:@"eventDate"]; //NSDate is not serializable
+        [itemDict setObject:[usDateFormater stringFromDate:item.eventDate] forKey:@"eventDate"]; //NSDate is not serializable
         [itemDict setObject:eventType forKey:@"eventType"];
         [itemDict setObject:item.address forKey:@"address"];
         [itemDict setObject:[NSNumber numberWithDouble:item.lat] forKey:@"lat"];
