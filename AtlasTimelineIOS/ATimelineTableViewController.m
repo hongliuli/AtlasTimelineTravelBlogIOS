@@ -69,7 +69,8 @@ NSMutableArray* originalEventListSorted;
 - (void)viewDidLoad {
 	
     [super viewDidLoad];
-    
+    [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"search any description and address",nil)];
+    [self.navigationItem setTitle:NSLocalizedString(@"Timeline/Search", nil)];
     // Add a pinch gesture recognizer to the table view.
 	UIPinchGestureRecognizer* pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
 	[self.tableView addGestureRecognizer:pinchRecognizer];
