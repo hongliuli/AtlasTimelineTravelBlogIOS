@@ -106,6 +106,9 @@
 		CE7E3D9C1698F506004E71CD /* ATEventAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7E3D9B1698F506004E71CD /* ATEventAnnotation.m */; };
 		CE7E3D9F1698F523004E71CD /* ATEventAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7E3D9E1698F523004E71CD /* ATEventAnnotationView.m */; };
 		CE7E3DA21698F55B004E71CD /* ATUnsavedAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7E3DA11698F55B004E71CD /* ATUnsavedAnnotationView.m */; };
+		CE88B40D1926FE8D00EE43C5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE88B40F1926FE8D00EE43C5 /* Localizable.strings */; };
+		CE88B417192704F900EE43C5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE88B412192704F900EE43C5 /* Localizable.strings */; };
+		CE88B418192704F900EE43C5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE88B415192704F900EE43C5 /* Localizable.strings */; };
 		CE97FC9B170795A600F97A3E /* no_image.gif in Resources */ = {isa = PBXBuildFile; fileRef = CE97FC9A170795A600F97A3E /* no_image.gif */; };
 		CEA41D3A18580C410034F1C3 /* BasePhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA41D3518580C410034F1C3 /* BasePhotoViewController.m */; };
 		CEA41D3B18580C410034F1C3 /* ImageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA41D3718580C410034F1C3 /* ImageScrollView.m */; };
@@ -308,6 +311,11 @@
 		CE7E3D9E1698F523004E71CD /* ATEventAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATEventAnnotationView.m; sourceTree = "<group>"; };
 		CE7E3DA01698F55B004E71CD /* ATUnsavedAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATUnsavedAnnotationView.h; sourceTree = "<group>"; };
 		CE7E3DA11698F55B004E71CD /* ATUnsavedAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATUnsavedAnnotationView.m; sourceTree = "<group>"; };
+		CE88B40C1926FC5000EE43C5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		CE88B40E1926FE8D00EE43C5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CE88B4101926FEF700EE43C5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		CE88B413192704F900EE43C5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localizable.strings; sourceTree = "<group>"; };
+		CE88B416192704F900EE43C5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = Localizable.strings; sourceTree = "<group>"; };
 		CE97FC9A170795A600F97A3E /* no_image.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = no_image.gif; path = images/no_image.gif; sourceTree = "<group>"; };
 		CEA41D3418580C410034F1C3 /* BasePhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePhotoViewController.h; sourceTree = "<group>"; };
 		CEA41D3518580C410034F1C3 /* BasePhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePhotoViewController.m; sourceTree = "<group>"; };
@@ -453,6 +461,7 @@
 		CE0E52F2168E671E00C147FB = {
 			isa = PBXGroup;
 			children = (
+				CE88B40F1926FE8D00EE43C5 /* Localizable.strings */,
 				CE7D62931847C2A900F01B0E /* SenTestingKit.framework */,
 				CED46F5C178E4774008397D6 /* DropboxSDK.framework */,
 				CED46F5A178E3739008397D6 /* Security.framework */,
@@ -502,6 +511,8 @@
 		CE0E5307168E671F00C147FB /* AtlasTimelineIOS */ = {
 			isa = PBXGroup;
 			children = (
+				CE88B411192704F900EE43C5 /* en.lproj */,
+				CE88B414192704F900EE43C5 /* zh-Hans.lproj */,
 				CE336159183804C800250D66 /* ThirdParty */,
 				CE2A1D3616AE18F5004476E8 /* MapViews */,
 				CE049EB516EB743A009F6404 /* TimeScroll */,
@@ -751,6 +762,22 @@
 			name = Annotation;
 			sourceTree = "<group>";
 		};
+		CE88B411192704F900EE43C5 /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				CE88B412192704F900EE43C5 /* Localizable.strings */,
+			);
+			path = en.lproj;
+			sourceTree = SOURCE_ROOT;
+		};
+		CE88B414192704F900EE43C5 /* zh-Hans.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				CE88B415192704F900EE43C5 /* Localizable.strings */,
+			);
+			path = "zh-Hans.lproj";
+			sourceTree = SOURCE_ROOT;
+		};
 		CECECE2E16B3000400FD7C17 /* TimelineView */ = {
 			isa = PBXGroup;
 			children = (
@@ -809,6 +836,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hans",
 			);
 			mainGroup = CE0E52F2168E671E00C147FB;
 			productRefGroup = CE0E52FE168E671F00C147FB /* Products */;
@@ -838,6 +866,7 @@
 				CEBD59D416B76607003BD211 /* app-settings-icon.png in Resources */,
 				CEBD59D516B76607003BD211 /* carat-open.png in Resources */,
 				CEBD59D616B76607003BD211 /* carat.png in Resources */,
+				CE88B417192704F900EE43C5 /* Localizable.strings in Resources */,
 				CE17E501189351B5003DCD83 /* scaleYearMonth.png in Resources */,
 				CEBD59DA16B76607003BD211 /* marker-af-1.png in Resources */,
 				CEBD59DB16B76607003BD211 /* marker-af-2.png in Resources */,
@@ -860,6 +889,7 @@
 				CE17E502189351B5003DCD83 /* scaleYearMonthEdge.png in Resources */,
 				CEDBDF3116EEC96C00ADB0FE /* frame-left.png in Resources */,
 				CE127B2818D2A79B0037B070 /* marker_star.png in Resources */,
+				CE88B40D1926FE8D00EE43C5 /* Localizable.strings in Resources */,
 				CEDBDF3216EEC96C00ADB0FE /* frame-right.png in Resources */,
 				CEDBDF3316EEC96C00ADB0FE /* frame-top.png in Resources */,
 				CE11969118D3F13400F65345 /* marker_school.png in Resources */,
@@ -889,6 +919,7 @@
 				CE73D24518DA831C00E61403 /* marker_hiking.png in Resources */,
 				CEAD5A3B172B5BD700CB7082 /* gesture-tap.png in Resources */,
 				CE73D24818DA831C00E61403 /* marker_question.png in Resources */,
+				CE88B418192704F900EE43C5 /* Localizable.strings in Resources */,
 				CE17E4FC189351B5003DCD83 /* scaleDayEdge.png in Resources */,
 				CEAD5A3F172B610700CB7082 /* gesture-swipe.png in Resources */,
 				CE1D4E4917354CFB00AA603C /* focusedIcon.png in Resources */,
@@ -994,6 +1025,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				CE0E530B168E671F00C147FB /* en */,
+				CE88B40C1926FC5000EE43C5 /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1012,6 +1044,31 @@
 				CE0E531D168E671F00C147FB /* en */,
 			);
 			name = MainStoryboard_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		CE88B40F1926FE8D00EE43C5 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE88B40E1926FE8D00EE43C5 /* en */,
+				CE88B4101926FEF700EE43C5 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		CE88B412192704F900EE43C5 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE88B413192704F900EE43C5 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		CE88B415192704F900EE43C5 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE88B416192704F900EE43C5 /* zh-Hans */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
