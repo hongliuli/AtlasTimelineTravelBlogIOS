@@ -419,25 +419,6 @@
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AqT-U1-UbS" id="eVS-rc-7zR">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="30"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <textField opaque="NO" clipsSubviews="YES" tag="999" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="email" minimumFontSize="17" id="WDt-h5-bxr">
-                                                    <rect key="frame" x="0.0" y="0.0" width="169" height="30"/>
-                                                    <nil key="textColor"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                                    <textInputTraits key="textInputTraits"/>
-                                                </textField>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="yli-Q5-cMg">
-                                                    <rect key="frame" x="181" y="1" width="119" height="31"/>
-                                                    <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <size key="titleShadowOffset" width="3" height="3"/>
-                                                    <state key="normal" title="Send Code">
-                                                        <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                                    </state>
-                                                    <connections>
-                                                        <action selector="getEmailAction:" destination="csw-GM-jKy" eventType="touchUpInside" id="ftF-E6-wGa"/>
-                                                    </connections>
-                                                </button>
-                                            </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>
@@ -450,22 +431,6 @@
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kBo-s5-6YZ" id="VkA-4U-TBZ">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="31"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Security Code" minimumFontSize="17" id="0tH-Ic-Qgd">
-                                                    <rect key="frame" x="0.0" y="0.0" width="162" height="30"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <textInputTraits key="textInputTraits"/>
-                                                </textField>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="vfN-85-4th">
-                                                    <rect key="frame" x="175" y="0.0" width="125" height="31"/>
-                                                    <state key="normal" title="Verify Security Code">
-                                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                                    </state>
-                                                    <connections>
-                                                        <action selector="verifySecurityCodeAction:" destination="csw-GM-jKy" eventType="touchUpInside" id="3T1-wr-zWg"/>
-                                                    </connections>
-                                                </button>
-                                            </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>
@@ -478,18 +443,6 @@
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="3PF-EW-6bj" id="hhn-SR-Ga0">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="31"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="afW-Sx-nRx">
-                                                    <rect key="frame" x="77" y="0.0" width="125" height="31"/>
-                                                    <state key="normal" title="Dismiss">
-                                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                                    </state>
-                                                    <connections>
-                                                        <action selector="dismiss:" destination="csw-GM-jKy" eventType="touchUpInside" id="krx-93-suT"/>
-                                                        <action selector="verifySecurityCodeAction:" destination="csw-GM-jKy" eventType="touchUpInside" id="BUa-ry-sve"/>
-                                                    </connections>
-                                                </button>
-                                            </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>
@@ -503,11 +456,6 @@
                     <navigationItem key="navigationItem" id="qwa-dU-a8Q"/>
                     <value key="contentSizeForViewInPopover" type="size" width="320" height="400"/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
-                    <connections>
-                        <outlet property="securityCodeText" destination="0tH-Ic-Qgd" id="zk5-tO-0Sq"/>
-                        <outlet property="userEmailText" destination="WDt-h5-bxr" id="5Lm-br-DQI"/>
-                        <outlet property="verifyButton" destination="vfN-85-4th" id="xVN-Sv-nHG"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eDb-p4-eFo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
