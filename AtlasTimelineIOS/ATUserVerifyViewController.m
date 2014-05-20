@@ -153,7 +153,7 @@ NSString* receivedSecurityCode; //use this to compare with user entered
     verifyButton.enabled = true;
     securityCodeText.backgroundColor = [UIColor whiteColor];
     verifyButton.backgroundColor = [UIColor whiteColor];
-    
+    userEmailText.text = [userEmailText.text lowercaseString];
     verifyingUserEmail = userEmailText.text;
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Check Your Email!",nil) message:NSLocalizedString(@"Please enter the security code you received in your email!",nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
