@@ -70,7 +70,7 @@
 #define HAVE_IMAGE_INDICATOR 100
 
 #define EPISODE_VIEW_WIDTH 340
-#define EPISODE_VIEW_HIGHT_LARGE 400
+#define EPISODE_VIEW_HIGHT_LARGE 410
 #define EPISODE_VIEW_HIGHT_SMALL 140
 #define EPISODE_ROW_HEIGHT 30
 
@@ -355,6 +355,11 @@
     {
         [eventEpisodeList addObject:evt.uniqueId];
     }
+    int cnt = [appDelegate.eventListSorted count];
+    if (episodeNameforUpdating == nil)
+        lblEpisode1.text = [NSString stringWithFormat:NSLocalizedString(@"%d event(s) are picked for new episode",nil), cnt];
+    else
+        lblEpisode1.text = [NSString stringWithFormat:NSLocalizedString(@"%d event(s) are in episode [%@]",nil), cnt, episodeNameforUpdating];
     [self refreshAnnotations];
     ATEventDataStruct* evt = appDelegate.eventListSorted[0];
     CLLocationCoordinate2D centerCoordinate;

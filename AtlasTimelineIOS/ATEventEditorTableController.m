@@ -39,7 +39,7 @@
 #define DESC_TEXT_TAG_FROM_STORYBOARD_888 888
 #define DATE_TEXT_FROM_STORYBOARD_999 999
 #define ADDED_PHOTOSCROLL_TAG_900 900
-#define NEWEVENT_DESC_PLACEHOLD @"Write notes here"
+#define NEWEVENT_DESC_PLACEHOLD NSLocalizedString(@"Write notes here",nil)
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
 @implementation ATEventEditorTableController

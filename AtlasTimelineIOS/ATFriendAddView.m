@@ -305,6 +305,7 @@ BOOL showSendRequestFlag;
 }
 -(void) sendFriendRequestToServer:(NSString*) friendString
 {
+    friendString = [friendString lowercaseString];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];

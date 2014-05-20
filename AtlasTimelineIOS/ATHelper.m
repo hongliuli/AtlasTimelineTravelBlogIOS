@@ -154,7 +154,7 @@ UIPopoverController *verifyViewPopover;
         return true;
     else
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Login to access server",nil) message:NSLocalizedString(@"Enter your email and send a security code to your email. Then enter the security code to login. Your email address will be your login ID!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Need your email address as ID to login when access server!",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
         [self startCreateUser: sender];
         return false;

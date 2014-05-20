@@ -813,6 +813,8 @@
     NSURL* serviceUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@/downloadjsoncontents?user_id=%@&security_code=%@&atlas_name=%@",[ATConstants ServerURL], userId, securityCode, atlasName]];
     
     NSData* downloadedData = [NSData dataWithContentsOfURL:serviceUrl];
+    if (downloadedData == nil)
+        return;
     NSString* displayLocalCnt = @"";
     if ([[ATHelper getSelectedDbFileName] isEqualToString :atlasName])
         displayLocalCnt = [NSString stringWithFormat:@"%i", localListCnt];
