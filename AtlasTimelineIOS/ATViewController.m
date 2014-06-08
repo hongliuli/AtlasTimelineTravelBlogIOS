@@ -31,6 +31,7 @@
 #import "ATTimeScrollWindowNew.h"
 #import "ATTutorialView.h"
 #import "ATInAppPurchaseViewController.h"
+#import "ATEventListWindowView.h"
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
@@ -39,14 +40,14 @@
 #define MERCATOR_RADIUS 85445659.44705395
 #define ZOOM_LEVEL_TO_HIDE_DESC 4
 #define ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE 9
-#define JPEG_QUALITY 0.5
-#define THUMB_JPEG_QUALITY 0.3
+
 #define DISTANCE_TO_HIDE 80
 
 #define RESIZE_WIDTH 600
 #define RESIZE_HEIGHT 450
 #define THUMB_WIDTH 120
 #define THUMB_HEIGHT 70
+#define JPEG_QUALITY 0.5
 
 #define FREE_VERSION_QUOTA 50
 
@@ -73,6 +74,9 @@
 #define EPISODE_VIEW_HIGHT_LARGE 410
 #define EPISODE_VIEW_HIGHT_SMALL 140
 #define EPISODE_ROW_HEIGHT 30
+
+#define EVENT_VIEW_CELL_WIDTH 220
+#define EVENT_VIEW_CELL_HEIGHT 120
 
 @interface MFTopAlignedLabel : UILabel
 
@@ -113,10 +117,10 @@
     NSMutableArray* eventEpisodeList;
     NSString* loadedEpisodeName; //if an episode is loaded from setting -> outgoing modify
     ATAnnotationFocused* focusedAnnotationIndicator;
-    ATEventDataStruct* focusedEvent;
     int currentTapTouchKey;
     bool currentTapTouchMove;
     UIButton *btnLess;
+    ATEventListWindowView* eventListView;
     
 }
 
@@ -176,6 +180,8 @@
     selectedAnnotationNearestLocationList = [[NSMutableArray alloc] init];
     regionChangeTimeStart = [[NSDate alloc] init];
     [self prepareMapView];
+    
+
 }
 -(void) viewDidAppear:(BOOL)animated
 {
@@ -190,6 +196,10 @@
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Add your first event",nil) message:NSLocalizedString(@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Incoming Contents/Episodes] to learn more.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
     }
+    
+    eventListView = [[ATEventListWindowView alloc] initWithFrame:CGRectMake(0,40, 220, 0)];
+    [eventListView.tableView setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7]];
+    [self.view addSubview:eventListView];
 }
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
@@ -580,6 +590,14 @@
     centerCoordinate.longitude=ent.lng;
     zoomLevel = MIN(zoomLevel, 28);
     
+    if (zoomLevel < 0) //do not change zoom level if pass in negative zoom level
+    {
+        //MKZoomScale currentZoomScale = self.mapView.bounds.size.width / self.mapView.visibleMapRect.size.width;
+        //NSLog(@" zoom level: %f",currentZoomScale);
+        [self.mapView setCenterCoordinate:centerCoordinate animated:NO];
+        return;
+    }
+    
     // use the zoom level to compute the region
     MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:zoomLevel];
     MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
@@ -739,6 +757,7 @@
         {
             mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
             self.timeScrollWindow.hidden = true;
+            eventListView.hidden = true;
             self.timeZoomLine.hidden = true;
             [self hideDescriptionLabelViews];
             self.navigationController.navigationBarHidden = true;
@@ -747,6 +766,7 @@
         {
             mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
             self.timeScrollWindow.hidden=false;
+            eventListView.hidden = false;
             self.timeZoomLine.hidden = false;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = false;
@@ -758,6 +778,7 @@
         {
             mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
             self.timeScrollWindow.hidden = true;
+            eventListView.hidden = true;
             self.timeZoomLine.hidden = true;
             [self hideDescriptionLabelViews];
             self.navigationController.navigationBarHidden = true;
@@ -766,6 +787,7 @@
         {
             mapViewShowWhatFlag = MAPVIEW_SHOW_PHOTO_LABEL_ONLY;
             self.timeScrollWindow.hidden=true;
+            eventListView.hidden = true;
             self.timeZoomLine.hidden = true;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = true;
@@ -774,6 +796,7 @@
         {
             mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
             self.timeScrollWindow.hidden=false;
+            eventListView.hidden = false;
             self.timeZoomLine.hidden = false;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = false;
@@ -946,7 +969,7 @@
                 tmpLbl = [[UILabel alloc] initWithFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, THUMB_WIDTH, THUMB_HEIGHT)]; //todo MFTopAlignedLabel
                 if (ann.eventType == EVENT_TYPE_HAS_PHOTO) //somehow it is a big number before save to db, need more study why not 1
                 {
-                    UIImage* img = [self readPhotoThumbFromFile:ann.uniqueId];
+                    UIImage* img = [ATHelper readPhotoThumbFromFile:ann.uniqueId];
                     if (img != nil)
                     {
                         UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
@@ -1345,14 +1368,17 @@
         ent.eventType = ann.eventType;
         ent.eventDesc = ann.description;
         ent.uniqueId = ann.uniqueId;
+        appDelegate.focusedEvent = ent;
         
         [self setNewFocusedDateAndUpdateMap:ent needAdjusted:TRUE]; //No reason, have to do focusedRow++ when focused a event in time wheel
         mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
         self.timeScrollWindow.hidden=false;
+        eventListView.hidden = false;
         self.timeZoomLine.hidden = false;
         self.navigationController.navigationBarHidden = false;
-        focusedEvent = ent;
+        appDelegate.focusedEvent = ent;
         [self showTimeLinkOverlay];
+        [self refreshEventListView];
     }
 }
 
@@ -1426,6 +1452,9 @@
 //always start from focusedEvent
 - (void) showTimeLinkOverlay
 {
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    ATEventDataStruct* focusedEvent = appDelegate.focusedEvent;
+    
     if (timeLinkOverlaysToBeCleaned != nil)
         [self.mapView removeOverlays:timeLinkOverlaysToBeCleaned];
     if (![ATHelper getOptionDisplayTimeLink])
@@ -1875,6 +1904,7 @@
         [self.eventEditorPopover dismissPopoverAnimated:true];
     if (self.timeZoomLine != nil)
         [self.timeZoomLine setNeedsDisplay];
+    [self refreshEventListView];
 }
 - (void)cancelEvent{
     if (self.eventEditorPopover != nil)
@@ -1982,6 +2012,7 @@
         [self.timeZoomLine setNeedsDisplay];
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
+    [self refreshEventListView];
 }
 //delegate required implementation
 - (void)addToEpisode{
@@ -2017,6 +2048,7 @@
     
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
+    [self refreshEventListView];
 }
 - (BOOL)isInEpisode //delegate requried to implement
 {
@@ -2255,35 +2287,6 @@
     }
 }
 
--(UIImage*)readPhotoThumbFromFile:(NSString*)eventId
-{
-    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
-    NSString* thumbPath = [fullPathToFile stringByAppendingPathComponent:@"thumbnail"];
-    UIImage* thumnailImage = [UIImage imageWithContentsOfFile:thumbPath];
-    if (thumnailImage == nil)
-    {
-        //If thumbnail is null, create one with the first photo if there is one
-        //This part of code is to solve the issue after user migrate to a new device and copy photos from dropbox where no thumbnail image in file
-        NSError *error = nil;
-        NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
-        NSString* photoForThumbnail = nil;
-        NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
-        if (tmpFileList != nil && [tmpFileList count] > 0)
-        {
-            photoForThumbnail = tmpFileList[0];
-        }
-        
-        if (photoForThumbnail != nil )
-        {
-            UIImage* photo = [UIImage imageWithContentsOfFile: [fullPathToFile stringByAppendingPathComponent:photoForThumbnail ]];
-            thumnailImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
-            NSData* imageData = UIImageJPEGRepresentation(thumnailImage, JPEG_QUALITY);
-            [imageData writeToFile:thumbPath atomically:NO];
-        }
-    }
-    return thumnailImage;
-}
-
 
 -(void)calculateSearchBarFrame
 {
@@ -2452,6 +2455,132 @@
     [self.mapView setRegion:region animated:YES];
     [self startEpisodeView];
     
+}
+
+- (void) refreshEventListView
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    
+    //following logic is same in ATTimeZoomLine to get colored range
+    NSDateComponents *dateComponent = [[NSDateComponents alloc] init];
+    NSCalendar* calendar = [NSCalendar currentCalendar];
+    NSDate* scaleStartDay;
+    NSDate* scaleEndDay;
+    
+    NSDate* focusedDate = appDelegate.focusedDate;
+    int periodIndays = appDelegate.selectedPeriodInDays;
+    if (periodIndays == 7)
+    {
+        dateComponent.day = -5;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.day = 5;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    if (periodIndays == 30)
+    {
+        dateComponent.day = -15;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.day = 15;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    else if (periodIndays == 365)
+    {
+        dateComponent.month = -5;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.month = 5;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    else if (periodIndays == 3650)
+    {
+        dateComponent.year = -5;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.year = 5;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    else if (periodIndays == 36500)
+    {
+        dateComponent.year = -50;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.year = 50;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    else if (periodIndays == 365000)
+    {
+        dateComponent.year = -500;
+        scaleStartDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
+        dateComponent.year = 500;
+        scaleEndDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
+    }
+    if ([self.startDate compare:scaleStartDay] == NSOrderedDescending)
+        scaleStartDay = self.startDate;
+    if ([self.endDate compare:scaleEndDay] == NSOrderedAscending)
+        scaleEndDay = self.endDate;
+    //NSLog(@" === scaleStartDate = %@,  scaleEndDay = %@", scaleStartDay, scaleEndDay);
+    NSArray* allEventSortedList = appDelegate.eventListSorted;
+    CGRect newFrame = CGRectMake(0,40,0,0);
+    int numOfCellOnScreen = 0;
+    
+    NSMutableArray* eventListViewList = [[NSMutableArray alloc] init];
+    
+    int cnt = [allEventSortedList count];
+    if (cnt == 0 )
+    {
+        [eventListView setFrame:newFrame];
+        [eventListView.tableView setFrame:newFrame];
+        [eventListView refresh:eventListViewList];
+        return;
+    }
+    ATEventDataStruct* latestEvent = allEventSortedList[0];
+    ATEventDataStruct* earlistEvent = allEventSortedList[cnt -1];
+    
+    //case special: where startDate/EndDate range is totally outside the event date range, or even no event at all
+    if ([scaleStartDay compare:latestEvent.eventDate] == NSOrderedDescending || [scaleEndDay compare: earlistEvent.eventDate] == NSOrderedAscending)
+    {
+        [eventListView setFrame:newFrame];
+        [eventListView.tableView setFrame:newFrame];
+        [eventListView refresh: eventListViewList];
+        return;
+    }
+    //come here when there start/end date range has intersect with allEventSorted
+    BOOL completeFlag = false;
+    for (int i=0; i<cnt;i++)
+    {
+        ATEventDataStruct* evt = allEventSortedList[i];
+        if ([self date:evt.eventDate isBetweenDate :scaleStartDay andDate:scaleEndDay])
+        {
+            [eventListViewList insertObject:evt atIndex:0]; //so event will order by date in regular sequence
+            completeFlag = true;
+        }
+        else
+        {
+            if (completeFlag == true)
+                break; //this is a trick to enhance performance. Do not continues because all in range has been added
+        }
+    }
+    //above logic will remain startDateIdx/endDateIdx to be -1 if no events
+    cnt = [eventListViewList count];
+    if (cnt > 0)
+    {
+        numOfCellOnScreen = cnt;
+        if (cnt > 5)
+            numOfCellOnScreen = 5;
+        
+        newFrame = CGRectMake(0,40,EVENT_VIEW_CELL_WIDTH,numOfCellOnScreen * EVENT_VIEW_CELL_HEIGHT);
+    }
+    
+    [eventListView setFrame:newFrame];
+    [eventListView.tableView setFrame:newFrame];
+    [eventListView refresh: eventListViewList];
+}
+- (BOOL)date:(NSDate*)date isBetweenDate:(NSDate*)beginDate andDate:(NSDate*)endDate
+{
+    if ([date compare:beginDate] == NSOrderedAscending)
+        return NO;
+    
+    if ([date compare:endDate] == NSOrderedDescending)
+        return NO;
+    
+    return YES;
 }
 
 @end

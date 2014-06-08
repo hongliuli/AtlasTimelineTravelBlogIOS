@@ -34,6 +34,7 @@
 + (NSString*)getNewUnsavedEventPhotoPath;
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
 + (UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir;
++ (UIImage*)readPhotoThumbFromFile:(NSString*)eventId;
 + (UIColor *) colorWithHexString: (NSString *) stringToConvert;
 + (NSString*) getMarkerNameFromDescText: (NSString*)descTxt;
 + (NSString*) clearMakerFromDescText: (NSString*)desc :(NSString*)markerName;

@@ -24,6 +24,7 @@
 @property(strong, nonatomic) NSString* episodeToBeShared;//just to pass it to FriendPickerView
 @property int selectedPeriodInDays;
 @property(strong, nonatomic) NSDate* focusedDate;
+@property(strong, nonatomic) ATEventDataStruct* focusedEvent;
 @property(strong, nonatomic) UIStoryboard* storyBoard;
 
 @property NSString* optionEnableDateMagnifierMove;

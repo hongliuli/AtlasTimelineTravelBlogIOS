@@ -846,6 +846,7 @@
     [self.parent.timeZoomLine changeDateText];
     [self.parent.timeZoomLine changeScaleText];
     [self.parent refreshAnnotations];
+    [self.parent refreshEventListView];
     [self changeFocusedCellColorToRed ];
     
     //animate button for emphasis

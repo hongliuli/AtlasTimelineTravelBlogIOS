@@ -59,6 +59,7 @@
 - (void) displayZoomLine;
 - (void) loadEpisode:(NSString*)episodeName;
 - (void) cancelPreference;
+- (void) refreshEventListView;
 
 
 @end
