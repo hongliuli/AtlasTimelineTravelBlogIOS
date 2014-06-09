@@ -150,6 +150,7 @@
     [appDelegate emptyEventList];
     [appDelegate.mapViewController cleanSelectedAnnotationSet];
     [appDelegate.mapViewController prepareMapView];
+    [appDelegate.mapViewController refreshEventListView];
     [self.navigationController popViewControllerAnimated:YES];
     isRemoveSourceForUploadAll = false;
     [self.tableView reloadData]; //reload so active source name will be display when back to preference view

@@ -81,7 +81,7 @@
 "Done"="完成";
 "Downloaded %@ has %i events"="下载的 %@ 有%i个事件";
 "Download from server to offline"="从服务器下载到设备";
-"Download missing %@ photos from Dropbox. This operation can be repeated until all photos are downloaded."="从Dropbox下载不完全，缺少[%@]中的照片. 可以重复这个操作直到全部下载完成.";
+"Download missing %@ photos from Dropbox. This operation can be repeated until all photos are downloaded."="从Dropbox下载[%@]中还没有被下载的照片. 可以重复这个操作直到全部下载完成.";
 "Downloading .. %d success, %d warnings"="正在下载.. %d 个完成, %d 个警告";
 "Double-tap at center to center on today"="双击中心位置可快速选择今天为当前选择时间";
 "Dropbox may not have some photos you are looking for."="Dropbox可能没有你寻找的一些照片.";

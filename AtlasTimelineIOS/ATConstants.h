@@ -49,6 +49,11 @@
 + (int) photoScrollCellHeight;
 + (int) defaultZoomLevel;
 + (int) timeScrollBigDateFont;
++ (int) eventListViewCellWidth;
++ (int) eventListViewCellHeight;
++ (int) eventListViewCellNum;
++ (int) eventListViewPhotoWidht;
++ (int) eventListViewPhotoHeight;
 
 + (NSString*) defaultSourceName;
 + (NSString*) UserEmailKeyName;

@@ -7,9 +7,7 @@
 //
 
 #import "ATEventListViewCell.h"
-
-#define CELL_WIDTH 220
-#define CELL_HEIGHT 120
+#import "ATConstants.h"
 
 
 @implementation ATEventListViewCell
@@ -28,13 +26,13 @@
     self=[super initWithFrame:frame];
     if (self)
     {
-        CGRect imageFrame = CGRectMake(5, 5, 80,60); //a little different frame in ATEventListView.m
-        CGRect textFrame = CGRectMake(5, 0, CELL_WIDTH,CELL_HEIGHT);
+        CGRect imageFrame = CGRectMake(5, 5, [ATConstants eventListViewPhotoWidht],[ATConstants eventListViewPhotoHeight]); //a little different frame in ATEventListView.m
+        CGRect textFrame = CGRectMake(5, 0, [ATConstants eventListViewCellWidth],[ATConstants eventListViewCellHeight]);
         
         self.photoImage = [[UIImageView alloc] initWithFrame:imageFrame];
         [self.contentView addSubview:self.photoImage];
         
-        self.checkIcon = [[UIImageView alloc] initWithFrame:CGRectMake(CELL_WIDTH -25, 7, 20, 20)];
+        self.checkIcon = [[UIImageView alloc] initWithFrame:CGRectMake([ATConstants eventListViewCellWidth] -25, 7, 20, 20)];
         [self.checkIcon setImage:[UIImage imageNamed:@"focuseIcon.png"]];
         [self.contentView addSubview:self.checkIcon];
         

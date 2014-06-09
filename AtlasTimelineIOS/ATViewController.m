@@ -75,9 +75,6 @@
 #define EPISODE_VIEW_HIGHT_SMALL 140
 #define EPISODE_ROW_HEIGHT 30
 
-#define EVENT_VIEW_CELL_WIDTH 220
-#define EVENT_VIEW_CELL_HEIGHT 120
-
 @interface MFTopAlignedLabel : UILabel
 
 @end
@@ -197,10 +194,13 @@
         [alert show];
     }
     
-    eventListView = [[ATEventListWindowView alloc] initWithFrame:CGRectMake(0,40, 220, 0)];
+    eventListView = [[ATEventListWindowView alloc] initWithFrame:CGRectMake(0,20, 0, 0)];
     [eventListView.tableView setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7]];
-    [self.view addSubview:eventListView];
+    [self.mapView addSubview:eventListView];
+    [self refreshEventListView];
 }
+
+
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
     NSString* currentVer = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
@@ -590,11 +590,27 @@
     centerCoordinate.longitude=ent.lng;
     zoomLevel = MIN(zoomLevel, 28);
     
-    if (zoomLevel < 0) //do not change zoom level if pass in negative zoom level
+    if (zoomLevel < 0) //do not change zoom level if pass in negative zoom level. This used by Event List View select a event
     {
         //MKZoomScale currentZoomScale = self.mapView.bounds.size.width / self.mapView.visibleMapRect.size.width;
         //NSLog(@" zoom level: %f",currentZoomScale);
-        [self.mapView setCenterCoordinate:centerCoordinate animated:NO];
+        CLLocationCoordinate2D currentCenter = [self.mapView centerCoordinate];
+        
+        CLLocation *pointFrom=[[CLLocation alloc]initWithLatitude:ent.lat longitude:ent.lng];
+        CLLocation *pointTo=[[CLLocation alloc]initWithLatitude:currentCenter.latitude longitude:currentCenter.longitude];
+        CLLocationDistance distance=[pointFrom distanceFromLocation:pointTo]; //distance in meter
+        
+        MKCoordinateRegion myRegion = MKCoordinateRegionMakeWithDistance(self.mapView.centerCoordinate, distance, 0);
+        CGRect myRect = [self.mapView convertRegion: myRegion toRectToView: nil];
+        
+        float distanceOnScreen = myRect.size.width;
+        if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
+            distanceOnScreen = myRect.size.height;
+        //NSLog(@"distance on screen is %f",distanceOnScreen);
+        if (distanceOnScreen > 10000) //for long distance in screen size, do not animate which is too slow
+            [self.mapView setCenterCoordinate:centerCoordinate animated:NO];
+        else
+            [self.mapView setCenterCoordinate:centerCoordinate animated:YES];
         return;
     }
     
@@ -1164,7 +1180,7 @@
     [self.timeZoomLine setNeedsDisplay];
     regionChangeTimeStart = [[NSDate alloc] init];
     [self showDescriptionLabelViews:mapView];
-    
+    [self.mapView bringSubviewToFront:eventListView]; //so eventListView will always cover map marker photo/txt icon (tmpLbl)
     
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
@@ -2517,7 +2533,7 @@
         scaleEndDay = self.endDate;
     //NSLog(@" === scaleStartDate = %@,  scaleEndDay = %@", scaleStartDay, scaleEndDay);
     NSArray* allEventSortedList = appDelegate.eventListSorted;
-    CGRect newFrame = CGRectMake(0,40,0,0);
+    CGRect newFrame = CGRectMake(0,35,0,0);
     int numOfCellOnScreen = 0;
     
     NSMutableArray* eventListViewList = [[NSMutableArray alloc] init];
@@ -2562,12 +2578,28 @@
     if (cnt > 0)
     {
         numOfCellOnScreen = cnt;
-        if (cnt > 5)
-            numOfCellOnScreen = 5;
-        
-        newFrame = CGRectMake(0,40,EVENT_VIEW_CELL_WIDTH,numOfCellOnScreen * EVENT_VIEW_CELL_HEIGHT);
+        if (cnt > [ATConstants eventListViewCellNum])
+            numOfCellOnScreen = [ATConstants eventListViewCellNum];
+        int offset = 35;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
+                offset = 32;
+            else
+                offset = 26;
+        }
+        int extra = 0;
+        if (cnt == 1)
+            extra = 40;
+        else if (cnt == 2)
+            extra = 80;
+        else if (cnt == 3 && UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
+            extra = 120;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            extra = 0;
+        newFrame = CGRectMake(0,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight] + extra);
     }
-    
+    eventListView.hidden = false;
     [eventListView setFrame:newFrame];
     [eventListView.tableView setFrame:newFrame];
     [eventListView refresh: eventListViewList];

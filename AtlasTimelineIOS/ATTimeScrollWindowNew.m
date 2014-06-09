@@ -104,16 +104,17 @@
         [self addSubview:self.horizontalTableView];
         yearElapsedFromToday = 0;
         
+        //following changed old way of [self addGesture..], which fixed possible tap on time wheel will act as tap on map
         UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
-        [self addGestureRecognizer:pinch];
+        [self.horizontalTableView addGestureRecognizer:pinch];
         
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
         tap.numberOfTapsRequired =1;
-        [self addGestureRecognizer:tap];
+        [self.horizontalTableView addGestureRecognizer:tap];
         
         UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
         doubleTap.numberOfTapsRequired = 2;
-        [self addGestureRecognizer:doubleTap];
+        [self.horizontalTableView addGestureRecognizer:doubleTap];
         [tap requireGestureRecognizerToFail:doubleTap]; //This is the way make sure double tap will not do single tap action, resolve confilict
         
         //Add longpress purely to disable adding new event when longpress on scrollwindow, or to prevent longpress to mapview
@@ -706,7 +707,7 @@
     else
         rect = [self.horizontalTableView convertRect:[self.horizontalTableView rectForRowAtIndexPath:index] toView:[self.horizontalTableView superview]];
     
-    //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     int windowWidth = [ATConstants timeScrollWindowWidth];
     int leftPosition = windowWidth/3;
     int middlePosition = 2 * windowWidth / 3;
@@ -729,18 +730,22 @@
         pinchVelocity = 999; //reuse code for pinch. as long as greate than 0
         [self doTimewheelZooming:pinchVelocity];
     }
-    //Todo this does not help to fix doubleTap issue, not important anyway. ----[self centerTable];
+    [appDelegate.mapViewController refreshEventListView];
 }
 
 -(void) zoomInAction:(id)sender
 {
     pinchVelocity = 999; //reuse code for pinch. as long as greate than 0
     [self doTimewheelZooming:pinchVelocity];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    [appDelegate.mapViewController refreshEventListView];
 }
 -(void) zoomOutAction:(id)sender
 {
     pinchVelocity = -999; //reuse code for pinch. as long as greate than 0
     [self doTimewheelZooming:pinchVelocity];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    [appDelegate.mapViewController refreshEventListView];
 }
 
 //have tap gesture achive two thing: prevent call tapGesture on parent mapView and process select a row action without a TableViewController

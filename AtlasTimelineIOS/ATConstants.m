@@ -275,6 +275,49 @@
     else
         return 15;
 }
+//Constants for Event List View
++ (int) eventListViewCellWidth{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        return 220;
+    else
+        return 160;
+}
++ (int) eventListViewCellHeight{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        return 120;
+    else
+        return 80;
+}
++ (int) eventListViewCellNum{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    {
+        if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
+            return 7;
+        else
+            return 5;
+    }
+    else
+    {
+        if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
+            return 5;
+        else
+            return 3;
+    }
+}
++ (int) eventListViewPhotoWidht{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        return 80;
+    else
+        return 60;
+}
++ (int) eventListViewPhotoHeight{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        return 57;
+    else
+        return 40;
+}
+
+
 
 + (BOOL) isLandscapeInPhone{
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;

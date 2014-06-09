@@ -54,7 +54,7 @@
         
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
         tap.numberOfTapsRequired =1;
-        [self addGestureRecognizer:tap];
+        [self.horizontalTableView addGestureRecognizer:tap]; //old way of [self addGest..] will cause sometime tap does not work
     }
     self.selectedAsThumbnailIndex = -1;
     self.selectedAsShareIndexSet = [[NSMutableSet alloc] init];
