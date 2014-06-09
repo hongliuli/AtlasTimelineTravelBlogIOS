@@ -347,9 +347,7 @@ NSString* deleteFriend_wait;
     NSMutableArray* dictArray = [[NSMutableArray alloc] initWithCapacity:eventCount];
     for (ATEventDataStruct* item in episodeEventList)
     {
-        NSNumber* eventType = [NSNumber numberWithInt: item.eventType]; //not initialized in code, need fix
-        if (eventType == nil)
-            eventType = [NSNumber numberWithInt:EVENT_TYPE_NO_PHOTO];
+        NSNumber* eventType = [NSNumber numberWithInt:EVENT_TYPE_NO_PHOTO]; //not initialized in code, need fix
         
         NSMutableDictionary* itemDict = [[NSMutableDictionary alloc] init];
         [itemDict setObject:item.uniqueId forKey:@"uniqueId"];
