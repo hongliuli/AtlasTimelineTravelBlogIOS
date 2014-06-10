@@ -193,10 +193,12 @@
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Add your first event",nil) message:NSLocalizedString(@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Incoming Contents/Episodes] to learn more.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
     }
-    
-    eventListView = [[ATEventListWindowView alloc] initWithFrame:CGRectMake(0,20, 0, 0)];
-    [eventListView.tableView setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7]];
-    [self.mapView addSubview:eventListView];
+    if (eventListView == nil)
+    {
+        eventListView = [[ATEventListWindowView alloc] initWithFrame:CGRectMake(0,20, 0, 0)];
+        [eventListView.tableView setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7]];
+        [self.mapView addSubview:eventListView];
+    }
     [self refreshEventListView];
 }
 

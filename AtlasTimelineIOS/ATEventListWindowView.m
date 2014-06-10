@@ -21,11 +21,15 @@
 @implementation ATEventListWindowView
 
 NSArray* internalEventList;
+BOOL isAtLeast7;
 
 - (id)initWithFrame:(CGRect)frame
 {
     if (self == [super initWithFrame:frame])
     {
+        NSString *version = [[UIDevice currentDevice] systemVersion];
+        isAtLeast7 = [version compare:@"7.0" options:NSNumericSearch] != NSOrderedAscending;
+        
         internalEventList = [[NSArray alloc] init];
         self.tableView = [[UITableView alloc] initWithFrame:frame];
         
@@ -93,8 +97,8 @@ NSArray* internalEventList;
     {
         [cell.checkIcon setHidden:true];
     }
-    
-    if (evt.eventType == EVENT_TYPE_HAS_PHOTO )
+        
+    if (evt.eventType == EVENT_TYPE_HAS_PHOTO && isAtLeast7) //excusionPaths is available only after 7
     {
         CGRect imageFrame = CGRectMake(0, 0, [ATConstants eventListViewPhotoWidht] - 2,[ATConstants eventListViewPhotoHeight] - 5);
         cell.photoImage.image = [ATHelper readPhotoThumbFromFile:evt.uniqueId];

@@ -294,7 +294,7 @@ int swipPromptCount;
                 [self startDownload];
             if (alertView.tag == DOWNLOAD_REPLACE_MY_SOURCE_ALERT )
             {
-                UIAlertView* alert  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Confirm to replace %@ contents in your device!",nil),[ATHelper getSelectedDbFileName]]
+                UIAlertView* alert  = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Confirm to download and set [%@] active!",nil),selectedAtlasName]
                     message:NSLocalizedString(@"Enter agree to continue:",nil) delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
                 [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
                 UITextField * aa = [alert textFieldAtIndex:0];

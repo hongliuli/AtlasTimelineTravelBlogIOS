@@ -19,7 +19,8 @@
 "1 yr"="1 年";
 "10 yrs"="10年";
 "100 yrs"="100年";
-"1mo"="1月";
+"1wk"="7天";
+"1mo"="1个月";
 "1yr"="1年";
 "10yr"="10年";
 "100yr"="100年";
@@ -62,7 +63,7 @@
 "Check Your Email!"="检查你的电子邮件!";
 "Complete"="完成";
 "Confirm to delete the event"="确信删除该事件";
-"Confirm to replace %@ contents in your device!"="确信替换设备上的%@ 内容!";
+"Confirm to download and set [%@] active!"="确信下载并把 ［%@］置成活跃!";
 "Confirm to replace all %@ photos on Dropbox!"="确信替换在Dropbox上所有的 %@照片!";
 "Connect Server Fail!"="连接服务器失败!";
 "Content %@ is empty or do not have photos to download."=" [%@]中没有照片下载.";
