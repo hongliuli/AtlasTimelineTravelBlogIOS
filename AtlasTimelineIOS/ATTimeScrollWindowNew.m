@@ -556,7 +556,7 @@
     
     [self.parent changeTimeScaleState];
     [self.parent refreshAnnotations];
-    [self.parent showTimeLinkOverlay];
+    [self.parent showOverlays];
     [self.parent displayZoomLine];//call this to change time line to whole mode or year mode
     [self showHideZoomAnimation:direction];
 }

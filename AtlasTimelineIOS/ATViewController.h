@@ -55,7 +55,7 @@
 - (void) setNewFocusedDateAndUpdateMapWithNewCenter:(ATEventDataStruct*) ent :(int)zoomLevel;
 - (void) refreshAnnotations;
 - (void) cleanSelectedAnnotationSet; //see comments in .m file
-- (void) showTimeLinkOverlay;
+- (void) showOverlays;
 - (void) displayZoomLine;
 - (void) loadEpisode:(NSString*)episodeName;
 - (void) cancelPreference;

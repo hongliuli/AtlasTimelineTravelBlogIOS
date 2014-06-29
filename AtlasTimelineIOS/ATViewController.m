@@ -107,10 +107,9 @@
     
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
     ATEventAnnotation* selectedEventAnnotation;
-    NSMutableDictionary* timeLinkOverlayDepthColorMap; // latlngTimeLinkDepthMapForOverlay;
     int timeLinkDepthDirectionFuture;
     int timeLinkDepthDirectionPast;
-    NSMutableArray* timeLinkOverlaysToBeCleaned ;
+    NSMutableArray* overlaysToBeCleaned ;
     NSMutableArray* eventEpisodeList;
     NSString* loadedEpisodeName; //if an episode is loaded from setting -> outgoing modify
     ATAnnotationFocused* focusedAnnotationIndicator;
@@ -1395,7 +1394,7 @@
         self.timeZoomLine.hidden = false;
         self.navigationController.navigationBarHidden = false;
         appDelegate.focusedEvent = ent;
-        [self showTimeLinkOverlay];
+        [self showOverlays];
         [self refreshEventListView];
     }
 }
@@ -1465,29 +1464,24 @@
     [ATEventEditorTableController setEventId:ann.uniqueId];
     //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
     [self.eventEditor createPhotoScrollView: ann.uniqueId ];
+    [self showOverlays]; //added in Reader version
 }
 
 //always start from focusedEvent
-- (void) showTimeLinkOverlay
+- (void) showOverlays
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     ATEventDataStruct* focusedEvent = appDelegate.focusedEvent;
     
-    if (timeLinkOverlaysToBeCleaned != nil)
-        [self.mapView removeOverlays:timeLinkOverlaysToBeCleaned];
-    if (![ATHelper getOptionDisplayTimeLink])
-        return;
+    if (overlaysToBeCleaned != nil)
+        [self.mapView removeOverlays:overlaysToBeCleaned];
     if (focusedEvent == nil)
         return;
-    if (timeLinkOverlayDepthColorMap == nil) //keyed on lat|lng, value is depth. viewForOverlay() can use this to decide what color the link to draw
-        timeLinkOverlayDepthColorMap = [[NSMutableDictionary alloc] init];
-    else
-        [timeLinkOverlayDepthColorMap removeAllObjects];
     
-    if (timeLinkOverlaysToBeCleaned == nil)
-        timeLinkOverlaysToBeCleaned = [[NSMutableArray alloc] init];
+    if (overlaysToBeCleaned == nil)
+        overlaysToBeCleaned = [[NSMutableArray alloc] init];
     else
-        [timeLinkOverlaysToBeCleaned removeAllObjects];
+        [overlaysToBeCleaned removeAllObjects];
     
     //first draw a circle on selected event
     CLLocationCoordinate2D workingCoordinate;
@@ -1502,270 +1496,86 @@
     
     
     //following prepare mkPoi
-    timeLinkDepthDirectionFuture = 0;
-    timeLinkDepthDirectionPast = 0;
-    NSArray* futureOverlays = [self prepareTimeLinkOverlays:focusedEvent :true];
-    //NSLog(@"---------------------------------------");
-    NSArray* pastOverlays = [self prepareTimeLinkOverlays:focusedEvent :false];
-    
-    [timeLinkOverlaysToBeCleaned addObjectsFromArray:futureOverlays];
-    [timeLinkOverlaysToBeCleaned addObjectsFromArray:pastOverlays];
+
+    NSArray* overlays = [self prepareOverlays:focusedEvent];
+
+    //TODO ### have problem here for Reader
+    [overlaysToBeCleaned addObjectsFromArray:overlays];
+
     
     
     // http://stackoverflow.com/questions/15061207/how-to-draw-a-straight-line-on-an-ios-map-without-moving-the-map-using-mkmapkit
     //add line by line, instead add all lines in one MKPolyline object, because I want to draw color differently in viewForOverlay
-    int size = [futureOverlays count];
+    int size = [overlays count];
     for(int i = 0; i < size; i++)
     {
-        MKPolyline* line = futureOverlays[i];
-        [self.mapView addOverlay:line];
-    }
-    size = [pastOverlays count];
-    for(int i = 0; i < size; i++)
-    {
-        MKPolyline* line = pastOverlays[i];
-        [self.mapView addOverlay:line];
+        MKPolygon* polygon = overlays[i];
+        [self.mapView addOverlay:polygon];
     }
 }
 
-- (NSArray*) prepareTimeLinkOverlays:(ATEventDataStruct*)ent :(BOOL)directionFuture
+- (NSArray*) prepareOverlays:(ATEventDataStruct*)ent
 {
     //direction = true is for event before ent
     //direction = false is for event after ent
+    NSMutableArray* returnOverlays = [[NSMutableArray alloc] init];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSMutableArray* list  = appDelegate.eventListSorted;
-    int listSize =[list count];
-    
-    
-    int currEventIdxConstant = [list indexOfObject:ent];
-    
-    //link all same day, and 5 different days before/after, (same day must be togetther
-    NSInteger linkDepth = 0;
-    int linkCount = 0;
-    
-    ATEventDataStruct* prevEvent = ent;
-    ATEventDataStruct* thisEvent = nil;
-    NSMutableArray* returnPolylineList = [[NSMutableArray alloc] init];
-    NSMutableArray* eventsInSameDepth = [[NSMutableArray alloc] init];
-    
-    //Time link logic 1: max time to stop time link witn max depth limit
-    int timeLinkMaxNumberOfDaysBtwTwoEvent = 30; //if time zoom is in day, then max is 30
-    if (appDelegate.selectedPeriodInDays >31 && appDelegate.selectedPeriodInDays <= 365)
+    NSArray* overlayRegions = [appDelegate.overlayCollection objectForKey:ent.uniqueId];
+    if (overlayRegions == nil)
+        return nil;
+    for (NSArray* regionLineArray in overlayRegions)
     {
-        timeLinkMaxNumberOfDaysBtwTwoEvent = 365;
-    }
-    else if (appDelegate.selectedPeriodInDays > 365 && appDelegate.selectedPeriodInDays <=3600)
-        timeLinkMaxNumberOfDaysBtwTwoEvent = 3650;
-    else if (appDelegate.selectedPeriodInDays > 3600)
-        timeLinkMaxNumberOfDaysBtwTwoEvent = 36000;
-    
-    //Following is to add points for event in future, and in before depends on direction, the logic is not ideal, hope it works
-    //NOTE a senario: if zoom range is not day and focused group is at end, then dashed line for this group will not show
-    while (linkDepth <= TIME_LINK_DEPTH) { //TODO TIME_LINK_DEPTH is 5, should be configurable, same day event link together
-        linkCount++;
-        int thisIdx = currEventIdxConstant + linkCount;
-        if (directionFuture)
-            thisIdx = currEventIdxConstant - linkCount;
-        
-        BOOL breakFlag = false;
-        MKPolyline* timeLinkPolyline = nil;
-        if (thisIdx >= 0 && thisIdx < listSize)
-        {
-            thisEvent = list[thisIdx];
-            
-            NSTimeInterval interval = [thisEvent.eventDate timeIntervalSinceDate: prevEvent.eventDate];
-            
-            if (abs(interval/86400.0) > timeLinkMaxNumberOfDaysBtwTwoEvent) //TODO  may need to tie with period lenth
-            {
-                if ([eventsInSameDepth count] == 0)
-                    break;
-                else
-                    breakFlag = true; //breakFlag = true;
-            }
-            else
-            {
-                
-                //NSLog(@"===in range: date1=%@   date2=%@    days=%f", thisEvent.eventDate, prevEvent.eventDate, interval/86400.0);
-                
-                [eventsInSameDepth addObject:prevEvent];
-                [eventsInSameDepth addObject:thisEvent];
-            }
-            
-        }
-        else
-        {
-            if ([eventsInSameDepth count] == 0)
-                break;
-            else
-                breakFlag = true; //breakFlag = true;
-            //else will continues following to finish remaining draw for nodes in same depth
-        }
-        
-        int numberOfSameDepthLine;
-        //Time Link logic 2: put group of events in same time link depth according to time wheel zoom
-        BOOL sameDepthFlag = false;
-        if (appDelegate.selectedPeriodInDays <=30)
-        {
-            sameDepthFlag = [prevEvent.eventDate isEqualToDate:thisEvent.eventDate];
-        }
-        else if (appDelegate.selectedPeriodInDays >30 && appDelegate.selectedPeriodInDays <= 365)
-        {
-            NSString* year1 = [ATHelper getYearMonthForTimeLink:prevEvent.eventDate];
-            NSString* year2 = [ATHelper getYearMonthForTimeLink:thisEvent.eventDate];
-            sameDepthFlag = [year1 isEqualToString:year2];
-        }
-        else if (appDelegate.selectedPeriodInDays >365 && appDelegate.selectedPeriodInDays <=3600)
-        {
-            NSString* year1 = [ATHelper getYearPartHelper:prevEvent.eventDate];
-            NSString* year2 = [ATHelper getYearPartHelper:thisEvent.eventDate];
-            sameDepthFlag = [year1 isEqualToString:year2];
-        }
-        else
-        {
-            NSString* year1 = [ATHelper get10YearForTimeLink:prevEvent.eventDate];
-            NSString* year2 = [ATHelper get10YearForTimeLink:thisEvent.eventDate];
-            sameDepthFlag = [year1 isEqualToString:year2];
-        }
-        
-        if (!sameDepthFlag || breakFlag)
-        { //if depth changed, draw the link. For same depth links, draw all in one overlay for better performance
-            numberOfSameDepthLine = [eventsInSameDepth count] / 2 - 1;  //the last one is not same depth
-            int pointArrSize = numberOfSameDepthLine;
-            if (numberOfSameDepthLine > MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP)
-                pointArrSize = MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP;
-            if (numberOfSameDepthLine > 0)
-            {
-                // /******* Following code works to draw line amoung events in same depth, and not to draw all but the configurable number for performance. But I comment it out because I think no need to draw if in same depth because annotation color already dell the events are in same depth.
-                int skipCount = 0;
-                MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * 2 * pointArrSize);
-                for (int i = 0; i < numberOfSameDepthLine; i++)  //only process those with same date
-                {
-                    if (numberOfSameDepthLine > MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP
-                        && i >= MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP/2
-                        && i <= (numberOfSameDepthLine - MAX_NUMBER_OF_TIME_LINKS_IN_SAME_DEPTH_GROUP/2 - 1)
-                        )
-                    { //only show first few and last few timelink line, not all for better berformance
-                        skipCount ++;
-                        continue;
-                    }
-                    pointArr[2*(i - skipCount) ] = [self getEventMapPoint:eventsInSameDepth[2*i]];
-                    pointArr[2*(i - skipCount)  + 1] = [self getEventMapPoint:eventsInSameDepth[2*i+1]];
-                    
-                }
-                timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr count:(2*pointArrSize)];
-                [returnPolylineList addObject:timeLinkPolyline];
-                free(pointArr);
-                linkDepth ++;
-                int tmp = linkDepth;
-                if (directionFuture)
-                    tmp = - tmp;
-                NSString* lineStyle = [NSString stringWithFormat:@"%d|%d", tmp, TIME_LINK_DASH_LINE_STYLE_FOR_SAME_DEPTH];
-                NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
-                [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
-                // ******************************/
-            }
-            //the last one must have differnt date, so add separately. Actually here take care of line with different date
-            int startIdx = [eventsInSameDepth count] - 2;
-            MKMapPoint* pointArr2 = malloc(sizeof(CLLocationCoordinate2D) * 2);
-            pointArr2[0] = [self getEventMapPoint:eventsInSameDepth[startIdx]];
-            pointArr2[1] = [self getEventMapPoint:eventsInSameDepth[startIdx+1]];
-            timeLinkPolyline = [MKPolyline polylineWithPoints:pointArr2 count:2];
-            [returnPolylineList addObject:timeLinkPolyline];
-            free(pointArr2);
-            linkDepth ++;
-            int tmp = linkDepth;
-            if (directionFuture)
-                tmp = - tmp;
-            
-            NSString* lineStyle = [NSString stringWithFormat:@"%d|%d", tmp, TIME_LINK_SOLID_LINE_STYLE];
-            //NSLog(@"    in prepare: linDepth=%d  tmp=%d, Solid Line",linkDepth, tmp);
-            NSString *key=[NSString stringWithFormat:@"%f|%f", timeLinkPolyline.coordinate.latitude, timeLinkPolyline.coordinate.longitude];
-            [timeLinkOverlayDepthColorMap  setValue: lineStyle  forKey:key];
-            
-            [eventsInSameDepth removeAllObjects];
-            
-            prevEvent = thisEvent;
-            
-            if (breakFlag)
-                break;
-        }
-        else
-        {   //so all same depth link will be in same overlay
-            prevEvent = thisEvent;
+        if (regionLineArray == nil)
             continue;
-        }
         
-    }
-    if (directionFuture)
-        timeLinkDepthDirectionFuture = linkDepth;
-    else
-        timeLinkDepthDirectionPast = linkDepth;
-    //NSLog(@"    in prepare: ======= linkDepth=%d   timLinkDepthDirectioTrue=%d   False=%d",linkDepth, timeLinkDepthDirectionFuture, timeLinkDepthDirectionPast);
-    return returnPolylineList;
-}
+        //MKMapPoint* overlayRegion2D = malloc(sizeof(CLLocationCoordinate2D) * [regionLineArray count]);
+        CLLocationCoordinate2D* overlayRegion2D = malloc(sizeof(CLLocationCoordinate2D) * [regionLineArray count]);
+        
+        for (int i=0; i<[regionLineArray count];i++)
+        {
+            NSString* lineStr = regionLineArray[i];
+            //in AppDelegate, lineStr are processed to be valid, so no need to check nil, empty here
+            NSArray* latlng = [lineStr componentsSeparatedByString:@","];
+            if (latlng == nil)
+            {
+                NSLog(@" ###### ATViewController latlng data has error %@",lineStr);
+                CLLocationCoordinate2D workingCoordinate;
+                workingCoordinate.latitude = 0.0;
+                workingCoordinate.longitude = 0.0;
+                //overlayRegion2D[i] = MKMapPointForCoordinate(workingCoordinate);
+                overlayRegion2D[i] = workingCoordinate;
+            }
+            else
+            {
+                //Note, do not know why, the kml file has lat/lng in postion 1, 0
+                double lat = [latlng[1] doubleValue];
+                double lng = [latlng[0] doubleValue];
+                CLLocationCoordinate2D workingCoordinate;
+                
+                workingCoordinate.latitude = lat;
+                workingCoordinate.longitude = lng;
+                //overlayRegion2D[i] = MKMapPointForCoordinate(workingCoordinate);
+                overlayRegion2D[i] = workingCoordinate;
+            }
+        }
 
-- (MKMapPoint) getEventMapPoint:(ATEventDataStruct*)evt
-{
-    CLLocationCoordinate2D workingCoordinate;
-    workingCoordinate.latitude = evt.lat;
-    workingCoordinate.longitude = evt.lng;
-    return MKMapPointForCoordinate(workingCoordinate);
+        MKPolygon* polygon = [MKPolygon polygonWithCoordinates:overlayRegion2D count:[regionLineArray count]];
+        free(overlayRegion2D);
+        [returnOverlays addObject:polygon];
+    }
+    return returnOverlays;
 }
 
 - (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id <MKOverlay>)overlay
 {
-    //TODO draw line color according to date distance, use mkPointDateMapForTimeLinOverlay
-    NSString *key=[NSString stringWithFormat:@"%f|%f", overlay.coordinate.latitude, overlay.coordinate.longitude];
-    NSString *lineStyle = [timeLinkOverlayDepthColorMap objectForKey:key];
-    
-    
-    NSArray *splitArray = [lineStyle componentsSeparatedByString:@"|"];
-    float colorHint =[splitArray[0] floatValue];
-    int lineStyleFlag = [splitArray[1] intValue];
-    
-    double depthFloat = timeLinkDepthDirectionPast;
-    if (colorHint < 0) //we put negative number -tmp in prepareTimeLink()
-        depthFloat = timeLinkDepthDirectionFuture;
-    
-    if (depthFloat == 0.0)
-        return nil;
-    //double alpha = colorHint/depthFloat;
-    double alpha = (depthFloat  - abs(colorHint))/depthFloat;
-    if (alpha == 0)
-    {
-        alpha = 0.1;
-        if (depthFloat <= 2)
-            alpha = 0.7;
+    if([overlay isKindOfClass:[MKPolygon class]]){
+        MKPolygonView *view = [[MKPolygonView alloc] initWithOverlay:overlay];
+        view.lineWidth=0;
+        view.strokeColor=[UIColor redColor];
+        view.fillColor=[[UIColor redColor] colorWithAlphaComponent:0.5];
+        return view;
     }
-    if (alpha < 0)
-        alpha = alpha * (-1.0);  //abs() is for int only, color will fail silently if give alpha value negative or great than 1. this fucking function make me crazy
-    
-    
-    
-    UIColor* color = [UIColor colorWithRed:0.9 green:0 blue:0 alpha:alpha];
-    if (colorHint <= 0)
-        color = [UIColor colorWithRed:0 green:0.9 blue:0 alpha:alpha];
-    
-    
-    MKPolylineView* routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
-    
-    routeLineView.fillColor = color;
-    routeLineView.strokeColor = color;
-    routeLineView.lineWidth = 1;
-    // /***** following working code no longer need. see comments for events in same depth
-    if (lineStyleFlag == TIME_LINK_DASH_LINE_STYLE_FOR_SAME_DEPTH) //for all events in same depth, draw dashed line
-    {
-        //DashLine render is too slow, get rid of it
-        // routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:3],[NSNumber numberWithFloat:10], nil];
-        routeLineView.lineWidth = 1;
-        
-        if (abs(colorHint) <= 1) //color link to blue only when first depth has same
-            routeLineView.strokeColor = [UIColor colorWithRed:0.7 green:0.6 blue:1.0 alpha:0.5];
-        //routeLineView.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithFloat:6],[NSNumber numberWithFloat:15], nil]; //dash line is too slow
-        
-    }
-    // *********/
-    return routeLineView;
+    return nil;
 }
 
 //I could not explain, but for tap left annotation button to focuse date, have to to do focusedRow++ in ATTimeScrollWindowNew

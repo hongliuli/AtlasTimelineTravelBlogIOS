@@ -86,6 +86,28 @@
         return [first compare:second]== NSOrderedAscending;
     }];
     _eventListSorted =[[NSMutableArray alloc] initWithCapacity:100];
+    if ([sortedArray count] == 0)
+    {
+        NSArray* eventsFromFile = [self readEventsFromFile];
+        if (eventsFromFile == nil)
+        {
+            NSLog(@"   read from file error ======");
+            return nil;
+        }
+        for (ATEventDataStruct* ent in eventsFromFile) {
+            
+            ATEventDataStruct* entData = [[ATEventDataStruct alloc] init];
+            entData.address = ent.address;
+            entData.eventDate = ent.eventDate;
+            entData.eventDesc = ent.eventDesc;
+            //NSLog(@"event date=%@   eventType=%i",entData.eventDate, entData.eventType);
+            entData.uniqueId = ent.uniqueId;
+            entData.lat = ent.lat;
+            entData.lng = ent.lng;
+            [_eventListSorted addObject:entData];
+        }
+    }
+
     //IMPORTANT: replace appDelegate's managed obj with pure object. without this, ATEventEntity fields will have nil value after pass to caller (changed for iOS7 )
     for (ATEventEntity* ent in sortedArray) {
  
@@ -105,12 +127,170 @@
     return _eventListSorted;
 }
 
+- (NSDictionary*) overlayCollection {
+    return _overlayCollection; //initialized in eventListSorted
+}
 
 -(void) emptyEventList
 {
     //used in ATPreferenceViewController when switch offline source
     [_eventListSorted removeAllObjects];
     _eventListSorted = nil;
+}
+
+- (NSArray*) readEventsFromFile
+{
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"eventsFile" ofType:@"txt"];
+    NSMutableArray* eventList = [[NSMutableArray alloc] initWithCapacity:400];
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"yyyy-MM-dd"];
+    
+    if (_overlayCollection == nil)
+        _overlayCollection = [[NSMutableDictionary alloc] init];
+
+    if (filePath) {
+        NSString *eventsString = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
+        if (eventsString != nil)
+        {
+            //[Date] must be the first Metadata for each event in file, and must already sorted?
+            NSArray* eventStrList = [eventsString componentsSeparatedByString: @"[Date]"];
+            
+            NSMutableArray* uniqueIdCollection = [[NSMutableArray alloc] init];
+            int partOfUniqueId = 0;
+            for (NSString* eventStr in eventStrList)
+            {
+                if ([@"" isEqualToString:eventStr])
+                    continue;
+                ATEventDataStruct* evt = [[ATEventDataStruct alloc] init];
+                //###### event in file must have order [Date]2001-01-01 -> [Addr] -> [Loc] -> [Desc] -> [Overlay]
+                NSString* tmp = [eventStr stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                NSString* datePart = [tmp substringToIndex:10];
+                evt.eventDate = [dateFormat dateFromString:datePart];
+                if (evt.eventDate == nil)
+                {
+                    NSLog(@"  ##### readEventsFromFile convert date %@ failed", datePart);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File date error",nil) message:NSLocalizedString(datePart,nil)
+                        delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                    [alert show];
+                    return nil;
+                }
+                NSRange addrFromRange = [tmp rangeOfString:@"[Addr]" options: NSCaseInsensitiveSearch];
+                NSRange locFromRange = [tmp rangeOfString:@"[Loc]" options: NSCaseInsensitiveSearch];
+                if (addrFromRange.location == NSNotFound) {
+                    NSLog(@"  ##### readFromFile - [Addr] was not found in %@", tmp);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File Addr error",nil) message:NSLocalizedString(tmp,nil)
+                                                                   delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                    [alert show];
+                    return nil;
+                }
+                if (locFromRange.location == NSNotFound) {
+                    NSLog(@"  ##### readFromFile - [Loc] was not found in %@", tmp);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File Loc error",nil) message:NSLocalizedString(tmp,nil)
+                                                                   delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                    [alert show];
+                    return nil;
+                }
+                tmp = [tmp substringFromIndex:addrFromRange.location];
+                //now [Addr] start from 0
+                locFromRange = [tmp rangeOfString:@"[Loc]" options: NSCaseInsensitiveSearch];
+                NSRange addrRange = NSMakeRange(6, locFromRange.location - 6);
+                evt.address = [tmp substringWithRange:addrRange];
+                tmp = [tmp substringFromIndex:locFromRange.location];
+                
+                //now [Loc] start from 0
+                NSRange descFromRange = [tmp rangeOfString:@"[Desc]"];
+                if (descFromRange.location == NSNotFound) {
+                    NSLog(@" ##### readFromFile - [Desc] was not found in %@", tmp);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File Desc error",nil) message:NSLocalizedString(tmp,nil)
+                                                                   delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                    [alert show];
+                    return nil;
+                }
+                NSRange locRange = NSMakeRange(5, descFromRange.location - 5);
+                NSString* loc = [tmp substringWithRange:locRange];
+                loc = [loc stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                NSArray* latlng = [loc componentsSeparatedByString:@","];
+                if (latlng == nil || [latlng count] != 2)
+                {
+                    NSLog(@" ###### [loc] data has error %@",tmp);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File Loc error",nil) message:NSLocalizedString(tmp,nil)
+                                                                   delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                    [alert show];
+                    return nil;
+                }
+                evt.lat = [latlng[0] doubleValue];
+                evt.lng = [latlng[1] doubleValue];
+ 
+                tmp = [tmp substringFromIndex:descFromRange.location];
+                
+                //now tmp start from [Desc]
+                NSRange overlayFromRange = [tmp rangeOfString:@"[Overlay]" options: NSCaseInsensitiveSearch];
+                if (overlayFromRange.location == NSNotFound)
+                    evt.eventDesc = [tmp substringFromIndex:6];
+                else
+                {
+                    NSRange descRange = NSMakeRange(6, overlayFromRange.location - 6);
+                    evt.eventDesc = [tmp substringWithRange:descRange];
+                }
+                
+                //because photo are stored in directory named with uniqueId, so after initial
+                //    run, uniqueId should not be changed, otherwise photo may be lost
+                NSString* uniqueId = datePart;
+                if ([uniqueIdCollection containsObject:uniqueId])
+                    uniqueId = [NSString stringWithFormat:@"%@_%d", datePart, partOfUniqueId];
+                [uniqueIdCollection addObject:uniqueId];
+                evt.uniqueId = uniqueId;
+                partOfUniqueId++; //this will make sure generated uniqueId is unique when events have same date
+                [eventList addObject:evt];
+
+                //Now process overlay.  [Overlay] -> [Region]...[Region]...[Region]
+                if (overlayFromRange.location != NSNotFound) {
+                 
+                    tmp = [tmp substringFromIndex:overlayFromRange.location + 9];
+                    tmp = [tmp stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                    //Now tmp contains only overlay data, no meta no space. store overlay
+                    NSArray* overlays = [tmp
+                                         componentsSeparatedByString:@"[Region]"];
+                    if ( overlays == nil || [overlays count] == 0)
+                    {
+                        NSLog(@" ##### [Overlay] data has error %@",tmp);
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File Overlay error",nil) message:NSLocalizedString(tmp,nil)
+                                                                       delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                        [alert show];
+                        return nil;
+                    }
+                    NSMutableArray* overlayList = [[NSMutableArray alloc] init];
+                
+                    for (NSString* regionLines in overlays)
+                    {
+                        if (regionLines == nil || [regionLines length] == 0)
+                            continue;
+                        NSArray* lines = [regionLines componentsSeparatedByString:@"\n"];
+                        if (lines == nil || [lines count] <= 2)
+                            lines = [regionLines componentsSeparatedByString:@" "]; //Google My map export data separated by space
+                        NSMutableArray* processedLines = [[NSMutableArray alloc] init];
+                        if (lines == nil || [lines count] == 0)
+                            continue;
+                        for (NSString* lineStr in lines)
+                        {
+                            if (lineStr == nil || [lineStr length] == 0)
+                                continue;
+                            NSString* line = [lineStr stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                            [processedLines addObject:line];
+                        }
+                        [overlayList addObject:processedLines];
+                    }
+                    [_overlayCollection setObject:overlayList forKey:uniqueId];
+                }
+            }
+        }
+    }
+    NSArray* ret = [eventList sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        NSDate *first = [(ATEventDataStruct*)a eventDate];
+        NSDate *second = [(ATEventDataStruct*)b eventDate];
+        return [first compare:second]== NSOrderedAscending;
+    }];
+    return ret;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions

@@ -131,7 +131,7 @@ BOOL isAtLeast7;
     appDelegate.focusedEvent = evt;  //appDelegate.focusedEvent is added when implement here
     ATViewController* mapView = appDelegate.mapViewController;
     [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
-    [mapView showTimeLinkOverlay];
+    [mapView showOverlays];
     [self.tableView reloadData]; //so show checkIcon for selected row
 }
 - (void) refresh:(NSMutableArray*)eventList //called by mapview::refreshEventListView()
