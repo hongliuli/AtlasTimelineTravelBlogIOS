@@ -1,2 +1,17 @@
 Duplicate from AtlastimelineiOS
 http://stackoverflow.com/questions/17744319/duplicate-and-rename-xcode-project-associated-folders
+
+Test overlay
+Think of photo flag (eventType), should scan again to set it by checking if directory exist
+EventEditor allow save for photo only, add an "Full" button
+Focuse: remove focuse button, every time click marker will forcuse automatically, same as select on event list view
+Add "Author Area" in manual to download file, Web-based upload file to "aaa@bb.com" directory
+Instruction to author contents and send photos
+
+
+Restrictions: 
+    mostly cased by using date as nuiqueId that could cause detached photos if author modified date in new version
+
+
+Next version should allow user to choose file to validate the contents the authored. may be the only way is to use dropbox file chooser framework.
+
