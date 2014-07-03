@@ -77,58 +77,43 @@
 - (NSArray*) eventListSorted {
     if (_eventListSorted != nil)
         return _eventListSorted;
-    ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
-    //sort from latest to past, so it is good for timeline view to group by year (could not do inplace sort use sortUseSelector etc)
-    NSArray *sortedArray;
-    sortedArray = [[dataController fetchAllEventEntities] sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-        NSDate *first = [(ATEventEntity*)a eventDate];
-        NSDate *second = [(ATEventEntity*)b eventDate];
-        return [first compare:second]== NSOrderedAscending;
-    }];
     _eventListSorted =[[NSMutableArray alloc] initWithCapacity:100];
-    if ([sortedArray count] == 0)
-    {
-        NSArray* eventsFromFile = [self readEventsFromFile];
-        if (eventsFromFile == nil)
-        {
-            NSLog(@"   read from file error ======");
-            return nil;
-        }
-        for (ATEventDataStruct* ent in eventsFromFile) {
-            
-            ATEventDataStruct* entData = [[ATEventDataStruct alloc] init];
-            entData.address = ent.address;
-            entData.eventDate = ent.eventDate;
-            entData.eventDesc = ent.eventDesc;
-            //NSLog(@"event date=%@   eventType=%i",entData.eventDate, entData.eventType);
-            entData.uniqueId = ent.uniqueId;
-            entData.lat = ent.lat;
-            entData.lng = ent.lng;
-            [_eventListSorted addObject:entData];
-        }
-    }
 
-    //IMPORTANT: replace appDelegate's managed obj with pure object. without this, ATEventEntity fields will have nil value after pass to caller (changed for iOS7 )
-    for (ATEventEntity* ent in sortedArray) {
- 
+    NSArray* eventsFromFile = [self readEventsFromFile];
+    if (eventsFromFile == nil)
+    {
+        NSLog(@"   read from file error ======");
+        return nil;
+    }
+    for (ATEventDataStruct* ent in eventsFromFile) {
+        
         ATEventDataStruct* entData = [[ATEventDataStruct alloc] init];
         entData.address = ent.address;
         entData.eventDate = ent.eventDate;
         entData.eventDesc = ent.eventDesc;
-        if ([ent.eventType intValue] == EVENT_TYPE_HAS_PHOTO)
-            entData.eventType = EVENT_TYPE_HAS_PHOTO;
         //NSLog(@"event date=%@   eventType=%i",entData.eventDate, entData.eventType);
         entData.uniqueId = ent.uniqueId;
-        entData.lat = [ent.lat doubleValue];
-        entData.lng = [ent.lng doubleValue];
+        entData.lat = ent.lat;
+        entData.lng = ent.lng;
+        
+        //TODO  ##### check if directory has file
+//#####################
+entData.eventType = EVENT_TYPE_NO_PHOTO;
+//#####################
+        
         [_eventListSorted addObject:entData];
     }
+
 
     return _eventListSorted;
 }
 
 - (NSDictionary*) overlayCollection {
     return _overlayCollection; //initialized in eventListSorted
+}
+
+- (NSDictionary*) sharedOverlayCollection {
+    return _sharedOverlayCollection; //initialized in eventListSorted
 }
 
 -(void) emptyEventList
@@ -147,6 +132,8 @@
     
     if (_overlayCollection == nil)
         _overlayCollection = [[NSMutableDictionary alloc] init];
+    if (_sharedOverlayCollection == nil)
+        _sharedOverlayCollection = [[NSMutableDictionary alloc] init];
 
     if (filePath) {
         NSString *eventsString = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
@@ -162,7 +149,7 @@
                 if ([@"" isEqualToString:eventStr])
                     continue;
                 ATEventDataStruct* evt = [[ATEventDataStruct alloc] init];
-                //###### event in file must have order [Date]2001-01-01 -> [Addr] -> [Loc] -> [Desc] -> [Overlay]
+                //###### event in file must have order [Date]2001-01-01 -> [Tags] -> [Loc] -> [Desc] -> [Overlay]..[Overlay]..[Overlay]
                 NSString* tmp = [eventStr stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                 NSString* datePart = [tmp substringToIndex:10];
                 evt.eventDate = [dateFormat dateFromString:datePart];
@@ -174,10 +161,10 @@
                     [alert show];
                     return nil;
                 }
-                NSRange addrFromRange = [tmp rangeOfString:@"[Addr]" options: NSCaseInsensitiveSearch];
+                NSRange addrFromRange = [tmp rangeOfString:@"[Tags]" options: NSCaseInsensitiveSearch];
                 NSRange locFromRange = [tmp rangeOfString:@"[Loc]" options: NSCaseInsensitiveSearch];
                 if (addrFromRange.location == NSNotFound) {
-                    NSLog(@"  ##### readFromFile - [Addr] was not found in %@", tmp);
+                    NSLog(@"  ##### readFromFile - [Tags] was not found in %@", tmp);
                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File Addr error",nil) message:NSLocalizedString(tmp,nil)
                                                                    delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
                     [alert show];
@@ -191,7 +178,7 @@
                     return nil;
                 }
                 tmp = [tmp substringFromIndex:addrFromRange.location];
-                //now [Addr] start from 0
+                //now [Tags] start from 0
                 locFromRange = [tmp rangeOfString:@"[Loc]" options: NSCaseInsensitiveSearch];
                 NSRange addrRange = NSMakeRange(6, locFromRange.location - 6);
                 evt.address = [tmp substringWithRange:addrRange];
@@ -243,14 +230,16 @@
                 partOfUniqueId++; //this will make sure generated uniqueId is unique when events have same date
                 [eventList addObject:evt];
 
-                //Now process overlay.  [Overlay] -> [Region]...[Region]...[Region]
+                //Now process overlay.  [Overlay]number,number number,number ..
+                //                      [Overlay]number,number number,number ..
+                //                      [Overlay]shareOverlayKey  the overlay is in [ShareOverlay]
                 if (overlayFromRange.location != NSNotFound) {
                  
-                    tmp = [tmp substringFromIndex:overlayFromRange.location + 9];
+                    tmp = [tmp substringFromIndex:overlayFromRange.location];
                     tmp = [tmp stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                     //Now tmp contains only overlay data, no meta no space. store overlay
                     NSArray* overlays = [tmp
-                                         componentsSeparatedByString:@"[Region]"];
+                                         componentsSeparatedByString:@"[Overlay]"];
                     if ( overlays == nil || [overlays count] == 0)
                     {
                         NSLog(@" ##### [Overlay] data has error %@",tmp);
@@ -261,13 +250,14 @@
                     }
                     NSMutableArray* overlayList = [[NSMutableArray alloc] init];
                 
-                    for (NSString* regionLines in overlays)
+                    for (NSString* overlayDataStr in overlays)
                     {
-                        if (regionLines == nil || [regionLines length] == 0)
+                        if (overlayDataStr == nil || [overlayDataStr length] == 0)
                             continue;
-                        NSArray* lines = [regionLines componentsSeparatedByString:@"\n"];
+                        //in a [Region], polygon lines can be separated by " " or "\n' (not both)
+                        NSArray* lines = [overlayDataStr componentsSeparatedByString:@"\n"];
                         if (lines == nil || [lines count] <= 2)
-                            lines = [regionLines componentsSeparatedByString:@" "]; //Google My map export data separated by space
+                            lines = [overlayDataStr componentsSeparatedByString:@" "]; //Google's "My Map" export KML data is separated by space
                         NSMutableArray* processedLines = [[NSMutableArray alloc] init];
                         if (lines == nil || [lines count] == 0)
                             continue;
@@ -278,13 +268,50 @@
                             NSString* line = [lineStr stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                             [processedLines addObject:line];
                         }
-                        [overlayList addObject:processedLines];
+                        [overlayList addObject:processedLines]; //shareOverlay key should also add in as one line
                     }
                     [_overlayCollection setObject:overlayList forKey:uniqueId];
                 }
             }
+            //Here is to parse whole file again to get shareOverlay data (ShareOverlay data will be put at end of file)
+            //Data format [ShareOverlay]key1 number,number number,number
+            //            [ShareOverlay]key2 number,number number,number ...
+            int firstShareOverlayLoc = [eventsString rangeOfString:@"[ShareOverlay]"].location;
+            if (firstShareOverlayLoc != NSNotFound)
+            {
+                eventsString = [eventsString substringFromIndex:firstShareOverlayLoc];
+                NSArray* shareOverlayList = [eventsString componentsSeparatedByString: @"[ShareOverlay]"];
+                for (NSString* polygonLinesStr in shareOverlayList)
+                {
+                    if (polygonLinesStr == nil || [polygonLinesStr isEqualToString:@""])
+                        continue;
+                    
+                    //in a [ShareRegion], first is key, then polygon lines. Separater can be separated by " " or "\n' (not both)
+                    NSString* tmp = [polygonLinesStr stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                    NSArray* lines = [tmp componentsSeparatedByString:@"\n"];
+                    if (lines == nil || [lines count] <= 2)
+                        lines = [tmp componentsSeparatedByString:@" "]; //Google's "My Map" export KML data is separated by space
+                    NSMutableArray* polygonLines = [[NSMutableArray alloc] init];
+                    for (int i = 0; i< [lines count]; i++)
+                    {
+                        NSString* line = [lines[i] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                        NSString* key = nil;
+                        if (i == 0) //first one must be key
+                        {
+                            key = [line lowercaseString]; //make shareOverlay key case insenstive. see ATViewController where fetch the key
+                            [_sharedOverlayCollection setObject:polygonLines forKey:key];
+                        }
+                        else
+                        {
+                            [polygonLines addObject:line];
+                        }
+                    }
+                }
+            }
         }
     }
+
+    
     NSArray* ret = [eventList sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
         NSDate *first = [(ATEventDataStruct*)a eventDate];
         NSDate *second = [(ATEventDataStruct*)b eventDate];
