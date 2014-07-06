@@ -3,7 +3,8 @@
 [Loc]1.2,3.2
 [Desc]desc asd asdk adkf fdkdasdkf ddkdf dkdkdf a
 sdfasdf dfdkd fd
-
+[Overlay]
+ShareOverlayKey1
 
 [Date]2014-02-01
 [Tags]google place
@@ -32,8 +33,9 @@ ShareOverlayKey1
 
 
 [ShareOverlay]   
-shareOverlayKey1
--4.218750,9.795678,0.0 
+shareOverlayKey1 
+
+5.218750,9.795678,0.0
 -2.109375,-2.811371,0.0 
 12.656250,0.000000,0.0 
 13.007813,9.795678,0.0 
