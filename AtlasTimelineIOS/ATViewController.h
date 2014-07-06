@@ -17,7 +17,7 @@
 @class ATTimeScrollWindowNew;
 @class ATTimeZoomLine;
 
-@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchBarDelegate,UIAlertViewDelegate>
+@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate>
 {
     ATDataController *dataController;
 

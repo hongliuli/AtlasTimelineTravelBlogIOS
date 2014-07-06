@@ -99,7 +99,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     self.dateTxt.delegate = self;
     editorPhotoViewWidth = EDITOR_PHOTOVIEW_WIDTH;
     editorPhotoViewHeight = EDITOR_PHOTOVIEW_HEIGHT;
-    
+    self.description.editable = false;
+    self.description.dataDetectorTypes = UIDataDetectorTypeLink;
+    CGRect frame = self.description.frame;
+    frame.size.width = frame.size.width + 20;
+    [self.description setFrame:frame];
+    self.description.font =[UIFont fontWithName:@"Helvetica" size:15];
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
         BOOL optionIPADFullScreenEditorFlag = [ATHelper getOptionEditorFullScreen];
@@ -109,7 +114,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             //editorPhotoViewHeight = [ATConstants screenHeight];
             CGRect frame = self.description.frame;
             frame.size.width = editorPhotoViewWidth;
+            
             [self.description setFrame:frame];
+            self.description.font =[UIFont fontWithName:@"Helvetica" size:19];
             
             frame = self.address.frame;
             frame.size.width = editorPhotoViewWidth;
@@ -184,20 +191,30 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     else if (section == 2)
     {
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 300.0, 40.0)];
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 300.0, 30.0)];
         
         //Label in the view
-        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 100, 40)];
+        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, -10, 200, 40)];
         label.backgroundColor = [UIColor clearColor];
-        label.text = NSLocalizedString(@"Addr:",nil);
+        label.text = NSLocalizedString(@"Tags, Address:",nil);
         [customView addSubview:label];
         
         UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        shareButton.frame = CGRectMake(240, 0, 40, 30);
+        shareButton.frame = CGRectMake(280, -10, 30, 30);
         [shareButton setImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
         [shareButton addTarget:self action:@selector(shareButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:shareButton];
+        UIButton *sizeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        sizeButton.frame = CGRectMake(210, -10, 30, 30);
+        BOOL fullFlag = [ATHelper getOptionEditorFullScreen];
+        if (fullFlag)
+            [sizeButton setImage:[UIImage imageNamed:@"window_minimize.png"] forState:UIControlStateNormal];
+        else
+            [sizeButton setImage:[UIImage imageNamed:@"window_maximize.png"] forState:UIControlStateNormal];
         
+        [sizeButton addTarget:self action:@selector(sizeButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        [customView addSubview:sizeButton];
+        /*
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         if ([appDelegate.sourceName isEqual:@"myEvents"]) //can create episode on myEvents only
         {
@@ -222,6 +239,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         lblShareCount.backgroundColor = [UIColor clearColor];
         lblShareCount.text = @"";
         [customView addSubview:lblShareCount];
+         */
     }
     return customView;
 }
@@ -274,24 +292,38 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     //in full screen editor, show large description
     if (indexPath.section == 1 &&  indexPath.row == 0)
     {
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        {
-            BOOL optionIPADFullScreenEditorFlag = [ATHelper getOptionEditorFullScreen];
-            if (optionIPADFullScreenEditorFlag)
-            {
-                height = 200;
-                CGRect frame = cell.contentView.frame;
-                frame.size.height = 200;
-                [cell.contentView setFrame:frame];
-                CGRect frame2 = self.description.frame;
-                frame2.size.height = 200;
-                [self.description setFrame:frame2];
-            }
-        }
+        height = [self getEventEditorDescriptionHeight]; //value for non-full screen iPad
+        
+        CGRect frame = cell.contentView.frame;
+        frame.size.height = height;
+        [cell.contentView setFrame:frame];
+        
+        CGRect frame2 = self.description.frame;
+        frame2.size.height = height;
+        [self.description setFrame:frame2];
 
     }
     return height;
     // return the height of the particular row in the table view
+}
+
+- (int) getEventEditorDescriptionHeight
+{
+    int height = 0;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    {
+        height = 130; //value for non-full screen iPad
+        BOOL optionIPADFullScreenEditorFlag = [ATHelper getOptionEditorFullScreen];
+        if (optionIPADFullScreenEditorFlag)
+        {
+            height = 300; //value for full screen iPad
+        }
+    }
+    else
+    {
+        height = 100;
+    }
+    return height;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -300,6 +332,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         return editorPhotoViewHeight + 15; //IMPORTANT, this will decide where is clickable for my photoScrollView and Add Photo button. 15 is the gap between Date and photo scroll
     else if (section == 1)
         return 0;
+    else if (section == 2)
+        return 20;
     else
         return [super tableView:tableView heightForHeaderInSection:section];
 }
@@ -342,6 +376,14 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     //Use Modal with Done button is good for both iPad/iPhone
     //[self presentModalViewController:imagePicker animated:YES];
     [self presentViewController:imagePicker animated:YES completion:nil];
+}
+- (IBAction)sizeButtonAction:(id)sender {
+    //xxxx
+    BOOL fullFlag = [ATHelper getOptionEditorFullScreen];
+    [ATHelper setOptionEditorFullScreen:!fullFlag];
+    [self.delegate cancelEvent];
+    [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
+    [self.delegate restartEditor];
 }
 - (IBAction)shareButtonAction:(id)sender {
     NSString *version = [[UIDevice currentDevice] systemVersion];
@@ -486,71 +528,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 //[2014-01-21] change following code from textFieldDidBegingEditing to shouldBeginEditing, and return false to disable keybord (should configurable to enable keyboarder for BC input
 //       This change resolved a big headache in iPad: click desc/address to bring keypad, then date field, will leave keypad always displayed.
 -(BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
-    if (textField.tag == DATE_TEXT_FROM_STORYBOARD_999) { //999 is for date textField in storyboard
-        NSString* bcDate = self.dateTxt.text;
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSDateFormatter *dateFormater = appDelegate.dateFormater;
-        NSDate* tmpDate = [dateFormater dateFromString:bcDate];
-        //if date is already a a BC date, datePicker will crash, so do not show date picker if is a BC date
-        if (bcDate != nil && [ATHelper isBCDate:tmpDate])
-            return true;
-
-        if (self.datePicker == nil) //will be nill if clicked Done button
-        {
-            self.datePicker = [[UIDatePicker alloc] init];
-            
-            
-            //[UIView appearanceWhenContainedIn:[UITableView class], [UIDatePicker class], nil].backgroundColor = [UIColor colorWithWhite:1 alpha:1];
-            
-            self.datePicker.backgroundColor = [UIColor colorWithRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0];
-            
-            
-            [self.datePicker setFrame:CGRectMake(0,240,320,180)];
-            
-            [self.datePicker addTarget:self action:@selector(changeDateInLabel:) forControlEvents:UIControlEventValueChanged];
-            self.datePicker.datePickerMode = UIDatePickerModeDate;
-            
-            [self.view addSubview:self.datePicker];
-            
-            self.toolbar = [[UIToolbar alloc] initWithFrame: CGRectMake(0, 380, 320, 44)];
-            //[self.toolbar setBackgroundColor:[UIColor clearColor]];
-            [self.toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-            
-            UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: @"Done" style: UIBarButtonItemStyleDone target: self action: @selector(datePicked:)];
-            doneButton.width = 50;
-            doneButton.tintColor = [UIColor blueColor];
-            self.toolbar.items = [NSArray arrayWithObject: doneButton];
-            
-            
-            [self.view addSubview: self.toolbar];
-            
-        }
-        
-        if ([self.dateTxt.text isEqualToString: @""] || self.dateTxt.text == nil)
-        {
-            self.datePicker.date = [[NSDate alloc] init];
-            self.dateTxt.text = [NSString stringWithFormat:@"%@",
-                                 [dateFormater stringFromDate:self.datePicker.date]];
-        }
-        else
-        {
-            //if date is already a a BC date, datePicker will crash here, so have the first line check above, so do not show date picker if is a BC date
-            NSDate* dt = [dateFormater dateFromString:self.dateTxt.text];
-            if (dt != nil)
-                self.datePicker.date = dt;
-            else
-                self.datePicker.date = [[NSDate alloc] init];
-        }
-        self.cancelButton.enabled = false;
-        self.saveButton.enabled = false;
-        self.deleteButton.enabled = false;
-        self.address.hidden=true;
-        self.address.backgroundColor = [UIColor darkGrayColor];//do not know why this does not work, however it does not mappter
-    }
-    if ([ATHelper getOptionDateFieldKeyboardEnable])
-        return YES;
-    else
-        return NO;  // Hide both keyboard and blinking cursor.
+    //if (textField.tag == DATE_TEXT_FROM_STORYBOARD_999) { //999 is for date textField in storyboard
+        return false; //disable datetext editing, make it readonly
 }
 - (BOOL) textViewShouldBeginEditing:(UITextView *)textView
 {
@@ -712,7 +691,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         
         self.cancelButton.enabled = true;
         self.saveButton.enabled = true;
-        self.deleteButton.enabled = true;
+        self.deleteButton.enabled = false;
         self.address.hidden=false;
         self.address.backgroundColor = [UIColor whiteColor];
     }

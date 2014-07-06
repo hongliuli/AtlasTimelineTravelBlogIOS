@@ -173,7 +173,10 @@
     selectedAnnotationNearestLocationList = [[NSMutableArray alloc] init];
     regionChangeTimeStart = [[NSDate alloc] init];
     [self prepareMapView];
-    
+    //if(IOS_7)
+    //{
+    self.searchDisplayController.searchBar.searchBarStyle = UISearchBarStyleMinimal; //otherwise, there will be a gray background around search bar
+    //}
 
 }
 -(void) viewDidAppear:(BOOL)animated
@@ -186,10 +189,7 @@
     filteredEventListSorted = [NSMutableArray arrayWithCapacity:[originalEventListSorted count]];
     [self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"Timeline/Search",nil)];
     [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"Search Event", nil)];
-    //if(IOS_7)
-    //{
-    self.searchDisplayController.searchBar.searchBarStyle = UISearchBarStyleMinimal; //otherwise, there will be a gray background around search bar
-    //}
+
     
     if ([appDelegate.eventListSorted count] == 0)
     {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="pcT-VW-fjY">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="pcT-VW-fjY">
     <dependencies>
         <deployment defaultVersion="1536" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
@@ -24,12 +24,14 @@
                             <rect key="frame" x="101" y="8" width="142" height="28"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <searchBar contentMode="scaleToFill" placeholder="Address" id="Wkd-PH-Chf">
-                                    <rect key="frame" x="-7" y="0.0" width="171" height="44"/>
-                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                    <rect key="contentStretch" x="0.29999999999999999" y="0.0" width="1" height="1"/>
+                                <searchBar contentMode="redraw" id="83d-Hk-jmL">
+                                    <rect key="frame" x="0.0" y="-8" width="142" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <color key="barTintColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                     <textInputTraits key="textInputTraits"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="oMe-e0-i8T" id="eL8-ti-atX"/>
+                                    </connections>
                                 </searchBar>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -44,10 +46,19 @@
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
                     <connections>
                         <outlet property="mapView" destination="QJE-JK-1rD" id="QG9-ET-ga6"/>
-                        <outlet property="searchBar" destination="Wkd-PH-Chf" id="Rbo-EI-O9l"/>
+                        <outlet property="searchDisplayController" destination="wtN-rX-2KW" id="lvu-9c-5FS"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CtY-H7-nRb" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="wtN-rX-2KW">
+                    <connections>
+                        <outlet property="delegate" destination="oMe-e0-i8T" id="TAN-BY-QB4"/>
+                        <outlet property="searchBar" destination="83d-Hk-jmL" id="sa0-dh-KUQ"/>
+                        <outlet property="searchContentsController" destination="oMe-e0-i8T" id="sJU-NB-BI4"/>
+                        <outlet property="searchResultsDataSource" destination="oMe-e0-i8T" id="3Hy-nk-ejq"/>
+                        <outlet property="searchResultsDelegate" destination="oMe-e0-i8T" id="y1o-Ue-RDz"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="720" y="-415"/>
         </scene>

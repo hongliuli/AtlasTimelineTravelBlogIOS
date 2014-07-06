@@ -85,8 +85,19 @@ BOOL isAtLeast7;
     [dateFormatter setLocale:[NSLocale currentLocale]];
 
     NSString* dateStr = [dateFormatter stringFromDate:evt.eventDate];
+    NSString* descStr = evt.eventDesc;
+    NSString* titleStr = @"";
+    NSString* descToDisplay = [NSString stringWithFormat:@"[%@]\n%@",dateStr, evt.eventDesc ];
+    int titleEndLocation = [descStr rangeOfString:@"\n"].location;
+    if (titleEndLocation < 60) //title is in file as [Desc]xxx yyy zzzz\n
+    {
+        titleStr = [descStr substringToIndex:titleEndLocation];
+        descStr = [descStr substringFromIndex:titleEndLocation];
+        descToDisplay = [NSString stringWithFormat:@"[%@] %@\n%@", dateStr,titleStr, descStr ];
+    }
+
     //dateStr = [dateStr substringToIndex:10];
-    cell.eventDescView.text = [NSString stringWithFormat:@"%@:\n%@",dateStr, evt.eventDesc ];
+    cell.eventDescView.text = descToDisplay;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     ATEventDataStruct* focusedEvent = appDelegate.focusedEvent;
     if (focusedEvent != nil && [focusedEvent.uniqueId isEqual:evt.uniqueId])
@@ -133,6 +144,12 @@ BOOL isAtLeast7;
     [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
     [mapView showOverlays];
     [self.tableView reloadData]; //so show checkIcon for selected row
+    
+    //bookmark selected event
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    int idx = [appDelegate.eventListSorted indexOfObject:evt];
+    [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
+    [userDefault synchronize];
 }
 - (void) refresh:(NSMutableArray*)eventList //called by mapview::refreshEventListView()
 {

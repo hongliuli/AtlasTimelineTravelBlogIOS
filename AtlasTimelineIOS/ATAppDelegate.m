@@ -62,14 +62,14 @@
     
     /*
      //These ivars have the following meaning: wait 5 days before asking a review from the user and wait for at least 10 application usage. If the user tap Remind me later, then wait 3 days before asking a review again. Very nice.
-    [iRate sharedInstance].appStoreID = 3333333;
-    [iRate sharedInstance].applicationName=@"xxxx";
-    [iRate sharedInstance].daysUntilPrompt = 5;
-    [iRate sharedInstance].usesUntilPrompt = 10;
-    [iRate sharedInstance].remindPeriod = 3;
-    [iRate sharedInstance].message = NSLocalizedString(@"striRateMessage_KEY", striRateMessage);
-    [iRate sharedInstance].NSLocalizedString(@"strrateButtonLabel_KEY", strrateButtonLabel);
-    */
+     [iRate sharedInstance].appStoreID = 3333333;
+     [iRate sharedInstance].applicationName=@"xxxx";
+     [iRate sharedInstance].daysUntilPrompt = 5;
+     [iRate sharedInstance].usesUntilPrompt = 10;
+     [iRate sharedInstance].remindPeriod = 3;
+     [iRate sharedInstance].message = NSLocalizedString(@"striRateMessage_KEY", striRateMessage);
+     [iRate sharedInstance].NSLocalizedString(@"strrateButtonLabel_KEY", strrateButtonLabel);
+     */
     
 }
 
@@ -78,7 +78,7 @@
     if (_eventListSorted != nil)
         return _eventListSorted;
     _eventListSorted =[[NSMutableArray alloc] initWithCapacity:100];
-
+    
     NSArray* eventsFromFile = [self readEventsFromFile];
     if (eventsFromFile == nil)
     {
@@ -97,14 +97,14 @@
         entData.lng = ent.lng;
         
         //TODO  ##### check if directory has file
-//#####################
-entData.eventType = EVENT_TYPE_NO_PHOTO;
-//#####################
+        //#####################
+        entData.eventType = EVENT_TYPE_NO_PHOTO;
+        //#####################
         
         [_eventListSorted addObject:entData];
     }
-
-
+    
+    
     return _eventListSorted;
 }
 
@@ -134,7 +134,7 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
         _overlayCollection = [[NSMutableDictionary alloc] init];
     if (_sharedOverlayCollection == nil)
         _sharedOverlayCollection = [[NSMutableDictionary alloc] init];
-
+    
     if (filePath) {
         NSString *eventsString = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
         if (eventsString != nil)
@@ -157,7 +157,7 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
                 {
                     NSLog(@"  ##### readEventsFromFile convert date %@ failed", datePart);
                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File date error",nil) message:NSLocalizedString(datePart,nil)
-                        delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                                                                   delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
                     [alert show];
                     return nil;
                 }
@@ -207,7 +207,7 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
                 }
                 evt.lat = [latlng[0] doubleValue];
                 evt.lng = [latlng[1] doubleValue];
- 
+                
                 tmp = [tmp substringFromIndex:descFromRange.location];
                 
                 //now tmp start from [Desc]
@@ -229,12 +229,12 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
                 evt.uniqueId = uniqueId;
                 partOfUniqueId++; //this will make sure generated uniqueId is unique when events have same date
                 [eventList addObject:evt];
-
+                
                 //Now process overlay.  [Overlay]number,number number,number ..
                 //                      [Overlay]number,number number,number ..
                 //                      [Overlay]shareOverlayKey  the overlay is in [ShareOverlay]
                 if (overlayFromRange.location != NSNotFound) {
-                 
+                    
                     tmp = [tmp substringFromIndex:overlayFromRange.location];
                     tmp = [tmp stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                     //Now tmp contains only overlay data, no meta no space. store overlay
@@ -249,15 +249,14 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
                         return nil;
                     }
                     NSMutableArray* overlayList = [[NSMutableArray alloc] init];
-                
+                    
                     for (NSString* overlayDataStr in overlays)
                     {
                         if (overlayDataStr == nil || [overlayDataStr length] == 0)
                             continue;
-                        //in a [Region], polygon lines can be separated by " " or "\n' (not both)
-                        NSArray* lines = [overlayDataStr componentsSeparatedByString:@"\n"];
-                        if (lines == nil || [lines count] <= 2)
-                            lines = [overlayDataStr componentsSeparatedByString:@" "]; //Google's "My Map" export KML data is separated by space
+                        //in a [Region], polygon lines can be separated by " " or "\n" or compbination
+                        NSString* allSpaceSepStr = [overlayDataStr stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+                        NSArray* lines = [allSpaceSepStr componentsSeparatedByString:@" "]; //Google's "My Map" export KML data is separated by space
                         NSMutableArray* processedLines = [[NSMutableArray alloc] init];
                         if (lines == nil || [lines count] == 0)
                             continue;
@@ -286,11 +285,11 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
                     if (polygonLinesStr == nil || [polygonLinesStr isEqualToString:@""])
                         continue;
                     
-                    //in a [ShareRegion], first is key, then polygon lines. Separater can be separated by " " or "\n' (not both)
+                    //in a [ShareRegion], first is key, then polygon lines. Separater can be separated by " " or "\n' (or combination)
                     NSString* tmp = [polygonLinesStr stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-                    NSArray* lines = [tmp componentsSeparatedByString:@"\n"];
-                    if (lines == nil || [lines count] <= 2)
-                        lines = [tmp componentsSeparatedByString:@" "]; //Google's "My Map" export KML data is separated by space
+                    tmp = [tmp stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+                    
+                    NSArray* lines = [tmp componentsSeparatedByString:@" "]; //Google's "My Map" export KML data is separated by space
                     NSMutableArray* polygonLines = [[NSMutableArray alloc] init];
                     for (int i = 0; i< [lines count]; i++)
                     {
@@ -299,10 +298,19 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
                         if (i == 0) //first one must be key
                         {
                             key = [line lowercaseString]; //make shareOverlay key case insenstive. see ATViewController where fetch the key
+                            if (key == nil || [key isEqualToString:@""])
+                            {
+                                NSLog(@"  ####### SharedOverlay key has error %@", line);
+                                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"read file sharedOverlay key has error",nil) message:line
+                                                                               delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                                [alert show];
+                            }
                             [_sharedOverlayCollection setObject:polygonLines forKey:key];
                         }
                         else
                         {
+                            if (line == nil || [line isEqualToString:@""])
+                                continue;
                             [polygonLines addObject:line];
                         }
                     }
@@ -310,7 +318,7 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
             }
         }
     }
-
+    
     
     NSArray* ret = [eventList sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
         NSDate *first = [(ATEventDataStruct*)a eventDate];
@@ -354,7 +362,7 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
     // Add whatever other url handling code your app requires here
     return NO;
 }
-							
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -363,7 +371,7 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 }
 

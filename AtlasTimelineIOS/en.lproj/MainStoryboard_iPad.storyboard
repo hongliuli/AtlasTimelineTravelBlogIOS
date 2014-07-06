@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C64" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="ARr-NR-22L">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="ARr-NR-22L">
     <dependencies>
         <deployment defaultVersion="1536" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
@@ -24,14 +24,15 @@
                             <rect key="frame" x="231" y="5" width="307" height="34"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <searchBar contentMode="scaleToFill" placeholder="Address" id="wKR-fy-09a">
-                                    <rect key="frame" x="0.0" y="-5" width="307" height="44"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                                <searchBar contentMode="redraw" id="eHI-lJ-OaB">
+                                    <rect key="frame" x="-7" y="-5" width="307" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                    <rect key="contentStretch" x="0.29999999999999999" y="0.0" width="1" height="1"/>
-                                    <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="barTintColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                     <textInputTraits key="textInputTraits"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="2" id="C3u-Nd-0Tt"/>
+                                    </connections>
                                 </searchBar>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -40,10 +41,19 @@
                     </navigationItem>
                     <connections>
                         <outlet property="mapView" destination="dYP-aq-uwo" id="tWs-Qx-XNt"/>
-                        <outlet property="searchBar" destination="wKR-fy-09a" id="4Cv-LG-jHG"/>
+                        <outlet property="searchDisplayController" destination="sGh-HK-8KW" id="hbC-O7-hs8"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="sGh-HK-8KW" customClass="ATMySearchDisplayController">
+                    <connections>
+                        <outlet property="delegate" destination="2" id="oTJ-Pu-fDu"/>
+                        <outlet property="searchBar" destination="eHI-lJ-OaB" id="Xnj-Fs-tWF"/>
+                        <outlet property="searchContentsController" destination="2" id="ach-hZ-aVR"/>
+                        <outlet property="searchResultsDataSource" destination="2" id="mel-Wb-30F"/>
+                        <outlet property="searchResultsDelegate" destination="2" id="YKc-gi-58L"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="720" y="-415"/>
         </scene>
@@ -395,19 +405,8 @@
                             <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                             <items>
-                                <barButtonItem systemItem="save" id="GoQ-O0-RcT">
-                                    <connections>
-                                        <action selector="saveAction:" destination="20s-SR-c0I" id="cH1-vX-akP"/>
-                                    </connections>
-                                </barButtonItem>
                                 <barButtonItem style="plain" systemItem="flexibleSpace" id="SDb-sE-XrW"/>
-                                <barButtonItem systemItem="trash" id="WDa-hz-0Or">
-                                    <color key="tintColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                    <connections>
-                                        <action selector="deleteAction:" destination="20s-SR-c0I" id="Nly-DC-Mz9"/>
-                                    </connections>
-                                </barButtonItem>
-                                <barButtonItem systemItem="cancel" id="PN1-yC-G0V">
+                                <barButtonItem image="window_cancel.png" id="PN1-yC-G0V">
                                     <connections>
                                         <action selector="cancelAction:" destination="20s-SR-c0I" id="8qN-Dt-hLF"/>
                                     </connections>
@@ -505,9 +504,7 @@
                         <outlet property="address" destination="Thc-hO-Nr1" id="Kyw-od-h9z"/>
                         <outlet property="cancelButton" destination="PN1-yC-G0V" id="G1X-Vf-add"/>
                         <outlet property="dateTxt" destination="iK3-7l-Jag" id="nbt-01-1GI"/>
-                        <outlet property="deleteButton" destination="WDa-hz-0Or" id="Tc0-Wh-Ahq"/>
                         <outlet property="description" destination="fda-Xc-X0n" id="vjN-iL-Ren"/>
-                        <outlet property="saveButton" destination="GoQ-O0-RcT" id="kbK-lk-QZD"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Uph-yx-Hwg" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -771,6 +768,9 @@
             <point key="canvasLocation" x="4312" y="387"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="window_cancel.png" width="32" height="32"/>
+    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
