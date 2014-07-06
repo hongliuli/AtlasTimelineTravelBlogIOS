@@ -32,6 +32,7 @@
 #import "ATTutorialView.h"
 #import "ATInAppPurchaseViewController.h"
 #import "ATEventListWindowView.h"
+#import "ATCell.h"
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
@@ -70,10 +71,6 @@
 
 #define HAVE_IMAGE_INDICATOR 100
 
-#define EPISODE_VIEW_WIDTH 340
-#define EPISODE_VIEW_HIGHT_LARGE 410
-#define EPISODE_VIEW_HIGHT_SMALL 140
-#define EPISODE_ROW_HEIGHT 30
 
 @interface MFTopAlignedLabel : UILabel
 
@@ -100,23 +97,23 @@
     UIButton *locationbtn;
     CGRect timeScrollWindowFrame;
     ATTutorialView* tutorialView;
-    UIView* episodeView; //we do not need to have a ATEpisodeView as ATTutorialView because ATTutorialView has to implement drawRect for some customised graph draw
-    UILabel* lblEpisode1;
-    NSString* episodeNameforUpdating; //if user picked a episode to update
-    UITextView* txtNewEpisodeName;
     
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
     ATEventAnnotation* selectedEventAnnotation;
     int timeLinkDepthDirectionFuture;
     int timeLinkDepthDirectionPast;
     NSMutableArray* overlaysToBeCleaned ;
-    NSMutableArray* eventEpisodeList;
-    NSString* loadedEpisodeName; //if an episode is loaded from setting -> outgoing modify
+
     ATAnnotationFocused* focusedAnnotationIndicator;
     int currentTapTouchKey;
     bool currentTapTouchMove;
     UIButton *btnLess;
     ATEventListWindowView* eventListView;
+    
+    NSMutableArray* filteredEventListSorted;
+    NSMutableArray* originalEventListSorted;
+    
+    MKAnnotationView* viewForEditorSizeChange;
     
 }
 
@@ -137,7 +134,7 @@
     int searchBarHeight = [ATConstants searchBarHeight];
     int searchBarWidth = [ATConstants searchBarWidth];
     [self.navigationItem.titleView setFrame:CGRectMake(0, 0, searchBarWidth, searchBarHeight)];
-    
+
     //Find this spent me long time: searchBar used titleView place which is too short, thuse tap on searchbar right side keyboard will not show up, now it is good
 	[self calculateSearchBarFrame];
     
@@ -149,7 +146,7 @@
     //add two button at right (can not do in storyboard for multiple button): setting and Help, available in iOS5
     //   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     //   {
-    UIBarButtonItem *settringButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Settings",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
+    UIBarButtonItem *settringButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"About",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
     
     //NOTE the trick to set background image for a bar buttonitem
     UIButton *helpbtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -185,11 +182,18 @@
     [self.timeZoomLine showHideScaleText:false];
     [ATHelper setOptionDateFieldKeyboardEnable:false]; //always set default to not allow keyboard
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    originalEventListSorted = appDelegate.eventListSorted;
+    filteredEventListSorted = [NSMutableArray arrayWithCapacity:[originalEventListSorted count]];
     [self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"Timeline/Search",nil)];
-    [self.searchBar setPlaceholder:NSLocalizedString(@"Address", nil)];
+    [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"Search Event", nil)];
+    //if(IOS_7)
+    //{
+    self.searchDisplayController.searchBar.searchBarStyle = UISearchBarStyleMinimal; //otherwise, there will be a gray background around search bar
+    //}
+    
     if ([appDelegate.eventListSorted count] == 0)
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Add your first event",nil) message:NSLocalizedString(@"Add event by long press on a map location, or search an address. You can also import [TestEvents] in [Settings->Incoming Contents/Episodes] to learn more.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Add your first event",nil) message:NSLocalizedString(@"No event file. Developer problem",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
         [alert show];
     }
     if (eventListView == nil) //viewDidAppear will be called when navigate back (such as from timeline/search view and full screen event editor, so need to check. Always be careful of viewDidAppear to not duplicate instances
@@ -207,45 +211,12 @@
     NSString* currentVer = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
     currentVer = [NSString stringWithFormat:@"Current Version: %@",currentVer ];
     
-    NSString* link = @"http://www.chroniclemap.com/";
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
-    NSURLResponse* response=nil;
-    NSError* error=nil;
-    NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    NSString* returnStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    
-    if(error == nil && returnStr != nil && [returnStr rangeOfString:@"Current Version:"].length > 0)
-    {
-        if ([returnStr rangeOfString:currentVer].length == 0)
-        {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"There is a new version!",nil)
-                                                            message:NSLocalizedString(@"Please update from App Store",nil)
-                                                           delegate:nil
-                                                  cancelButtonTitle:NSLocalizedString(@"OK",nil)
-                                                  otherButtonTitles:nil];
-            [alert show];
-        }
-    }
-    
-    UIStoryboard * storyboard;
-    ATPreferenceViewController *preference;
-    
-    //NOTE: following I have it seems strange that "preference_nav_id" is a NavagatorController not ATPreferenceViewController, but I have to do this way. When I do I phone, it will be simpler because I do not use popover, so no "preference_nav_id" navagatorController needed
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-    {
-        storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPad" bundle:nil];
-        preference = [storyboard instantiateViewControllerWithIdentifier:@"preference_nav_id"];
-        self.preferencePopover = [[UIPopoverController alloc] initWithContentViewController:preference];
-        //IMPORTANT: preferenceViewController is on storyboard with specified size, so have to put 0, 0 for size, otherwise weired thing will happen. Also 700 is not idea for landscape
-        [self.preferencePopover presentPopoverFromRect:CGRectMake(800,0,0,0)
-                                                inView:self.mapView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
-    }
-    else
-    {
-        storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone" bundle:nil];
-        preference = [storyboard instantiateViewControllerWithIdentifier:@"preference_storyboard_id"];
-        [self.navigationController pushViewController:preference animated:true];
-    }
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:currentVer message:NSLocalizedString(
+            @"This App is supported by ChronicleMap App, which can be used to record your personal life stories! (Download app from Apple Store)\n\nIf you have a history story and own a app like this, please email support@chroniclemap.com, we can help you to own an app like this free. All you have to do is to write story in text in a simpel format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
+            delegate:self
+            cancelButtonTitle:NSLocalizedString(@"OK",nil)
+            otherButtonTitles:nil];
+    [alert show];
 }
 
 -(void) currentLocationClicked:(id)sender
@@ -330,123 +301,10 @@
         
         NSLog(@"%@%@",@"Failed to open url:",[url description]);
 }
--(void) saveEpisodeClicked:(id)sender
-{
-    if (episodeNameforUpdating == nil)
-    {
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Enter Name for the new episode",nil)
-                                                        message:@"  "
-                                                       delegate:self
-                                              cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-                                              otherButtonTitles:NSLocalizedString(@"OK",nil), nil];
-        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-        alert.tag = ALERT_FOR_SAVE;
-        [alert show];
-    }
-    else
-    {
-        [self saveEpisodeWithName:episodeNameforUpdating renameIfDuplicate:FALSE];
-    }
-}
--(void) cancelEpisodeClicked:(id)sender
-{
-    if (eventEpisodeList != nil)
-        [eventEpisodeList removeAllObjects];
-    [self refreshAnnotations];
-    [self closeEpisodeView];
-}
--(void) allEpisodeClicked:(id)sender
-{
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    if (eventEpisodeList == nil)
-        eventEpisodeList = [[NSMutableArray alloc] initWithCapacity:[appDelegate.eventListSorted count]];
-    else
-        [eventEpisodeList removeAllObjects];
-    for (ATEventDataStruct* evt in appDelegate.eventListSorted)
-    {
-        [eventEpisodeList addObject:evt.uniqueId];
-    }
-    int cnt = [appDelegate.eventListSorted count];
-    if (episodeNameforUpdating == nil)
-        lblEpisode1.text = [NSString stringWithFormat:NSLocalizedString(@"%d event(s) are picked for new episode",nil), cnt];
-    else
-        lblEpisode1.text = [NSString stringWithFormat:NSLocalizedString(@"%d event(s) are in episode [%@]",nil), cnt, episodeNameforUpdating];
-    [self refreshAnnotations];
-    ATEventDataStruct* evt = appDelegate.eventListSorted[0];
-    CLLocationCoordinate2D centerCoordinate;
-    centerCoordinate.latitude = evt.lat;
-    centerCoordinate.longitude = evt.lng;
-    MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:2];
-    MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
-    
-    // set the region like normal
-    [self.mapView setRegion:region animated:YES];
-}
--(void) lessEpisodeClicked:(id)sender
-{
-    NSString* lessMoreTxt = btnLess.titleLabel.text;
-    CGRect frame = episodeView.frame;
-    BOOL flag = false;
-    if ([NSLocalizedString(@"Less",nil) isEqualToString:lessMoreTxt])
-    {
-        frame.size.height = EPISODE_VIEW_HIGHT_SMALL;
-        btnLess.titleLabel.text = NSLocalizedString(@"More",nil);
-        flag = false;
-    }
-    else
-    {
-        frame.size.height = EPISODE_VIEW_HIGHT_LARGE;
-        btnLess.titleLabel.text = NSLocalizedString(@"More",nil);
-        flag = true;
-    }
-    [episodeView setFrame:frame];
-    [self partialInitEpisodeView:flag];
-}
 
--(void) saveEpisodeWithName: (NSString*)episodeName renameIfDuplicate:(BOOL)renameFlag
-{
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    NSMutableDictionary* episodeDictionary = [[userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]] mutableCopy];
-    if (episodeDictionary == nil)
-        episodeDictionary = [[NSMutableDictionary alloc] init];
-    if (renameFlag)
-    {
-        NSArray* nameList = [episodeDictionary allKeys];
-        if ([nameList containsObject:episodeName])
-            episodeName = [NSString stringWithFormat:NSLocalizedString(@"%@ (Copy)",nil),episodeName];//not need check if this dupicated again.
-    }
-    [episodeDictionary setObject:eventEpisodeList forKey:episodeName];
-    [userDefault setObject:episodeDictionary forKey:[ATConstants EpisodeDictionaryKeyName]];
-    
-    if (eventEpisodeList != nil)
-        [eventEpisodeList removeAllObjects];
-    [self refreshAnnotations];
-    [self closeEpisodeView];
-    
-}
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     //if (alertView.tag == ALERT_FOR_SAVE)
     if (buttonIndex == 1 && alertView.tag == ALERT_FOR_SAVE) {
-        NSString *episodeName = [alertView textFieldAtIndex:0].text;
-        episodeName =[episodeName stringByTrimmingCharactersInSet:
-                      [NSCharacterSet whitespaceCharacterSet]];
-        if (![episodeName isEqual:@""] //remember episode Name is saved in saver as xxx|email|date
-                                        // and may passed to here with prefix 1* if not readed yet
-                                        // so should not conttains * | etc
-            && [episodeName rangeOfString:@"*"].location == NSNotFound
-            && [episodeName rangeOfString:@"@"].location == NSNotFound
-            && [episodeName rangeOfString:@"&"].location == NSNotFound
-            && [episodeName rangeOfString:@"|"].location == NSNotFound )
-            [self saveEpisodeWithName:episodeName renameIfDuplicate:TRUE];
-        else
-        {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Episode name is empty or contains some special char",nil)
-                                                            message:NSLocalizedString(@"Episode name should not be empty, and should not contains '@', '*','&' or '|'. Tap Create Episode again to enter valid name!",nil)
-                                                           delegate:nil
-                                                  cancelButtonTitle:NSLocalizedString(@"OK",nil)
-                                                  otherButtonTitles:nil];
-            [alert show];
-        }
     }
     if (buttonIndex == 0 && alertView.tag == ALERT_FOR_POPOVER_ERROR)
     {
@@ -476,9 +334,21 @@
     NSArray * eventList = appDelegate.eventListSorted;
     if ([eventList count] > 0)
     {
-        ATEventDataStruct* entStruct = eventList[0];
-        
-        [self setMapCenter:entStruct :[ATConstants defaultZoomLevel]];
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        NSString* bookmarkIdxStr = [userDefault valueForKey:@"BookmarkEventIdx"];
+        int eventListSize = [eventList count];
+        ATEventDataStruct* entStruct = eventList[eventListSize -1]; //if no bookmark, always use earlist
+        if (bookmarkIdxStr != nil)
+        {
+            int bookmarkIdx = [bookmarkIdxStr intValue];
+            if (bookmarkIdx >= eventListSize)
+                bookmarkIdx = eventListSize - 1;
+            entStruct = eventList[bookmarkIdx];
+        }
+        appDelegate.focusedDate = entStruct.eventDate;
+        appDelegate.focusedEvent = entStruct;  //appDelegate.focusedEvent is added when implement here
+        [self setNewFocusedDateAndUpdateMapWithNewCenter : entStruct :-1]; //do not change map zoom level
+        [self showOverlays];
     }
     
     //add annotation. ### this is the loop where we can adding NSLog to print individual items
@@ -959,10 +829,7 @@
         
         selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate: specialMarkerName]; //keep this line here
         MKAnnotationView* annView;
-        if (eventEpisodeList != nil && [eventEpisodeList containsObject:ann.uniqueId])
-            annView = [self getImageAnnotationView:@"add-to-episode-marker.png" :annotation];
-        else
-            annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
+        annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
         annView.annotation = annotation;
         NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
         //keey list of red  annotations
@@ -1396,11 +1263,16 @@
         appDelegate.focusedEvent = ent;
         [self showOverlays];
         [self refreshEventListView];
+        //bookmark selected event
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        int idx = [appDelegate.eventListSorted indexOfObject:ent];
+        [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
     }
 }
 
 - (void) startEventEditor:(MKAnnotationView*)view
 {
+    viewForEditorSizeChange = view;
     ATEventAnnotation* ann = [view annotation];
     selectedEventAnnotation = ann;
     self.selectedAnnotation = ann;
@@ -1455,7 +1327,8 @@
     }
     
     self.eventEditor.description.text = ann.description;
-    self.eventEditor.address.text=ann.address;
+    self.eventEditor.address.text= ann.address;
+    self.eventEditor.address.editable = false;
     self.eventEditor.dateTxt.text = [NSString stringWithFormat:@"%@",
                                      [dateFormater stringFromDate:ann.eventDate]];
     self.eventEditor.eventType = ann.eventType;
@@ -1516,24 +1389,34 @@
 
 - (NSArray*) prepareOverlays:(ATEventDataStruct*)ent
 {
-    //direction = true is for event before ent
-    //direction = false is for event after ent
     NSMutableArray* returnOverlays = [[NSMutableArray alloc] init];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSArray* overlayRegions = [appDelegate.overlayCollection objectForKey:ent.uniqueId];
-    if (overlayRegions == nil)
+    NSArray* overlays = [appDelegate.overlayCollection objectForKey:ent.uniqueId];
+    if (overlays == nil)
         return nil;
-    for (NSArray* regionLineArray in overlayRegions)
+    for (NSArray* polygonLines in overlays)
     {
-        if (regionLineArray == nil)
+        if (polygonLines == nil || [polygonLines count] == 0)
             continue;
-        
-        //MKMapPoint* overlayRegion2D = malloc(sizeof(CLLocationCoordinate2D) * [regionLineArray count]);
-        CLLocationCoordinate2D* overlayRegion2D = malloc(sizeof(CLLocationCoordinate2D) * [regionLineArray count]);
-        
-        for (int i=0; i<[regionLineArray count];i++)
+        NSArray* shareOverlayArray = polygonLines;
+        if ([polygonLines count] == 1) //this will be case for ShareOverlay key
         {
-            NSString* lineStr = regionLineArray[i];
+            NSString* key = [polygonLines[0] lowercaseString]; //make key case insensitive
+            shareOverlayArray = [appDelegate.sharedOverlayCollection objectForKey:key];
+            if (shareOverlayArray == nil || [shareOverlayArray count] <= 2)
+            {
+                NSLog(@"  ##### shareOverlay %@ has data issue ", polygonLines[0]);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"ShareOverlay data issue with following shareOverlay key:",nil) message:NSLocalizedString(polygonLines[0],nil)
+                                                               delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                [alert show];
+            }
+        }
+        //MKMapPoint* overlayRegion2D = malloc(sizeof(CLLocationCoordinate2D) * [regionLineArray count]);
+        CLLocationCoordinate2D* overlayRegion2D = malloc(sizeof(CLLocationCoordinate2D) * [shareOverlayArray count]);
+        
+        for (int i=0; i<[shareOverlayArray count];i++)
+        {
+            NSString* lineStr = shareOverlayArray[i];
             //in AppDelegate, lineStr are processed to be valid, so no need to check nil, empty here
             NSArray* latlng = [lineStr componentsSeparatedByString:@","];
             if (latlng == nil)
@@ -1559,7 +1442,7 @@
             }
         }
 
-        MKPolygon* polygon = [MKPolygon polygonWithCoordinates:overlayRegion2D count:[regionLineArray count]];
+        MKPolygon* polygon = [MKPolygon polygonWithCoordinates:overlayRegion2D count:[shareOverlayArray count]];
         free(overlayRegion2D);
         [returnOverlays addObject:polygon];
     }
@@ -1738,6 +1621,10 @@
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
 }
+- (void)restartEditor{
+    [self cancelEvent];
+    [self startEventEditor:viewForEditorSizeChange];
+}
 - (void)cancelPreference{
     if (self.preferencePopover != nil)
         [self.preferencePopover dismissPopoverAnimated:true];
@@ -1745,39 +1632,23 @@
 - (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList thumbnailFileName:(NSString*)thumbNailFileName{
     //update annotation by remove/add, then update database or added to database depends on if have id field in selectedAnnotation
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSMutableArray* list  = appDelegate.eventListSorted;
-    //For add event, check if the app has been purchased
-    if (self.selectedAnnotation.uniqueId == nil && [list count] >= FREE_VERSION_QUOTA )
-    {
-        
-        //solution in yahoo email, search"non-consumable"
-        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-        NSString* loginSecurityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
-        //This part is for test sandbox version, so no limit when test with Mac
-        BOOL noHongliuliFlag = true;
-        if (loginSecurityCode != nil && [loginSecurityCode isEqualToString:@"375151"])
-            noHongliuliFlag = false;
-        if ([userDefault objectForKey:IN_APP_PURCHASED] == nil && noHongliuliFlag)
-        {
-            purchase = [[ATInAppPurchaseViewController alloc] init];
-            [purchase processInAppPurchase];
-        }
-        //Check again if purchase has really done
-        if ([userDefault objectForKey:IN_APP_PURCHASED] == nil && noHongliuliFlag)
-            return;
-    }
-    
+
     [self mapViewShowHideAction]; //de-select annotation will flip it, so double flip
     newData.lat = self.selectedAnnotation.coordinate.latitude;
     newData.lng = self.selectedAnnotation.coordinate.longitude;
-    ATEventEntity* newEntity = [self.dataController updateEvent:self.selectedAnnotation.uniqueId EventData:newData];
-    if (newEntity == nil)
-        newData.uniqueId = self.selectedAnnotation.uniqueId;
-    else
-        newData.uniqueId = newEntity.uniqueId;
+    
+    newData.uniqueId = self.selectedAnnotation.uniqueId;
     
     [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
-    
+    if ([newAddedList count] > 0) //this is for adding photo in reader, in real reader, we hardly come here
+    {
+        int evtIndex = [appDelegate.eventListSorted indexOfObject:newData]; //implemented isEqual
+        if (evtIndex != NSNotFound)
+        {
+            ATEventDataStruct* evt = appDelegate.eventListSorted[evtIndex];
+            evt.eventType = EVENT_TYPE_HAS_PHOTO;
+        }
+    }
     NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
     UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
     if (tmpLbl != nil)
@@ -1808,28 +1679,7 @@
     ann.eventType=newData.eventType;
     [self.mapView addAnnotation:ann];
     
-    int newIndex  = NSNotFound;
-    if (newEntity != nil) //we can  modify the logic, should use if selectedAnnotation.UniqueId == null to decide it is add action
-    {
-        //add in sorted order so timeline view can generate sections
-        [list insertObject:newData atIndex:0];
-        [list sortUsingComparator:^NSComparisonResult(id a, id b) {
-            NSDate *first = [(ATEventEntity*)a eventDate];
-            NSDate *second = [(ATEventEntity*)b eventDate];
-            return [first compare:second]== NSOrderedAscending;
-        }];
-    }
-    else //for update, still need to remove and add incase  date is updated
-    {
-        newIndex = [list indexOfObject:newData]; //implemented isEqual
-        if (newIndex != NSNotFound)
-            [list replaceObjectAtIndex:newIndex withObject:newData];
-        [list sortUsingComparator:^NSComparisonResult(id a, id b) {
-            NSDate *first = [(ATEventEntity*)a eventDate];
-            NSDate *second = [(ATEventEntity*)b eventDate];
-            return [first compare:second]== NSOrderedAscending;
-        }];
-    }
+   
     
      appDelegate.focusedDate = ann.eventDate;
     [self setNewFocusedDateAndUpdateMap:newData needAdjusted:FALSE];
@@ -1842,184 +1692,7 @@
         [self.eventEditorPopover dismissPopoverAnimated:true];
     [self refreshEventListView];
 }
-//delegate required implementation
-- (void)addToEpisode{
-    //[self mapViewShowHideAction]; //de-select annotation will flip it, so double flip
-    if (eventEpisodeList == nil)
-        eventEpisodeList = [[NSMutableArray alloc] init];
-    
-    NSString* tmpUniqueId = self.selectedAnnotation.uniqueId;
-    if ([eventEpisodeList containsObject:tmpUniqueId])
-        [eventEpisodeList removeObject:tmpUniqueId];
-    else
-        [eventEpisodeList addObject:tmpUniqueId];
-    
-    //Following will do removeAnnotation/addAnnotation for this one, so need to remove tmpLbl otherwise tab on icon/text after
-    //add/remove episode will crash
-    NSString *key=[NSString stringWithFormat:@"%f|%f",self.selectedAnnotation.coordinate.latitude, self.selectedAnnotation.coordinate.longitude];
-    UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
-    [tmpLbl removeFromSuperview];
-    [selectedAnnotationSet removeObjectForKey:key];
-    //remove/add so viewForAnnotation will call to redraw the annotation with a new icon
-    [self.mapView removeAnnotation:self.selectedAnnotation];
-    [self.mapView addAnnotation:self.selectedAnnotation];
 
-    if (self.timeZoomLine != nil)
-        [self.timeZoomLine setNeedsDisplay];
-    
-    if ([eventEpisodeList count] == 0)
-        [self closeEpisodeView];
-    else
-        [self startEpisodeView];
-    
-    
-    
-    if (self.eventEditorPopover != nil)
-        [self.eventEditorPopover dismissPopoverAnimated:true];
-    [self refreshEventListView];
-}
-- (BOOL)isInEpisode //delegate requried to implement
-{
-    if (eventEpisodeList == nil)
-        return false;
-    else
-        return [eventEpisodeList containsObject:self.selectedAnnotation.uniqueId];
-        
-}
-
-- (void) startEpisodeView
-{
-    BOOL largeFlag = false;
-    int episodeViewHeight = EPISODE_VIEW_HIGHT_SMALL;
-    if (episodeView == nil)
-    {
-        largeFlag = TRUE; //only when first show full episode wording
-        episodeViewHeight = EPISODE_VIEW_HIGHT_LARGE;
-        episodeView = [[UIView alloc] initWithFrame:CGRectMake(0,0,0,0)];
-        [episodeView.layer setCornerRadius:10.0f];
-       ////// episodeView setBackgroundColor:xxxx
-        // Do any additional setup after loading the view, typically from a nib.
-        
-        //////[self.mapView addSubview:episodeView];
-        
-    }
-    
-    [UIView transitionWithView:self.mapView
-                      duration:0.5
-                       options:UIViewAnimationTransitionFlipFromRight //any animation
-                    animations:^ {
-                        [episodeView setFrame:CGRectMake(0, 0, EPISODE_VIEW_WIDTH, episodeViewHeight)];
-                        episodeView.backgroundColor=[UIColor colorWithRed:1 green:1 blue:0.7 alpha:0.6];
-                        episodeView.layer.shadowColor = [UIColor grayColor].CGColor;
-                        episodeView.layer.shadowOffset = CGSizeMake(15,15);
-                        episodeView.layer.shadowOpacity = 1;
-                        episodeView.layer.shadowRadius = 10.0;
-                        [self.mapView addSubview:episodeView];
-                        //[self partialInitEpisodeView];
-                    }
-                    completion:^(BOOL finished) {[self partialInitEpisodeView:largeFlag];}];
-}
-
-//the purpose to have this to be called in completion:^ is to make animation together with all subviews
-//(ATTutorialView has drawRect so no such issue)
-- (void) partialInitEpisodeView:(BOOL)largeFlag
-{
-    [[episodeView subviews]
-     makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    
-    UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 3*EPISODE_ROW_HEIGHT + 10, EPISODE_VIEW_WIDTH - 20, 9*EPISODE_ROW_HEIGHT)];
-    lblWording.lineBreakMode = NSLineBreakByWordWrapping;
-    lblWording.numberOfLines = 0;
-    lblWording.text = NSLocalizedString(@"An episode is a collection of events, such as an itinerary, that you can share to your friends' ChronicleMap app. (Photos are not included.)\n\nTo send an episode to a friend's ChronicleMap app, tap the episode in [Settings->Share my Episodes]\n\nYour friend can check the incoming episode in the app's [Settings->Incoming Contents/Episodes] and download to display on map.",nil);
-    [episodeView addSubview:lblWording];
-    
-    int btnY = 12*EPISODE_ROW_HEIGHT + 10;
-    lblWording.hidden = false;
-    if (!largeFlag)
-    {
-        btnY = 10 + 3*EPISODE_ROW_HEIGHT;
-        lblWording.hidden = true;
-    }
-    NSString* btnSaveTitleText = NSLocalizedString(@"Create Episode",nil);
-    if (episodeNameforUpdating != nil)
-    {
-        int nameLength = [episodeNameforUpdating length];
-        if (nameLength >5)
-            btnSaveTitleText = [NSString stringWithFormat:NSLocalizedString(@"Update %@..",nil), [episodeNameforUpdating substringToIndex:5]];
-        else
-            btnSaveTitleText = [NSString stringWithFormat:NSLocalizedString(@"Update %@",nil), episodeNameforUpdating];
-    }
-    if (largeFlag)
-    {
-        UIButton *btnAll = [UIButton buttonWithType:UIButtonTypeSystem];
-        btnAll.frame = CGRectMake(10, 3*EPISODE_ROW_HEIGHT - 4, 120, 20);
-        [btnAll setTitle:NSLocalizedString(@"Select All",nil) forState:UIControlStateNormal];
-        btnAll.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
-        [btnAll addTarget:self action:@selector(allEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [episodeView addSubview: btnAll];
-    }
-    UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnSave.frame = CGRectMake(10, btnY, 120, 20);
-    [btnSave setTitle:btnSaveTitleText forState:UIControlStateNormal];
-    btnSave.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
-    [btnSave addTarget:self action:@selector(saveEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [episodeView addSubview: btnSave];
-    
-    UIButton *btnClear = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnClear.frame = CGRectMake(140, btnY, 60, 20);
-    [btnClear setTitle:NSLocalizedString(@"Cancel",nil) forState:UIControlStateNormal];
-    btnClear.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
-    [btnClear addTarget:self action:@selector(cancelEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [episodeView addSubview: btnClear];
-    
-    if (btnLess == nil)
-        btnLess = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnLess.frame = CGRectMake(210, btnY, 60, 20);
-    if (largeFlag)
-        [btnLess setTitle:NSLocalizedString(@"Less",nil) forState:UIControlStateNormal];
-    else
-        [btnLess setTitle:NSLocalizedString(@"More",nil) forState:UIControlStateNormal];
-    btnLess.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
-    [btnLess addTarget:self action:@selector(lessEpisodeClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [episodeView addSubview: btnLess];
-    
-    if (txtNewEpisodeName == nil)
-    {
-        txtNewEpisodeName = [[UITextView alloc] initWithFrame:CGRectMake(10, 2*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, EPISODE_ROW_HEIGHT)];
-        //[episodeView addSubview:txtNewEpisodeName];
-    }
-    
-    if (lblEpisode1 == nil)
-    {
-        lblEpisode1 = [[UILabel alloc] initWithFrame:CGRectMake(10, 2*EPISODE_ROW_HEIGHT, EPISODE_VIEW_WIDTH - 20, EPISODE_ROW_HEIGHT)];
-    }
-    [episodeView addSubview:lblEpisode1];
-    int cnt = [eventEpisodeList count];
-    if (episodeNameforUpdating == nil)
-        lblEpisode1.text = [NSString stringWithFormat:NSLocalizedString(@"%d event(s) are picked for new episode",nil), cnt];
-    else
-        lblEpisode1.text = [NSString stringWithFormat:NSLocalizedString(@"%d event(s) are in episode [%@]",nil), cnt, episodeNameforUpdating];
-
-}
-
-- (void) closeEpisodeView
-{
-    if (episodeView != nil)
-    {
-        [UIView transitionWithView:self.mapView
-                          duration:0.5
-                           options:UIViewAnimationTransitionCurlDown
-                        animations:^ {
-                            [episodeView setFrame:CGRectMake(0,0,0,0)];
-                        }
-                        completion:^(BOOL finished) {
-                            [episodeView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-                            [episodeView removeFromSuperview];
-                            episodeView = nil;
-                        }];
-    }
-    episodeNameforUpdating = nil;
-}
 //Save photo to file. Called by updateEvent after write event to db
 //I should put image process functions such as resize/convert to JPEG etc in ImagePickerController
 //put it here is because we have to save image here since we only have uniqueId and some other info here
@@ -2258,32 +1931,6 @@
     return span;
 }
 
-- (void) loadEpisode:(NSString *)episodeName
-{
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    NSMutableDictionary* episodeDictionary = [[userDefault objectForKey:[ATConstants EpisodeDictionaryKeyName]] mutableCopy];
-    
-    if (episodeDictionary != nil)
-        eventEpisodeList = [[episodeDictionary objectForKey:episodeName] mutableCopy];
-    episodeNameforUpdating = episodeName;
-    [self refreshAnnotations];
-    
-    CLLocationCoordinate2D centerCoordinate;
-
-    NSArray* evtList = [ATHelper getEventListWithUniqueIds:eventEpisodeList];
-    if ([evtList count] == 0)
-        return;
-    ATEventDataStruct* evt = evtList[0];
-    centerCoordinate.latitude = evt.lat;
-    centerCoordinate.longitude = evt.lng;
-    MKCoordinateSpan span = self.mapView.region.span;
-    MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
-    
-    // set the region like normal
-    [self.mapView setRegion:region animated:YES];
-    [self startEpisodeView];
-    
-}
 
 - (void) refreshEventListView
 {
@@ -2425,6 +2072,90 @@
         return NO;
     
     return YES;
+}
+
+-(UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
+    
+    static NSString *searchCellIdentifier = @"searchCellIdentifier";
+    ATCell* cell = nil;
+    if (tableView == self.searchDisplayController.searchResultsTableView)
+	{
+        cell = (ATCell*)[tableView dequeueReusableCellWithIdentifier:searchCellIdentifier];
+        
+        if (cell == nil) {
+            cell = [[ATCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:searchCellIdentifier];
+            cell.accessoryType = UITableViewCellAccessoryDetailButton;
+        }
+        ATEventDataStruct* ent = [filteredEventListSorted objectAtIndex:indexPath.row];
+        cell.entity = ent;
+        cell.textLabel.numberOfLines = 3;
+        cell.textLabel.text = [NSString stringWithFormat:@"[%@] - %@",[ATHelper getYearPartHelper:ent.eventDate], ent.eventDesc];
+        cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size:13];
+    }
+    
+    return cell;
+}
+
+-(NSInteger)tableView:(UITableView*)tableView numberOfRowsInSection:(NSInteger)section {
+    return [filteredEventListSorted count];
+}
+
+- (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
+{
+	[filteredEventListSorted removeAllObjects]; // First clear the filtered array.
+	for (ATEventDataStruct *ent in originalEventListSorted)
+	{
+        if ([ent.eventDesc rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound
+            || [ent.address rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound )
+            //if (result == NSOrderedSame)
+        {
+            [filteredEventListSorted insertObject:ent atIndex:0]; //list in time from early to late
+        }
+        
+	}
+}
+
+#pragma mark -
+#pragma mark UISearchDisplayController Delegate Methods
+
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
+{
+    [self filterContentForSearchText:searchString scope:
+     [[self.searchDisplayController.searchBar scopeButtonTitles] objectAtIndex:[self.searchDisplayController.searchBar selectedScopeButtonIndex]]];
+    
+    // Return YES to cause the search result table view to be reloaded.
+    return YES;
+}
+
+
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption
+{
+    [self filterContentForSearchText:[self.searchDisplayController.searchBar text] scope:
+     [[self.searchDisplayController.searchBar scopeButtonTitles] objectAtIndex:searchOption]];
+    
+    // Return YES to cause the search result table view to be reloaded.
+    return YES;
+}
+-(void)searchDisplayController:(UISearchDisplayController *)controller didShowSearchResultsTableView:(UITableView *)tableView {
+    float screenWidth = [ATConstants screenWidth];
+    float searchResultWidth = 350;
+    float x = screenWidth/2 - searchResultWidth/2;
+    
+    CGRect frame = CGRectMake(x, 40, searchResultWidth, 300);
+    tableView.frame = frame;
+}
+//have to use accessary button instead of didSelect on row because tap on row have no gesture somehow
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    //NSLog(@"detail view clicked row is %i" , indexPath.row);
+    ATEventDataStruct* ent = nil;
+
+    ATCell *cell = (ATCell*)[tableView cellForRowAtIndexPath:indexPath];
+    ent = cell.entity;
+    
+    [self setNewFocusedDateAndUpdateMapWithNewCenter:ent :[ATConstants defaultZoomLevel]];
+    [self.searchDisplayController setActive:NO];//this will dismiss search display table same as click cancel button
+//##### todo  event list view not switched
 }
 
 @end
