@@ -23,10 +23,13 @@
 }
 @property int hasPhotoFlag;
 @property int eventType;
+@property bool authorModeFlag;
 @property ATPhotoScrollView* photoScrollView;
 @property (strong, nonatomic) UIImageView* selectedPhoto; //set by ATPhotoScrollView didRowSelected
 @property CLLocationCoordinate2D coordinate;
 @property (strong, nonatomic) NSString* eventId;
+@property (strong, nonatomic) UIButton * photoAddBtn;
+@property (strong, nonatomic) UIButton * photoSaveBtn;
 
 @property (weak, nonatomic) IBOutlet UITextView *description;
 @property (weak, nonatomic) IBOutlet UITextView *address;
@@ -72,8 +75,6 @@
 - (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList thumbnailFileName:(NSString*)thumbNailFileName;
 - (void)cancelEvent;
 - (void)restartEditor;
-- (void)addToEpisode;
-- (BOOL)isInEpisode;
 
 @end
 

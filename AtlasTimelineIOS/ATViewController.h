@@ -49,7 +49,6 @@
 - (Boolean) eventInPeriodRange:(NSDate*) eventDate;
 - (float) getDistanceFromFocusedDate:(NSDate*) eventDate;
 - (void) setSelectedPeriodLabel;
-- (NSString*) getSelectedPeriodLabel;
 - (void) changeTimeScaleState;
 - (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent needAdjusted:(BOOL)newdAdjust;
 - (void) setNewFocusedDateAndUpdateMapWithNewCenter:(ATEventDataStruct*) ent :(int)zoomLevel;
@@ -57,7 +56,6 @@
 - (void) cleanSelectedAnnotationSet; //see comments in .m file
 - (void) showOverlays;
 - (void) displayZoomLine;
-- (void) loadEpisode:(NSString*)episodeName;
 - (void) cancelPreference;
 - (void) refreshEventListView;
 

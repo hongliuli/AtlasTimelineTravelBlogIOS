@@ -42,6 +42,8 @@
 #define NEWEVENT_DESC_PLACEHOLD NSLocalizedString(@"Write notes here",nil)
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 
+#define AUTHOR_MODE_KEY @"AUTHOR_MODE_KEY"
+
 @implementation ATEventEditorTableController
 
 static NSArray* _photoList = nil;
@@ -64,6 +66,8 @@ UILabel *lblShareCount;
 
 UIAlertView *alertDelete;
 UIAlertView *alertCancel;
+
+
 
 NSMutableArray* markerPickerTitleList;
 NSMutableArray* markerPickerImageNameList;
@@ -123,6 +127,17 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             [self.address setFrame:frame];
         }
     }
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
+    
+    if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
+    {
+        self.authorModeFlag = false;
+    }
+    else
+    {
+        self.authorModeFlag = true;
+    }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -171,13 +186,13 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [customView addSubview:lblNewAddedCount];
         
         // create the button object
-        UIButton * photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        self.photoAddBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         UIImage *thumb2 = [UIImage imageNamed:@"add-button-md.png"];
-        [photoBtn setImage:thumb2 forState:UIControlStateNormal];
-        photoBtn.frame = CGRectMake(50, editorPhotoViewHeight - 40, 48, 48);
-        [photoBtn addTarget:self action:@selector(takePictureAction:) forControlEvents:UIControlEventTouchUpInside];
-        photoBtn.tag = ADD_PHOTO_BUTTON_TAG_777;
-        [customView addSubview:photoBtn];
+        [self.photoAddBtn setImage:thumb2 forState:UIControlStateNormal];
+        self.photoAddBtn.frame = CGRectMake(50, editorPhotoViewHeight - 40, 48, 48);
+        [self.photoAddBtn addTarget:self action:@selector(takePictureAction:) forControlEvents:UIControlEventTouchUpInside];
+        self.photoAddBtn.tag = ADD_PHOTO_BUTTON_TAG_777;
+        [customView addSubview:self.photoAddBtn];
         customViewForPhoto = customView;
         //tricky, see another comments with word "tricky"
         if (self.photoScrollView != nil && nil == [customViewForPhoto viewWithTag:ADDED_PHOTOSCROLL_TAG_900])
@@ -214,6 +229,23 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         
         [sizeButton addTarget:self action:@selector(sizeButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:sizeButton];
+        
+        self.photoSaveBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [self.photoSaveBtn setTitle:@"Save  Photo" forState:UIControlStateNormal];
+        [self.photoSaveBtn setBackgroundColor:[UIColor darkGrayColor]];
+        [self.photoSaveBtn addTarget:self action:@selector(saveAction:) forControlEvents:UIControlEventTouchUpInside];
+        self.photoSaveBtn.frame = CGRectMake(10, -10, 190, 40);
+        [customView addSubview:self.photoSaveBtn];
+        
+        if (self.authorModeFlag) {
+            self.photoAddBtn.hidden = false;
+            self.photoSaveBtn.hidden = false;
+        }
+        else
+        {
+            self.photoAddBtn.hidden = true;
+            self.photoSaveBtn.hidden = true;
+        }
         /*
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         if ([appDelegate.sourceName isEqual:@"myEvents"]) //can create episode on myEvents only
@@ -616,12 +648,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
-- (IBAction)addToEpisodeAction:(id)sender {
-    if (self.eventId == nil)
-        return;
-    [self.delegate addToEpisode];
-    [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
-}
+
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (alertView == alertDelete)

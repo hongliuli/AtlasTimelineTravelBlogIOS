@@ -11,10 +11,9 @@
 #import "ATViewController.h"
 #import <DropboxSDK/DropboxSDK.h>
 
-@interface ATPreferenceViewController : UITableViewController <SourceChooseViewControllerDelegate,DBRestClientDelegate>
+@interface ATPreferenceViewController : UITableViewController <DBRestClientDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *detailLabel;
 @property (weak, nonatomic) ATViewController* mapViewParent;
 @property (nonatomic, strong) DBRestClient *_restClient;
 
--(void) changeSelectedSource:(NSString*)selectedAtlasName;
 @end

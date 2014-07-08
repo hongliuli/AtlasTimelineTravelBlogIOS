@@ -31,6 +31,8 @@
 
 @property NSString* optionEnableDateMagnifierMove;
 
+@property BOOL authorMode;
+
 -(void) emptyEventList;
 
 @end

@@ -10,8 +10,10 @@
 #define SCREEN_HEIGHT ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.height : [[UIScreen mainScreen] bounds].size.width)
 
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
-#define ALERT_FOR_SAVE 1
+#define ALERT_FOR_SWITCH_AUTHO_MODE 1
 #define ALERT_FOR_POPOVER_ERROR 2
+
+#define AUTHOR_MODE_KEY @"AUTHOR_MODE_KEY"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -114,6 +116,7 @@
     NSMutableArray* originalEventListSorted;
     
     MKAnnotationView* viewForEditorSizeChange;
+    UIView* authorView;
     
 }
 
@@ -129,6 +132,7 @@
 {
     [super viewDidLoad];
     [ATHelper createPhotoDocumentoryPath];
+    //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.locationManager = [[CLLocationManager alloc] init];
     mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
     int searchBarHeight = [ATConstants searchBarHeight];
@@ -187,7 +191,7 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     originalEventListSorted = appDelegate.eventListSorted;
     filteredEventListSorted = [NSMutableArray arrayWithCapacity:[originalEventListSorted count]];
-    [self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"Timeline/Search",nil)];
+    [self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"List",nil)];
     [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"Search Event", nil)];
 
     
@@ -203,6 +207,19 @@
         [self.mapView addSubview:eventListView];
     }
     [self refreshEventListView];
+    
+    //author mode
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
+    
+    if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
+    {
+        [self closeAuthorView];
+    }
+    else
+    {
+        [self startAuthorView];
+    }
 }
 
 
@@ -210,12 +227,18 @@
 {
     NSString* currentVer = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
     currentVer = [NSString stringWithFormat:@"Current Version: %@",currentVer ];
-    
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
+    NSString* buttonText = @"To View Mode";
+    if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
+        buttonText = @"To Author Mode";
+        
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:currentVer message:NSLocalizedString(
             @"This App is supported by ChronicleMap App, which can be used to record your personal life stories! (Download app from Apple Store)\n\nIf you have a history story and own a app like this, please email support@chroniclemap.com, we can help you to own an app like this free. All you have to do is to write story in text in a simpel format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
             delegate:self
-            cancelButtonTitle:NSLocalizedString(@"OK",nil)
-            otherButtonTitles:nil];
+            cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+            otherButtonTitles:buttonText, nil];
+    alert.tag = ALERT_FOR_SWITCH_AUTHO_MODE;
     [alert show];
 }
 
@@ -304,7 +327,22 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     //if (alertView.tag == ALERT_FOR_SAVE)
-    if (buttonIndex == 1 && alertView.tag == ALERT_FOR_SAVE) {
+    if (buttonIndex == 1 && alertView.tag == ALERT_FOR_SWITCH_AUTHO_MODE) {
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
+        
+        if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
+        {
+            BOOL loginFlag = [ATHelper checkUserEmailAndSecurityCode:self];
+            if (!loginFlag)
+                return;
+            [self startAuthorView];
+        }
+        else
+        {
+            [self closeAuthorView];
+        }
     }
     if (buttonIndex == 0 && alertView.tag == ALERT_FOR_POPOVER_ERROR)
     {
@@ -1334,6 +1372,7 @@
     self.eventEditor.eventType = ann.eventType;
     self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
     self.eventEditor.eventId = ann.uniqueId;
+
     [ATEventEditorTableController setEventId:ann.uniqueId];
     //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
     [self.eventEditor createPhotoScrollView: ann.uniqueId ];
@@ -2073,6 +2112,125 @@
     
     return YES;
 }
+
+- (void) startAuthorView
+{
+    if (authorView == nil)
+    {
+        authorView = [[UIView alloc] initWithFrame:CGRectMake(0,0,0,0)];
+        [authorView.layer setCornerRadius:10.0f];
+    }
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    [userDefault setObject:@"UPDATE_MODE" forKey:AUTHOR_MODE_KEY];
+    appDelegate.authorMode = true;
+    [userDefault synchronize];
+    
+    [UIView transitionWithView:self.mapView
+                      duration:0.5
+                       options:UIViewAnimationTransitionFlipFromRight //any animation
+                    animations:^ {
+                        [authorView setFrame:CGRectMake(280, 50, 300, 80)];
+                        authorView.backgroundColor=[UIColor colorWithRed:1 green:1 blue:0.7 alpha:0.6];
+                        authorView.layer.shadowColor = [UIColor grayColor].CGColor;
+                        authorView.layer.shadowOffset = CGSizeMake(15,15);
+                        authorView.layer.shadowOpacity = 1;
+                        authorView.layer.shadowRadius = 10.0;
+                        [self.mapView addSubview:authorView];
+                        //[self partialInitEpisodeView];
+                    }
+                    completion:^(BOOL finished) {[self partialInitAuthorView];}];
+}
+
+//the purpose to have this to be called in completion:^ is to make animation together with all subviews
+//(ATTutorialView has drawRect so no such issue)
+- (void) partialInitAuthorView
+{
+    [[authorView subviews]
+     makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    
+    UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, 180, 30)];
+    lblWording.text = NSLocalizedString(@"Author Mode:",nil);
+    [authorView addSubview:lblWording];
+    
+
+    UIButton *btnDropbox = [UIButton buttonWithType:UIButtonTypeSystem];
+    btnDropbox.frame = CGRectMake(10, 50, 120, 40);
+    [btnDropbox setTitle:@"Sync Dropbox" forState:UIControlStateNormal];
+    btnDropbox.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
+    [btnDropbox addTarget:self action:@selector(photoDroboxClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [authorView addSubview: btnDropbox];
+    
+    UIButton *btnBackToViewMode = [UIButton buttonWithType:UIButtonTypeSystem];
+    btnBackToViewMode.frame = CGRectMake(140, 50, 60, 40);
+    [btnBackToViewMode setTitle:NSLocalizedString(@"Quit",nil) forState:UIControlStateNormal];
+    btnBackToViewMode.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
+    [btnBackToViewMode addTarget:self action:@selector(quitClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [authorView addSubview: btnBackToViewMode];
+    
+    UIButton *btnLogout = [UIButton buttonWithType:UIButtonTypeSystem];
+    btnLogout.frame = CGRectMake(200, 50, 120, 40);
+    [btnLogout setTitle:NSLocalizedString(@"Logout",nil) forState:UIControlStateNormal];
+    btnLogout.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
+    [btnLogout addTarget:self action:@selector(logoutClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [authorView addSubview: btnLogout];
+    
+}
+
+- (void) closeAuthorView
+{
+    if (authorView != nil)
+    {
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        [userDefault setObject:@"VIEW_MODE" forKey:AUTHOR_MODE_KEY];
+        appDelegate.authorMode = false;
+        [userDefault synchronize];
+        [UIView transitionWithView:self.mapView
+                          duration:0.5
+                           options:UIViewAnimationTransitionCurlDown
+                        animations:^ {
+                            [authorView setFrame:CGRectMake(0,0,0,0)];
+                        }
+                        completion:^(BOOL finished) {
+                            [authorView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+                            [authorView removeFromSuperview];
+                            authorView = nil;
+                        }];
+    }
+}
+
+-(void) photoDroboxClicked:(id)sender
+{
+    UIStoryboard * storyboard;
+    ATPreferenceViewController *preference;
+    
+    //NOTE: following I have it seems strange that "preference_nav_id" is a NavagatorController not ATPreferenceViewController, but I have to do this way. When I do I phone, it will be simpler because I do not use popover, so no "preference_nav_id" navagatorController needed
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    {
+        storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPad" bundle:nil];
+        preference = [storyboard instantiateViewControllerWithIdentifier:@"preference_nav_id"];
+        self.preferencePopover = [[UIPopoverController alloc] initWithContentViewController:preference];
+        //IMPORTANT: preferenceViewController is on storyboard with specified size, so have to put 0, 0 for size, otherwise weired thing will happen. Also 700 is not idea for landscape
+        [self.preferencePopover presentPopoverFromRect:CGRectMake(800,0,0,0)
+                                                inView:self.mapView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    }
+    else
+    {
+        storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone" bundle:nil];
+        preference = [storyboard instantiateViewControllerWithIdentifier:@"preference_storyboard_id"];
+        [self.navigationController pushViewController:preference animated:true];
+    }
+}
+-(void) quitClicked:(id)sender
+{
+    [self closeAuthorView];
+}
+-(void) logoutClicked:(id)sender
+{
+}
+
+/////// following is for search bar actions
 
 -(UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
     

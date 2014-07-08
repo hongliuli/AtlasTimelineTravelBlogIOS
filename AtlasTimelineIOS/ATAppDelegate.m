@@ -97,9 +97,9 @@
         entData.lng = ent.lng;
         
         //TODO  ##### check if directory has file
-        //#####################
-        entData.eventType = EVENT_TYPE_NO_PHOTO;
-        //#####################
+//#####################
+entData.eventType = EVENT_TYPE_NO_PHOTO;
+//#####################
         
         [_eventListSorted addObject:entData];
     }
