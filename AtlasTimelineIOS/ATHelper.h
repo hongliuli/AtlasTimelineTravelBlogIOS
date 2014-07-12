@@ -30,6 +30,7 @@
 + (NSDate *)getMonthStartDate:(NSDate*)date;
 + (void) createPhotoDocumentoryPath;
 + (NSString*) getRootDocumentoryPath;
++ (NSString*)getRootBundlePath;
 + (NSString*)getPhotoDocummentoryPath;
 + (NSString*)getNewUnsavedEventPhotoPath;
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;

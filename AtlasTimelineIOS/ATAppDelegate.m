@@ -96,10 +96,8 @@
         entData.lat = ent.lat;
         entData.lng = ent.lng;
         
-        //TODO  ##### check if directory has file
-//#####################
-entData.eventType = EVENT_TYPE_NO_PHOTO;
-//#####################
+        //Every events must have photos, otherwise eventListView will has a empty space
+        entData.eventType = EVENT_TYPE_HAS_PHOTO;
         
         [_eventListSorted addObject:entData];
     }
@@ -125,7 +123,10 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
 
 - (NSArray*) readEventsFromFile
 {
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"eventsFile" ofType:@"txt"];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+    NSString* eventFileName = [NSString stringWithFormat:@"EventsFileFor%@", targetName ];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:eventFileName ofType:@"txt"];
+    NSLog(@"========== readEvents filepath:%@,  fileNm=%@",filePath,eventFileName);
     NSMutableArray* eventList = [[NSMutableArray alloc] initWithCapacity:400];
     NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
     [dateFormat setDateFormat:@"yyyy-MM-dd"];
@@ -146,7 +147,7 @@ entData.eventType = EVENT_TYPE_NO_PHOTO;
             int partOfUniqueId = 0;
             for (NSString* eventStr in eventStrList)
             {
-                if ([@"" isEqualToString:eventStr])
+                if ([@"" isEqualToString:eventStr] || [@"\n" isEqualToString:eventStr])
                     continue;
                 ATEventDataStruct* evt = [[ATEventDataStruct alloc] init];
                 //###### event in file must have order [Date]2001-01-01 -> [Tags] -> [Loc] -> [Desc] -> [Overlay]..[Overlay]..[Overlay]

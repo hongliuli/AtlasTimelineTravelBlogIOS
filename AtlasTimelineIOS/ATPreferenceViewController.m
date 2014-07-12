@@ -9,7 +9,6 @@
 #import <DropboxSDK/DropboxSDK.h>
 #import "ATDataController.h"
 #import "ATPreferenceViewController.h"
-#import "ATDownloadTableViewController.h"
 #import "ATConstants.h"
 #import "ATHelper.h"
 #import "ATAppDelegate.h"

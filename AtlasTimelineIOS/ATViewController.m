@@ -163,10 +163,6 @@
     
     
 	// Do any additional setup after loading the view, typically from a nib.
-    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
-                                          initWithTarget:self action:@selector(handleLongPressGesture:)];
-    lpgr.minimumPressDuration = 0.3;  //user must press for 0.5 seconds
-    [_mapView addGestureRecognizer:lpgr];
     // tap to show/hide timeline navigator
     UITapGestureRecognizer *tapgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
     [_mapView addGestureRecognizer:tapgr];
@@ -234,7 +230,7 @@
         buttonText = @"To Author Mode";
         
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:currentVer message:NSLocalizedString(
-            @"This App is supported by ChronicleMap App, which can be used to record your personal life stories! (Download app from Apple Store)\n\nIf you have a history story and own a app like this, please email support@chroniclemap.com, we can help you to own an app like this free. All you have to do is to write story in text in a simpel format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
+            @"This App is supported by ChronicleMap App, which can be used to record your personal life stories! (Download app from Apple Store)\n\nIf you have a history story to make an app like this, please email support@chroniclemap.com, we can help you to own an app like this free of charge. All you have to do is to write story in text in a simpel format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
             delegate:self
             cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
             otherButtonTitles:buttonText, nil];
@@ -328,7 +324,6 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     //if (alertView.tag == ALERT_FOR_SAVE)
     if (buttonIndex == 1 && alertView.tag == ALERT_FOR_SWITCH_AUTHO_MODE) {
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
         
@@ -385,7 +380,7 @@
         }
         appDelegate.focusedDate = entStruct.eventDate;
         appDelegate.focusedEvent = entStruct;  //appDelegate.focusedEvent is added when implement here
-        [self setNewFocusedDateAndUpdateMapWithNewCenter : entStruct :-1]; //do not change map zoom level
+        [self setNewFocusedDateAndUpdateMapWithNewCenter : entStruct :4]; //initially set map zoom to a reasonable zoom level so annotation marker icon can show
         [self showOverlays];
     }
     
@@ -520,15 +515,16 @@
             [self.mapView setCenterCoordinate:centerCoordinate animated:NO];
         else
             [self.mapView setCenterCoordinate:centerCoordinate animated:YES];
-        return;
     }
-    
-    // use the zoom level to compute the region
-    MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:zoomLevel];
-    MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
-    
-    // set the region like normal
-    [self.mapView setRegion:region animated:YES];
+    else
+    {
+        // use the zoom level to compute the region
+        MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:zoomLevel];
+        MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
+        
+        // set the region like normal
+        [self.mapView setRegion:region animated:YES];
+    }
 }
 
 //orientation change will call following, need to removeFromSuperview when call addSubview
@@ -738,68 +734,6 @@
     {
         [self mapViewShowHideAction];
     }
-}
-
-- (void)handleLongPressGesture:(UIGestureRecognizer *)gestureRecognizer
-{
-    
-    if (gestureRecognizer.state != UIGestureRecognizerStateBegan)   // UIGestureRecognizerStateEnded)
-        return;
-    
-    //NSLog(@"--- to be processed State is %d", gestureRecognizer.state);
-    CGPoint touchPoint = [gestureRecognizer locationInView:_mapView];
-    
-    //Following is to do not create annotation when tuch upper part of the map because of the timeline related controls.
-    if ((UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation) && touchPoint.y <= 120 && touchPoint.x > 300 && touchPoint.x < 650)
-        ||
-        (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation) && touchPoint.y <=105))
-        return;
-    
-    CLLocationCoordinate2D touchMapCoordinate =
-    [_mapView convertPoint:touchPoint toCoordinateFromView:_mapView];
-    double lat = touchMapCoordinate.latitude;
-    double lng = touchMapCoordinate.longitude;
-    
-    self.location = [[CLLocation alloc] initWithLatitude:lat longitude:lng];
-    //NSLog(@" inside gesture lat is %f", self.location.coordinate.latitude);
-    
-    //Have to initialize locally here, this is the requirement of CLGeocode
-    //######## I have spend many days to figure it out on Jan 11, 2013 weekend
-    self.geoCoder = [[CLGeocoder alloc] init];
-    
-    
-    //reverseGeocodeLocation will take long time in very special case, such as when FreedomPop up/down, so use following stupid way to check network first, need more test on train
-    
-    NSString* link = @"http://www.google.com";
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
-    NSURLResponse* response=nil;
-    NSError* error=nil;
-    NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    //NSString* URLString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    
-    if(data == nil || error != nil)
-        [self addPinToMap:@"Unknow" :touchMapCoordinate];
-    else
-        [self.geoCoder reverseGeocodeLocation: self.location completionHandler:
-         ^(NSArray *placemarks, NSError *error) {
-             //NSLog(@"reverseGeocoder:completionHandler: called lat=%f",self.location.coordinate.latitude);
-             if (error) {
-                 NSLog(@"Geocoder failed with error: %@", error);
-             }
-             NSString *locatedAt = @"Unknown";
-             if (placemarks && placemarks.count > 0)
-             {
-                 //Get nearby address
-                 CLPlacemark *placemark = [placemarks objectAtIndex:0];
-                 //String to hold address
-                 locatedAt = [[placemark.addressDictionary valueForKey:@"FormattedAddressLines"] componentsJoinedByString:@", "];
-             }
-             [self addPinToMap:locatedAt :touchMapCoordinate];
-             //  /*** following is for testing add to db for each longpress xxxxxxxx TODO
-             // [self.dataController addEventEntityAddress:locatedAt description:@"desc by touch" date:[NSDate date] lat:touchMapCoordinate.latitude lng:touchMapCoordinate.longitude];
-             //    */
-         }];
-    
 }
 
 - (void) addPinToMap:(NSString*)locatedAt :(CLLocationCoordinate2D) touchMapCoordinate
@@ -1493,8 +1427,8 @@
     if([overlay isKindOfClass:[MKPolygon class]]){
         MKPolygonView *view = [[MKPolygonView alloc] initWithOverlay:overlay];
         view.lineWidth=0;
-        view.strokeColor=[UIColor redColor];
-        view.fillColor=[[UIColor redColor] colorWithAlphaComponent:0.5];
+        view.strokeColor=[UIColor clearColor];
+        view.fillColor=[[UIColor redColor] colorWithAlphaComponent:0.3];
         return view;
     }
     return nil;
@@ -2311,9 +2245,23 @@
     ATCell *cell = (ATCell*)[tableView cellForRowAtIndexPath:indexPath];
     ent = cell.entity;
     
-    [self setNewFocusedDateAndUpdateMapWithNewCenter:ent :[ATConstants defaultZoomLevel]];
+
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    appDelegate.focusedDate = ent.eventDate;
+    appDelegate.focusedEvent = ent;  //appDelegate.focusedEvent is added when implement here
+    [self setNewFocusedDateAndUpdateMapWithNewCenter : ent :-1]; //do not change map zoom level
+    [self showOverlays];
+    [self refreshEventListView]; //so show checkIcon for selected row
+    
+    //bookmark selected event
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    int idx = [appDelegate.eventListSorted indexOfObject:ent];
+    [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
+    [userDefault synchronize];
+    
+    
     [self.searchDisplayController setActive:NO];//this will dismiss search display table same as click cancel button
-//##### todo  event list view not switched
+    
 }
 
 @end

@@ -231,10 +231,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [customView addSubview:sizeButton];
         
         self.photoSaveBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.photoSaveBtn setTitle:@"Save  Photo" forState:UIControlStateNormal];
-        [self.photoSaveBtn setBackgroundColor:[UIColor darkGrayColor]];
+        [self.photoSaveBtn setTitle:@"Save Photo" forState:UIControlStateNormal];
+        [self.photoSaveBtn setBackgroundColor:[UIColor blueColor]];
         [self.photoSaveBtn addTarget:self action:@selector(saveAction:) forControlEvents:UIControlEventTouchUpInside];
-        self.photoSaveBtn.frame = CGRectMake(10, -10, 190, 40);
+        self.photoSaveBtn.frame = CGRectMake(10, -10, 190, 30);
         [customView addSubview:self.photoSaveBtn];
         
         if (self.authorModeFlag) {

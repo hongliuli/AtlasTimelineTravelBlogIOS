@@ -9,6 +9,7 @@
 #import "PhotoViewController.h"
 #import "ATEventEditorTableController.h"
 #import "ATConstants.h"
+#import "ATAppDelegate.h"
 
 #define NOT_THUMBNAIL -1;
 
@@ -50,16 +51,14 @@ UILabel* shareCountLabel;
     [self.view addSubview:self.pageViewController.view];
     [self.pageViewController didMoveToParentViewController:self];
     
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    
     //prepare button
+
     UIBarButtonItem* doneButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem: UIBarButtonSystemItemDone target:self action:@selector(doneAction:)];
-    UIImage *markerIcon = [UIImage imageNamed:@"marker-selected.png"];
-    UIButton *markerButton = [UIButton buttonWithType:UIButtonTypeCustom ];
-    [markerButton setBackgroundImage:markerIcon forState:UIControlStateNormal];
-    [markerButton addTarget:self action:@selector(setDefaultAction:) forControlEvents:UIControlEventTouchUpInside];
-    markerButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
-    UIBarButtonItem* setThumbnailButton = [[UIBarButtonItem alloc] initWithCustomView:markerButton ];
-    
+    UIBarButtonItem* setThumbnailButton = nil;
+
     UIImage *shareIcon = [UIImage imageNamed:@"share.png"];
     UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom ];
     [shareButton setBackgroundImage:shareIcon forState:UIControlStateNormal];
@@ -73,7 +72,18 @@ UILabel* shareCountLabel;
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpace.width = 10;
     
-    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
+    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, fixedSpace, fixedSpace, setShareButton, fixedSpace, nil];
+    if (appDelegate.authorMode)
+    {
+        UIImage *markerIcon = [UIImage imageNamed:@"marker-selected.png"];
+        UIButton *markerButton = [UIButton buttonWithType:UIButtonTypeCustom ];
+        [markerButton setBackgroundImage:markerIcon forState:UIControlStateNormal];
+        [markerButton addTarget:self action:@selector(setDefaultAction:) forControlEvents:UIControlEventTouchUpInside];
+        markerButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
+        setThumbnailButton = [[UIBarButtonItem alloc] initWithCustomView:markerButton ];
+        items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
+    }
+
     [self.toolbar setItems:items animated:NO];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]

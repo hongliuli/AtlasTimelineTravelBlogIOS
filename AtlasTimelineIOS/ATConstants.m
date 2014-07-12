@@ -278,7 +278,7 @@
 //Constants for Event List View
 + (int) eventListViewCellWidth{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return 260;
+        return 270;
     else
         return 160;
 }
@@ -306,13 +306,13 @@
 }
 + (int) eventListViewPhotoWidht{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return 80;
+        return 100;
     else
         return 60;
 }
 + (int) eventListViewPhotoHeight{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return 57;
+        return 70;
     else
         return 40;
 }

@@ -263,12 +263,22 @@ UIPopoverController *verifyViewPopover;
     NSError *error;
     [[NSFileManager defaultManager] createDirectoryAtPath:documentsDirectory withIntermediateDirectories:YES attributes:nil error:&error];
     [[NSFileManager defaultManager] createDirectoryAtPath:[ATHelper getNewUnsavedEventPhotoPath] withIntermediateDirectories:YES attributes:nil error:&error];
-    NSLog(@"Error in createPhotoDocumentoryPath  %@",[error localizedDescription]);
+    if (error != nil)
+        NSLog(@"Error in createPhotoDocumentoryPath=%@, Error= %@", [ATHelper getNewUnsavedEventPhotoPath],[error localizedDescription]);
 }
 + (NSString*)getRootDocumentoryPath
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     return [paths objectAtIndex:0];
+}
+
+//   http://www.iosmanual.com/tutorials/how-to-add-bundle-files-in-to-the-project-framework/
++ (NSString*)getRootBundlePath
+{
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+    //NSLog(@"------- mainBundle = %@, target=%@",[[NSBundle mainBundle] bundlePath],targetName);
+    NSString* photoDir = [NSString stringWithFormat:@"PhotosFor%@", targetName ];
+    return [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:photoDir];
 }
 + (NSString*)getPhotoDocummentoryPath
 {
@@ -280,12 +290,15 @@ UIPopoverController *verifyViewPopover;
         sourceName = [ATHelper getSelectedDbFileName];
         appDelegate.sourceName = sourceName;
     }
-    return [[self getRootDocumentoryPath] stringByAppendingPathComponent:sourceName];
+    if (appDelegate.authorMode)
+        return [[self getRootDocumentoryPath] stringByAppendingPathComponent:sourceName];
+    else
+        return [self getRootBundlePath];
 }
 
 + (NSString*)getNewUnsavedEventPhotoPath
 {
-    return  [[self getPhotoDocummentoryPath] stringByAppendingPathComponent:@"newPhotosTmp"];
+    return  [[[self getRootDocumentoryPath] stringByAppendingPathComponent:@"myEvents"] stringByAppendingPathComponent:@"newPhotosTmp"];
 }
 
 + (UIColor *)darkerColorForColor:(UIColor *)c
