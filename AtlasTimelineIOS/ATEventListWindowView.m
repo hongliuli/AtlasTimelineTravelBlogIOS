@@ -65,10 +65,12 @@ BOOL isAtLeast7;
     //NSLog(@" ===== cellForRow %d  internalList count %d ",indexPath.row, [internalEventList count]);
 
     ATEventDataStruct* evt = internalEventList[indexPath.row];
-    //REMEMBER internalEventList has added row to first and last for arrow button
+    //REMEMBER internalEventList has added row to first and last for arrow button (code
     if (indexPath.row == 0) // first one is up arrow
     {
         UITableViewCell* cell = [[UITableViewCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants eventListViewCellWidth], 40)];
+        if ([self shouldHideArrowButtonRow:indexPath.row])
+            return cell;
         cell.selectionStyle = UITableViewCellStyleDefault;
         CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, 10, 100, 40);
         UIImageView* upArrow = [[UIImageView alloc] initWithFrame:imageFrame];
@@ -81,6 +83,8 @@ BOOL isAtLeast7;
     if (indexPath.row == [internalEventList count] - 1) //last one is down arrow
     {
         UITableViewCell* cell = [[UITableViewCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants eventListViewCellWidth], 40)];
+        if ([self shouldHideArrowButtonRow:indexPath.row])
+            return cell;
         cell.selectionStyle = UITableViewCellStyleDefault;
         CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, -5, 100, 40);
         UIImageView* downArrow = [[UIImageView alloc] initWithFrame:imageFrame];
@@ -149,19 +153,24 @@ BOOL isAtLeast7;
     if (indexPath.row == 0 || indexPath.row == [internalEventList count] - 1)
     {
         //Do not show arrow button if reach last or begin of events
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        ATEventDataStruct* firstEvt = internalEventList[1];
-        ATEventDataStruct* lastEvt = internalEventList[[internalEventList count] - 2];
-        int globalIdxFirst = [appDelegate.eventListSorted indexOfObject:firstEvt];
-        int globalIdxLast = [appDelegate.eventListSorted indexOfObject:lastEvt];
-        if ((globalIdxFirst == [appDelegate.eventListSorted count] - 1 &&  indexPath.row == 0) ||
-            (globalIdxLast == 0 && indexPath.row == [internalEventList count] - 1))
+        if ([self shouldHideArrowButtonRow:indexPath.row])
             return 0;
         else
             return 40;
     }
     else
         return 120;
+}
+
+- (BOOL) shouldHideArrowButtonRow:(int)row
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    ATEventDataStruct* firstEvt = internalEventList[1];
+    ATEventDataStruct* lastEvt = internalEventList[[internalEventList count] - 2];
+    int globalIdxFirst = [appDelegate.eventListSorted indexOfObject:firstEvt];
+    int globalIdxLast = [appDelegate.eventListSorted indexOfObject:lastEvt];
+    return ((globalIdxFirst == [appDelegate.eventListSorted count] - 1 &&  row == 0) ||
+            (globalIdxLast == 0 && row == [internalEventList count] - 1));
 }
 //have tap gesture achive two thing: prevent call tapGesture on parent mapView and process select a row action without a TableViewController
 - (void)handleTapGesture:(UIGestureRecognizer *)gestureRecognizer
@@ -227,7 +236,7 @@ BOOL isAtLeast7;
     if (appDelegate.focusedEvent == nil)
         return;
     int selectedEventIdx = 1; //previouse is 0. after add Up/Down arrow cell, change to 1 is better
-    for (int i=0; i< [eventList count]; i++)
+    for (int i=1; i< [eventList count] - 1; i++)
     {
         ATEventDataStruct* evt = eventList[i];
         if ([evt.uniqueId isEqual:appDelegate.focusedEvent.uniqueId])
