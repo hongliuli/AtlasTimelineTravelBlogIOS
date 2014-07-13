@@ -251,6 +251,9 @@
     int daysInPeriod = appDelegate.selectedPeriodInDays;
     if (cell == nil)
     {
+        //cell = [[ATTimeScrollCell alloc] initWithStyle:UITableViewCellSelectionStyleNone reuseIdentifier:@"ATTimeScrollCell"];
+        //cell.frame = CGRectMake(0, 0, [ATConstants timeScrollCellWidth], [ATConstants timeScrollCellHeight]);
+        
         cell = [[ATTimeScrollCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants timeScrollCellWidth], [ATConstants timeScrollCellHeight])];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }

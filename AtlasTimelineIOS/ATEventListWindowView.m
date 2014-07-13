@@ -63,13 +63,38 @@ BOOL isAtLeast7;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     //NSLog(@" ===== cellForRow %d  internalList count %d ",indexPath.row, [internalEventList count]);
-    ATEventListViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
 
     ATEventDataStruct* evt = internalEventList[indexPath.row];
-    //ATEventListViewCell *cell = nil;
+    //REMEMBER internalEventList has added row to first and last for arrow button
+    if (indexPath.row == 0) // first one is up arrow
+    {
+        UITableViewCell* cell = [[UITableViewCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants eventListViewCellWidth], 40)];
+        cell.selectionStyle = UITableViewCellStyleDefault;
+        CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, 10, 100, 40);
+        UIImageView* upArrow = [[UIImageView alloc] initWithFrame:imageFrame];
+        [upArrow setImage:[UIImage imageNamed:@"arrow-up-icon.png"]];
+        [cell.contentView addSubview:upArrow];
+        cell.contentView.backgroundColor = [UIColor clearColor];
+        cell.backgroundColor= [UIColor clearColor];
+        return cell;
+    }
+    if (indexPath.row == [internalEventList count] - 1) //last one is down arrow
+    {
+        UITableViewCell* cell = [[UITableViewCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants eventListViewCellWidth], 40)];
+        cell.selectionStyle = UITableViewCellStyleDefault;
+        CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, -5, 100, 40);
+        UIImageView* downArrow = [[UIImageView alloc] initWithFrame:imageFrame];
+        [downArrow setImage:[UIImage imageNamed:@"arrow-down-icon.png"]];
+        [cell.contentView addSubview:downArrow];
+        cell.contentView.backgroundColor = [UIColor clearColor];
+        cell.backgroundColor= [UIColor clearColor];
+        return cell;
+    }
+    ATEventListViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
     if (cell == nil)
     {
         cell = [[ATEventListViewCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants eventListViewCellWidth], [ATConstants eventListViewCellHeight])];
+        
         cell.eventDescView.font = [UIFont fontWithName:@"Arial" size:13];
 
         cell.selectionStyle = UITableViewCellStyleDefault;
@@ -121,7 +146,22 @@ BOOL isAtLeast7;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 120;
+    if (indexPath.row == 0 || indexPath.row == [internalEventList count] - 1)
+    {
+        //Do not show arrow button if reach last or begin of events
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        ATEventDataStruct* firstEvt = internalEventList[1];
+        ATEventDataStruct* lastEvt = internalEventList[[internalEventList count] - 2];
+        int globalIdxFirst = [appDelegate.eventListSorted indexOfObject:firstEvt];
+        int globalIdxLast = [appDelegate.eventListSorted indexOfObject:lastEvt];
+        if ((globalIdxFirst == [appDelegate.eventListSorted count] - 1 &&  indexPath.row == 0) ||
+            (globalIdxLast == 0 && indexPath.row == [internalEventList count] - 1))
+            return 0;
+        else
+            return 40;
+    }
+    else
+        return 120;
 }
 //have tap gesture achive two thing: prevent call tapGesture on parent mapView and process select a row action without a TableViewController
 - (void)handleTapGesture:(UIGestureRecognizer *)gestureRecognizer
@@ -137,29 +177,56 @@ BOOL isAtLeast7;
 - (void) didSelectRowAtIndexPath:(NSIndexPath *)indexPath  //called by tapGesture. This is not in a TableViewController, so no didSelect... delegate mechanism, have to process  by tap gesture
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    ATEventDataStruct* evt = internalEventList[indexPath.row];
-    appDelegate.focusedDate = evt.eventDate;
-    appDelegate.focusedEvent = evt;  //appDelegate.focusedEvent is added when implement here
     ATViewController* mapView = appDelegate.mapViewController;
-    [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
-    [mapView showOverlays];
-    [self.tableView reloadData]; //so show checkIcon for selected row
+    ATEventDataStruct* evt = internalEventList[indexPath.row];
     
-    //bookmark selected event
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    int idx = [appDelegate.eventListSorted indexOfObject:evt];
-    [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
-    [userDefault synchronize];
+    if (indexPath.row == 0) //tapped on up arrow button
+    {
+        //NSLog(@"******* up arrow, find previouse event to scroll to");
+        ATEventDataStruct* firstEvt = internalEventList[1];
+        int globalIdx = [appDelegate.eventListSorted indexOfObject:firstEvt];
+        evt = appDelegate.eventListSorted[globalIdx + 1]; //no need to check range here
+        
+        [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
+        [mapView showOverlays];
+        [mapView refreshEventListView];
+    }
+    else if (indexPath.row == [internalEventList count] - 1)
+    {
+        //NSLog(@"******* down arrow, find next event");
+        ATEventDataStruct* lastEvt = internalEventList[[internalEventList count] -2];//Minus 2 because the -1 is a dummy row for arrow
+        int globalIdx = [appDelegate.eventListSorted indexOfObject:lastEvt];
+        evt = appDelegate.eventListSorted[globalIdx -1]; //no need to check range here
+        
+        [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
+        [mapView showOverlays];
+        [mapView refreshEventListView];
+    }
+    else{ //Do not change focused event for up/down arrow cause
+        appDelegate.focusedDate = evt.eventDate;
+        appDelegate.focusedEvent = evt;  //appDelegate.focusedEvent is added when implement here
+        [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
+        [mapView showOverlays];
+        [self.tableView reloadData]; //so show checkIcon for selected row
+        //bookmark selected event
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        int idx = [appDelegate.eventListSorted indexOfObject:evt];
+        [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
+        [userDefault synchronize];
+    }
+
 }
 - (void) refresh:(NSMutableArray*)eventList //called by mapview::refreshEventListView()
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    [eventList addObject:[[ATEventDataStruct alloc] init]];
+    [eventList insertObject:[[ATEventDataStruct alloc] init] atIndex:0];
     internalEventList = eventList;
     [self.tableView reloadData];
     [self.tableView layoutIfNeeded]; //must have for following work
     if (appDelegate.focusedEvent == nil)
         return;
-    int selectedEventIdx = 0;
+    int selectedEventIdx = 1; //previouse is 0. after add Up/Down arrow cell, change to 1 is better
     for (int i=0; i< [eventList count]; i++)
     {
         ATEventDataStruct* evt = eventList[i];
