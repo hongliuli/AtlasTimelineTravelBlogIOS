@@ -116,13 +116,14 @@ BOOL isAtLeast7;
     NSString* dateStr = [dateFormatter stringFromDate:evt.eventDate];
     NSString* descStr = evt.eventDesc;
     NSString* titleStr = @"";
-    NSString* descToDisplay = [NSString stringWithFormat:@"[%@]\n%@",dateStr, evt.eventDesc ];
+    NSString* descToDisplay = [NSString stringWithFormat:@"%@\n%@",dateStr, evt.eventDesc ];
+    
     int titleEndLocation = [descStr rangeOfString:@"\n"].location;
     if (titleEndLocation < 60) //title is in file as [Desc]xxx yyy zzzz\n
     {
         titleStr = [descStr substringToIndex:titleEndLocation];
         descStr = [descStr substringFromIndex:titleEndLocation];
-        descToDisplay = [NSString stringWithFormat:@"[%@] %@\n%@", dateStr,titleStr, descStr ];
+        descToDisplay = [NSString stringWithFormat:@"%@\n%@\n%@", dateStr,titleStr, descStr ];
     }
 
     //dateStr = [dateStr substringToIndex:10];
@@ -214,7 +215,10 @@ BOOL isAtLeast7;
     else{ //Do not change focused event for up/down arrow cause
         appDelegate.focusedDate = evt.eventDate;
         appDelegate.focusedEvent = evt;  //appDelegate.focusedEvent is added when implement here
-        [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
+        int zoomLeve = -1;
+        if ([mapView zoomLevel] < 5)
+            zoomLeve = 5;
+        [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :zoomLeve]; //do not change map zoom level
         [mapView showOverlays];
         [self.tableView reloadData]; //so show checkIcon for selected row
         //bookmark selected event
