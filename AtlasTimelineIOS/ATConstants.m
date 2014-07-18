@@ -292,16 +292,16 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
         if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
-            return 7;
+            return 6;
         else
-            return 5;
+            return 4;
     }
     else
     {
         if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
-            return 5;
+            return 4;
         else
-            return 3;
+            return 2;
     }
 }
 + (int) eventListViewPhotoWidht{

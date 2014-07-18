@@ -156,14 +156,14 @@
             timewheelZoomButtonSize = 35;
         btnZoomOut = [UIButton buttonWithType:UIButtonTypeCustom];
         btnZoomOut.frame = CGRectMake(20, 2, timewheelZoomButtonSize, timewheelZoomButtonSize);
-        [btnZoomOut setImage:[UIImage imageNamed:@"TimewheelZoomOut.png"] forState:UIControlStateNormal];
-        [btnZoomOut addTarget:self action:@selector(zoomOutAction:) forControlEvents:UIControlEventTouchUpInside];
+        [btnZoomOut setImage:[UIImage imageNamed:@"arrow-left-icon.png"] forState:UIControlStateNormal];
+        [btnZoomOut addTarget:self action:@selector(gotoPrevEventAction:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:btnZoomOut];
         
         btnZoomIn = [UIButton buttonWithType:UIButtonTypeCustom];
         btnZoomIn.frame = CGRectMake([ATConstants timeScrollWindowWidth] - 70, 2, timewheelZoomButtonSize, timewheelZoomButtonSize);
-        [btnZoomIn setImage:[UIImage imageNamed:@"TimewheelZoomIn.png"] forState:UIControlStateNormal];
-        [btnZoomIn addTarget:self action:@selector(zoomInAction:) forControlEvents:UIControlEventTouchUpInside];
+        [btnZoomIn setImage:[UIImage imageNamed:@"arrow-right-icon.png"] forState:UIControlStateNormal];
+        [btnZoomIn addTarget:self action:@selector(gotoNextEventAction:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:btnZoomIn];
         
     }
@@ -736,6 +736,7 @@
     [appDelegate.mapViewController refreshEventListView];
 }
 
+//Following two action is not used because I removed zoom-in-out button
 -(void) zoomInAction:(id)sender
 {
     pinchVelocity = 999; //reuse code for pinch. as long as greate than 0
@@ -751,6 +752,61 @@
     [appDelegate.mapViewController refreshEventListView];
 }
 
+-(void) gotoPrevEventAction:(id)sender
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    
+    NSDictionary* scaleDateDic = [ATHelper getScaleStartEndDate:appDelegate.focusedDate];
+    NSDate* scaleStartDay = [scaleDateDic objectForKey:@"START"];
+
+
+    //NSLog(@" === scaleStartDate = %@,  scaleEndDay = %@", scaleStartDay, scaleEndDay);
+    int closestEvtIdx = [self getIndexOfClosestDate:scaleStartDay :0 :FIRST_TIME_CALL];
+    ATEventDataStruct* prevEvent = appDelegate.eventListSorted[closestEvtIdx];
+    if ([prevEvent.eventDate compare:scaleStartDay] == NSOrderedDescending || [prevEvent.eventDate compare:scaleStartDay] == NSOrderedSame )
+    {
+        //if peve is later than endDate
+        if (closestEvtIdx <= 0)
+            return;
+        else
+            prevEvent = appDelegate.eventListSorted[closestEvtIdx + 1];
+    }
+    //NSLog(@" === scaleStartDate = %@,  scaleEndDay = %@", scaleStartDay, scaleEndDay);
+    //appDelegate.focusedEvent = prevEvent;
+    //appDelegate.focusedDate = prevEvent.eventDate;
+    
+    //Should not do this: [self.parent setNewFocusedDateAndUpdateMapWithNewCenter : prevEvent :-1]; //do not change map zoom level
+    [self performSettingFocusedRowForDate:prevEvent.eventDate needAdjusted:FALSE];
+    [self.parent refreshAnnotations];
+    [self.parent refreshEventListView];
+}
+-(void) gotoNextEventAction:(id)sender
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    NSDictionary* scaleDateDic = [ATHelper getScaleStartEndDate:appDelegate.focusedDate];
+    NSDate* scaleEndDay = [scaleDateDic objectForKey:@"END"];
+
+    int eventCount = [appDelegate.eventListSorted count];
+    int closestEvtIdx = [self getIndexOfClosestDate:scaleEndDay :0 :FIRST_TIME_CALL];
+    ATEventDataStruct* nextEvent = appDelegate.eventListSorted[closestEvtIdx];
+    if ([nextEvent.eventDate compare:scaleEndDay] == NSOrderedAscending || [nextEvent.eventDate compare:scaleEndDay] == NSOrderedSame )
+    {
+        //if nextDate is ealier than endDate
+        if (closestEvtIdx >= eventCount -1)
+            return;
+        else
+            nextEvent = appDelegate.eventListSorted[closestEvtIdx +1];
+    }
+    //NSLog(@" === scaleStartDate = %@,  scaleEndDay = %@", scaleStartDay, scaleEndDay);
+    //appDelegate.focusedEvent = nextEvent;
+    //appDelegate.focusedDate = nextEvent.eventDate;
+    
+    //Should not do this: it is wrong idea: [self.parent setNewFocusedDateAndUpdateMapWithNewCenter : nextEvent :-1]; //do not change map zoom level
+    [self performSettingFocusedRowForDate:nextEvent.eventDate needAdjusted:FALSE];
+    [self.parent refreshAnnotations];
+    [self.parent refreshEventListView];
+}
 //have tap gesture achive two thing: prevent call tapGesture on parent mapView and process select a row action without a TableViewController
 - (void)handleTapGesture:(UIGestureRecognizer *)gestureRecognizer
 {
@@ -957,74 +1013,7 @@
 {
     return @"HorizontalCell";
 }
-/*
-- (void) changeBackgroundImage:(UIView*)view year:(int)year
-{
-    NSString* tmpImg = nil;
-    self.horizontalTableView.backgroundColor = [UIColor clearColor];
-    if (year <-2500)
-        tmpImg=@"3000BCSumer.png";
-    else if (year < -2000)
-        tmpImg = @"2500BCPyramid.png";
-    else if (year < -1700)
-        tmpImg = @"2000BCDing.png";
-    else if (year < -1500)
-        tmpImg = @"1700BCHamrabi.png";
-    else if (year < -1000)
-        tmpImg = @"1200BCTut.png";
-    else if (year < -700)
-        tmpImg = @"1000BCDavid.png";
-    else if (year < -500)
-        tmpImg = @"700BC.png";
-    else if (year < -300)
-        tmpImg = @"500BC.png";
-    else if (year < -200)
-        tmpImg = @"300BCAlex.png";
-    else if (year < -100)
-        tmpImg = @"200BCQin.png";
-    else if (year < 0)
-        tmpImg = @"100BCRome.png";
-    else if (year < 600)
-        tmpImg = @"0BC.png";
-    else if (year < 650)
-        tmpImg = @"600ADMahamd.png";
-    else if (year < 1000)
-        tmpImg = @"650ADTangTaiZhong.png";
-    else if (year < 1500)
-        tmpImg = @"1000ADCrusade.png";
-    else if (year < 1800)
-        tmpImg = @"1500DaVench.png";
-    else if (year < 1914)
-        tmpImg = @"1800AD.png";
-    else if (year < 1945)
-        tmpImg = @"1914ADWar1.png";
-    else //no picture
-    { //added on 2013-06-01 when first version is in wait for review
-        //self.horizontalTableView.backgroundColor=[UIColor colorWithRed:0 green:0 blue:0 alpha:0.2];
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        int selectedPeriod = appDelegate.selectedPeriodInDays;
-        if (selectedPeriod == 30)
-            tmpImg = @"scaleBkg_25.png";
-        else if (selectedPeriod == 365)
-            tmpImg = @"scaleBkg_20.png";
-        else if (selectedPeriod == 3650)
-            tmpImg = @"scaleBkg_15.png";
-        else if (selectedPeriod == 36500)
-            tmpImg = @"scaleBkg_10.png";
-        else if (selectedPeriod == 365000)
-            tmpImg = @"scaleBkg_5.png";
-        else if (selectedPeriod == 7)
-            tmpImg = @"scaleBkg_60.png";
-        
-    }
-    
-    if (tmpImg != nil )
-    {
-        self.backgroundColor=[UIColor colorWithPatternImage:[UIImage imageNamed:tmpImg]];
-    }
-    
-}
-*/
+
 -(void) setNewFocusedDateFromAnnotation:(NSDate *)newFocusedDate needAdjusted:(BOOL)needAdjusted
 {
     //NSDateComponents *dateComponents = [[NSDateComponents alloc] init];

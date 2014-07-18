@@ -549,6 +549,65 @@ UIPopoverController *verifyViewPopover;
         return false;
 }
 
++ (NSDictionary*) getScaleStartEndDate:(NSDate*)focusedDate
+{
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    
+    //following logic is same in ATTimeZoomLine to get colored range
+    NSDateComponents *dateComponent = [[NSDateComponents alloc] init];
+    NSCalendar* calendar = [NSCalendar currentCalendar];
+    NSDate* scaleStartDay;
+    NSDate* scaleEndDay;
+
+    int periodIndays = appDelegate.selectedPeriodInDays;
+    if (periodIndays == 7)
+    {
+        dateComponent.day = -5;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.day = 5;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    if (periodIndays == 30)
+    {
+        dateComponent.day = -15;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.day = 15;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    else if (periodIndays == 365)
+    {
+        dateComponent.month = -5;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.month = 5;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    else if (periodIndays == 3650)
+    {
+        dateComponent.year = -5;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.year = 5;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    else if (periodIndays == 36500)
+    {
+        dateComponent.year = -50;
+        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+        dateComponent.year = 50;
+        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
+    }
+    else if (periodIndays == 365000)
+    {
+        dateComponent.year = -500;
+        scaleStartDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
+        dateComponent.year = 500;
+        scaleEndDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
+    }
+    NSMutableDictionary* ret = [[NSMutableDictionary alloc] init];
+    [ret setObject:scaleStartDay forKey:@"START"];
+    [ret setObject:scaleEndDay forKey:@"END"];
+    return ret;
+}
+
 
 //---- set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable

@@ -73,11 +73,11 @@ NSDate* prevYearDate;
         
         CGRect frameLeft = CGRectMake(0, -10, 10, ZOOM_LEVEL_BLOCK_HEIGHT);
         timeScaleLeftBlock = [[UILabel alloc] initWithFrame:frameLeft];
-        [timeScaleLeftBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.15]];
+        [timeScaleLeftBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.25]];
 
         CGRect frameRight = CGRectMake([ATConstants timeScrollWindowWidth] - 200, -10, 300, ZOOM_LEVEL_BLOCK_HEIGHT);
         timeScaleRightBlock = [[UILabel alloc] initWithFrame:frameRight];
-        [timeScaleRightBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.15]];
+        [timeScaleRightBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.25]];
         
         /*
         self.zoomLabel.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ];
@@ -528,57 +528,10 @@ NSDate* prevYearDate;
     if (calendar == nil)
         calendar = [NSCalendar currentCalendar];
     
-    //TODO should we validate that startDay < focused date < endDay ???? for defensive
+    NSDictionary* scaleDateDic = [ATHelper getScaleStartEndDate:focusedDate];
+    NSDate* scaleStartDay = [scaleDateDic objectForKey:@"START"];
+    NSDate* scaleEndDay = [scaleDateDic objectForKey:@"END"];
     
-    NSDateComponents *dateComponent = [[NSDateComponents alloc] init];
-    
-    NSDate* scaleStartDay;
-    NSDate* scaleEndDay;
-    
-    if (focusedDate == nil)
-        focusedDate = [[NSDate alloc] init];
-    if (periodIndays <= 30)
-    {
-        dateComponent.day = -1;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.day = 1;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = NSLocalizedString(@"1mo",nil);
-        if (periodIndays <= 7)
-            timeScaleZoomLeveText.text = NSLocalizedString(@"1wk",nil);
-    }
-    else if (periodIndays == 365)
-    {
-        dateComponent.month = -5;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.month = 5;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = NSLocalizedString(@"1yr",nil);
-    }
-    else if (periodIndays == 3650)
-    {
-        dateComponent.year = -5;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.year = 5;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = NSLocalizedString(@"10yr",nil);
-    }
-    else if (periodIndays == 36500)
-    {
-        dateComponent.year = -50;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.year = 50;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = NSLocalizedString(@"100yr",nil);
-    }
-    else if (periodIndays == 365000)
-    {
-        dateComponent.year = -500;
-        scaleStartDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
-        dateComponent.year = 500;
-        scaleEndDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
-        timeScaleZoomLeveText.text = NSLocalizedString(@"1000yr",nil);
-    }
     if ([startDate compare:scaleStartDay] == NSOrderedDescending)
         scaleStartDay = startDate;
     if ([endDate compare:scaleEndDay] == NSOrderedAscending)

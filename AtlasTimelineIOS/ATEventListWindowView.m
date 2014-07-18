@@ -75,7 +75,7 @@ BOOL isAtLeast7;
         CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, 10, 100, 40);
         UIImageView* upArrow = [[UIImageView alloc] initWithFrame:imageFrame];
         [upArrow setImage:[UIImage imageNamed:@"arrow-up-icon.png"]];
-        [cell.contentView addSubview:upArrow];
+        [cell.contentView addSubview:upArrow]; //gotoPrevEventAction is hadled by didSelected...
         cell.contentView.backgroundColor = [UIColor clearColor];
         cell.backgroundColor= [UIColor clearColor];
         return cell;

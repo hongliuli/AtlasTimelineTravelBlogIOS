@@ -177,10 +177,17 @@ UILabel* updatableLabel2;
     [self addTimeZoomLevelSection1];
     //following are on same y level, so change currentYLocation once:
     currentYLocation = currentYLocation + itemHeight + 50*iPhoneSizeYFactor;
-    [self addDoubleTapCenterSection:x_start + [ATConstants timeScrollWindowWidth]/3]; //this first so red shade go under pinch
-    [self addTimeZoomLevelSection:x_start - 50 :@"TimewheelZoomOut.png" :NSLocalizedString(@"Tap (-) or double-tab here to zoom out",nil)];
-    [self addTimeZoomLevelSection:x_start + [ATConstants timeScrollWindowWidth]/3-85 :@"gesture-pinch.png" :NSLocalizedString(@"Pinch is another way of zooming Time Wheel",nil)];
-    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 50:@"TimewheelZoomIn.png" :NSLocalizedString(@"Tap (+) or double-tab here to zoom in",nil)];
+
+    int centerX = x_start + [ATConstants timeScrollWindowWidth]/3;
+    int adjust = 90;
+    if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
+        adjust = 50;
+
+    [self addTimeZoomLevelSection:x_start - adjust :@"arrow-left-icon.png" :NSLocalizedString(@"Left Arrow:\nQuick move to earlier period having event(s)",nil) :currentYLocation];
+    [self addTimeZoomLevelSection:centerX - 120 :nil :NSLocalizedString(@"Double-Tap Left side to zoom-out Time Wheel",nil) :currentYLocation + 30];
+    [self addTimeZoomLevelSection:centerX :@"gesture-pinch.png" :NSLocalizedString(@"Pinch is another way of zooming Time Wheel",nil) :currentYLocation + 60];
+    [self addTimeZoomLevelSection:centerX + 120 :nil :NSLocalizedString(@"Double-Tap Right side to zoom-out Time Wheel",nil) :currentYLocation + 30];
+    [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 100:@"arrow-right-icon.png" :NSLocalizedString(@"Right Arrow:\nQuick move to next period having event(s)",nil) :currentYLocation];
 }
 
 - (void) addLongPressSection
@@ -431,7 +438,7 @@ UILabel* updatableLabel2;
 }
  */
 
-- (void) addTimeZoomLevelSection:(int)xStart :(NSString*)gestureImageName :(NSString*)text
+- (void) addTimeZoomLevelSection:(int)xStart :(NSString*)gestureImageName :(NSString*)text :(int)yEnd
 {
     int scrollWindowWidth = [ATConstants timeScrollWindowWidth];
     int scrollWindowHeight = [ATConstants timeScrollWindowHeight];
@@ -439,12 +446,12 @@ UILabel* updatableLabel2;
     int lineX = xStart + scrollWindowWidth/3 - 150*iPhoneSizeXFactor;
 
     //Upper Label description
-    CGRect lblFrame = CGRectMake(lineX - 50*iPhoneSizeXFactor, currentYLocation -30, 145*iPhoneSizeXFactor, 2*itemHeight);
+    CGRect lblFrame = CGRectMake(lineX - 50*iPhoneSizeXFactor, yEnd -30, 145*iPhoneSizeXFactor, 3*itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:lblFrame];
     lbl.text = text;
     lbl.font = [UIFont fontWithName:@"Arial" size:fontSmall];
     lbl.lineBreakMode = NSLineBreakByWordWrapping;
-    lbl.numberOfLines=2;
+    lbl.numberOfLines=4;
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
     if ([lbl.text rangeOfString:@"Pinch"].location != NSNotFound)
@@ -457,7 +464,7 @@ UILabel* updatableLabel2;
     CGContextSetLineWidth(context, 1.0);
     //Draw lines around time window
 
-    CGContextMoveToPoint(context, lineX, currentYLocation + 20);
+    CGContextMoveToPoint(context, lineX, yEnd + 20);
     CGContextAddLineToPoint(context, lineX, y_start + 5);
     CGContextStrokePath(context);
     
@@ -521,6 +528,5 @@ UILabel* updatableLabel2;
     lblShade.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.2];
     [self addSubview:lblShade];
 }
-
 
 @end

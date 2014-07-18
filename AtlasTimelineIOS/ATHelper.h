@@ -44,6 +44,7 @@
 + (NSString*) httpGetFromServer:(NSString*)serverUrl;
 + (void)startReplaceDb:(NSString*)selectedAtlasName :(NSArray*)downloadedJsonArray :(UIActivityIndicatorView*)spinner;
 + (BOOL)isBCDate:(NSDate*)date;
++ (NSDictionary*) getScaleStartEndDate:(NSDate*)focusedDate;
 
 //set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable;
