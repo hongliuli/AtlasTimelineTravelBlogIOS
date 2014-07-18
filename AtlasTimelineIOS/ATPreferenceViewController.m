@@ -83,6 +83,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    _source = [ATHelper getSelectedDbFileName];
     spinner = [[UIActivityIndicatorView alloc]
                initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     spinner.frame = CGRectMake(0,0,60,60);
@@ -121,8 +122,10 @@
         if ([agree.text caseInsensitiveCompare:@"agree"] == NSOrderedSame)
         {
             [spinner startAnimating];
-            isRemoveSourceForUploadAll = true; //so if /ChronicleMap/myEvent not on dropbox yet, delete fail will know the case
+            isRemoveSourceForUploadAll = true; //so if /ChronicleReader/myEvent not on dropbox yet, delete fail will know the case
             [[self myRestClient] deletePath:[NSString stringWithFormat:@"/ChronicleReader/%@", [ATHelper getSelectedDbFileName]]];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"The upload started and [New] number is decreasing.\n If number reach 0 then full back up is done.\n If number stop at non-zero, then tap [Photo Backup] row to continue.",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+            [alert show];
         }
         else
         {
@@ -420,7 +423,7 @@
 
 //Because of the DBRestClient's asynch nature, I have to implement a synchronous way:
 /*
- * 1. create /ChronicleMap fold. if success or fail with already-exists then create Source Folder (such as myEvents)
+ * 1. create /ChronicleReader fold. if success or fail with already-exists then create Source Folder (such as myEvents)
  * 2. if detected create Source success or already exist, then call startProcessNewPhotoQueueChainAction(), which will pop one photo entry
  * 3. in startProcessNewPhotoQueueChainAction() do:
  *      . popup one photo entry, save to a global var currentPhotoEventPath
@@ -703,7 +706,7 @@
         for (DBMetadata *file in metadata.contents) {
             //NSLog(@"\t%@", file.filename);
             NSString* localPhotoPath = [[[ATHelper getRootDocumentoryPath] stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:currentPhotoName];
-            NSString* partialPath = [metadata.path substringFromIndex:14]; //metadata.path is "/ChronicleReader/myEvents/eventid"
+            NSString* partialPath = [metadata.path substringFromIndex:17]; //metadata.path is "/ChronicleReader/myEvents/eventid"
             localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:partialPath] stringByAppendingPathComponent:file.filename];
 
             if (![[NSFileManager defaultManager] fileExistsAtPath:localPhotoPath]){
@@ -774,7 +777,7 @@
 
 - (void)promptCopyFromDropboxStatus
 {
-    //NSLog(@"  download success=%d, failed=%d, total=%d",downloadFromDropboxSuccessCount,downloadFromDropboxFailCount,downloadFromDropboxStartCount);
+    //NSLog(@" ----- download success=%d, failed=%d, total=%d",downloadFromDropboxSuccessCount,downloadFromDropboxFailCount,downloadFromDropboxStartCount);
     if (   downloadFromDropboxSuccessCount + downloadFromDropboxFailCount + downloadAlreadyExistCount == downloadFromDropboxStartCount
         && downloadFromDropboxStartCount > 0)
     {
