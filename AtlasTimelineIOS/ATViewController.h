@@ -58,6 +58,7 @@
 - (void) displayZoomLine;
 - (void) cancelPreference;
 - (void) refreshEventListView;
+- (int) zoomLevel;
 
 
 @end

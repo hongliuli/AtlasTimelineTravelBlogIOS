@@ -41,7 +41,7 @@
 
 #define MERCATOR_OFFSET 268435456
 #define MERCATOR_RADIUS 85445659.44705395
-#define ZOOM_LEVEL_TO_HIDE_DESC 4
+#define ZOOM_LEVEL_TO_HIDE_DESC 3
 #define ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE 9
 
 #define DISTANCE_TO_HIDE 80
@@ -1025,6 +1025,8 @@
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
 {
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSString *focuseKey=[NSString stringWithFormat:@"%f|%f",appDelegate.focusedEvent.lat, appDelegate.focusedEvent.lng];
     for (id key in selectedAnnotationSet) {
         NSArray *splitArray = [key componentsSeparatedByString:@"|"];
         UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
@@ -1049,7 +1051,7 @@
                     break;
                 }
             }
-            if (tooCloseToShowFlag)
+            if (tooCloseToShowFlag && ![key isEqualToString:focuseKey])
             {
                 tmpLbl.hidden = true;
                 continue;
@@ -1127,7 +1129,7 @@
     
 }
 
-- (NSUInteger) zoomLevel {
+- (int) zoomLevel {
     MKCoordinateRegion region = self.mapView.region;
     
     double centerPixelX = [self longitudeToPixelSpaceX: region.center.longitude];
@@ -1428,7 +1430,7 @@
         MKPolygonView *view = [[MKPolygonView alloc] initWithOverlay:overlay];
         view.lineWidth=0;
         view.strokeColor=[UIColor clearColor];
-        view.fillColor=[[UIColor redColor] colorWithAlphaComponent:0.3];
+        view.fillColor=[[UIColor blackColor] colorWithAlphaComponent:0.3];
         return view;
     }
     return nil;
@@ -1909,64 +1911,20 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     
-    //following logic is same in ATTimeZoomLine to get colored range
-    NSDateComponents *dateComponent = [[NSDateComponents alloc] init];
-    NSCalendar* calendar = [NSCalendar currentCalendar];
-    NSDate* scaleStartDay;
-    NSDate* scaleEndDay;
+    NSDictionary* scaleDateDic = [ATHelper getScaleStartEndDate:appDelegate.focusedDate];
+    NSDate* scaleStartDay = [scaleDateDic objectForKey:@"START"];
+    NSDate* scaleEndDay = [scaleDateDic objectForKey:@"END"];
     
     int offset = 60;
-    
-    NSDate* focusedDate = appDelegate.focusedDate;
-    int periodIndays = appDelegate.selectedPeriodInDays;
-    if (periodIndays == 7)
-    {
-        dateComponent.day = -5;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.day = 5;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-    }
-    if (periodIndays == 30)
-    {
-        dateComponent.day = -15;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.day = 15;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-    }
-    else if (periodIndays == 365)
-    {
-        dateComponent.month = -5;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.month = 5;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-    }
-    else if (periodIndays == 3650)
-    {
-        dateComponent.year = -5;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.year = 5;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-    }
-    else if (periodIndays == 36500)
-    {
-        dateComponent.year = -50;
-        scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.year = 50;
-        scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-    }
-    else if (periodIndays == 365000)
-    {
-        dateComponent.year = -500;
-        scaleStartDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
-        dateComponent.year = 500;
-        scaleEndDay = [ATHelper dateByAddingComponentsRegardingEra:dateComponent toDate:focusedDate options:0];
-    }
+
     if ([self.startDate compare:scaleStartDay] == NSOrderedDescending)
         scaleStartDay = self.startDate;
     if ([self.endDate compare:scaleEndDay] == NSOrderedAscending)
         scaleEndDay = self.endDate;
     //NSLog(@" === scaleStartDate = %@,  scaleEndDay = %@", scaleStartDay, scaleEndDay);
     NSArray* allEventSortedList = appDelegate.eventListSorted;
+    //try to move evetlistview to right side screenWidht - eventListViewCellWidth, but a lot of trouble, not know why
+    //  even make x to 30, it will move more than 30, besides, not left side tap works
     CGRect newFrame = CGRectMake(0,offset,0,0);
     int numOfCellOnScreen = 0;
     
@@ -2024,13 +1982,13 @@
         }
         int extra = 0;
         if (cnt == 1)
-            extra = 40;
+            extra = 60;
         else if (cnt == 2)
             extra = 80;
         else if (cnt == 3 && UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
             extra = 120;
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-            extra = 40; //previouse it was 0, now change to 40 after add up/down arrow, so have extra space to show partial arrow button
+            extra = 60; //previouse it was 0, now change to 40 after add up/down arrow, so have extra space to show partial arrow button
         newFrame = CGRectMake(0,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight] + extra);
     }
     eventListView.hidden = false;
