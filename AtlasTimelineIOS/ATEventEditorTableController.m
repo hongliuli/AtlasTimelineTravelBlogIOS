@@ -16,6 +16,7 @@
 #import "ATConstants.h"
 #import <QuartzCore/QuartzCore.h>
 #import <Social/Social.h>
+#import <iAd/iAd.h>
 
 #define JPEG_QUALITY 1.0
 #define THUMB_JPEG_QUALITY 0.3
@@ -67,14 +68,6 @@ UILabel *lblShareCount;
 UIAlertView *alertDelete;
 UIAlertView *alertCancel;
 
-
-
-NSMutableArray* markerPickerTitleList;
-NSMutableArray* markerPickerImageNameList;
-NSString* markerPickerSelectedItemName;
-UIPickerView* markerPickerView;
-UIToolbar* markerPickerToolbar; //treat it the same way as self.toolbar
-
 int editorPhotoViewWidth;
 int editorPhotoViewHeight;
 
@@ -106,27 +99,28 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     self.description.editable = false;
     self.description.dataDetectorTypes = UIDataDetectorTypeLink;
     CGRect frame = self.description.frame;
-    frame.size.width = frame.size.width + 20;
+    frame.size.width = EDITOR_PHOTOVIEW_WIDTH - 20;
+    frame.size.height = [self getEventEditorDescriptionHeight ];
     [self.description setFrame:frame];
     self.description.font =[UIFont fontWithName:@"Helvetica" size:15];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    BOOL optionIPADFullScreenEditorFlag = [ATHelper getOptionEditorFullScreen];
+    if ((UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && optionIPADFullScreenEditorFlag)
+        || (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone))
     {
-        BOOL optionIPADFullScreenEditorFlag = [ATHelper getOptionEditorFullScreen];
-        if (optionIPADFullScreenEditorFlag)
-        {
-            editorPhotoViewWidth = [ATConstants screenWidth];
-            //editorPhotoViewHeight = [ATConstants screenHeight];
-            CGRect frame = self.description.frame;
-            frame.size.width = editorPhotoViewWidth;
+        editorPhotoViewWidth = [ATConstants screenWidth];
+        //editorPhotoViewHeight = [ATConstants screenHeight];
+        CGRect frame = self.description.frame;
+        frame.size.width = editorPhotoViewWidth;
             
-            [self.description setFrame:frame];
-            self.description.font =[UIFont fontWithName:@"Helvetica" size:19];
-            
-            frame = self.address.frame;
-            frame.size.width = editorPhotoViewWidth;
-            [self.address setFrame:frame];
-        }
+        [self.description setFrame:frame];
+        self.description.font =[UIFont fontWithName:@"Helvetica" size:19];
+        
+        frame = self.address.frame;
+        frame.size.width = editorPhotoViewWidth;
+        [self.address setFrame:frame];
     }
+    self.address.backgroundColor = [UIColor clearColor]; // [UIColor colorWithRed:1 green:1 blue:1 alpha:0.4];
+    self.description.backgroundColor = [UIColor clearColor];
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
     
@@ -138,15 +132,22 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     {
         self.authorModeFlag = true;
     }
+    
+    // I did not use iOS7's self.canDisplayBannerAds to automatically display adds, not sure why
+    //if (ipad)
+    [self initiAdBanner];
+    [self initgAdBanner];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
     if (indexPath.section == 0 &&  indexPath.row == 0)
     {
-       // ### IMPORTANT tick to remove cell background for the section 0's row 0
+       // ### IMPORTANT trick to remove cell background for the section 0's row 0
         cell.backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     }
+    cell.contentView.backgroundColor = [UIColor clearColor];
+    cell.backgroundColor = [UIColor clearColor];
     return cell;
 }
 -(void) resetEventEditor //called by mapview whenever bring up event editor
@@ -174,24 +175,14 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         //view for this section. Please refer to heightForHeaderInSection() function
         customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, editorPhotoViewWidth, editorPhotoViewHeight)];
         
-        // create photo count display
-        lblTotalCount = [[UILabel alloc] initWithFrame:CGRectMake(editorPhotoViewWidth - 180, editorPhotoViewHeight + 15, 20, 20)];
-        lblNewAddedCount = [[UILabel alloc] initWithFrame:CGRectMake(editorPhotoViewWidth - 160, editorPhotoViewHeight + 15, 100, 20)];
-        lblTotalCount.backgroundColor = [UIColor clearColor];
-        lblNewAddedCount.backgroundColor = [UIColor clearColor];
-        lblTotalCount.font = [UIFont fontWithName:@"Helvetica" size:13];
-        lblNewAddedCount.font = [UIFont fontWithName:@"Helvetica" size:13];
-        lblNewAddedCount.textColor = [UIColor redColor];
-        [customView addSubview:lblTotalCount];
-        [customView addSubview:lblNewAddedCount];
-        
-        // create the button object
+       // create the button object
         self.photoAddBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         UIImage *thumb2 = [UIImage imageNamed:@"add-button-md.png"];
         [self.photoAddBtn setImage:thumb2 forState:UIControlStateNormal];
         self.photoAddBtn.frame = CGRectMake(50, editorPhotoViewHeight - 40, 48, 48);
         [self.photoAddBtn addTarget:self action:@selector(takePictureAction:) forControlEvents:UIControlEventTouchUpInside];
         self.photoAddBtn.tag = ADD_PHOTO_BUTTON_TAG_777;
+        customView.backgroundColor = [UIColor clearColor];
         [customView addSubview:self.photoAddBtn];
         customViewForPhoto = customView;
         //tricky, see another comments with word "tricky"
@@ -206,21 +197,21 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     else if (section == 2)
     {
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 300.0, 30.0)];
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0, 300.0, 40.0)];
         
         //Label in the view
-        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, -10, 200, 40)];
+        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 200, 40)];
         label.backgroundColor = [UIColor clearColor];
         label.text = NSLocalizedString(@"Tags, Address:",nil);
         [customView addSubview:label];
         
         UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        shareButton.frame = CGRectMake(280, -10, 30, 30);
+        shareButton.frame = CGRectMake(280, 0, 30, 30);
         [shareButton setImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
         [shareButton addTarget:self action:@selector(shareButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:shareButton];
         UIButton *sizeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        sizeButton.frame = CGRectMake(210, -10, 30, 30);
+        sizeButton.frame = CGRectMake(210, 0, 30, 30);
         BOOL fullFlag = [ATHelper getOptionEditorFullScreen];
         if (fullFlag)
             [sizeButton setImage:[UIImage imageNamed:@"window_minimize.png"] forState:UIControlStateNormal];
@@ -228,13 +219,15 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             [sizeButton setImage:[UIImage imageNamed:@"window_maximize.png"] forState:UIControlStateNormal];
         
         [sizeButton addTarget:self action:@selector(sizeButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-        [customView addSubview:sizeButton];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            [customView addSubview:sizeButton];
         
         self.photoSaveBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.photoSaveBtn setTitle:@"Save Photo" forState:UIControlStateNormal];
         [self.photoSaveBtn setBackgroundColor:[UIColor blueColor]];
         [self.photoSaveBtn addTarget:self action:@selector(saveAction:) forControlEvents:UIControlEventTouchUpInside];
-        self.photoSaveBtn.frame = CGRectMake(10, -10, 190, 30);
+        self.photoSaveBtn.frame = CGRectMake(10, 0, 190, 30);
+        customView.backgroundColor = [UIColor clearColor];
         [customView addSubview:self.photoSaveBtn];
         
         if (self.authorModeFlag) {
@@ -246,33 +239,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             self.photoAddBtn.hidden = true;
             self.photoSaveBtn.hidden = true;
         }
-        /*
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-        if ([appDelegate.sourceName isEqual:@"myEvents"]) //can create episode on myEvents only
-        {
-            UIButton *episodeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-            episodeButton.frame = CGRectMake(170, 0, 40, 30);
-            if ([self.delegate isInEpisode])
-                [episodeButton setImage:[UIImage imageNamed:@"add-to-episode-folder-reverse.png"] forState:UIControlStateNormal];
-            else
-                [episodeButton setImage:[UIImage imageNamed:@"add-to-episode-folder.png"] forState:UIControlStateNormal];
-            [episodeButton addTarget:self action:@selector(addToEpisodeAction:) forControlEvents:UIControlEventTouchUpInside];
-            [customView addSubview:episodeButton];
-        }
-        UIButton *markerPicker = [UIButton buttonWithType:UIButtonTypeCustom];
-        markerPicker.frame = CGRectMake(100, 0, 30, 30);
-        [markerPicker setImage:[UIImage imageNamed:@"marker_star.png"] forState:UIControlStateNormal];
-        [markerPicker setAlpha:0.8];
-        [markerPicker addTarget:self action:@selector(markerPickerAction:) forControlEvents:UIControlEventTouchUpInside];
-        [customView addSubview:markerPicker];
-        
-        lblShareCount = [[UILabel alloc] initWithFrame:CGRectMake(270, 0, 100, 40)];
-        lblShareCount.font = [UIFont fontWithName:@"Helvetica" size:10];
-        lblShareCount.backgroundColor = [UIColor clearColor];
-        lblShareCount.text = @"";
-        [customView addSubview:lblShareCount];
-         */
+        customView.backgroundColor = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0.1];
     }
+
     return customView;
 }
 
@@ -353,7 +322,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     else
     {
-        height = 100;
+        height = 200;
     }
     return height;
 }
@@ -365,7 +334,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     else if (section == 1)
         return 0;
     else if (section == 2)
-        return 20;
+        return 30;
     else
         return [super tableView:tableView heightForHeaderInSection:section];
 }
@@ -486,74 +455,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [alert show];
     }
 }
-- (void)markerPickerAction:(id)sender {
 
-    
-    markerPickerTitleList = [[NSMutableArray alloc] init];
-    markerPickerImageNameList = [[NSMutableArray alloc] init];
-    [markerPickerTitleList addObject:@"Default"];
-    [markerPickerTitleList addObject:@"Star"];
-    [markerPickerTitleList addObject:@"Eat/Food"];
-    [markerPickerTitleList addObject:@"Hotel/Bed"];
-    [markerPickerTitleList addObject:@"Transportation"];
-    [markerPickerTitleList addObject:@"Air Port"];
-    [markerPickerTitleList addObject:@"Scenary/View"];
-    [markerPickerTitleList addObject:@"Historical"];
-    [markerPickerTitleList addObject:@"Art/Museum"];
-    [markerPickerTitleList addObject:@"Party"];
-    [markerPickerTitleList addObject:@"Uncertain"];
-    [markerPickerTitleList addObject:@"Information"];
-    [markerPickerTitleList addObject:@"Hiking"];
-    [markerPickerTitleList addObject:@"Wildlife"];
-    [markerPickerTitleList addObject:@"School"];
-    [markerPickerTitleList addObject:@"Hospital"];
-    
-    [markerPickerImageNameList addObject:@"marker_selected.png"];
-    [markerPickerImageNameList addObject:@"marker_star.png"];
-    [markerPickerImageNameList addObject:@"marker_food.png"];
-    [markerPickerImageNameList addObject:@"marker_bed.png"];
-    [markerPickerImageNameList addObject:@"marker_bus.png"];
-    [markerPickerImageNameList addObject:@"marker_airport.png"];
-    [markerPickerImageNameList addObject:@"marker_view.png"];
-    [markerPickerImageNameList addObject:@"marker_historical.png"];
-    [markerPickerImageNameList addObject:@"marker_art.png"];
-    [markerPickerImageNameList addObject:@"marker_party.png"];
-    [markerPickerImageNameList addObject:@"marker_question.png"];
-    [markerPickerImageNameList addObject:@"marker_info.png"];
-    [markerPickerImageNameList addObject:@"marker_hiking.png"];
-    [markerPickerImageNameList addObject:@"marker_wildlife.png"];
-    [markerPickerImageNameList addObject:@"marker_school.png"];
-    [markerPickerImageNameList addObject:@"marker_hospital.png"];
-    
-    markerPickerSelectedItemName = [ATHelper getMarkerNameFromDescText:self.description.text];
-    markerPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 215, 360, 440)];
-    markerPickerView.delegate = self;
-    markerPickerView.showsSelectionIndicator = YES;
-    
-    if (markerPickerSelectedItemName != nil)
-    {
-        NSString* markerImageName = [NSString stringWithFormat:@"marker_%@.png", markerPickerSelectedItemName];
-        int index = [markerPickerImageNameList indexOfObject:markerImageName];
-        if (index != NSNotFound)
-        {
-            [markerPickerView selectRow:index inComponent:0 animated:NO];
-        }
-    }
-    
-    markerPickerToolbar = [[UIToolbar alloc] initWithFrame: CGRectMake(0, 380, 320, 44)];
-    markerPickerView.backgroundColor = [UIColor colorWithRed: 0.95 green: 0.95 blue: 0.95 alpha: 1.0];
-    [markerPickerToolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-    
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle: NSLocalizedString(@"Done",nil) style: UIBarButtonItemStyleDone target: self action: @selector(markerPicked:)];
-    doneButton.width = 50;
-    doneButton.tintColor = [UIColor blueColor];
-    markerPickerToolbar.items = [NSArray arrayWithObject: doneButton];
- 
-    [self.view addSubview:markerPickerView];
-    [self.view addSubview: markerPickerToolbar];
-    self.saveButton.enabled = false;
-    
-}
 -(void)textFieldDidBeginEditing:(UITextField*)textField
 {
  }
@@ -576,40 +478,17 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     return YES;
 }
 - (IBAction)saveAction:(id)sender {
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSDateFormatter *dateFormater = appDelegate.dateFormater;
+
     ATEventDataStruct *ent = [[ATEventDataStruct alloc] init];
     ent.eventDesc = self.description.text;
     ent.address = self.address.text;
     ent.uniqueId = nil;
-    NSDate* dt = [dateFormater dateFromString:self.dateTxt.text ];
-    if (dt == nil)  //this could happen if edit a BC date where DatePicker is not allowed popup
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Wrong Date Format",nil)
-                                                        message:[NSString stringWithFormat:NSLocalizedString(@"The correct date format is MM/dd/yyyy Era (such as %@)",nil),appDelegate.localizedAD]
-                delegate:nil
-                cancelButtonTitle:@"OK"
-                otherButtonTitles:nil];
-        [alert show];
-        return;
-    }
     
     //A bug fix, "\n" is treated as empty, thus the event became untapable. (a long time bug, just found 03/22/14)
     NSString* descTxt = self.description.text;
     descTxt = [descTxt stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     descTxt = [descTxt stringByReplacingOccurrencesOfString:@" " withString:@""];
     descTxt = [ATHelper clearMakerAllFromDescText:descTxt];
-    if (descTxt == nil || descTxt.length == 0)
-    {  //#### have to have this check, otherwise the eventEditor will not popup
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Description field may not be empty. (keep tag <<...>> if there is one)",nil)
-                message:NSLocalizedString(@"Please enter description.",nil)
-                delegate:nil
-                cancelButtonTitle:@"OK"
-                otherButtonTitles:nil];
-        [alert show];
-        return;
-    }
-    ent.eventDate = dt;
 
     ent.eventType = self.eventType;
     //see doneSelectPicture() which will set if there is a picture
@@ -698,59 +577,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 
-- (void)changeDateInLabel:(id)sender{
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSDateFormatter *dateFormater = appDelegate.dateFormater;
-    dateTxt.text = [NSString stringWithFormat:@"%@",
-            [dateFormater stringFromDate:self.datePicker.date]];
-}
-
-- (void)datePicked:(id)sender{
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSDateFormatter *dateFormater = appDelegate.dateFormater;
-    NSDate* dt = [dateFormater dateFromString:self.dateTxt.text];
-    if (dt != nil)
-    {
-        [self.datePicker removeFromSuperview];
-        [self.toolbar removeFromSuperview];
-        self.datePicker = nil;
-        self.toolbar = nil;
-        
-        self.cancelButton.enabled = true;
-        self.saveButton.enabled = true;
-        self.deleteButton.enabled = false;
-        self.address.hidden=false;
-        self.address.backgroundColor = [UIColor whiteColor];
-    }
-    else
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Wrong Date Format",nil)
-                message:[NSString stringWithFormat:NSLocalizedString(@"The correct date format is MM/dd/yyyy Era (such as %@)",nil),appDelegate.localizedAD]
-                delegate:nil
-                cancelButtonTitle:@"OK"
-                otherButtonTitles:nil];
-        [alert show];
-    }
-}
-
-- (void)markerPicked:(id)sender{
-    [markerPickerView removeFromSuperview];
-    [markerPickerToolbar removeFromSuperview];
-    
-    self.saveButton.enabled = true;
-    
-    if (markerPickerSelectedItemName == nil)
-        return; //do nothing if previously has no marker and user did not picker any marker
-    
-    NSString* toBeReplacedMarkerName = [ATHelper getMarkerNameFromDescText: self.description.text];
-    if (toBeReplacedMarkerName != nil)
-    {
-        self.description.text = [ATHelper clearMakerFromDescText: self.description.text :toBeReplacedMarkerName];
-    }
-    if (![markerPickerSelectedItemName isEqualToString:@"selected"])
-        self.description.text = [NSString stringWithFormat:@"%@\n<<%@>>",self.description.text,markerPickerSelectedItemName];
-
-}
 
 
 //callback from imagePicker Controller
@@ -849,49 +675,104 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         lblNewAddedCount.hidden = false;
 }
 
+//iad/gAd
+-(void)initiAdBanner
+{
+    if (!self.iAdBannerView)
+    {
+        NSLog(@"----- iAdView height=%f ", self.view.frame.size.height);
+        CGRect rect = CGRectMake(0, [ATConstants screenHeight] - 50, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        self.iAdBannerView = [[ADBannerView alloc]initWithFrame:rect];
+        self.iAdBannerView.delegate = self;
+        self.iAdBannerView.hidden = TRUE;
+        [self.view addSubview:self.iAdBannerView];
+    }
+}
+
+-(void)initgAdBanner
+{
+    if (!self.gAdBannerView)
+    {
+        NSLog(@"----- gAdView height=%f ", self.view.frame.size.height);
+        CGRect rect = CGRectMake(0, [ATConstants screenHeight] - 50, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        self.gAdBannerView = [[GADBannerView alloc] initWithFrame:rect];
+        self.gAdBannerView.adUnitID = @"ca-app-pub-5383516122867647/8499480217";
+        self.gAdBannerView.rootViewController = self;
+        self.gAdBannerView.delegate = self;
+        self.gAdBannerView.hidden = TRUE;
+        [self.view addSubview:self.gAdBannerView];
+    }
+}
+-(void)hideBanner:(UIView*)banner
+{
+    if (banner && ![banner isHidden])
+    {
+        [UIView beginAnimations:@"hideBanner" context:nil];
+        banner.frame = CGRectOffset(banner.frame, 0, banner.frame.size.height - 60);
+        [UIView commitAnimations];
+        banner.hidden = TRUE;
+    }
+}
+-(void)showBanner:(UIView*)banner
+{
+    if (banner && [banner isHidden])
+    {
+        [UIView beginAnimations:@"showBanner" context:nil];
+        banner.frame = CGRectOffset(banner.frame, 0, -banner.frame.size.height + 60);
+        [UIView commitAnimations];
+        banner.hidden = FALSE;
+    }
+}
+////////// iAd delegate
+// Called before the add is shown, time to move the view
+- (void)bannerViewWillLoadAd:(ADBannerView *)banner
+{
+    NSLog(@"----- Editor iAd load");
+    [self hideBanner:self.gAdBannerView];
+    [self showBanner:self.iAdBannerView];
+}
+
+// Called when an error occured
+- (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
+{
+    NSLog(@"###### Editor iAd error: %@", error);
+    [self hideBanner:self.iAdBannerView];
+    [self.gAdBannerView loadRequest:[GADRequest request]];
+}
+
+//////////gAd delegate
+// Called before ad is shown, good time to show the add
+- (void)adViewDidReceiveAd:(GADBannerView *)view
+{
+    NSLog(@"------ Editor Admob load");
+    [self hideBanner:self.iAdBannerView];
+    [self showBanner:self.gAdBannerView];
+}
+
+// An error occured
+- (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error
+{
+    NSLog(@"########  Editor Admob error: %@", error);
+    [self hideBanner:self.gAdBannerView];
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    //ATConstants screenHeight already considered screen orentation
+    CGRect frame = self.iAdBannerView.frame;
+    frame.origin.y = [ATConstants screenHeight] - 50;
+    self.iAdBannerView.frame = frame;
+    
+    frame = self.gAdBannerView.frame;
+    frame.origin.y = [ATConstants screenHeight] - 50;
+    self.gAdBannerView.frame = frame;
+}
+
 - (void)viewDidUnload {
     [self setDateTxt:nil];
     [super viewDidUnload];
 }
-- (void)pickerView:(UIPickerView *)pickerView didSelectRow: (NSInteger)row inComponent:(NSInteger)component {
-    // Handle the selection
-    NSString* pngName = markerPickerImageNameList[row];
-    markerPickerSelectedItemName = [pngName substringToIndex:[pngName rangeOfString:@"."].location];
-    markerPickerSelectedItemName = [markerPickerSelectedItemName substringFromIndex:[markerPickerSelectedItemName rangeOfString:@"_"].location +1];
-}
 
-- (NSInteger)numberOfComponentsInPickerView:
-(UIPickerView *)pickerView
-{
-    return 1;
-}
-
-- (NSInteger)pickerView:(UIPickerView *)pickerView
-numberOfRowsInComponent:(NSInteger)component
-{
-    return markerPickerImageNameList.count;
-}
-
-
-- (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row
-          forComponent:(NSInteger)component reusingView:(UIView *)view
-{
-    UIImage *img = [UIImage imageNamed:[markerPickerImageNameList objectAtIndex:row]];
-    UIImageView *icon = [[UIImageView alloc] initWithImage:img];
-    [icon setFrame:CGRectMake(0, 0, 32, 32)];
-    
-    UILabel *firstLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 150, 32)];
-    firstLabel.text = [markerPickerTitleList objectAtIndex:row];
-    firstLabel.textAlignment = NSTextAlignmentLeft;
-    firstLabel.backgroundColor = [UIColor clearColor];
-    
-    UIView *tmpView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 32)];
-    [tmpView insertSubview:icon atIndex:0];
-    [tmpView insertSubview:firstLabel atIndex:0];
-    [tmpView setUserInteractionEnabled:NO];
-    [tmpView setTag:row];
-    return tmpView;
-}
 
 @end
 

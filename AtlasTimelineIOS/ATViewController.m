@@ -73,6 +73,9 @@
 
 #define HAVE_IMAGE_INDICATOR 100
 
+#define AD_Y_POSITION_IPAD 60
+#define AD_Y_POSITION_PHONE 40
+
 
 @interface MFTopAlignedLabel : UILabel
 
@@ -117,7 +120,7 @@
     
     MKAnnotationView* viewForEditorSizeChange;
     UIView* authorView;
-    
+    NSDate* tmpDateHold;
 }
 
 @synthesize mapView = _mapView;
@@ -177,6 +180,22 @@
     //{
     self.searchDisplayController.searchBar.searchBarStyle = UISearchBarStyleMinimal; //otherwise, there will be a gray background around search bar
     //}
+    //author mode
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
+    
+    if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
+    {
+        [self closeAuthorView];
+    }
+    else
+    {
+        [self startAuthorView];
+    }
+    // I did not use iOS7's self.canDisplayBannerAds to automatically display adds, not sure why
+    [self initiAdBanner];
+    [self initgAdBanner];
+    
 
 }
 -(void) viewDidAppear:(BOOL)animated
@@ -199,23 +218,11 @@
     if (eventListView == nil) //viewDidAppear will be called when navigate back (such as from timeline/search view and full screen event editor, so need to check. Always be careful of viewDidAppear to not duplicate instances
     {
         eventListView = [[ATEventListWindowView alloc] initWithFrame:CGRectMake(0,20, 0, 0)];
-        [eventListView.tableView setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7]];
+        [eventListView.tableView setBackgroundColor:[UIColor clearColor] ];// colorWithRed:1 green:1 blue:1 alpha:0.7]];
         [self.mapView addSubview:eventListView];
     }
     [self refreshEventListView];
     
-    //author mode
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
-    
-    if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
-    {
-        [self closeAuthorView];
-    }
-    else
-    {
-        [self startAuthorView];
-    }
 }
 
 
@@ -230,7 +237,7 @@
         buttonText = @"To Author Mode";
         
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:currentVer message:NSLocalizedString(
-            @"This App is supported by ChronicleMap App, which can be used to record your personal life stories! (Download app from Apple Store)\n\nIf you have a history story to make an app like this, please email support@chroniclemap.com, we can help you to own an app like this free of charge. All you have to do is to write story in text in a simpel format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
+            @"This App is supported by ChronicleMap App, which is a popular App to record personal life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get at least half revenue. All you have to do is to write story in text in a simple format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
             delegate:self
             cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
             otherButtonTitles:buttonText, nil];
@@ -324,6 +331,18 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     //if (alertView.tag == ALERT_FOR_SAVE)
     if (buttonIndex == 1 && alertView.tag == ALERT_FOR_SWITCH_AUTHO_MODE) {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Only available in iPad Version",nil)
+                                                            message:NSLocalizedString(@"",nil)
+                                                           delegate:self
+                                                  cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                                                  otherButtonTitles:nil];
+            [alert show];
+            return;
+        }
+        
+        
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
         
@@ -682,6 +701,7 @@
             self.timeZoomLine.hidden = true;
             [self hideDescriptionLabelViews];
             self.navigationController.navigationBarHidden = true;
+            [self showAdAtTop:true];
         }
         else if (mapViewShowWhatFlag == MAPVIEW_HIDE_ALL || mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
         {
@@ -691,6 +711,7 @@
             self.timeZoomLine.hidden = false;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = false;
+            [self showAdAtTop:false];
         }
     }
     else //if has selected nodes, use 3-step show/hide
@@ -703,6 +724,7 @@
             self.timeZoomLine.hidden = true;
             [self hideDescriptionLabelViews];
             self.navigationController.navigationBarHidden = true;
+            [self showAdAtTop:true];
         }
         else if (mapViewShowWhatFlag == MAPVIEW_HIDE_ALL)
         {
@@ -712,6 +734,7 @@
             self.timeZoomLine.hidden = true;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = true;
+            [self showAdAtTop:true];
         }
         else if (mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
         {
@@ -721,6 +744,7 @@
             self.timeZoomLine.hidden = false;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = false;
+            [self showAdAtTop:false];
         }
     }
 }
@@ -1234,6 +1258,7 @@
         eventListView.hidden = false;
         self.timeZoomLine.hidden = false;
         self.navigationController.navigationBarHidden = false;
+        [self showAdAtTop:false];
         appDelegate.focusedEvent = ent;
         [self showOverlays];
         [self refreshEventListView];
@@ -1252,7 +1277,7 @@
     self.selectedAnnotation = ann;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
-    NSDateFormatter *dateFormater = appDelegate.dateFormater;
+
     //if (self.eventEditor == nil) {
     //I just learned from iOS5 tutor pdf, there is a way to create segue for accessory buttons, I do not want to change, Will use it in iPhone storyboard
     self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
@@ -1303,11 +1328,19 @@
     self.eventEditor.description.text = ann.description;
     self.eventEditor.address.text= ann.address;
     self.eventEditor.address.editable = false;
-    self.eventEditor.dateTxt.text = [NSString stringWithFormat:@"%@",
-                                     [dateFormater stringFromDate:ann.eventDate]];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+    [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+    [dateFormatter setLocale:[NSLocale currentLocale]];
+    
+    self.eventEditor.dateTxt.text = [dateFormatter stringFromDate:ann.eventDate];
+    tmpDateHold = ann.eventDate;
+
     self.eventEditor.eventType = ann.eventType;
     self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
     self.eventEditor.eventId = ann.uniqueId;
+    //self.eventEditor.view.backgroundColor = [UIColor clearColor];//  [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3]; //this will make full screen editor black
 
     [ATEventEditorTableController setEventId:ann.uniqueId];
     //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
@@ -1553,7 +1586,7 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    NSLog(@"=============== Memory warning");
+    NSLog(@"=============== Memory warning in ATViewController");
     // Dispose of any resources that can be recreated.
 }
 
@@ -1613,6 +1646,7 @@
     newData.lng = self.selectedAnnotation.coordinate.longitude;
     
     newData.uniqueId = self.selectedAnnotation.uniqueId;
+    newData.eventDate = tmpDateHold;
     
     [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
     if ([newAddedList count] > 0) //this is for adding photo in reader, in real reader, we hardly come here
@@ -1650,7 +1684,7 @@
     [ann setCoordinate:self.selectedAnnotation.coordinate];
     ann.address = newData.address;
     ann.description=newData.eventDesc;
-    ann.eventDate=newData.eventDate;
+    ann.eventDate=tmpDateHold;
     ann.eventType=newData.eventType;
     [self.mapView addAnnotation:ann];
     
@@ -2024,12 +2058,12 @@
     [userDefault setObject:@"UPDATE_MODE" forKey:AUTHOR_MODE_KEY];
     appDelegate.authorMode = true;
     [userDefault synchronize];
-    
+
     [UIView transitionWithView:self.mapView
                       duration:0.5
                        options:UIViewAnimationTransitionFlipFromRight //any animation
                     animations:^ {
-                        [authorView setFrame:CGRectMake(280, 50, 300, 80)];
+                        [authorView setFrame:CGRectMake([ATConstants screenWidth] - 300, 130, 300, 80)];
                         authorView.backgroundColor=[UIColor colorWithRed:1 green:1 blue:0.7 alpha:0.6];
                         authorView.layer.shadowColor = [UIColor grayColor].CGColor;
                         authorView.layer.shadowOffset = CGSizeMake(15,15);
@@ -2039,6 +2073,9 @@
                         //[self partialInitEpisodeView];
                     }
                     completion:^(BOOL finished) {[self partialInitAuthorView];}];
+    [appDelegate emptyEventList]; //this will cause eventListSorted to be generated again from internet
+    [self refreshAnnotations];
+    [self refreshEventListView];
 }
 
 //the purpose to have this to be called in completion:^ is to make animation together with all subviews
@@ -2054,22 +2091,22 @@
     
 
     UIButton *btnDropbox = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnDropbox.frame = CGRectMake(10, 50, 120, 40);
+    btnDropbox.frame = CGRectMake(5, 40, 120, 40);
     [btnDropbox setTitle:@"Sync Dropbox" forState:UIControlStateNormal];
     btnDropbox.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
     [btnDropbox addTarget:self action:@selector(photoDroboxClicked:) forControlEvents:UIControlEventTouchUpInside];
     [authorView addSubview: btnDropbox];
     
     UIButton *btnBackToViewMode = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnBackToViewMode.frame = CGRectMake(140, 50, 60, 40);
+    btnBackToViewMode.frame = CGRectMake(125, 40, 60, 40);
     [btnBackToViewMode setTitle:NSLocalizedString(@"Quit",nil) forState:UIControlStateNormal];
     btnBackToViewMode.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
     [btnBackToViewMode addTarget:self action:@selector(quitClicked:) forControlEvents:UIControlEventTouchUpInside];
     [authorView addSubview: btnBackToViewMode];
     
     UIButton *btnLogout = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnLogout.frame = CGRectMake(200, 50, 120, 40);
-    [btnLogout setTitle:NSLocalizedString(@"Logout",nil) forState:UIControlStateNormal];
+    btnLogout.frame = CGRectMake(180, 40, 120, 40);
+    [btnLogout setTitle:NSLocalizedString(@"Logout&Quit",nil) forState:UIControlStateNormal];
     btnLogout.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
     [btnLogout addTarget:self action:@selector(logoutClicked:) forControlEvents:UIControlEventTouchUpInside];
     [authorView addSubview: btnLogout];
@@ -2078,9 +2115,9 @@
 
 - (void) closeAuthorView
 {
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if (authorView != nil)
     {
-        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         [userDefault setObject:@"VIEW_MODE" forKey:AUTHOR_MODE_KEY];
         appDelegate.authorMode = false;
@@ -2097,6 +2134,9 @@
                             authorView = nil;
                         }];
     }
+    [appDelegate emptyEventList]; //this will cause eventListSorted to be generated again from internet
+    [self refreshAnnotations];
+    [self refreshEventListView];
 }
 
 -(void) photoDroboxClicked:(id)sender
@@ -2127,6 +2167,10 @@
 }
 -(void) logoutClicked:(id)sender
 {
+    [self closeAuthorView];
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    [userDefault removeObjectForKey:[ATConstants UserEmailKeyName]];
+    [userDefault removeObjectForKey:[ATConstants UserSecurityCodeKeyName]];
 }
 
 /////// following is for search bar actions
@@ -2171,6 +2215,115 @@
         
 	}
 }
+-(void)initiAdBanner
+{
+    if (!self.iAdBannerView)
+    {
+        CGRect rect = CGRectMake(0, AD_Y_POSITION_IPAD, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+            rect = CGRectMake(0, AD_Y_POSITION_PHONE, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        self.iAdBannerView = [[ADBannerView alloc]initWithFrame:rect];
+        self.iAdBannerView.delegate = self;
+        self.iAdBannerView.hidden = TRUE;
+        [self.view addSubview:self.iAdBannerView];
+    }
+}
+
+-(void)initgAdBanner
+{
+    if (!self.gAdBannerView)
+    {
+        CGRect rect = CGRectMake(0, 60, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+            rect = CGRectMake(0, AD_Y_POSITION_PHONE, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        self.gAdBannerView = [[GADBannerView alloc] initWithFrame:rect];
+        self.gAdBannerView.adUnitID = @"ca-app-pub-5383516122867647/8499480217";
+        self.gAdBannerView.rootViewController = self;
+        self.gAdBannerView.delegate = self;
+        self.gAdBannerView.hidden = TRUE;
+        [self.view addSubview:self.gAdBannerView];
+    }
+}
+
+-(void)hideBanner:(UIView*)banner
+{
+    if (banner && ![banner isHidden])
+    {
+        [UIView beginAnimations:@"hideBanner" context:nil];
+        banner.frame = CGRectOffset(banner.frame, 0, banner.frame.size.height - 60);
+        [UIView commitAnimations];
+        banner.hidden = TRUE;
+    }
+}
+-(void)showBanner:(UIView*)banner
+{
+    if (banner && [banner isHidden])
+    {
+        [UIView beginAnimations:@"showBanner" context:nil];
+        banner.frame = CGRectOffset(banner.frame, 0, -banner.frame.size.height + 60);
+        [UIView commitAnimations];
+        banner.hidden = FALSE;
+    }
+}
+
+//this function go with navigator show/hide
+-(void)showAdAtTop:(BOOL)topFlag
+{
+    if (topFlag)
+    {
+        CGRect frame = self.iAdBannerView.frame;
+        frame.origin.y = 0;
+        self.iAdBannerView.frame = frame;
+        frame = self.gAdBannerView.frame;
+        frame.origin.y = 0;
+        self.gAdBannerView.frame = frame;
+    }
+    else
+    {
+        int yPos = AD_Y_POSITION_IPAD;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+            yPos = AD_Y_POSITION_PHONE;
+        CGRect frame = self.iAdBannerView.frame;
+        frame.origin.y = yPos;
+        self.iAdBannerView.frame = frame;
+        frame = self.gAdBannerView.frame;
+        frame.origin.y = yPos;
+        self.gAdBannerView.frame = frame;
+    }
+}
+////////// iAd delegate
+// Called before the add is shown, time to move the view
+- (void)bannerViewWillLoadAd:(ADBannerView *)banner
+{
+    NSLog(@"----- iAd load");
+    [self hideBanner:self.gAdBannerView];
+    [self showBanner:self.iAdBannerView];
+}
+
+// Called when an error occured
+- (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
+{
+    NSLog(@"###### iAd error: %@", error);
+    [self hideBanner:self.iAdBannerView];
+    [self.gAdBannerView loadRequest:[GADRequest request]];
+}
+
+//////////gAd delegate
+// Called before ad is shown, good time to show the add
+- (void)adViewDidReceiveAd:(GADBannerView *)view
+{
+    NSLog(@"------ Admob load");
+    [self hideBanner:self.iAdBannerView];
+    [self showBanner:self.gAdBannerView];
+}
+
+// An error occured
+- (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error
+{
+    NSLog(@"######## Admob error: %@", error);
+    [self hideBanner:self.gAdBannerView];
+}
+
 
 #pragma mark -
 #pragma mark UISearchDisplayController Delegate Methods

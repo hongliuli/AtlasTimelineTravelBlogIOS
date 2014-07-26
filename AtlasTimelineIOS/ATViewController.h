@@ -12,12 +12,15 @@
 #import "ATEventEditorTableController.h"
 #import "ATPreferenceViewController.h"
 #import <StoreKit/StoreKit.h>
+#import <iAd/iAd.h>
+#import "GADBannerView.h"
+
 @class ATAppDelegate;
 @class ATEventAnnotation;
 @class ATTimeScrollWindowNew;
 @class ATTimeZoomLine;
 
-@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate>
+@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate, ADBannerViewDelegate,GADBannerViewDelegate>
 {
     ATDataController *dataController;
 
@@ -43,6 +46,10 @@
 @property (strong, nonatomic) NSDate* endDate;
 @property (strong, nonatomic) ATTimeZoomLine* timeZoomLine;
 
+@property (strong, nonatomic) ADBannerView *iAdBannerView;
+@property (strong, nonatomic) GADBannerView *gAdBannerView;
+
+
 
 - (void) prepareMapView;
 - (NSString*) getImageIdentifier:(NSDate*) eventDate :(NSString*) specialMarker;
@@ -59,6 +66,7 @@
 - (void) cancelPreference;
 - (void) refreshEventListView;
 - (int) zoomLevel;
+- (void) closeAuthorView;
 
 
 @end

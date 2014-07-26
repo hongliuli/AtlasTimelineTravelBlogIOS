@@ -10,6 +10,8 @@
 #import "ATEventAnnotation.h"
 #import "ATViewImagePickerController.h"
 #import "ATPhotoScrollView.h"
+#import <iAd/iAd.h>
+#import "GADBannerView.h"
 
 @protocol EventEditorDelegate ;
 
@@ -17,7 +19,7 @@
 @class ATEventEntity;
 @class ATEventDataStruct;
 
-@interface ATEventEditorTableController : UITableViewController <UITextFieldDelegate, ATImagePickerDelegate, UIPickerViewDelegate, UIPickerViewDataSource>
+@interface ATEventEditorTableController : UITableViewController <UITextFieldDelegate, ATImagePickerDelegate, UIPickerViewDelegate, UIPickerViewDataSource, ADBannerViewDelegate,GADBannerViewDelegate>
 {
     ATEventAnnotation * annotation;
 }
@@ -44,6 +46,10 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *cancelButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *deleteButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *saveButton;
+
+@property (strong, nonatomic) ADBannerView *iAdBannerView;
+@property (strong, nonatomic) GADBannerView *gAdBannerView;
+
 
 - (IBAction)saveAction:(id)sender;
 - (IBAction)deleteAction:(id)sender;
