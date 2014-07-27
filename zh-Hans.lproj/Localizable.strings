@@ -51,6 +51,7 @@
 "Are you sure?"="确信吗?";
 "Are you sure to replace your offline copy?"="确信替换离线拷贝吗?";
 "Available zoom-levels: Month / Year  /10 Yrs / 100 Yrs / 1000 Yrs"="可用时间缩放级别有: 周（可选）/ 月 / 年  /10 年 / 100 年 / 1000 年";
+"AuthorEmail"="support@chroniclemap.com";
 "Back"="返回";
 "Backup myEvents to server"="备份myEvents到服务器";
 "Backup Photos (Full)"="完全备份";
@@ -80,6 +81,8 @@
 "Description field may not be empty. (keep tag <<...>> if there is one)"="描述域不能为空. (如果有<<...>>，不要删除)";
 "Do not cancel"="不要取消";
 "Done"="完成";
+"Double-Tap Right side to zoom-in Time Wheel"="右侧双击，缩小时间段";
+"Double-Tap Left side to zoom-out Time Wheel"="左侧双击，放大时间段";
 "Downloaded %@ has %i events"="下载的 %@ 有%i个事件";
 "Download from server to offline"="从服务器下载到设备";
 "Download missing %@ photos from Dropbox. This operation can be repeated until all photos are downloaded."="从Dropbox下载[%@]中还没有被下载的照片. 可以重复这个操作直到全部下载完成.";
@@ -106,7 +109,7 @@
 "Fail reason could be network issue or data issue!"="失败原因可能是网络或数据问题!";
 "failed to add %@"="添加%@失败";
 "Failed to save image"="保存图像失败";
-"Select All"="全选";
+
 "Free version allows you to store as many as 50 events and unlimited photos, do you want to support us by purchasing unlimited version for USD$2.99 now?"="免费版本只能添加50个事件和无限制的照片。现在你要付2.99美元买完整版本吗?";
 "%@ has not accepted your request yet"="%@ 还没有接受你的请求";
 "Full Screen Event Editor"="全屏幕事件编辑";
@@ -123,6 +126,7 @@
 "Invalid Email Format!"="无效邮件地址格式!";
 "%@ is already your friend"="%@ 已经是你的朋友";
 "[%@] %@\n\n Map Location:%@      (Organized with ChronicleMap.com)"="[%@] %@\n\n 地图位置:%@      (由ChronicleMap.com提供)";
+"Left Arrow:\nQuick move to earlier period having event(s)"="左箭头：\n快速移动到以前有事件的时间段";
 "Login to access server"="登录访问服务器";
 "Logout"="退出";
 "Long-press on a map location."="在地图上长按你选好的位置.";
@@ -156,8 +160,13 @@
 "Please swipe right"="请用手指右刷";
 "Please try again!"="请再试试!";
 "Please update from App Store"="请在苹果Ｓｔｏｒｅ更新";
+"Photo backup has started!"="照片备份已经开始！";
+"Photos will be uploaded to your Dropbox account one by one, please watch for the decreasing number.\n\nThe upload is done if number is decreased to 0."="照片会一个一个地被上载到你的Dropbox，请关注正在变小的数字！\n\n当数字变为 0 后， 上载结束。";
+"Photo upload started and [New] number is decreasing.\n If number reach 0 then full back up is done.\n If number stop at non-zero, then tap [Photo Backup] row to continue."="全上载已开始，[New]数字应该在变小。\n如果数字减到 0，则上载完成。\n如果数字停止变化到0，则点击上行[Photo Backup]继续.";
 "Purchase Full Version"="购买完全版本";
 "Quit w/o save"="不保存退出";
+"Quit"="退出";
+"Logout&Quit"="注销并退出";
 "Reached the max Zoom-In level Month!"="已经到达最高放大级别-月!";
 "Reached the max Zoom-In level Week!"="不能再放大，7天是最高放大级别!";
 "Record/navigate events on map in chronological order!"="以时间顺序，记录/浏览地图事件!";
@@ -168,11 +177,13 @@
 "Restore myEvents from server"="从服务器恢复myEvents";
 "Restore Photos"="恢复照片";
 "Restore Purchase"="恢复购买";
+"Right Arrow:\nQuick move to next period having event(s)"="右箭头：\n快速移动到下个有事件的时间段";
 "Save failed"="保存失败";
 "Search Address     OR  "="搜索地址      或  ";
 "Scroll Date Magnifer"="滑动日期放大镜";
 "search any description and address"="搜索事件－输入描述或地址任何部分";
 "   section %d   row %d"="   section %d   row %d";
+"Select All"="全选";
 "Select Active from the downloaded contents/episodes"="从已下载的内容／片段中选一个为活跃的";
 "%d selected"="%d 个被选上";
 "Settings"="菜单";
@@ -190,6 +201,7 @@
 "Share Episode Success!"="分享片断成功!";
 "Share Event"="分享事件";
 "Share my Episodes to Friends"="分享我的片断给朋友";
+"Suggestion to Author"="给作者建议";
 "Support Us"="支持我们";
 "Sync %i events to %@ on server"="同步 %i 个事件到服务器的[%@]";
 "Tap (+) or double-tab here to zoom in"="点击 (+) 或双击这里来放大时间范围";
@@ -199,6 +211,7 @@
 "The access to Address Book has previously been denied"="访问通讯录曾被拒绝";
 "The correct date format is MM/dd/yyyy Era (such as %@)"="正确日期格式：MM/dd/yyyy Era (例如 %@)";
 "The events in this episode is no longer in myEvents, please remove this episode."="这个片断中的该事件已不在myEvents中，请删除.";
+"This App is supported by ChronicleMap App, which is a popular App to record personal life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get a sizable portion of revenue. All you have to do is to write story in text in a simple format.\n\nDetail see www.chroniclemap.com/authorarea"="该APP由ChronicleMap 开发。ChornicleMap APP 可以用来记录你的人生旅程，请从Apple APP Store下载！\n\n如果你有一个好的历史故事，帮助我们建立更大的历史事件APP库，则请联系我们，我们可以帮你拥有APP，得到可观的收入。你所要做的是把故事按照一个简单的正文格式写出来。\n\n详情访问 www.chroniclemap.com/authorarea";
 "This content may not have photos."="该内容可能没有照片.";
 "This episode is empty!"="该片断是空的!";
 "This is what is happening on your screen:"="下面解释你当前屏幕上所显示了什么:";
@@ -207,12 +220,16 @@
 "The product is restored, no charge is applied"="APP已恢复，你不用任何支付！";
 "Time Wheel"="时间轮";
 "Timeline/Search"="年列表／搜索事件";
+"To View Mode"="回到阅读方式";
+"To Author Mode"="变到作者方式";
+"Author Mode:"="作者方式";
+"Sync Dropbox"="同步";
 "Use keyboard to enter date"="使用键盘输入事件日期";
 "Verify Success!"="验证代码成功!";
 "Verify Failed!"="验证代码失败!";
 "Video Tutorial and FAQ"="教程和 FAQ";
 "Wrong Date Format"="错误日期格式";
-"WARNING: All photoes on your dropbox:/ChoronicleMap/%@ will be deleted and replaced by %d photos from this device!"="警告: 在你的 Dropbox:/ChoronicleMap/%@ 中的所有照片将被删除，而被设备APP上的%d 照片所代替!";
+"WARNING: All photoes on your dropbox:/ChronicleReader/%@ will be deleted and replaced by %d photos from this device!"="警告: 在你的 Dropbox:/ChronicleReader/%@ 中的所有照片将被删除，而被设备APP上的%d 照片所代替!";
 "WARNING: Export will replace existing %@ event data on server."="警告: 上载将替换服务器上的 %@ 事件数据.";
 "WARNING: Local %@'s %@ events will be replaced!"="警告: 设备上 %@ 的 %@ 事件将被代替!";
 "%@ was downloaded before"="%@ 以前被下载过";
