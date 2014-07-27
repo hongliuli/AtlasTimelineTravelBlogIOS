@@ -680,7 +680,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 {
     if (!self.iAdBannerView)
     {
-        NSLog(@"----- iAdView height=%f ", self.view.frame.size.height);
+        //NSLog(@"----- iAdView height=%f ", self.view.frame.size.height);
         CGRect rect = CGRectMake(0, [ATConstants screenHeight] - 50, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
         self.iAdBannerView = [[ADBannerView alloc]initWithFrame:rect];
         self.iAdBannerView.delegate = self;
@@ -693,7 +693,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 {
     if (!self.gAdBannerView)
     {
-        NSLog(@"----- gAdView height=%f ", self.view.frame.size.height);
+        //NSLog(@"----- gAdView height=%f ", self.view.frame.size.height);
         CGRect rect = CGRectMake(0, [ATConstants screenHeight] - 50, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
         self.gAdBannerView = [[GADBannerView alloc] initWithFrame:rect];
         self.gAdBannerView.adUnitID = @"ca-app-pub-5383516122867647/8499480217";
@@ -727,7 +727,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 // Called before the add is shown, time to move the view
 - (void)bannerViewWillLoadAd:(ADBannerView *)banner
 {
-    NSLog(@"----- Editor iAd load");
+    //NSLog(@"----- Editor iAd load");
     [self hideBanner:self.gAdBannerView];
     [self showBanner:self.iAdBannerView];
 }
@@ -735,7 +735,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 // Called when an error occured
 - (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
 {
-    NSLog(@"###### Editor iAd error: %@", error);
+    //NSLog(@"###### Editor iAd error: %@", error);
     [self hideBanner:self.iAdBannerView];
     [self.gAdBannerView loadRequest:[GADRequest request]];
 }
@@ -744,7 +744,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 // Called before ad is shown, good time to show the add
 - (void)adViewDidReceiveAd:(GADBannerView *)view
 {
-    NSLog(@"------ Editor Admob load");
+    //NSLog(@"------ Editor Admob load");
     [self hideBanner:self.iAdBannerView];
     [self showBanner:self.gAdBannerView];
 }
@@ -752,7 +752,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 // An error occured
 - (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error
 {
-    NSLog(@"########  Editor Admob error: %@", error);
+    //NSLog(@"########  Editor Admob error: %@", error);
     [self hideBanner:self.gAdBannerView];
 }
 

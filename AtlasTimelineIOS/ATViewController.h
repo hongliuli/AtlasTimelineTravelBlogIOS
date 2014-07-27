@@ -14,13 +14,14 @@
 #import <StoreKit/StoreKit.h>
 #import <iAd/iAd.h>
 #import "GADBannerView.h"
+#import <MessageUI/MessageUI.h>
 
 @class ATAppDelegate;
 @class ATEventAnnotation;
 @class ATTimeScrollWindowNew;
 @class ATTimeZoomLine;
 
-@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate, ADBannerViewDelegate,GADBannerViewDelegate>
+@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate, ADBannerViewDelegate,GADBannerViewDelegate, MFMailComposeViewControllerDelegate>
 {
     ATDataController *dataController;
 

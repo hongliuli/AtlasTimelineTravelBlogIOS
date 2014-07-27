@@ -105,6 +105,8 @@ BOOL isAtLeast7;
         [cell.layer setCornerRadius:7.0f];
         [cell.layer setMasksToBounds:YES];
         [cell.layer setBorderWidth:1.0f];
+        cell.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
+        //cell.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
         //[cell.layer setBorderColor:(__bridge CGColorRef)([UIColor lightGrayColor])];
     }
 
@@ -220,6 +222,7 @@ BOOL isAtLeast7;
             zoomLeve = 5;
         [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :zoomLeve]; //do not change map zoom level
         [mapView showOverlays];
+        //Removed the implementatin b/c not so good  [mapView startEventEditorWithEvent:evt];
         [self.tableView reloadData]; //so show checkIcon for selected row
         //bookmark selected event
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];

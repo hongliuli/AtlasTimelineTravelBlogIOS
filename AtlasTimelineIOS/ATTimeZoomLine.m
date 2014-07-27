@@ -721,16 +721,6 @@ NSDate* prevYearDate;
                 CGContextSetRGBFillColor(context, 0,0.5,0.2, 1);
                 CGContextFillRect(context, CGRectMake(x, DOT_Y_POS_GREEN, DOT_SIZE, 8*DOT_SIZE));
                 previouseVisibleEventDrawXPos = x;
-                if (toastFirstTimeDelay > 10 && toastFirstTimeDelay < 1000 )
-                {
-                    toastFirstTimeDelay = 10001; //My Trick so only display once
-                    float xPos = x - 170;
-                    if (xPos < 80)
-                        xPos = 100;
-                    [self makeToast:NSLocalizedString(@"Tip: Where is dot where are events.",nil) duration:5.0 position:[NSValue valueWithCGPoint:CGPointMake(xPos, -25)]];
-                    self.hidden = false;
-                    self.mapViewController.timeScrollWindow.hidden  = false;
-                }
             }
             else
             {

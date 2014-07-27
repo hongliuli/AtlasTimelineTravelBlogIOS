@@ -186,7 +186,7 @@ UILabel* updatableLabel2;
     [self addTimeZoomLevelSection:x_start - adjust :@"arrow-left-icon.png" :NSLocalizedString(@"Left Arrow:\nQuick move to earlier period having event(s)",nil) :currentYLocation];
     [self addTimeZoomLevelSection:centerX - 120 :nil :NSLocalizedString(@"Double-Tap Left side to zoom-out Time Wheel",nil) :currentYLocation + 30];
     [self addTimeZoomLevelSection:centerX :@"gesture-pinch.png" :NSLocalizedString(@"Pinch is another way of zooming Time Wheel",nil) :currentYLocation + 60];
-    [self addTimeZoomLevelSection:centerX + 120 :nil :NSLocalizedString(@"Double-Tap Right side to zoom-out Time Wheel",nil) :currentYLocation + 30];
+    [self addTimeZoomLevelSection:centerX + 120 :nil :NSLocalizedString(@"Double-Tap Right side to zoom-in Time Wheel",nil) :currentYLocation + 30];
     [self addTimeZoomLevelSection:x_start + 2*[ATConstants timeScrollWindowWidth]/3   + 100:@"arrow-right-icon.png" :NSLocalizedString(@"Right Arrow:\nQuick move to next period having event(s)",nil) :currentYLocation];
 }
 

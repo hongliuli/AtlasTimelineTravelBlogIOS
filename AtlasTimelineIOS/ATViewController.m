@@ -232,15 +232,15 @@
     currentVer = [NSString stringWithFormat:@"Current Version: %@",currentVer ];
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
-    NSString* buttonText = @"To View Mode";
+    NSString* buttonText = NSLocalizedString(@"To View Mode",nil);
     if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
-        buttonText = @"To Author Mode";
+        buttonText = NSLocalizedString(@"To Author Mode",nil);
         
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:currentVer message:NSLocalizedString(
-            @"This App is supported by ChronicleMap App, which is a popular App to record personal life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get at least half revenue. All you have to do is to write story in text in a simple format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
+            @"This App is supported by ChronicleMap App, which is a popular App to record personal life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get a sizable portion of revenue. All you have to do is to write story in text in a simple format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
             delegate:self
             cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-            otherButtonTitles:buttonText, nil];
+            otherButtonTitles:buttonText, NSLocalizedString(@"Suggestion to Author",nil),nil];
     alert.tag = ALERT_FOR_SWITCH_AUTHO_MODE;
     [alert show];
 }
@@ -330,32 +330,47 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     //if (alertView.tag == ALERT_FOR_SAVE)
-    if (buttonIndex == 1 && alertView.tag == ALERT_FOR_SWITCH_AUTHO_MODE) {
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    if (alertView.tag == ALERT_FOR_SWITCH_AUTHO_MODE) {
+        if (buttonIndex == 1) //switch view/author mode
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Only available in iPad Version",nil)
-                                                            message:NSLocalizedString(@"",nil)
-                                                           delegate:self
-                                                  cancelButtonTitle:NSLocalizedString(@"OK",nil)
-                                                  otherButtonTitles:nil];
-            [alert show];
-            return;
-        }
-        
-        
-        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-        NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
-        
-        if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
-        {
-            BOOL loginFlag = [ATHelper checkUserEmailAndSecurityCode:self];
-            if (!loginFlag)
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Only available in iPad Version",nil)
+                                                                message:NSLocalizedString(@"",nil)
+                                                               delegate:self
+                                                      cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                                                      otherButtonTitles:nil];
+                [alert show];
                 return;
-            [self startAuthorView];
+            }
+            NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+            NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
+            
+            if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
+            {
+                BOOL loginFlag = [ATHelper checkUserEmailAndSecurityCode:self];
+                if (!loginFlag)
+                    return;
+                [self startAuthorView];
+            }
+            else
+            {
+                [self closeAuthorView];
+            }
         }
-        else
+        if (buttonIndex == 2) //suggestion to
         {
-            [self closeAuthorView];
+            NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+            //NSArray *toReceipients = @[@"aa@aa.com"];
+            NSArray *toReceipients = @[NSLocalizedString(@"AuthorEmail",nil)]; //AuthorEmail is in Localizable.String file
+            NSArray *ccReceipients = @[@"support@chroniclemap.com"]; //AuthorEmail is in Localizable.String file
+            MFMailComposeViewController* mailComposer = [[MFMailComposeViewController alloc]init];
+            mailComposer.mailComposeDelegate = self;
+            [mailComposer setToRecipients:toReceipients];
+            [mailComposer setCcRecipients:ccReceipients];
+            [mailComposer setSubject:NSLocalizedString(targetName,nil)];
+            //[mailComposer setMessageBody:@"Testing message for the test mail" isHTML:NO];
+            [self presentModalViewController:mailComposer animated:YES];
         }
     }
     if (buttonIndex == 0 && alertView.tag == ALERT_FOR_POPOVER_ERROR)
@@ -364,6 +379,20 @@
         [self refreshAnnotations];
     }
 }
+
+#pragma mark - mail compose delegate
+-(void)mailComposeController:(MFMailComposeViewController *)controller
+         didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error{
+    if (result) {
+        NSLog(@"Result : %d",result);
+    }
+    if (error) {
+        NSLog(@"Error : %@",error);
+    }
+    [self dismissModalViewControllerAnimated:YES];
+    
+}
+
 - (void)handleTapOnTutorial:(UIGestureRecognizer *)gestureRecognizer
 {
     [self closeTutorialView];
@@ -2092,7 +2121,7 @@
 
     UIButton *btnDropbox = [UIButton buttonWithType:UIButtonTypeSystem];
     btnDropbox.frame = CGRectMake(5, 40, 120, 40);
-    [btnDropbox setTitle:@"Sync Dropbox" forState:UIControlStateNormal];
+    [btnDropbox setTitle:NSLocalizedString(@"Sync Dropbox",nil) forState:UIControlStateNormal];
     btnDropbox.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
     [btnDropbox addTarget:self action:@selector(photoDroboxClicked:) forControlEvents:UIControlEventTouchUpInside];
     [authorView addSubview: btnDropbox];
