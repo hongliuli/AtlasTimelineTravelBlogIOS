@@ -67,7 +67,6 @@ http://en.wikipedia.org/wiki/Axis_powers
 [Tags]Tokyo-Berlin
 [Loc]35.685745,139.682236
 [Desc]Nazi Japan Anti-Comintern Pact.
- 
 Axis Alliance now are formed. See the blue colored part on maps in photo view.
  
 Nazi Germany and Imperial Japan sign the Anti-Comintern Pact, directed against the Soviet Union and the international Communist movement.
@@ -84,7 +83,8 @@ This incident is known as the Marco Polo Bridge Incident, or Lugouqiao Incident 
  
 Actually, Japan’s invasion and occupation of China began even earlier when it occupied Manchuria, the northeastern part of China, starting on September 18, 1931 (known as the 918 Incident), and then set up the puppet government in Manchuria known as Manchukuo.  What was special about the July 7, 1937 incident was that it triggered the large-scale war between China and Japan, which during the eight years of 1937-1945 resulted in the huge casualty previously mentioned.   Between 1931-1937,  there were also intermittent fighting against the Japanese invaders from various Chinese segments, including the regular army of the Chinese Nationalists, the guerrilla army of the Chinese Communists, or various Chinese insurgent fighting forces.  That is why sometimes the War of Resistance is known as the Fourteen Year War of Resistance from 1931-1945, and the Second Sino-Japanese War can sometimes be thought of starting in 1931。
  
-Japan occupation map around 1940: http://en.wikipedia.org/wiki/Second_Sino-Japanese_War#mediaviewer/File:Second_Sino-Japanese_War_WW2.png
+Map photo:
+   - Japan occupation map around 1940:
  
 http://en.wikipedia.org/wiki/Second_Sino-Japanese_War
  
@@ -114,8 +114,7 @@ http://en.wikipedia.org/wiki/Anschluss
 [Date]1938-09-29
 [Tags]Munich Germany
 [Loc]48.144098,11.58165
-[Desc]Munich Agreement.
- 
+[Desc]Munich Agreement
 The shaded area indicate smaller Czech after the agreement.
  
 Munich Agreement settlement reached by Germany, Great Britain, France, and Italy that permitted German annexation of the ** Sudetenland** ( http://en.wikipedia.org/wiki/Sudetenland )  in western Czechoslovakia.
@@ -149,13 +148,12 @@ In mid-March 1939, Adolf Hitler gave Hungary permission to occupy the rest of Ca
 Six months after Hungary had occupied the rest of Carpatho-Ukraine, north up to the Polish border, in September 1939, the Polish government and part of its military would escape to Hungary and Romania, and from there to France and French-mandated Syria to carry on the war against Hitler's Germany.
  
 After World War II, the 1947 Treaty of Paris declared the Vienna Award null and void.
- 
-Map – The partition of Czech. First Vienna Award in Red color: http://en.wikipedia.org/wiki/First_Vienna_Award#mediaviewer/File:Czechoslovakia_1939.SVG
- 
+
 http://en.wikipedia.org/wiki/First_Vienna_Award
  
 Vienna Awards 1 and 2: http://en.wikipedia.org/wiki/Vienna_Awards
  
+
  
 [Date]1939-03-14
 [Tags]Slovak Republic
@@ -167,7 +165,8 @@ Tiso faced even more radical Slovak nationalists and their paramilitary Hlinka G
  
 Vojtech Tuka had been released from prison and became prime minister. An ally Ferdinand Durcansky was appointed foreign minister. Hlinka Guard commander Alexander Mach was appointed propaganda minister. Slovakia became a compliant NAZI puppetstate. A NAZI "advisory mission" was installed in each Slovak ministry. The Wehrmact had entered Slovakia (March 15) and soon was stationed throughout the country. Slovakia became the most slavishly obedient of all the NAZI satellite regimes.
  
-Slovak map in 1941 http://en.wikipedia.org/wiki/Axis_powers#mediaviewer/File:Slovakia1941_02.png
+Map photo:
+    - Slovak map in 1941
  
 http://en.wikipedia.org/wiki/Slovak_Republic_(1939%E2%80%9345)
  
@@ -188,7 +187,7 @@ Then, on March 15, 1939, during a meeting with Czech President Emil Hacha--a man
  
 The Munich Pact, which according to British Prime Minister Neville Chamberlain had purchased "peace in our time," was actually a mere negotiating ploy by the Hitler, only temporarily delaying the Fuhrer's blood and land lust.
  
-Czech invasion map: http://en.wikipedia.org/wiki/German_occupation_of_Czechoslovakia#mediaviewer/File:Czechoslovakia_1939.SVG
+
  
 http://www.history.com/this-day-in-history/nazis-take-czechoslovakia
  
@@ -244,11 +243,7 @@ With Europe on the brink of another major war, Soviet leader Joseph Stalin (1879
  
 The pact also contained a secret agreement in which the Soviets and Germans agreed how they would later divide up Eastern Europe. The German-Soviet Nonaggression Pact fell apart in June 1941, when Nazi forces invaded the Soviet Union. September 1, 1939
 Germany invades Poland, initiating World War II in Europe.
- 
-The map demonstration of the Pact: http://en.wikipedia.org/wiki/Occupation_of_the_Baltic_states#mediaviewer/File:Ribbentrop-Molotov.svg
- 
-http://en.wikipedia.org/wiki/Occupation_of_the_Baltic_states#mediaviewer/File:Ribbentrop-Molotov.svg
- 
+
 http://en.wikipedia.org/wiki/Molotov%E2%80%93Ribbentrop_Pact
  
 [Overlay]MolotovPactSovietPart
@@ -263,8 +258,7 @@ To Hitler, the conquest of Poland would bring Lebensraum, or "living space," for
  
 To neutralize the possibility that the USSR would come to Poland's aid, Germany signed a nonaggression pact with the Soviet Union on August 23, 1939. In a secret clause of the agreement, the ideological enemies agreed to divide Poland between them. Hitler gave orders for the Poland invasion to begin on August 26, but on August 25 he delayed the attack when he learned that Britain had signed a new treaty with Poland, promising military support should it be attacked. To forestall a British intervention, Hitler turned to propaganda and misinformation, alleging persecution of German-speakers in eastern Poland. Fearing imminent attack, Poland began to call up its troops, but Britain and France persuaded Poland to postpone general mobilization until August 31 in a last ditch effort to dissuade Germany from war.
  
-Invasion of Poland Map: http://en.wikipedia.org/wiki/Invasion_of_Poland#mediaviewer/File:Second_World_War_Europe.png
- 
+
 http://www.history.com/this-day-in-history/germans-invade-poland
  
 http://en.wikipedia.org/wiki/Invasion_of_Poland
@@ -282,8 +276,7 @@ The Soviet invasion of Poland was a direct result of the Ribbentrop-Molotov Pact
  
 The Soviet government used the German invasion of Poland as a pretext to violate the non-aggression treaty, announced the Polish state as non-existent and claimed that it entered Polish territory to defend Ukrainian and Belarusian people.
  
-Invasion of Poland Map: http://en.wikipedia.org/wiki/Invasion_of_Poland#mediaviewer/File:Second_World_War_Europe.png
- 
+
 http://en.wikipedia.org/wiki/Soviet_invasion_of_Poland
  
 [Overlay] MolotovPactSovietPart
@@ -307,7 +300,6 @@ http://en.wikipedia.org/wiki/Siege_of_Warsaw_(1939)
 [Tags] Suursaari  island, Finland, Winter War
 [Loc] 60.450276,27.178459
 [Desc]The Soviet Union invades Finland.
- 
 Following the Soviet invasion of Poland in the fall of 1939, they turned their attention north to Finland. In November the Soviet Union demanded that the Finns move the border back 25km from Leningrad and grant them a 30-year lease on the Hanko Peninsula for construction of a naval base. In exchange, the Soviets offered a large tract of the Karelian wilderness. Termed as exchanging "two pounds of dirt for one pound of gold" by the Finns, the offer was flatly refused. Not to be denied, the Soviets began massing approximately 1 million men along the Finnish border.
  
 On November 26, 1939, the Soviets faked the Finnish shelling of the Russian town of Mainila. In the aftermath of the shelling, they demanded that the Finns apologize and withdraw their forces 25km from the border. Denying responsibility, the Finns refused. Four days later, 450,000 Soviet troops crossed the border. They were met by the small Finnish army which initially numbered only 180,000. The Finns were badly outnumbered in all areas during the conflict with the Soviets also possessing superiority in armor (6,541 to 30) and aircraft (3,800 to 130).
@@ -321,7 +313,8 @@ Finland had been under pressure from both Sweden and Germany for nearly a month 
 The Winter War proved a costly victory for the Soviets. In the fighting, they lost approximately 126,875 dead or missing, 264,908 wounded, and 5,600 captured. In addition, they lost around 2,268 tanks and armored cars. Casualties for the Finns numbered around 26,662 dead and 39,886 wounded. The Soviet's poor performance in the Winter War led Hitler to believe that Stalin's military could be quickly defeated if attacked. He attempted to put this to the test when German forces launched Operation Barbarossa in 1941. The Finns renewed their conflict with the Soviets in June 1941, with their forces operating in conjunction with, but not allied to, the Germans.
  
  
-Map – Finland ceded land: http://en.wikipedia.org/wiki/Winter_War#mediaviewer/File:Finnish_areas_ceded_in_1940.png
+Map photo:
+   – Finland ceded land
  
 http://www.historylearningsite.co.uk/winter_war_1939.htm
  
@@ -354,9 +347,10 @@ In the Second World War, the Battle of France, also known as the Fall of France,
  
 After the withdrawal of the BEF, Germany launched a second operation, Fall Rot (Case Red), which was commenced on 5 June 1940. While the depleted French forces put up stiff initial resistance, German air superiority and armoured mobility overwhelmed the remaining French forces. German armour outflanked the Maginot Line and pushed deep into France with German forces arriving in an undefended Paris on 14 June. This caused a chaotic period of flight for the French government and effectively ended organized French military resistance. German commanders finally met with French officials on June 18 with the goal of the new French government being an armistice with Germany. Chief among the new government leaders was Marshal Philippe Pétain, newly appointed prime minister and one of the supporters of seeking an armistice with Germany.
  
-Map – The German advance up to May 21, 1940: http://en.wikipedia.org/wiki/Battle_of_France#mediaviewer/File:21May-6June_Battle_of_Belgium.PNG
- 
-Map – Situation until Jun 4, 1940 : http://en.wikipedia.org/wiki/Battle_of_France#mediaviewer/File:21May-6June_Battle_of_Belgium.PNG
+The three map photos:
+   – The German advance up to May 21, 1940
+   - Situation 16 May and Operations since 10 May
+   – Situation until Jun 4, 1940
  
 http://en.wikipedia.org/wiki/Battle_of_France
  
@@ -401,9 +395,9 @@ http://en.wikipedia.org/wiki/Italian_invasion_of_France
 [Loc] 49.419684,2.82589
 [Desc]France Surrenders to Nazi Germany
 The Agreement includes the Germans occupy the northern half of the country and the entire Atlantic coastline. In southern France, a collaborationist regime with its capital in Vichy is established.
- 
-Here is the map showing how France get divided after the invasion:
-http://en.wikipedia.org/wiki/Axis_powers#mediaviewer/File:France_map_Lambert-93_with_regions_and_departments-occupation.svg
+
+Map photo:
+   - Occupied and annexed zones by Germany in shades of red, Italian occupation zones in shades of green, "Free zone" in blue.
  
 http://www.findingdulcinea.com/news/on-this-day/June/France-Surrenders-to-Nazi-Germany.html
  
@@ -444,8 +438,7 @@ After the success of Blitzkrieg, the evacuation of Dunkirk and the surrender of 
 The Germans needed to control the English Channel to launch her invasion of Britain (which the Germans code-named Operation Sealion).
 They needed this control of the Channel so that the British Navy would not be able to attack her invasion barges which were scheduled to land on the Kent and Sussex beaches.
 To control the Channel the Germans needed control of the air.
- 
-The battle map: http://en.wikipedia.org/wiki/Battle_of_Britain#mediaviewer/File:Battle_of_Britain_map.svg
+
  
 http://www.historylearningsite.co.uk/battleofbritain.htm
  
@@ -461,7 +454,8 @@ In addition to the Second Vienna Award, on 7 September 1940 the Cadrilater or "Q
  
 After WWII, the Paris Peace Treaties, signed on 10 February 1947, declared null and void both Vienna Awards, canceling Hungary's gains from Czechoslovakia and Romania.
  
-Map – Romania with Northen Transylvania in yellow: http://en.wikipedia.org/wiki/Vienna_Awards#mediaviewer/File:Northern_Transylvania_yellow.png
+Map photo
+   – Romania with Northen Transylvania in yellow.
  
 Vienna Awards 1 and 2 - http://en.wikipedia.org/wiki/Vienna_Awards
  
@@ -524,9 +518,7 @@ http://en.wikipedia.org/wiki/Tripartite_Pact
 On this day in 1940, Mussolini's army, already occupying Albania, invades Greece in what will prove to be a disastrous military campaign for the Duce's forces.
  
 Mussolini surprised everyone with this move against Greece; even his ally, Adolf Hitler, was caught off-guard, especially since the Duce had led Hitler to believe he had no such intention. Hitler denounced the move as a major strategic blunder. According to Hitler, Mussolini should have concentrated on North Africa, continuing the advance into Egypt. Even Mussolini's own chief of army staff found out about the invasion only after the fact. But despite being warned off an invasion of Greece by his own generals, despite the lack of preparedness on the part of his military, despite that it would mean getting bogged down in a mountainous country during the rainy season against an army willing to fight tooth and nail to defend its autonomy, Mussolini moved ahead out of sheer hubris, convinced he could defeat the Greeks in a matter of days. He also knew a secret, that millions of lire had been put aside to bribe Greek politicians and generals not to resist the Italian invasion. Whether the money ever made it past the Italian fascist agents delegated with the responsibility is unclear; if it did, it clearly made no difference whatsoever-the Greeks succeeded in pushing the Italian invaders back into Albania after just one week, and the Axis power spent the next three months fighting for its life in a defensive battle. To make matters worse, virtually half the Italian fleet at Taranto had been crippled by a British carrier-based attack. Mussolini had been humiliated.
- 
-Map - Initial Italy Attack: http://en.wikipedia.org/wiki/Greco-Italian_War#mediaviewer/File:GreekItalianinitialItal.JPG
- 
+
 http://www.history.com/this-day-in-history/italy-invades-greece
  
 http://en.wikipedia.org/wiki/Greco-Italian_War
@@ -544,7 +536,7 @@ The Axis Powers were one of two major military alliances during World War II. Th
  
 Stalin had also been approached and was considering signing. Of course, Hitler had no intention of permitting it. He was planning to invade the Soviet Union early in 1941.
  
-Final Allies/Axis countries map - http://en.wikipedia.org/wiki/Axis_powers#mediaviewer/File:WWII.png
+Map photo - Final Allies/Axis countries map:
 . Color Blue - Axis countries
 . Dark Green - Allied Powers
 . Light green – Allies entering after the Attack on Pearl Harbor
@@ -586,10 +578,10 @@ http://en.wikipedia.org/wiki/Afrika_Korps
 Germany, Italy, Hungary, and Bulgaria invade and dismember Yugoslavia. Yugoslavia surrenders on April 17. Germany and Bulgaria invade Greece in support of the Italians. Resistance in Greece ceases in early June 1941.
  
 See the shaded area on map for Yugoslavia during 1940s, now it has been divided into Slovenia, Montenegro, Kosovo, Croatia, Bosnia and Serbia.
- 
-Yugoslavia before invasion map: http://en.wikipedia.org/wiki/Axis_powers#mediaviewer/File:Yugoslavia1936physical.jpg
- 
-Yugoslavia after invasion map: http://en.wikipedia.org/wiki/Axis_powers#mediaviewer/File:Axis_occupation_of_Yugoslavia_1941-43.png
+
+Maps photos:
+  - Yugoslavia before invasion.
+  - Yugoslavia after invasion.
  
 http://en.wikipedia.org/wiki/Invasion_of_Yugoslavia
  
@@ -846,8 +838,6 @@ http://en.wikipedia.org/wiki/Bombing_of_Cologne_in_World_War_II
 British and US navies halt the Japanese naval advance in the central Pacific at Midway.
  
 Six months after the attack on Pearl Harbor, the United States defeated Japan in one of the most decisive naval battles of World War II. Thanks in part to major advances in code breaking, the United States was able to preempt and counter Japan’s planned ambush of its few remaining aircraft carriers, inflicting permanent damage on the Japanese Navy. An important turning point in the Pacific campaign, the victory allowed the United States and its allies to move into an offensive position.
- 
-Battle Plan map - http://en.wikipedia.org/wiki/Battle_of_Midway#mediaviewer/File:Battle_of_midway-deployment_map.svg
  
 http://www.history.com/topics/world-war-ii/battle-of-midway
  
@@ -1126,7 +1116,6 @@ http://en.wikipedia.org/wiki/Tehran_Conference
 [Tags]Anzio, Italy
 [Loc] 41.450290, 12.624050
 [Desc]Allied troops land near Anzio
- 
 The 1944 Battle of Anzio stemmed from the Allied attempt to draw German troops off the Gustav Line during Operation Shingle. An expeditionary force commanded by U.S. Major General John P. Lucas secured a beachhead near Anzio and Nettuno on Italy’s west coast, but his divisions were quickly contained by German Field Marshall Albert Kesselring. A succession of attacks resulted in heavy casualties on both sides, though no budge in the stalemate for four months. The Allies finally broke out of the beachhead in late May, facilitating the advance that led to the eventual capture of Rome.
  
 http://www.history.com/topics/world-war-ii/battle-of-anzio
@@ -1150,7 +1139,6 @@ http://en.wikipedia.org/wiki/Mikl%C3%B3s_Horthy
 [Tags]Rome, Italy
 [Loc] 41.891673, 12.591960
 [Desc]Allied troops liberate Rome.
- 
 After Benito Mussolini was deposed in July 1943, the new Italian government headed by Marshal Pietro Badoglio began secret surrender negotiations with the Allies. In mid-August, hoping to spare Rome from destruction, the new government declared it an ''open city'' -- in effect, a demilitarized zone free from military activity by the warring antagonists.
 Rome are still in Germany hands ….
  

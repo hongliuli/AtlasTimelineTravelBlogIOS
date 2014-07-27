@@ -85,13 +85,18 @@
         eventsFromStr = [self readEventsFromInternet];
         if (eventsFromStr == nil)
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event String from Internet error",nil) message:NSLocalizedString(@"Please contact support@chroniclemap.com to learn how to upload your authored contents",nil)
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event String from Internet error",nil) message:NSLocalizedString(@"Please contact support@chroniclemap.com to learn how to upload your authored contents and test on your iPad",nil)
                                                            delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [alert show];
             NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
             NSString* userEmail = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
             if (![userEmail isEqualToString:@"hongliuli@yahoo.com"])
+            {
                 [self.mapViewController closeAuthorView];
+                [userDefault removeObjectForKey:[ATConstants UserEmailKeyName]];
+                [userDefault removeObjectForKey:[ATConstants UserSecurityCodeKeyName]];
+                [userDefault synchronize];
+            }
             eventsFromStr = [self readEventsFromBundleFile]; //fallback to events in bundle file
         }
     }
@@ -141,7 +146,7 @@
 - (NSArray*) readEventsFromBundleFile
 {
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
-    NSString* eventFileName = [NSString stringWithFormat:@"EventsFileFor%@", targetName ];
+    NSString* eventFileName = [NSString stringWithFormat:NSLocalizedString(@"EventsFileFor%@",nil), targetName ];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:eventFileName ofType:@"txt"];
     NSArray* eventArray = nil;
     NSLog(@"========== readEvents filepath:%@,  fileNm=%@",filePath,eventFileName);

@@ -6,6 +6,12 @@
  Copyright (c) 2014 hong. All rights reserved.
  */
 
+/** Configuration Param **/
+"AuthorEmail"="support@chroniclemap.com";
+"EventsFileFor%@"="EventsFileFor%@_CH";
+
+/********* end configure param *******/
+
 "[+%d/-%d unsaved!]"="[+%d/-%d 没有保存!]";
 "7 Days"="7 天";
 "Month"="月";
@@ -51,7 +57,6 @@
 "Are you sure?"="确信吗?";
 "Are you sure to replace your offline copy?"="确信替换离线拷贝吗?";
 "Available zoom-levels: Month / Year  /10 Yrs / 100 Yrs / 1000 Yrs"="可用时间缩放级别有: 周（可选）/ 月 / 年  /10 年 / 100 年 / 1000 年";
-"AuthorEmail"="support@chroniclemap.com";
 "Back"="返回";
 "Backup myEvents to server"="备份myEvents到服务器";
 "Backup Photos (Full)"="完全备份";
@@ -150,6 +155,7 @@
 "Only when myEvents is active can you edit episode"="只有当 myEvents 被设为活跃后才能修改纪事";
 "Options"="选项";
 " Pick Episode to Share"=" 选一个片断来分享";
+"Please contact support@chroniclemap.com to learn how to upload your authored contents and test on your iPad"="请联系 support@chroniclemap.com, 让我们告诉你怎样上载你编辑的历史故事并且在iPad上测试！";
 "Please grant access in iOS Settings->Privacy->Contacts->Chronicle Map\n(This is optional. Address Book is used for you to find friend easily)"="请开放访问权限：在iOS的[设置->隐私->通讯录->Chronicle Map]\n(访问通讯录不是必须的，只是帮助你更容易地找到朋友.)";
 "Please Enter Valid Email Address."="请输入有效电子邮件地址.";
 "Please enter the security code you received in your email!"="请输入你在邮件中收到的安全代码!";
@@ -211,7 +217,7 @@
 "The access to Address Book has previously been denied"="访问通讯录曾被拒绝";
 "The correct date format is MM/dd/yyyy Era (such as %@)"="正确日期格式：MM/dd/yyyy Era (例如 %@)";
 "The events in this episode is no longer in myEvents, please remove this episode."="这个片断中的该事件已不在myEvents中，请删除.";
-"This App is supported by ChronicleMap App, which is a popular App to record personal life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get a sizable portion of revenue. All you have to do is to write story in text in a simple format.\n\nDetail see www.chroniclemap.com/authorarea"="该APP由ChronicleMap 开发。ChornicleMap APP 可以用来记录你的人生旅程，请从Apple APP Store下载！\n\n如果你有一个好的历史故事，帮助我们建立更大的历史事件APP库，则请联系我们，我们可以帮你拥有APP，得到可观的收入。你所要做的是把故事按照一个简单的正文格式写出来。\n\n详情访问 www.chroniclemap.com/authorarea";
+"This App is supported by ChronicleMap App, which is a popular App to record personal life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get a sizable portion of revenue. All you have to do is to write story in a simple text format.\n\nDetail see www.chroniclemap.com/authorarea"="该APP由ChronicleMap 开发。ChornicleMap APP 可以用来记录你的人生旅程，请从Apple APP Store下载！\n\n如果你有一个好的历史故事，帮助我们建立更大的历史事件APP库，则请联系我们，我们可以帮你拥有APP，得到可观的收入。你所要做的是把故事按照一个简单的正文格式写出来。\n\n详情访问 www.chroniclemap.com/authorarea";
 "This content may not have photos."="该内容可能没有照片.";
 "This episode is empty!"="该片断是空的!";
 "This is what is happening on your screen:"="下面解释你当前屏幕上所显示了什么:";

@@ -162,7 +162,7 @@ BOOL isAtLeast7;
             return 40;
     }
     else
-        return 120;
+        return [ATConstants eventListViewCellHeight];
 }
 
 - (BOOL) shouldHideArrowButtonRow:(int)row

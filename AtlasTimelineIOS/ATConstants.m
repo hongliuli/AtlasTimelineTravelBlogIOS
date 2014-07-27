@@ -286,7 +286,7 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         return 120;
     else
-        return 80;
+        return 100;
 }
 + (int) eventListViewCellNum{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
