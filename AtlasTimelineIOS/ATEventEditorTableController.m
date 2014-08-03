@@ -45,6 +45,8 @@
 
 #define AUTHOR_MODE_KEY @"AUTHOR_MODE_KEY"
 
+#define SECTION_2_HEIGHT 40
+
 @implementation ATEventEditorTableController
 
 static NSArray* _photoList = nil;
@@ -70,6 +72,7 @@ UIAlertView *alertCancel;
 
 int editorPhotoViewWidth;
 int editorPhotoViewHeight;
+
 
 #pragma mark UITableViewDelegate
 /*
@@ -98,7 +101,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     editorPhotoViewHeight = EDITOR_PHOTOVIEW_HEIGHT;
     self.description.editable = false;
     self.description.dataDetectorTypes = UIDataDetectorTypeLink;
-    CGRect frame = self.description.frame;
+    //CGRect frame = self.description.frame;
+    CGRect frame = CGRectMake(0, 0, 0, 0);
     frame.size.width = EDITOR_PHOTOVIEW_WIDTH - 20;
     frame.size.height = [self getEventEditorDescriptionHeight ];
     [self.description setFrame:frame];
@@ -120,7 +124,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [self.address setFrame:frame];
     }
     self.address.backgroundColor = [UIColor clearColor]; // [UIColor colorWithRed:1 green:1 blue:1 alpha:0.4];
-    self.description.backgroundColor = [UIColor clearColor];
+    self.description.backgroundColor = [UIColor whiteColor];
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
     
@@ -146,8 +150,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
        // ### IMPORTANT trick to remove cell background for the section 0's row 0
         cell.backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     }
-    cell.contentView.backgroundColor = [UIColor clearColor];
-    cell.backgroundColor = [UIColor clearColor];
+    cell.contentView.backgroundColor = [UIColor whiteColor];
+    cell.backgroundColor = [UIColor whiteColor];
     return cell;
 }
 -(void) resetEventEditor //called by mapview whenever bring up event editor
@@ -197,10 +201,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     else if (section == 2)
     {
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0, 300.0, 40.0)];
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0, 300.0, SECTION_2_HEIGHT)];
         
         //Label in the view
-        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 200, 40)];
+        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 200, SECTION_2_HEIGHT)];
         label.backgroundColor = [UIColor clearColor];
         label.text = NSLocalizedString(@"Tags, Address:",nil);
         [customView addSubview:label];
@@ -239,7 +243,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             self.photoAddBtn.hidden = true;
             self.photoSaveBtn.hidden = true;
         }
-        customView.backgroundColor = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0.1];
     }
 
     return customView;
@@ -334,7 +337,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     else if (section == 1)
         return 0;
     else if (section == 2)
-        return 30;
+        return SECTION_2_HEIGHT;
     else
         return [super tableView:tableView heightForHeaderInSection:section];
 }
