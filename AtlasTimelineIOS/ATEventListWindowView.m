@@ -135,10 +135,12 @@ BOOL isAtLeast7;
     if (focusedEvent != nil && [focusedEvent.uniqueId isEqual:evt.uniqueId])
     {
         [cell.checkIcon setHidden:false];
+        cell.backgroundColor = [UIColor redColor];
     }
     else
     {
         [cell.checkIcon setHidden:true];
+        cell.backgroundColor = [UIColor clearColor];
     }
         
     if (evt.eventType == EVENT_TYPE_HAS_PHOTO && isAtLeast7) //excusionPaths is available only after 7

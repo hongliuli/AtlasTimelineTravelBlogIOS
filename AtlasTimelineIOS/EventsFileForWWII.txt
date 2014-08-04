@@ -83,7 +83,7 @@ This incident is known as the Marco Polo Bridge Incident, or Lugouqiao Incident 
  
 Actually, Japan’s invasion and occupation of China began even earlier when it occupied Manchuria, the northeastern part of China, starting on September 18, 1931 (known as the 918 Incident), and then set up the puppet government in Manchuria known as Manchukuo.  What was special about the July 7, 1937 incident was that it triggered the large-scale war between China and Japan, which during the eight years of 1937-1945 resulted in the huge casualty previously mentioned.   Between 1931-1937,  there were also intermittent fighting against the Japanese invaders from various Chinese segments, including the regular army of the Chinese Nationalists, the guerrilla army of the Chinese Communists, or various Chinese insurgent fighting forces.  That is why sometimes the War of Resistance is known as the Fourteen Year War of Resistance from 1931-1945, and the Second Sino-Japanese War can sometimes be thought of starting in 1931。
  
-Map photo:
+Photo Map:
    - Japan occupation map around 1940:
  
 http://en.wikipedia.org/wiki/Second_Sino-Japanese_War
@@ -165,7 +165,7 @@ Tiso faced even more radical Slovak nationalists and their paramilitary Hlinka G
  
 Vojtech Tuka had been released from prison and became prime minister. An ally Ferdinand Durcansky was appointed foreign minister. Hlinka Guard commander Alexander Mach was appointed propaganda minister. Slovakia became a compliant NAZI puppetstate. A NAZI "advisory mission" was installed in each Slovak ministry. The Wehrmact had entered Slovakia (March 15) and soon was stationed throughout the country. Slovakia became the most slavishly obedient of all the NAZI satellite regimes.
  
-Map photo:
+Photo Map:
     - Slovak map in 1941
  
 http://en.wikipedia.org/wiki/Slovak_Republic_(1939%E2%80%9345)
@@ -313,7 +313,7 @@ Finland had been under pressure from both Sweden and Germany for nearly a month 
 The Winter War proved a costly victory for the Soviets. In the fighting, they lost approximately 126,875 dead or missing, 264,908 wounded, and 5,600 captured. In addition, they lost around 2,268 tanks and armored cars. Casualties for the Finns numbered around 26,662 dead and 39,886 wounded. The Soviet's poor performance in the Winter War led Hitler to believe that Stalin's military could be quickly defeated if attacked. He attempted to put this to the test when German forces launched Operation Barbarossa in 1941. The Finns renewed their conflict with the Soviets in June 1941, with their forces operating in conjunction with, but not allied to, the Germans.
  
  
-Map photo:
+Photo Map:
    – Finland ceded land
  
 http://www.historylearningsite.co.uk/winter_war_1939.htm
@@ -331,8 +331,7 @@ Germany's economy relied on over 11 million tons of iron ore imported from Swede
  
 The Altmark incident on 16 Feb 1940, where Norwegian gunboats stood by and allowed a British destroyer to board a German transport, however, changed the German viewpoint. The Norwegian lack of response in this particular incident, to Adolf Hitler, meant that Norway could easily full prey to an Allied invasion should the Allies chose to violate Norwegian neutrality, thus closing the iron ore supply route. Furthermore, an Allied violation of neutrality of Norway could very well be extended into Sweden as well. Hitler, therefore, decided that he must act.
  
-The German landing sites during the initial phase of Operation Weser-Exercise:
-http://en.wikipedia.org/wiki/Operation_Weser%C3%BCbung#mediaviewer/File:Weser%C3%BCbung.png
+Photo Map: The German landing sites during the initial phase of Operation Weser-Exercise:
  
 http://en.wikipedia.org/wiki/Operation_Weser%C3%BCbung
  
@@ -347,7 +346,7 @@ In the Second World War, the Battle of France, also known as the Fall of France,
  
 After the withdrawal of the BEF, Germany launched a second operation, Fall Rot (Case Red), which was commenced on 5 June 1940. While the depleted French forces put up stiff initial resistance, German air superiority and armoured mobility overwhelmed the remaining French forces. German armour outflanked the Maginot Line and pushed deep into France with German forces arriving in an undefended Paris on 14 June. This caused a chaotic period of flight for the French government and effectively ended organized French military resistance. German commanders finally met with French officials on June 18 with the goal of the new French government being an armistice with Germany. Chief among the new government leaders was Marshal Philippe Pétain, newly appointed prime minister and one of the supporters of seeking an armistice with Germany.
  
-The three map photos:
+The three Photo maps:
    – The German advance up to May 21, 1940
    - Situation 16 May and Operations since 10 May
    – Situation until Jun 4, 1940
@@ -368,14 +367,23 @@ http://www.historylearningsite.co.uk/german_plan_of_attack.htm
 [Loc] 51.99841,5.625
 [Desc]Netherlands surrenders to Germany
 The involvement of the Netherlands in World War II began with its invasion by Nazi Germany on 10 May 1940. The Netherlands had originally hoped to stay neutral when war broke out in 1939, but this wish was ignored. On 15 May 1940, one day after the bombing of Rotterdam, the Dutch forces surrendered. Subsequently the Dutch government and the royal family went into exile in London.
+
+Photo 1: Duche women who had sex with Germen wait for their fate
+Photo 2: Duch solder
+Photo 3: Germany officers
  
 http://en.wikipedia.org/wiki/Netherlands_in_World_War_II
  
 [Date]1940-05-28
-[Tags]Belgium
-[Loc] 50.833698,4.416504
+[Tags]Fort Eben-Emael, Belgium
+[Loc] 50.797624, 5.678912
 [Desc] Belgium surrenders to Germany
 The Battle of Belgium or Belgian Campaign, often referred to as the 18 Days' Campaign in Belgium, formed part of the greater Battle of France, an offensive campaign by Germany during the Second World War. It took place over 18 days in May 1940 and ended with the German occupation of Belgium following the surrender of the Belgian Army.
+
+Photos: Eben-Emael fortifications, the Belgians these can help to delay the Germans
+Photo: The future King Leopold III (left), with his father Albert I (right)
+Photo Map:
+    Map of the area between Belgium and the Netherlands near Fort Eben-Emael: The fort protected the vital stratgic bridgeheads into Belgium.
  
 http://en.wikipedia.org/wiki/Battle_of_Belgium
  
@@ -388,6 +396,8 @@ This is a small scale invation. When Mussolini saw how easily Germany was runnin
  
 Mussolini was upset by his sad performance and decided to prove to the world that the Roman empire had resurfaced. He ordered his army in Tripoli to invade Egypt. They did well at the beginning, but the vastly outnumbered British stopped them. After this halt, the British went over to the offensive and regained all of their ground and started driving into Italian territory. At this point, Hitler dispatched Rommel at the head of the DAK. Italy dreamed of reclaiming the former glory of Rome and becoming a true world power. It's problem was that it's military was not.
  
+Photo Map: Ambitions of Fascist Italy in Europe in 1936
+Photo:
 http://en.wikipedia.org/wiki/Italian_invasion_of_France
  
 [Date]1940-06-22
@@ -396,7 +406,7 @@ http://en.wikipedia.org/wiki/Italian_invasion_of_France
 [Desc]France Surrenders to Nazi Germany
 The Agreement includes the Germans occupy the northern half of the country and the entire Atlantic coastline. In southern France, a collaborationist regime with its capital in Vichy is established.
 
-Map photo:
+Photo Map:
    - Occupied and annexed zones by Germany in shades of red, Italian occupation zones in shades of green, "Free zone" in blue.
  
 http://www.findingdulcinea.com/news/on-this-day/June/France-Surrenders-to-Nazi-Germany.html
@@ -413,6 +423,12 @@ This was the military occupation of the formerly Romanian regions of Bessarabia 
  
 The Soviet Union had planned to accomplish the annexation with a full-scale invasion, but the Romanian government, responding to a Soviet ultimatum delivered on June 26, agreed to withdraw from the territories in order to avoid a military conflict. Germany, which had acknowledged the Soviet interest in Bessarabia in a secret protocol to the 1939 Molotov-Ribbentrop Pact, had been made aware prior to the planned ultimatum on June 24, but had not informed the Romanian authorities, nor were they willing to provide support.[3] The fall of France, a guarantor of Romania's borders, on 22 June, is considered an important factor in the Soviet decision to issue the ultimatum.
  
+Photos:
+    Refugees after occupation
+    Jews being deported to concentraion camps by the Romanian Army
+Photo Map:
+    Romania interwar
+
 http://en.wikipedia.org/wiki/Soviet_occupation_of_Bessarabia_and_Northern_Bukovina
 [Overlay]Basarabia
  
@@ -425,6 +441,8 @@ The occupation of the Baltic states refers to the military occupation of the thr
  
 As a result of the Baltic Offensive of 1944, the Soviet Union recaptured most of the Baltic states and trapped the remaining German forces in the Courland pocket until their formal surrender in May 1945.[4] The Soviet "annexation occupation" (Annexionsbesetzung or occupation sui generis) of the Baltic states lasted until August 1991, when the Baltic states regained independence.
  
+Photo Map: Planned and actual divisions of Europe, according to the Molotov-Rbbentrop Pact, with later adjstments.
+
 http://en.wikipedia.org/wiki/Occupation_of_the_Baltic_states
 [Overlay]BalticStates
  
@@ -454,7 +472,7 @@ In addition to the Second Vienna Award, on 7 September 1940 the Cadrilater or "Q
  
 After WWII, the Paris Peace Treaties, signed on 10 February 1947, declared null and void both Vienna Awards, canceling Hungary's gains from Czechoslovakia and Romania.
  
-Map photo
+Photo Map:
    – Romania with Northen Transylvania in yellow.
  
 Vienna Awards 1 and 2 - http://en.wikipedia.org/wiki/Vienna_Awards
@@ -471,6 +489,13 @@ http://en.wikipedia.org/wiki/Second_Vienna_Award
  
 A 7 months of bombing was the period of sustained strategic bombing of the United Kingdom by Nazi Germany during the Second World War.
 Between 7 Sept 1940 and 21 May 1941 there were major aerial raids (attacks in which more than 100 tonnes of high explosives were dropped) on 16 British cities. Over a period of 267 days (almost 37 weeks), London was attacked 71 times, Birmingham, Liverpool and Plymouth eight times, Bristol six, Glasgow five, Southampton four, Portsmouth and Hull three, and there was also at least one large raid on another eight cities This was a result of a rapid escalation starting on 24 August 1940, when night bombers aiming for RAF airfields drifted off course and accidentally destroyed several London homes, killing civilians, combined with the UK Prime Minister Winston Churchill's immediate response of bombing Berlin on the following night.
+
+Photos:
+    - A young woman plays a gramophone in an air raid shelter in noth London durint 1940.
+    - Subway station as bomb shelter
+    - Office workers make their way to work throught debris
+    - View from St. Paul's Cathedral after the Blitz.
+
  
 http://en.wikipedia.org/wiki/The_Blitz
 [Overlay] -3.021240234375,53.48477702972815,0.0 -3.1475830078125,53.366942995161345,0.0 -2.8509521484375,53.366942995161345,0.0 -3.021240234375,53.48477702972815,0.0
@@ -495,6 +520,11 @@ http://en.wikipedia.org/wiki/The_Blitz
 [Desc]Italy Invade Egypt
 The Italian invasion of Egypt was an Italian offensive action against British, Commonwealth and Free French forces during the Western Desert Campaign of the Second World War. Initially, the goal of the offensive was to seize the Suez Canal. To accomplish this, Italian forces from Libya would have to advance across northern Egypt to the canal. After numerous delays, the aim of the offensive was scaled back. Ultimately, the goal was to advance into Egypt and attack any forces confronting the advance.
  
+Photos:
+    - Two captured italian tankerttes
+    - Western Desert Map 1940
+
+
 http://en.wikipedia.org/wiki/Italian_invasion_of_Egypt
  
 [Date]1940-09-27
@@ -536,7 +566,7 @@ The Axis Powers were one of two major military alliances during World War II. Th
  
 Stalin had also been approached and was considering signing. Of course, Hitler had no intention of permitting it. He was planning to invade the Soviet Union early in 1941.
  
-Map photo - Final Allies/Axis countries map:
+Photo Map - Final Allies/Axis countries map:
 . Color Blue - Axis countries
 . Dark Green - Allied Powers
 . Light green – Allies entering after the Attack on Pearl Harbor
@@ -569,6 +599,9 @@ http://www.history.com/this-day-in-history/bulgaria-joins-the-axis
 [Desc] Erwin Rommel’s first attack in the Desert War.
 Adolf Hitler was shocked by the defeats being suffered by the Italian Army and in January 1941, sent General Erwin Rommel and the recently formed Deutsches Afrika Korps to North Africa. Rommel mounted his first attack on 24th March 1941, and after a week of fighting he pushed Archibald Wavell and the British Army out of most of Libya. However, under Lieutenant General Leslie Morshead the British managed to hold vital forward supply base at Tobruk.
  
+Photo 1: Rommel in North Africa
+Photo 2: 3 Germany Officer
+
 http://en.wikipedia.org/wiki/Afrika_Korps
  
 [Date]1941-04-06
@@ -616,6 +649,10 @@ http://en.wikipedia.org/wiki/Halfaya_Pass
 [Desc]Croatia Independent
 The leaders of the terrorist Ustasa movement proclaim the so-called Independent State of Croatia. Recognized immediately by Germany and Italy, the new state includes the province of Bosnia-Herzegovina. Croatia joins the Axis powers formally on June 15, 1941.
  
+Photos:
+    - Ustasa leader with Mussolini in Rome
+    - Ustasa leader with Hitler in Berlin
+
 http://www.history.com/this-day-in-history/croatia-declares-independence
  
 http://en.wikipedia.org/wiki/Usta%C5%A1e
@@ -725,6 +762,8 @@ Operation Crusader was a military operation by the British Eighth Army between 1
  
 The Eighth Army's initial plan to destroy the Axis armoured force before advancing its infantry came apart when, after a number of inconclusive engagements, the British 7th Armoured Division were heavily defeated by the Afrika Korps at Sidi Rezegh. Lieutenant General Erwin Rommel's subsequent advance of his armoured divisions to the Axis fortress positions on the Egyptian border failed to find the main body of the Allied infantry, which had bypassed the fortresses and headed for Tobruk, so Rommel had to withdraw his armoured units to support the fighting at Tobruk. Despite achieving some tactical successes at Tobruk, the need to preserve his remaining forces prompted Rommel to withdraw his army to the defensive line at Gazala, west of Tobruk, and then all the way back to El Agheila. It was the first victory over the German ground forces by British-led forces in the Second World War.
  
+Photo: Rommel conversing with his staff near EI Agheila, 12 January 1942
+
 https://en.m.wikipedia.org/wiki/Operation_Crusader
  
  
@@ -1041,8 +1080,6 @@ http://ww2db.com/battle_spec.php?battle_id=53
  
 http://en.wikipedia.org/wiki/Allied_invasion_of_Sicily
  
-[Overlay]Troina
-[Overlay]CataniaRegion
  
 [Date]1943-07-05
 [Tags]Kursk
@@ -1058,12 +1095,18 @@ http://en.wikipedia.org/wiki/Battle_of_Kursk
  
  
 [Date]1943-07-25
-[Tags]Rome, Mussolini, Badoglio
-[Loc] 41.900872, 12.405192
-[Desc]Depose Mussolini
+[Tags]Campo Imperatore Hotel, Italy
+[Loc] 42.357828, 13.396667
+[Desc]Depose Mussolini and Gran Sasso raid
 The Fascist Grand Council deposes Benito Mussolini, enabling Italian Marshall Pietro Badoglio to form a new government.
+
+Mussolini was being transported around Italy by his captors, (first in Ponza, then in La Maddalena, both small islands in Tyrrhenian sea) whilst Otto Skorzeny, selected personally by Hitler and Ernst Kaltenbrunner to carry out the mission, was tracking him. Later, Sept 1943, Mussolini was rescued.
+
+Mussolini was made leader of the Italian Social Republic (a German puppet state consisting of the German-occupied portion of Italy). Otto Skorzeny gained a large amount of success from this mission; he received a promotion to Sturmbannführer, the award of the Knight's Cross of the Iron Cross and fame that led to his "most dangerous man in Europe" image. Winston Churchill himself described the mission as "one of great daring."
+
+The Campo Imperatore Hotel still exists. The hotel maintains Mussolini's bedroom just as it was when he left it, with the same furnishings.[7]
  
-http://ww2today.com/25th-july-1943-italys-dictator-benito-mussolini-is-deposed
+http://en.wikipedia.org/wiki/Gran_Sasso_raid
  
  
 [Date]1943-09-08
@@ -1173,7 +1216,7 @@ http://en.wikipedia.org/wiki/Operation_Bagration
  
 [Date]1944-07-25
 [Tags]D-Day, St. Lô area
-[Loc] 45.001918, 6.598577
+[Loc] 49.373629, -1.444073
 [Desc] Operation Cobra
 Landing in Normandy on D-Day (June 6, 1944), Allied forces quickly consolidated their foothold in France. Pushing inland, American forces in the west encountered difficulty negotiating the bocage of Normandy. Slowed by this vast network of hedgerows, their advance was slow. As June passed, their greatest successes came on the Cotentin Peninsula where troops secured the key port of Cherbourg. To the east, British and Canadian forces fared little better as they sought to capture the city of Caen. Grappling with the Germans, the Allied efforts around the city succeeded drawing the bulk of the enemy armor to that sector.
  
@@ -1329,8 +1372,21 @@ http://en.wikipedia.org/wiki/Battle_of_Berlin
 [Loc] 45.812444, 15.977721
 [Desc] Yugoslav Communist counter-attack
 Partisan units, led by Yugoslav Communist leader Josip Tito, capture Zagreb and topple the Ustasa regime. The top Ustasa leaders flee to Italy and Austria.
- 
-http://www.axishistory.com/various/145-germany-heer/heer-unsorted/5402-contacts-between-german-forces-and-yugoslav-partisans
+
+The Partisans, or the National Liberation Army, officially the National Liberation Army and Partisan Detachments of Yugoslavia, was Europe's most effective anti-Nazi resistance movement, often compared to the Polish resistance movement, despite the latter was an exceptional, non-communist autonomic movement. The Yugoslav Resistance was led by the Communist Party of Yugoslavia[10] during World War II. Its commander was Marshal Josip Broz Tito.
+
+More about Tito and Yugoslav:
+
+For the republics of Yugoslavia (1944-1992), Marshall Tito cultivated socialist fraternity and a unity that took precedence over ethnic differences. Tito was a considered a benevolent Father about whom rousing songs were composed and whose portrait still occupies a prominent place some homes and public buildings. Children honored him en masse every year on his birthday, May 25. A child was proud to make a small speech, hand him flowers, or present the ceremonial stafeta at the end of a relay race. This semblance of unity was maintained by sending dissidents to work camps or demoting them from positions of power.
+
+Tito's death from cancer in May 1980 was a profound shock and provoked mourning throughout Yugoslavia. Many feared that without his presence unity could not be maintained. His coffin was placed on a train, which wound through the country, headed for an official state funeral in Belgrade. Huge crowds lined the tracks, carrying placards and singing songs that vowed to follow his path. Tito's burial was accompanied by a gun salute and the wailing of air-raid sirens.
+
+Yugoslav brotherhood and unity dissolved quickly following Tito's death, as his "sons" vied for the position of the Father. An escalation of gruesome and violent acts by citizens against one another led to demands for the autonomy of republics and to a fracturing along ethnic lines. Bosnia became the central site of a multicultural dissolution, engineered by Serbian leader Slobodan Milosevic. One of the most poignant symbols of this painful disintegration was the Croatian army's bombing of Bosnia's Mostar bridge, which brutally separated the city's Muslim and Croat populations.
+
+
+http://en.wikipedia.org/wiki/Josip_Broz_Tito
+
+http://en.wikipedia.org/wiki/Yugoslav_Partisans
  
 http://en.wikipedia.org/wiki/World_War_II_in_Yugoslavia
  

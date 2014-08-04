@@ -204,7 +204,7 @@
         //[Date] must be the first Metadata for each event in file, and must already sorted?
         NSArray* eventStrList = [eventsString componentsSeparatedByString: @"[Date]"];
         
-        NSMutableArray* uniqueIdCollection = [[NSMutableArray alloc] init];
+        NSMutableDictionary* uniqueIdCollectionDict = [[NSMutableDictionary alloc] init];
         int partOfUniqueId = 0;
         for (NSString* eventStr in eventStrList)
         {
@@ -286,9 +286,17 @@
             //because photo are stored in directory named with uniqueId, so after initial
             //    run, uniqueId should not be changed, otherwise photo may be lost
             NSString* uniqueId = datePart;
-            if ([uniqueIdCollection containsObject:uniqueId])
+            NSNumber* sameDateCountObj = [uniqueIdCollectionDict objectForKey:datePart];
+            if (sameDateCountObj == nil)
+            {
+                [uniqueIdCollectionDict setObject:[NSNumber numberWithInt:0] forKey:datePart];
+            }
+            else
+            {  //duplicated date will be sequenced to 1 2 3 ..
+                int partOfUniqueId = [sameDateCountObj intValue] + 1;
+                [uniqueIdCollectionDict setObject:[NSNumber numberWithInt:partOfUniqueId] forKey:datePart];
                 uniqueId = [NSString stringWithFormat:@"%@_%d", datePart, partOfUniqueId];
-            [uniqueIdCollection addObject:uniqueId];
+            }
             evt.uniqueId = uniqueId;
             partOfUniqueId++; //this will make sure generated uniqueId is unique when events have same date
             [eventList addObject:evt];

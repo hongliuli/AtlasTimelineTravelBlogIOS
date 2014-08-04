@@ -45,6 +45,7 @@
 
 #define AUTHOR_MODE_KEY @"AUTHOR_MODE_KEY"
 
+#define SECTION_1_ADVERTISE_HEIGHT 40
 #define SECTION_2_HEIGHT 40
 
 @implementation ATEventEditorTableController
@@ -244,6 +245,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             self.photoSaveBtn.hidden = true;
         }
     }
+    else if (section ==  1 && (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)) //advertize
+    {
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0, 300.0, SECTION_1_ADVERTISE_HEIGHT)];
+        [customView addSubview:self.gAdBannerView];
+        [customView addSubview:self.iAdBannerView];
+    }
 
     return customView;
 }
@@ -335,7 +342,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     if (section == 0)
         return editorPhotoViewHeight + 15; //IMPORTANT, this will decide where is clickable for my photoScrollView and Add Photo button. 15 is the gap between Date and photo scroll
     else if (section == 1)
-        return 0;
+    {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+            return SECTION_1_ADVERTISE_HEIGHT;
+        else
+            return 0;
+    }
     else if (section == 2)
         return SECTION_2_HEIGHT;
     else
@@ -688,7 +700,13 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         self.iAdBannerView = [[ADBannerView alloc]initWithFrame:rect];
         self.iAdBannerView.delegate = self;
         self.iAdBannerView.hidden = TRUE;
-        [self.view addSubview:self.iAdBannerView];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            rect = CGRectMake(0, -20, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+            [self.iAdBannerView setFrame:rect];
+        }
+        else
+            [self.view addSubview:self.iAdBannerView];
     }
 }
 
@@ -703,7 +721,13 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         self.gAdBannerView.rootViewController = self;
         self.gAdBannerView.delegate = self;
         self.gAdBannerView.hidden = TRUE;
-        [self.view addSubview:self.gAdBannerView];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            rect = CGRectMake(0, -20, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+            [self.gAdBannerView setFrame:rect];
+        }
+        else
+            [self.view addSubview:self.gAdBannerView];
     }
 }
 -(void)hideBanner:(UIView*)banner
@@ -761,6 +785,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+    /*
     //ATConstants screenHeight already considered screen orentation
     CGRect frame = self.iAdBannerView.frame;
     frame.origin.y = [ATConstants screenHeight] - 50;
@@ -769,6 +794,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     frame = self.gAdBannerView.frame;
     frame.origin.y = [ATConstants screenHeight] - 50;
     self.gAdBannerView.frame = frame;
+     */
 }
 
 - (void)viewDidUnload {

@@ -240,7 +240,7 @@
             @"This App is supported by ChronicleMap App, which is a popular App to record personal life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get a sizable portion of revenue. All you have to do is to write story in text in a simple format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
             delegate:self
             cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-            otherButtonTitles:buttonText, NSLocalizedString(@"Suggestion to Author",nil),nil];
+            otherButtonTitles:buttonText, NSLocalizedString(@"Feedback to Author",nil),nil];
     alert.tag = ALERT_FOR_SWITCH_AUTHO_MODE;
     [alert show];
 }
@@ -358,7 +358,7 @@
                 [self closeAuthorView];
             }
         }
-        if (buttonIndex == 2) //suggestion to
+        if (buttonIndex == 2) //Feedback to
         {
             NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
             //NSArray *toReceipients = @[@"aa@aa.com"];
