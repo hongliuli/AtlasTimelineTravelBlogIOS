@@ -23,6 +23,8 @@
 NSArray* internalEventList;
 BOOL isAtLeast7;
 
+NSDateFormatter *dateFormatter;
+
 - (id)initWithFrame:(CGRect)frame
 {
     if (self == [super initWithFrame:frame])
@@ -41,6 +43,11 @@ BOOL isAtLeast7;
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
         tap.numberOfTapsRequired =1;
         [self.tableView addGestureRecognizer:tap]; //IMPORTANT: I used [self addGest..] which cause sometime tap on a row does not react. After chage to self.tableView addGest.., it works much better
+        
+        dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+        [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+        [dateFormatter setLocale:[NSLocale currentLocale]];
 
     }
     return self;
@@ -110,15 +117,10 @@ BOOL isAtLeast7;
         //[cell.layer setBorderColor:(__bridge CGColorRef)([UIColor lightGrayColor])];
     }
 
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
-    [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-    [dateFormatter setLocale:[NSLocale currentLocale]];
-
     NSString* dateStr = [dateFormatter stringFromDate:evt.eventDate];
-    NSString* descStr = evt.eventDesc;
+    NSString* descStr = [evt.eventDesc substringToIndex:150];
     NSString* titleStr = @"";
-    NSString* descToDisplay = [NSString stringWithFormat:@"%@\n%@",dateStr, evt.eventDesc ];
+    NSString* descToDisplay = [NSString stringWithFormat:@"%@\n%@",dateStr, descStr ];
     
     int titleEndLocation = [descStr rangeOfString:@"\n"].location;
     if (titleEndLocation < 60) //title is in file as [Desc]xxx yyy zzzz\n

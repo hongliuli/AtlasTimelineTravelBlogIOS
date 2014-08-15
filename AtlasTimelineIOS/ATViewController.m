@@ -121,6 +121,9 @@
     MKAnnotationView* viewForEditorSizeChange;
     UIView* authorView;
     NSDate* tmpDateHold;
+    
+    ATEventDataStruct* currentSelectedEvent;
+    MKAnnotationView* currentSelectedEventAnn;
 }
 
 @synthesize mapView = _mapView;
@@ -851,7 +854,7 @@
     else if ([annotation isKindOfClass:[ATAnnotationSelected class]]) //all that read from db will be ATAnnotationSelected type
     {
         NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
-        
+
         selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate: specialMarkerName]; //keep this line here
         MKAnnotationView* annView;
         annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
@@ -971,6 +974,14 @@
          }
          */
         //annView.hidden = false;
+        
+        if (currentSelectedEvent != nil)
+        {
+            if ([currentSelectedEvent.uniqueId isEqualToString:ann.uniqueId])
+            {
+                currentSelectedEventAnn = annView;
+            }
+        }
         return annView;
     }
     else if ([annotation isKindOfClass:[ATAnnotationFocused class]]) //Focused annotation is added when tab focused
@@ -1056,6 +1067,8 @@
         tmpLbl.hidden=true;
     }
 }
+
+//After map scroll/zoom finish
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
     //TODO could set option to enable/disable hide white flag, because if large nmber of selected note, then move map may be slow
@@ -1074,6 +1087,15 @@
     regionChangeTimeStart = [[NSDate alloc] init];
     [self showDescriptionLabelViews:mapView];
     [self.mapView bringSubviewToFront:eventListView]; //so eventListView will always cover map marker photo/txt icon (tmpLbl)
+    
+    //show annotation info window programmatically, especially for when select on event list view
+    if (currentSelectedEventAnn != nil)
+    {
+        [self.mapView selectAnnotation:currentSelectedEventAnn.annotation animated:YES];
+        eventListView.hidden = false;
+        currentSelectedEventAnn = nil;
+        currentSelectedEvent = nil;
+    }
     
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
@@ -1501,6 +1523,7 @@
 //I could not explain, but for tap left annotation button to focuse date, have to to do focusedRow++ in ATTimeScrollWindowNew
 - (void) setNewFocusedDateAndUpdateMap:(ATEventDataStruct*) ent needAdjusted:(BOOL)needAdjusted
 {
+    currentSelectedEvent = ent;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.focusedDate = ent.eventDate;
     [self.timeScrollWindow setNewFocusedDateFromAnnotation:ent.eventDate needAdjusted:needAdjusted];
