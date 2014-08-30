@@ -118,7 +118,11 @@ NSDateFormatter *dateFormatter;
     }
 
     NSString* dateStr = [dateFormatter stringFromDate:evt.eventDate];
-    NSString* descStr = [evt.eventDesc substringToIndex:150];
+    NSString* descStr = evt.eventDesc;
+    if ([descStr length] > 150)
+    {
+        descStr = [evt.eventDesc substringToIndex:150];
+    }
     NSString* titleStr = @"";
     NSString* descToDisplay = [NSString stringWithFormat:@"%@\n%@",dateStr, descStr ];
     
