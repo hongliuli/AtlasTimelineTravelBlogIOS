@@ -1092,7 +1092,13 @@
     if (currentSelectedEventAnn != nil)
     {
         [self.mapView selectAnnotation:currentSelectedEventAnn.annotation animated:YES];
+        
+        self.timeScrollWindow.hidden=false;
         eventListView.hidden = false;
+        self.timeZoomLine.hidden = false;
+        [self showDescriptionLabelViews:self.mapView];
+        self.navigationController.navigationBarHidden = false;
+        
         currentSelectedEventAnn = nil;
         currentSelectedEvent = nil;
     }
@@ -2077,7 +2083,12 @@
             extra = 60; //previouse it was 0, now change to 40 after add up/down arrow, so have extra space to show partial arrow button
         newFrame = CGRectMake(0,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight] + extra);
     }
+    
+    self.timeScrollWindow.hidden=false;
     eventListView.hidden = false;
+    self.timeZoomLine.hidden = false;
+    [self showDescriptionLabelViews:self.mapView];
+    self.navigationController.navigationBarHidden = false;
     
     //important Tricky: bottom part of event list view is not clickable, thuse down arrow button always not clickable, add some height will works
     CGRect aaa = newFrame;
