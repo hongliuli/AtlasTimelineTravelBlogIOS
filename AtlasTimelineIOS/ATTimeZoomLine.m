@@ -525,6 +525,29 @@ NSDate* prevYearDate;
     mStartDateFromParent = startDate;
     mEndDateFromParent = endDate;
     
+    if (periodIndays <= 30)
+    {
+        timeScaleZoomLeveText.text = @"1mo";
+        if (periodIndays <= 7)
+            timeScaleZoomLeveText.text = @"1wk";
+    }
+    else if (periodIndays == 365)
+    {
+        timeScaleZoomLeveText.text = @"1yr";
+    }
+    else if (periodIndays == 3650)
+    {
+        timeScaleZoomLeveText.text = @"10yr";
+    }
+    else if (periodIndays == 36500)
+    {
+        timeScaleZoomLeveText.text = @"100yr";
+    }
+    else if (periodIndays == 365000)
+    {
+        timeScaleZoomLeveText.text = @"1000yr";
+    }
+    
     if (calendar == nil)
         calendar = [NSCalendar currentCalendar];
     
