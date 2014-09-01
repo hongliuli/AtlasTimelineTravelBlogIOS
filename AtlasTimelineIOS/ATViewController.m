@@ -431,7 +431,15 @@
         }
         appDelegate.focusedDate = entStruct.eventDate;
         appDelegate.focusedEvent = entStruct;  //appDelegate.focusedEvent is added when implement here
-        [self setNewFocusedDateAndUpdateMapWithNewCenter : entStruct :4]; //initially set map zoom to a reasonable zoom level so annotation marker icon can show
+        
+        NSString* bookmarkedZoomLevelStr = [userDefault valueForKey:@"BookmarkMapZoomLevel"];
+        int bookmarkedZoomLevel = 4;
+        if (bookmarkedZoomLevelStr != nil)
+        {
+            bookmarkedZoomLevel = [bookmarkedZoomLevelStr intValue];
+        }
+        
+        [self setNewFocusedDateAndUpdateMapWithNewCenter : entStruct :bookmarkedZoomLevel]; //initially set map zoom to a reasonable zoom level so annotation marker icon can show
         [self showOverlays];
     }
     
@@ -1102,7 +1110,10 @@
         currentSelectedEventAnn = nil;
         currentSelectedEvent = nil;
     }
-    
+    //bookmark zoom level so app restart will restore state
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    [userDefault setObject:[NSString stringWithFormat:@"%d",[self zoomLevel] ] forKey:@"BookmarkMapZoomLevel"];
+    [userDefault synchronize];
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
 {

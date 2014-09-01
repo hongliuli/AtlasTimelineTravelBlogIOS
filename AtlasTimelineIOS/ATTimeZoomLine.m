@@ -527,25 +527,25 @@ NSDate* prevYearDate;
     
     if (periodIndays <= 30)
     {
-        timeScaleZoomLeveText.text = @"1mo";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"1mo",nil);
         if (periodIndays <= 7)
-            timeScaleZoomLeveText.text = @"1wk";
+            timeScaleZoomLeveText.text = NSLocalizedString(@"1wk",nil);
     }
     else if (periodIndays == 365)
     {
-        timeScaleZoomLeveText.text = @"1yr";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"1yr",nil);
     }
     else if (periodIndays == 3650)
     {
-        timeScaleZoomLeveText.text = @"10yr";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"10yr",nil);
     }
     else if (periodIndays == 36500)
     {
-        timeScaleZoomLeveText.text = @"100yr";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"100yr",nil);
     }
     else if (periodIndays == 365000)
     {
-        timeScaleZoomLeveText.text = @"1000yr";
+        timeScaleZoomLeveText.text = NSLocalizedString(@"1000yr",nil);
     }
     
     if (calendar == nil)
