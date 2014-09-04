@@ -1028,6 +1028,7 @@
     {
         MKAnnotationView* annView = [tmpLblUniqueIdMap objectForKey:annViewKey];
         [self startEventEditor:annView];
+        [self refreshFocusedEvent:self.mapView :annView];
     }
 }
 
@@ -1281,60 +1282,63 @@
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
     //need use base class ATEventAnnotation here to handle call out for all type of annotation
-    ATEventAnnotation* ann = [view annotation];
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     
     if ([control.accessibilityLabel isEqualToString: @"right"]){
         [self startEventEditor:view];
     }
-    else if ([control.accessibilityLabel isEqualToString: @"left"]){
-        //NSLog(@"left button clicked");
-        
-        //get view location of an annotation
-        CGPoint annotationViewPoint = [mapView convertCoordinate:view.annotation.coordinate
-                                                   toPointToView:mapView];
-        
-        
-        CGRect newFrame = CGRectMake(annotationViewPoint.x,annotationViewPoint.y,0,0);//self.focusedEventLabel.frame;
-        self.focusedEventLabel.frame = newFrame;
-        self.focusedEventLabel.text = [NSString stringWithFormat:@" %@",[appDelegate.dateFormater stringFromDate: ann.eventDate]];
-        [self.focusedEventLabel setHidden:false];
-        [UIView transitionWithView:self.focusedEventLabel
-                          duration:0.5f
-                           options:UIViewAnimationCurveEaseInOut
-                        animations:^(void) {
-                            self.focusedEventLabel.frame = focusedLabelFrame;
-                        }
-                        completion:^(BOOL finished) {
-                            // Do nothing
-                            [self.focusedEventLabel setHidden:true];
-                        }];
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate :ann.description];
-        ATEventDataStruct* ent = [[ATEventDataStruct alloc] init];
-        ent.address = ann.address;
-        ent.lat = ann.coordinate.latitude;
-        ent.lng = ann.coordinate.longitude;
-        ent.eventDate = ann.eventDate;
-        ent.eventType = ann.eventType;
-        ent.eventDesc = ann.description;
-        ent.uniqueId = ann.uniqueId;
-        appDelegate.focusedEvent = ent;
-        
-        [self setNewFocusedDateAndUpdateMap:ent needAdjusted:TRUE]; //No reason, have to do focusedRow++ when focused a event in time wheel
-        mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
-        self.timeScrollWindow.hidden=false;
-        eventListView.hidden = false;
-        self.timeZoomLine.hidden = false;
-        self.navigationController.navigationBarHidden = false;
-        [self showAdAtTop:false];
-        appDelegate.focusedEvent = ent;
-        [self showOverlays];
-        [self refreshEventListView];
-        //bookmark selected event
-        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-        int idx = [appDelegate.eventListSorted indexOfObject:ent];
-        [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
-    }
+    
+        [self refreshFocusedEvent:mapView :view];
+
+}
+
+- (void) refreshFocusedEvent:(MKMapView*)mapView :(MKAnnotationView*)view
+{
+    //get view location of an annotation
+    CGPoint annotationViewPoint = [mapView convertCoordinate:view.annotation.coordinate
+                                               toPointToView:mapView];
+    
+    ATEventAnnotation* ann = [view annotation];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    
+    CGRect newFrame = CGRectMake(annotationViewPoint.x,annotationViewPoint.y,0,0);//self.focusedEventLabel.frame;
+    self.focusedEventLabel.frame = newFrame;
+    self.focusedEventLabel.text = [NSString stringWithFormat:@" %@",[appDelegate.dateFormater stringFromDate: ann.eventDate]];
+    [self.focusedEventLabel setHidden:false];
+    [UIView transitionWithView:self.focusedEventLabel
+                      duration:0.5f
+                       options:UIViewAnimationCurveEaseInOut
+                    animations:^(void) {
+                        self.focusedEventLabel.frame = focusedLabelFrame;
+                    }
+                    completion:^(BOOL finished) {
+                        // Do nothing
+                        [self.focusedEventLabel setHidden:true];
+                    }];
+    selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate :ann.description];
+    ATEventDataStruct* ent = [[ATEventDataStruct alloc] init];
+    ent.address = ann.address;
+    ent.lat = ann.coordinate.latitude;
+    ent.lng = ann.coordinate.longitude;
+    ent.eventDate = ann.eventDate;
+    ent.eventType = ann.eventType;
+    ent.eventDesc = ann.description;
+    ent.uniqueId = ann.uniqueId;
+    appDelegate.focusedEvent = ent;
+    
+    [self setNewFocusedDateAndUpdateMap:ent needAdjusted:TRUE]; //No reason, have to do focusedRow++ when focused a event in time wheel
+    mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+    self.timeScrollWindow.hidden=false;
+    eventListView.hidden = false;
+    self.timeZoomLine.hidden = false;
+    self.navigationController.navigationBarHidden = false;
+    [self showAdAtTop:false];
+    appDelegate.focusedEvent = ent;
+    [self showOverlays];
+    [self refreshEventListView];
+    //bookmark selected event
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    int idx = [appDelegate.eventListSorted indexOfObject:ent];
+    [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
 }
 
 - (void) startEventEditor:(MKAnnotationView*)view
