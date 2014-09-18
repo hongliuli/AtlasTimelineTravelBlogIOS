@@ -22,6 +22,7 @@
 
 NSArray* internalEventList;
 BOOL isAtLeast7;
+BOOL eventListViewInMapModeFlag;
 
 NSDateFormatter *dateFormatter;
 
@@ -79,10 +80,13 @@ NSDateFormatter *dateFormatter;
         if ([self shouldHideArrowButtonRow:indexPath.row])
             return cell;
         cell.selectionStyle = UITableViewCellStyleDefault;
-        CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, 10, 100, 40);
-        UIImageView* upArrow = [[UIImageView alloc] initWithFrame:imageFrame];
-        [upArrow setImage:[UIImage imageNamed:@"arrow-up-icon.png"]];
-        [cell.contentView addSubview:upArrow]; //gotoPrevEventAction is hadled by didSelected...
+        if (!eventListViewInMapModeFlag)
+        {
+            CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, 10, 100, 40);
+            UIImageView* upArrow = [[UIImageView alloc] initWithFrame:imageFrame];
+            [upArrow setImage:[UIImage imageNamed:@"arrow-up-icon.png"]];
+            [cell.contentView addSubview:upArrow]; //gotoPrevEventAction is hadled by didSelected...
+        }
         cell.contentView.backgroundColor = [UIColor clearColor];
         cell.backgroundColor= [UIColor clearColor];
         return cell;
@@ -93,10 +97,13 @@ NSDateFormatter *dateFormatter;
         if ([self shouldHideArrowButtonRow:indexPath.row])
             return cell;
         cell.selectionStyle = UITableViewCellStyleDefault;
-        CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, -5, 100, 40);
-        UIImageView* downArrow = [[UIImageView alloc] initWithFrame:imageFrame];
-        [downArrow setImage:[UIImage imageNamed:@"arrow-down-icon.png"]];
-        [cell.contentView addSubview:downArrow];
+        if (!eventListViewInMapModeFlag)
+        {
+            CGRect imageFrame = CGRectMake([ATConstants eventListViewCellWidth]/2 - 50, -5, 100, 40);
+            UIImageView* downArrow = [[UIImageView alloc] initWithFrame:imageFrame];
+            [downArrow setImage:[UIImage imageNamed:@"arrow-down-icon.png"]];
+            [cell.contentView addSubview:downArrow];
+        }
         cell.contentView.backgroundColor = [UIColor clearColor];
         cell.backgroundColor= [UIColor clearColor];
         return cell;
@@ -164,7 +171,7 @@ NSDateFormatter *dateFormatter;
     if (indexPath.row == 0 || indexPath.row == [internalEventList count] - 1)
     {
         //Do not show arrow button if reach last or begin of events
-        if ([self shouldHideArrowButtonRow:indexPath.row])
+        if ([self shouldHideArrowButtonRow:indexPath.row] || eventListViewInMapModeFlag)
             return 0;
         else
             return 40;
@@ -209,7 +216,7 @@ NSDateFormatter *dateFormatter;
         
         [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
         [mapView showOverlays];
-        [mapView refreshEventListView];
+        [mapView refreshEventListView:false];
     }
     else if (indexPath.row == [internalEventList count] - 1)
     {
@@ -220,7 +227,7 @@ NSDateFormatter *dateFormatter;
         
         [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
         [mapView showOverlays];
-        [mapView refreshEventListView];
+        [mapView refreshEventListView:false];
     }
     else{ //Do not change focused event for up/down arrow cause
         appDelegate.focusedDate = evt.eventDate;
@@ -240,8 +247,9 @@ NSDateFormatter *dateFormatter;
     }
 
 }
-- (void) refresh:(NSMutableArray*)eventList //called by mapview::refreshEventListView()
+- (void) refresh:(NSMutableArray*)eventList :(BOOL)eventListViewInMapModeFlagArg //called by mapview::refreshEventListView()
 {
+    eventListViewInMapModeFlag = eventListViewInMapModeFlagArg;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     [eventList addObject:[[ATEventDataStruct alloc] init]];
     [eventList insertObject:[[ATEventDataStruct alloc] init] atIndex:0];

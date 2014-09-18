@@ -733,7 +733,7 @@
         pinchVelocity = 999; //reuse code for pinch. as long as greate than 0
         [self doTimewheelZooming:pinchVelocity];
     }
-    [appDelegate.mapViewController refreshEventListView];
+    [appDelegate.mapViewController refreshEventListView:true];
 }
 
 //Following two action is not used because I removed zoom-in-out button
@@ -742,14 +742,14 @@
     pinchVelocity = 999; //reuse code for pinch. as long as greate than 0
     [self doTimewheelZooming:pinchVelocity];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate.mapViewController refreshEventListView];
+    [appDelegate.mapViewController refreshEventListView:true];
 }
 -(void) zoomOutAction:(id)sender
 {
     pinchVelocity = -999; //reuse code for pinch. as long as greate than 0
     [self doTimewheelZooming:pinchVelocity];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate.mapViewController refreshEventListView];
+    [appDelegate.mapViewController refreshEventListView:true];
 }
 
 -(void) gotoPrevEventAction:(id)sender
@@ -778,7 +778,7 @@
     //Should not do this: [self.parent setNewFocusedDateAndUpdateMapWithNewCenter : prevEvent :-1]; //do not change map zoom level
     [self performSettingFocusedRowForDate:prevEvent.eventDate needAdjusted:FALSE];
     [self.parent refreshAnnotations];
-    [self.parent refreshEventListView];
+    [self.parent refreshEventListView:true];
 }
 -(void) gotoNextEventAction:(id)sender
 {
@@ -805,7 +805,7 @@
     //Should not do this: it is wrong idea: [self.parent setNewFocusedDateAndUpdateMapWithNewCenter : nextEvent :-1]; //do not change map zoom level
     [self performSettingFocusedRowForDate:nextEvent.eventDate needAdjusted:FALSE];
     [self.parent refreshAnnotations];
-    [self.parent refreshEventListView];
+    [self.parent refreshEventListView:true];
 }
 //have tap gesture achive two thing: prevent call tapGesture on parent mapView and process select a row action without a TableViewController
 - (void)handleTapGesture:(UIGestureRecognizer *)gestureRecognizer
@@ -910,7 +910,7 @@
     [self.parent.timeZoomLine changeDateText];
     [self.parent.timeZoomLine changeScaleText];
     [self.parent refreshAnnotations];
-    [self.parent refreshEventListView];
+    [self.parent refreshEventListView:true];
     [self changeFocusedCellColorToRed ];
     
     //animate button for emphasis

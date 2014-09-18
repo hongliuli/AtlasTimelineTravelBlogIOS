@@ -35,6 +35,7 @@
 #import "ATInAppPurchaseViewController.h"
 #import "ATEventListWindowView.h"
 #import "ATCell.h"
+#import "Toast+UIView.h"
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
@@ -101,6 +102,7 @@
     NSDate* regionChangeTimeStart;
     ATDefaultAnnotation* newAddedPin;
     UIButton *locationbtn;
+    UIButton *switchEventListViewModeBtn;
     CGRect timeScrollWindowFrame;
     ATTutorialView* tutorialView;
     
@@ -124,7 +126,11 @@
     NSDate* tmpDateHold;
     
     ATEventDataStruct* currentSelectedEvent;
-    MKAnnotationView* currentSelectedEventAnn;
+    MKAnnotationView* selectedEventAnnInEventListView;
+    MKAnnotationView* selectedEventAnnOnMap;
+    
+    BOOL switchEventListViewModeToVisibleOnMapFlag;
+    NSMutableArray* eventListInVisibleMapArea;
 }
 
 @synthesize mapView = _mapView;
@@ -138,6 +144,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    switchEventListViewModeToVisibleOnMapFlag = false; //eventListView for timewheel is more reasonable, so make it as default always, even not save to userDefault
     [ATHelper createPhotoDocumentoryPath];
     //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.locationManager = [[CLLocationManager alloc] init];
@@ -200,6 +207,18 @@
     [self initiAdBanner];
     [self initgAdBanner];
     
+    //For eventlistview mode
+    if (switchEventListViewModeBtn == nil)
+        switchEventListViewModeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    else
+        [switchEventListViewModeBtn removeFromSuperview];
+    switchEventListViewModeBtn.frame = CGRectMake(20, 70, 40, 40);
+    [switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon.png"] forState:UIControlStateNormal];
+    [switchEventListViewModeBtn addTarget:self action:@selector(switchEventListViewMode:) forControlEvents:UIControlEventTouchUpInside];
+    [self.mapView addSubview:switchEventListViewModeBtn];
+    switchEventListViewModeToVisibleOnMapFlag = false;
+    eventListInVisibleMapArea = nil;
+    [self refreshEventListView:false];
 
 }
 -(void) viewDidAppear:(BOOL)animated
@@ -225,7 +244,7 @@
         [eventListView.tableView setBackgroundColor:[UIColor clearColor] ];// colorWithRed:1 green:1 blue:1 alpha:0.7]];
         [self.mapView addSubview:eventListView];
     }
-    [self refreshEventListView];
+    [self refreshEventListView:false];
     
 }
 
@@ -266,6 +285,28 @@
     // set the region like normal
     [self.mapView setRegion:region animated:YES];
 }
+
+
+-(void) switchEventListViewMode:(id)sender
+{
+    if (switchEventListViewModeToVisibleOnMapFlag)
+    {
+        switchEventListViewModeToVisibleOnMapFlag = false;
+        eventListInVisibleMapArea = nil; //IMPORTANT: refreshEventListView will use this is nil or not to decide if in map event list view mode, do not refresh if scroll timewheel
+        [switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon.png"] forState:UIControlStateNormal];
+        [self.mapView makeToast:NSLocalizedString(@"Show events in selected time period (default)",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(210, 90)]];
+        [self refreshEventListView:false];
+    }
+    else
+    {
+        switchEventListViewModeToVisibleOnMapFlag = true;
+        [switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Maps-icon.png"] forState:UIControlStateNormal];
+        [self.mapView makeToast:NSLocalizedString(@"Show events currently on screen (map)",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(200, 90)]];
+        [self refreshEventListView:false];
+    }
+}
+
+
 #pragma mark - CLLocationManagerDelegate
 
 -(void) tutorialClicked:(id)sender //Only iPad come here. on iPhone will be frome inside settings and use push segue
@@ -988,7 +1029,7 @@
         {
             if ([currentSelectedEvent.uniqueId isEqualToString:ann.uniqueId])
             {
-                currentSelectedEventAnn = annView;
+                selectedEventAnnInEventListView = annView;
             }
         }
         return annView;
@@ -1029,7 +1070,8 @@
     {
         MKAnnotationView* annView = [tmpLblUniqueIdMap objectForKey:annViewKey];
         [self startEventEditor:annView];
-        [self refreshFocusedEvent:self.mapView :annView];
+        selectedEventAnnOnMap = annView;
+        [self refreshFocusedEvent];
     }
 }
 
@@ -1092,6 +1134,54 @@
         }
     }
     
+    //******************** get annotations on the screen map and show in event list view
+    //Do following if 1) map mode for event viewlist
+    //                2) map zoom level is at state level
+    //                3) eventlistview is not hidden
+    
+    eventListInVisibleMapArea = nil;
+    if (switchEventListViewModeToVisibleOnMapFlag)
+    {
+        if (eventListInVisibleMapArea == nil)
+            eventListInVisibleMapArea = [[NSMutableArray alloc] init];
+        else
+            [eventListInVisibleMapArea removeAllObjects];
+        
+        if ([self zoomLevel] >= 7)
+        {
+            
+            NSSet *nearbySet = [self.mapView annotationsInMapRect:self.mapView.visibleMapRect];
+            NSMutableArray* uniqueIdSet = [[NSMutableArray alloc] init];
+            for(MKAnnotationView* annView in nearbySet)
+            {
+                if ([annView isKindOfClass:[MKUserLocation class]])
+                    continue; //filter out MKUserLocation pin
+                ATDefaultAnnotation* ann = (ATDefaultAnnotation*)annView;
+                if (ann.uniqueId != nil)
+                    [uniqueIdSet addObject:ann.uniqueId];
+            }
+            //big performance hit
+            ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+            NSArray* allEvents = [appDelegate eventListSorted];
+            int sizeInMap = [uniqueIdSet count];
+            int cnt = 0;
+            for(ATEventDataStruct* evt in allEvents)
+            {
+                if ([uniqueIdSet containsObject: evt.uniqueId])
+                {
+                    [eventListInVisibleMapArea insertObject:evt atIndex:0];
+                    cnt ++;
+                }
+                if (cnt == sizeInMap) //to improve performance for most case
+                    break;
+            }
+        }
+        if (eventListView.hidden == false)
+            [self refreshEventListView:false];
+    }
+    //******************
+    
+
     //NSLog(@"retion didChange, zoom level is %i", [self zoomLevel]);
     [self.timeZoomLine setNeedsDisplay];
     regionChangeTimeStart = [[NSDate alloc] init];
@@ -1099,9 +1189,9 @@
     [self.mapView bringSubviewToFront:eventListView]; //so eventListView will always cover map marker photo/txt icon (tmpLbl)
     
     //show annotation info window programmatically, especially for when select on event list view
-    if (currentSelectedEventAnn != nil)
+    if (selectedEventAnnInEventListView != nil)
     {
-        [self.mapView selectAnnotation:currentSelectedEventAnn.annotation animated:YES];
+        [self.mapView selectAnnotation:selectedEventAnnInEventListView.annotation animated:YES];
         
         self.timeScrollWindow.hidden=false;
         eventListView.hidden = false;
@@ -1109,7 +1199,7 @@
         [self showDescriptionLabelViews:self.mapView];
         self.navigationController.navigationBarHidden = false;
         
-        currentSelectedEventAnn = nil;
+        selectedEventAnnInEventListView = nil;
         currentSelectedEvent = nil;
     }
     //bookmark zoom level so app restart will restore state
@@ -1287,34 +1377,39 @@
     if ([control.accessibilityLabel isEqualToString: @"right"]){
         [self startEventEditor:view];
     }
-    
-        [self refreshFocusedEvent:mapView :view];
-
+    selectedEventAnnOnMap = view;
+    [self refreshFocusedEvent];
 }
 
-- (void) refreshFocusedEvent:(MKMapView*)mapView :(MKAnnotationView*)view
+- (void) refreshFocusedEvent
 {
-    //get view location of an annotation
-    CGPoint annotationViewPoint = [mapView convertCoordinate:view.annotation.coordinate
-                                               toPointToView:mapView];
-    
+    if (selectedEventAnnOnMap == nil || switchEventListViewModeToVisibleOnMapFlag)
+        return; //do not focuse when popup event editor in map event list mode for two reason:
+    // 1. conceptually it is not neccessary   2. there is a small but if do so
+    //MKMapView* mapView = self.mapView;
+    MKAnnotationView* view = selectedEventAnnOnMap;
+    //need use base class ATEventAnnotation here to handle call out for all type of annotation
     ATEventAnnotation* ann = [view annotation];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    
-    CGRect newFrame = CGRectMake(annotationViewPoint.x,annotationViewPoint.y,0,0);//self.focusedEventLabel.frame;
-    self.focusedEventLabel.frame = newFrame;
-    self.focusedEventLabel.text = [NSString stringWithFormat:@" %@",[appDelegate.dateFormater stringFromDate: ann.eventDate]];
-    [self.focusedEventLabel setHidden:false];
-    [UIView transitionWithView:self.focusedEventLabel
-                      duration:0.5f
-                       options:UIViewAnimationCurveEaseInOut
-                    animations:^(void) {
-                        self.focusedEventLabel.frame = focusedLabelFrame;
-                    }
-                    completion:^(BOOL finished) {
-                        // Do nothing
-                        [self.focusedEventLabel setHidden:true];
-                    }];
+    /********** remove annimation of focuse event, I think it is not neccessary
+     //get view location of an annotation
+     CGPoint annotationViewPoint = [mapView convertCoordinate:view.annotation.coordinate
+     toPointToView:mapView];
+     CGRect newFrame = CGRectMake(annotationViewPoint.x,annotationViewPoint.y,0,0);//self.focusedEventLabel.frame;
+     self.focusedEventLabel.frame = newFrame;
+     self.focusedEventLabel.text = [NSString stringWithFormat:@" %@",[appDelegate.dateFormater stringFromDate: ann.eventDate]];
+     [self.focusedEventLabel setHidden:false];
+     [UIView transitionWithView:self.focusedEventLabel
+     duration:0.5f
+     options:UIViewAnimationCurveEaseInOut
+     animations:^(void) {
+     self.focusedEventLabel.frame = focusedLabelFrame;
+     }
+     completion:^(BOOL finished) {
+     // Do nothing
+     [self.focusedEventLabel setHidden:true];
+     }];
+     ***********/
     selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate :ann.description];
     ATEventDataStruct* ent = [[ATEventDataStruct alloc] init];
     ent.address = ann.address;
@@ -1332,16 +1427,14 @@
     eventListView.hidden = false;
     self.timeZoomLine.hidden = false;
     self.navigationController.navigationBarHidden = false;
-    [self showAdAtTop:false];
     appDelegate.focusedEvent = ent;
-    [self showOverlays];
-    [self refreshEventListView];
+    [self refreshEventListView:false];
     //bookmark selected event
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     int idx = [appDelegate.eventListSorted indexOfObject:ent];
     [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
+    [userDefault synchronize];
 }
-
 - (void) startEventEditor:(MKAnnotationView*)view
 {
     viewForEditorSizeChange = view;
@@ -1697,7 +1790,7 @@
         [self.eventEditorPopover dismissPopoverAnimated:true];
     if (self.timeZoomLine != nil)
         [self.timeZoomLine setNeedsDisplay];
-    [self refreshEventListView];
+    [self refreshEventListView:false];
 }
 - (void)cancelEvent{
     if (self.eventEditorPopover != nil)
@@ -1777,7 +1870,7 @@
         [self.timeZoomLine setNeedsDisplay];
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
-    [self refreshEventListView];
+    [self refreshEventListView:false];
     
     //TODO save metaFile
     NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:newData.uniqueId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
@@ -2023,72 +2116,82 @@
 }
 
 
-- (void) refreshEventListView
+- (void) refreshEventListView:(BOOL)callFromScrollTimewheel
 {
+    if (callFromScrollTimewheel && switchEventListViewModeToVisibleOnMapFlag)
+        return; //while in map eventListView mode, move timewheel will call this function as well, but do nothing. eventListInVisibleMapArea is set to nil in switch button action
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    
-    NSDictionary* scaleDateDic = [ATHelper getScaleStartEndDate:appDelegate.focusedDate];
-    NSDate* scaleStartDay = [scaleDateDic objectForKey:@"START"];
-    NSDate* scaleEndDay = [scaleDateDic objectForKey:@"END"];
-    
     int offset = 60;
-
-    if ([self.startDate compare:scaleStartDay] == NSOrderedDescending)
-        scaleStartDay = self.startDate;
-    if ([self.endDate compare:scaleEndDay] == NSOrderedAscending)
-        scaleEndDay = self.endDate;
-    //NSLog(@" === scaleStartDate = %@,  scaleEndDay = %@", scaleStartDay, scaleEndDay);
-    NSArray* allEventSortedList = appDelegate.eventListSorted;
     //try to move evetlistview to right side screenWidht - eventListViewCellWidth, but a lot of trouble, not know why
     //  even make x to 30, it will move more than 30, besides, not left side tap works
     CGRect newFrame = CGRectMake(0,offset,0,0);
     int numOfCellOnScreen = 0;
     
-    NSMutableArray* eventListViewList = [[NSMutableArray alloc] init];
     
-    int cnt = [allEventSortedList count];
-    if (cnt == 0 )
-    {
-        [eventListView setFrame:newFrame];
-        [eventListView.tableView setFrame:newFrame];
-        [eventListView refresh:eventListViewList];
-        return;
-    }
-    ATEventDataStruct* latestEvent = allEventSortedList[0];
-    ATEventDataStruct* earlistEvent = allEventSortedList[cnt -1];
+    NSMutableArray* eventListViewList = eventListInVisibleMapArea;
     
-    //case special: where startDate/EndDate range is totally outside the event date range, or even no event at all
-    if ([scaleStartDay compare:latestEvent.eventDate] == NSOrderedDescending || [scaleEndDay compare: earlistEvent.eventDate] == NSOrderedAscending)
+    if (eventListInVisibleMapArea == nil && switchEventListViewModeToVisibleOnMapFlag == false) //it means eventlistView will show events inside timewheel period
     {
-        [eventListView setFrame:newFrame];
-        [eventListView.tableView setFrame:newFrame];
-        [eventListView refresh: eventListViewList];
-        return;
-    }
-    //come here when there start/end date range has intersect with allEventSorted
-    BOOL completeFlag = false;
-    for (int i=0; i<cnt;i++)
-    {
-        ATEventDataStruct* evt = allEventSortedList[i];
-        if ([self date:evt.eventDate isBetweenDate :scaleStartDay andDate:scaleEndDay])
+        NSDictionary* scaleDateDic = [ATHelper getScaleStartEndDate:appDelegate.focusedDate];
+        NSDate* scaleStartDay = [scaleDateDic objectForKey:@"START"];
+        NSDate* scaleEndDay = [scaleDateDic objectForKey:@"END"];
+        
+        
+        
+        if ([self.startDate compare:scaleStartDay] == NSOrderedDescending)
+            scaleStartDay = self.startDate;
+        if ([self.endDate compare:scaleEndDay] == NSOrderedAscending)
+            scaleEndDay = self.endDate;
+        //NSLog(@" === scaleStartDate = %@,  scaleEndDay = %@", scaleStartDay, scaleEndDay);
+        NSArray* allEventSortedList = appDelegate.eventListSorted;
+        
+        
+        eventListViewList = [[NSMutableArray alloc] init];
+        
+        int cnt = [allEventSortedList count];
+        if (cnt == 0 )
         {
-            [eventListViewList insertObject:evt atIndex:0]; //so event will order by date in regular sequence
-            completeFlag = true;
+            [eventListView setFrame:newFrame];
+            [eventListView.tableView setFrame:newFrame];
+            [eventListView refresh:eventListViewList: switchEventListViewModeToVisibleOnMapFlag];
+            return;
         }
-        else
+        ATEventDataStruct* latestEvent = allEventSortedList[0];
+        ATEventDataStruct* earlistEvent = allEventSortedList[cnt -1];
+        
+        //case special: where startDate/EndDate range is totally outside the event date range, or even no event at all
+        if ([scaleStartDay compare:latestEvent.eventDate] == NSOrderedDescending || [scaleEndDay compare: earlistEvent.eventDate] == NSOrderedAscending)
         {
-            if (completeFlag == true)
-                break; //this is a trick to enhance performance. Do not continues because all in range has been added
+            [eventListView setFrame:newFrame];
+            [eventListView.tableView setFrame:newFrame];
+            [eventListView refresh: eventListViewList :switchEventListViewModeToVisibleOnMapFlag];
+            return;
+        }
+        //come here when there start/end date range has intersect with allEventSorted
+        BOOL completeFlag = false;
+        for (int i=0; i<cnt;i++)
+        {
+            ATEventDataStruct* evt = allEventSortedList[i];
+            if ([self date:evt.eventDate isBetweenDate :scaleStartDay andDate:scaleEndDay])
+            {
+                [eventListViewList insertObject:evt atIndex:0]; //so event will order by date in regular sequence
+                completeFlag = true;
+            }
+            else
+            {
+                if (completeFlag == true)
+                    break; //this is a trick to enhance performance. Do not continues because all in range has been added
+            }
         }
     }
     //above logic will remain startDateIdx/endDateIdx to be -1 if no events
-    cnt = [eventListViewList count]; //Inside ATEventListWindow, this will add two rows for arrow button, one at top, one at bottom
+    int cnt = [eventListViewList count]; //Inside ATEventListWindow, this will add two rows for arrow button, one at top, one at bottom
     if (cnt > 0)
     {
         numOfCellOnScreen = cnt;
         if (cnt > [ATConstants eventListViewCellNum])
             numOfCellOnScreen = [ATConstants eventListViewCellNum];
-
+        
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
         {
             if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
@@ -2120,9 +2223,9 @@
     [eventListView setFrame:aaa];
     
     [eventListView.tableView setFrame:newFrame];
-    [eventListView refresh: eventListViewList];
-}
-- (BOOL)date:(NSDate*)date isBetweenDate:(NSDate*)beginDate andDate:(NSDate*)endDate
+    if (eventListViewList != nil)
+        [eventListView refresh: eventListViewList :switchEventListViewModeToVisibleOnMapFlag];
+}- (BOOL)date:(NSDate*)date isBetweenDate:(NSDate*)beginDate andDate:(NSDate*)endDate
 {
     if ([date compare:beginDate] == NSOrderedAscending)
         return NO;
@@ -2162,7 +2265,7 @@
                     completion:^(BOOL finished) {[self partialInitAuthorView];}];
     [appDelegate emptyEventList]; //this will cause eventListSorted to be generated again from internet
     [self refreshAnnotations];
-    [self refreshEventListView];
+    [self refreshEventListView:false];
 }
 
 //the purpose to have this to be called in completion:^ is to make animation together with all subviews
@@ -2223,7 +2326,7 @@
     }
     [appDelegate emptyEventList]; //this will cause eventListSorted to be generated again from internet
     [self refreshAnnotations];
-    [self refreshEventListView];
+    [self refreshEventListView:false];
 }
 
 -(void) photoDroboxClicked:(id)sender
@@ -2456,7 +2559,7 @@
     appDelegate.focusedEvent = ent;  //appDelegate.focusedEvent is added when implement here
     [self setNewFocusedDateAndUpdateMapWithNewCenter : ent :-1]; //do not change map zoom level
     [self showOverlays];
-    [self refreshEventListView]; //so show checkIcon for selected row
+    [self refreshEventListView:false]; //so show checkIcon for selected row
     
     //bookmark selected event
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];

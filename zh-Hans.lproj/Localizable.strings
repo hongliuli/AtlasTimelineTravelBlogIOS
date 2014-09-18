@@ -92,6 +92,7 @@
 "Download from server to offline"="从服务器下载到设备";
 "Download missing %@ photos from Dropbox. This operation can be repeated until all photos are downloaded."="从Dropbox下载[%@]中还没有被下载的照片. 可以重复这个操作直到全部下载完成.";
 "Downloading .. %d success, %d warnings"="正在下载.. %d 个完成, %d 个警告";
+"Download ChronicleMap App Now"="马上下载";
 "Double-tap at center to center on today"="双击中心位置可快速选择今天为当前选择时间";
 "Dropbox may not have some photos you are looking for."="Dropbox可能没有你寻找的一些照片.";
 "Edit"="编辑";
@@ -144,6 +145,7 @@
 "No"="不";
 "No photos to export to your Dropbox!"="没有照片可上载到你的Dropbox!";
 "Not login"="没有登录";
+"Not Now"="下次再说";
 "OK"="好的";
 "%d new photo(s) are not saved"="%d 张新照片被保存";
 "Photo Backup - New:%d  Del:%d"="照片备份- 新的:%d  删除:%d";
@@ -157,6 +159,7 @@
 " Pick Episode to Share"=" 选一个片断来分享";
 "Please contact support@chroniclemap.com to learn how to upload your authored contents and test on your iPad"="请联系 support@chroniclemap.com, 让我们告诉你怎样上载你编辑的历史故事并且在iPad上测试！";
 "Please grant access in iOS Settings->Privacy->Contacts->Chronicle Map\n(This is optional. Address Book is used for you to find friend easily)"="请开放访问权限：在iOS的[设置->隐私->通讯录->Chronicle Map]\n(访问通讯录不是必须的，只是帮助你更容易地找到朋友.)";
+"Please download our ChronicleMap App, based on which this app was created, for your photo albums, trip planner and journal"="本APP是基于［纪实地图］APP开发的。请下载［纪实地图］APP 作为你自己的随身相册和行程规划工具";
 "Please Enter Valid Email Address."="请输入有效电子邮件地址.";
 "Please enter the security code you received in your email!"="请输入你在邮件中收到的安全代码!";
 "Please enter description."="请输入描述域.";
@@ -207,6 +210,8 @@
 "Share Episode Success!"="分享片断成功!";
 "Share Event"="分享事件";
 "Share my Episodes to Friends"="分享我的片断给朋友";
+"Show events in selected time period (default)"="显示所选时间段中事件(默认设置)";
+"Show events currently on screen (map)"="显示当前出现在屏幕(地图)上的事件";
 "Feedback to Author"="给作者建议";
 "Support Us"="支持我们";
 "Sync %i events to %@ on server"="同步 %i 个事件到服务器的[%@]";

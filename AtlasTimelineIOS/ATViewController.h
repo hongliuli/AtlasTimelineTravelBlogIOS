@@ -65,7 +65,7 @@
 - (void) showOverlays;
 - (void) displayZoomLine;
 - (void) cancelPreference;
-- (void) refreshEventListView;
+- (void) refreshEventListView:(BOOL)callFromScrollTimewheel;
 - (int) zoomLevel;
 - (void) closeAuthorView;
 
