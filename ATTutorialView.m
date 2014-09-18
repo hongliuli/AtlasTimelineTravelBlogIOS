@@ -47,7 +47,34 @@ UILabel* updatableLabel2;
         // Initialization code
         // add subview etc here
     }
+    
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* tmpKey = [userDefault objectForKey:@"xxxDO_NOT_PROMPT_DOWNLOAD"];
+    if (tmpKey == nil)
+    {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @""
+                                                       message: NSLocalizedString(@"Please download our ChronicleMap App, based on which this app was created, for your photo albums, trip planner and journal",nil)
+                                                      delegate: self
+                                             cancelButtonTitle:NSLocalizedString(@"Not Now",nil)
+                                             otherButtonTitles:NSLocalizedString(@"Download ChronicleMap App Now",nil), NSLocalizedString(@"No, Thanks",nil), nil];
+        [alert show];
+    }
+    
     return self;
+}
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0) //Not Now
+        return; //user clicked cancel button
+    if (buttonIndex == 1)
+    {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/us/app/chroniclemap-events-itinerary/id649653093?ls=1&mt=8"]];
+    }
+    else
+    {
+        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+        [userDefault setObject:@"yes" forKey:@"DO_NOT_PROMPT_DOWNLOAD"];
+    }
 }
 
 - (void) updateDateText
