@@ -9,6 +9,7 @@
 #import "PhotoViewController.h"
 #import "ATEventEditorTableController.h"
 #import "ATConstants.h"
+#import "ATAppDelegate.h"
 
 #define NOT_THUMBNAIL -1;
 
@@ -74,7 +75,12 @@ UILabel* sortIdexLabel;
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpace.width = 10;
     
-    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
+    NSArray *items = [NSArray arrayWithObjects: doneButton, fixedSpace, setShareButton, nil];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (appDelegate.authorMode)
+    {
+        items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
+    }
     [self.toolbar setItems:items animated:NO];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
