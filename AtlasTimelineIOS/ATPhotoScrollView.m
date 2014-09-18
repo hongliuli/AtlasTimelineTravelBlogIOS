@@ -19,8 +19,9 @@
 #define GROUP_BACKGROUND_COLOR_1 0.0
 #define GROUP_BACKGROUND_COLOR_2 0.4
 #define SHARE_ICON_TAG 100
-#define MAP_MARKER_TAG 200
+#define PHOTO_SORT_TAG 200
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
+
 
 @implementation ATPhotoScrollView
 {
@@ -55,9 +56,12 @@
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
         tap.numberOfTapsRequired =1;
         [self.horizontalTableView addGestureRecognizer:tap]; //old way of [self addGest..] will cause sometime tap does not work
+        
+        //The important part to fill uitable datasource photoList is in
+        //ATEventEditor
     }
-    self.selectedAsThumbnailIndex = -1;
     self.selectedAsShareIndexSet = [[NSMutableSet alloc] init];
+    self.selectedAsSortIndexList = [[NSMutableArray alloc] init];
     return self;
 }
 
@@ -73,7 +77,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
+    
     
     static NSString *CellIdentifier = @"ATPhotoScrollCell";
     
@@ -91,14 +95,14 @@
     else
     {
         NSString* photoName = self.photoList[indexPath.row];
-
+        
         cell.photo.image = [ATHelper readPhotoFromFile:photoName eventId:self.eventEditor.eventId];
-
+        
         cell.photo.contentMode = UIViewContentModeScaleAspectFit;
         cell.photo.clipsToBounds = YES;
         UIImageView* iconShare = (UIImageView*)[cell.photo viewWithTag:SHARE_ICON_TAG];
-        UIImageView* iconMapMarker = (UIImageView*)[cell.photo viewWithTag:MAP_MARKER_TAG];
-
+        UILabel* lblExistingSortView = (UILabel*)[cell.photo viewWithTag:PHOTO_SORT_TAG];
+        
         if ([self.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:indexPath.row]])
         {
             if (iconShare == nil)
@@ -113,18 +117,21 @@
             [iconShare removeFromSuperview];
         
         
-        if (indexPath.row == self.selectedAsThumbnailIndex)
+        if ([self.selectedAsSortIndexList containsObject:[NSNumber numberWithInt:indexPath.row]])
         {
-            if (iconMapMarker == nil)
-            {
-                UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(60, 10, 30, 30)];
-                imgView.image = [UIImage imageNamed:@"marker-selected.png"];
-                imgView.tag = MAP_MARKER_TAG;
-                [cell.photo addSubview:imgView];
-            }
+            int sortIndex = [self.selectedAsSortIndexList indexOfObject:[NSNumber numberWithInt:indexPath.row]];
+            UILabel *lblSortView = [[UILabel alloc] initWithFrame:CGRectMake(60, 10, 30, 30)];
+            lblSortView.backgroundColor = [UIColor colorWithRed: 0.15 green: 0.15 blue: 0.15 alpha: 0.8];
+            lblSortView.textColor = [UIColor whiteColor];
+            lblSortView.font = [UIFont fontWithName:@"Helvetica-Bold" size:20.0];
+            lblSortView.textAlignment = NSTextAlignmentCenter;
+            lblSortView.text = [NSString stringWithFormat:@"%d",sortIndex + 1];
+            lblSortView.tag = PHOTO_SORT_TAG;
+            [cell.photo addSubview:lblSortView];
+            
         }
-        else if (iconMapMarker != nil)
-            [iconMapMarker removeFromSuperview];
+        else if (lblExistingSortView != nil)
+            [lblExistingSortView removeFromSuperview];
         //[cell setNeedsDisplay];
     }
     return cell;

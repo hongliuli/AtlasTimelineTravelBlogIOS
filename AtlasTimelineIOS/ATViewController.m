@@ -76,6 +76,7 @@
 #define AD_Y_POSITION_IPAD 60
 #define AD_Y_POSITION_PHONE 40
 
+#define PHOTO_META_FILE_NAME @"MetaFileForOrderAndDesc"
 
 @interface MFTopAlignedLabel : UILabel
 
@@ -1710,7 +1711,7 @@
     if (self.preferencePopover != nil)
         [self.preferencePopover dismissPopoverAnimated:true];
 }
-- (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList thumbnailFileName:(NSString*)thumbNailFileName{
+- (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList photoMetaData:(NSDictionary *)photoMetaData{
     //update annotation by remove/add, then update database or added to database depends on if have id field in selectedAnnotation
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
 
@@ -1720,6 +1721,10 @@
     
     newData.uniqueId = self.selectedAnnotation.uniqueId;
     newData.eventDate = tmpDateHold;
+    
+    NSString* thumbNailFileName = nil;
+    if (self.eventEditor.photoScrollView.photoList != nil && [self.eventEditor.photoScrollView.photoList count]>0)
+        thumbNailFileName = self.eventEditor.photoScrollView.photoList[0];
     
     [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
     if ([newAddedList count] > 0) //this is for adding photo in reader, in real reader, we hardly come here
@@ -1773,6 +1778,10 @@
     if (self.eventEditorPopover != nil)
         [self.eventEditorPopover dismissPopoverAnimated:true];
     [self refreshEventListView];
+    
+    //TODO save metaFile
+    NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:newData.uniqueId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
+    [photoMetaData writeToFile:photoMetaFilePath atomically:TRUE];
 }
 
 //Save photo to file. Called by updateEvent after write event to db

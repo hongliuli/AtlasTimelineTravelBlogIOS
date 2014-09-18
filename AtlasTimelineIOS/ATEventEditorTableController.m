@@ -48,6 +48,10 @@
 #define SECTION_1_ADVERTISE_HEIGHT 40
 #define SECTION_2_HEIGHT 40
 
+#define PHOTO_META_FILE_NAME @"MetaFileForOrderAndDesc"
+#define PHOTO_META_SORT_LIST_KEY @"sort_key"
+#define PHOTO_META_DESC_MAP_KEY @"desc_key"
+
 @implementation ATEventEditorTableController
 
 static NSArray* _photoList = nil;
@@ -74,6 +78,8 @@ UIAlertView *alertCancel;
 int editorPhotoViewWidth;
 int editorPhotoViewHeight;
 
+
+NSMutableDictionary *photoFilesMetaMap;
 
 #pragma mark UITableViewDelegate
 /*
@@ -272,17 +278,47 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         self.photoScrollView.photoList = [[NSMutableArray alloc] init];
         //read photo list and save tophotoScrollView
         NSError *error = nil;
-        
         NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:photoDirName];
-            
+        
         NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
-        if (tmpFileList != nil && [tmpFileList count] > 0)
-        {
-            self.photoScrollView.photoList = [NSMutableArray arrayWithArray:tmpFileList];
-            //remove thumbnail file title
-            [self.photoScrollView.photoList removeObject:@"thumbnail"];
-            _photoList = self.photoScrollView.photoList;
+        if(error != nil) {
+            NSLog(@"Error in reading files: %@", [error localizedDescription]);
+            return;
         }
+        self.photoScrollView.photoList = [NSMutableArray arrayWithArray:tmpFileList];
+        //Sort photo list. The sort will be saved to dropbox as a file together with photo description
+        NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:self.eventId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
+        
+        //photoFileMetaMap will be nil if no file ???
+        photoFilesMetaMap = [NSDictionary dictionaryWithContentsOfFile:photoMetaFilePath];
+        if (photoFilesMetaMap != nil)
+        {
+            self.photoScrollView.photoSortedNameList = (NSMutableArray*)[photoFilesMetaMap objectForKey:PHOTO_META_SORT_LIST_KEY];
+            self.photoScrollView.photoDescMap = [photoFilesMetaMap objectForKey:PHOTO_META_DESC_MAP_KEY];
+        }
+        //Although photoSortedNameList should have all filenames in order, to be safe, still read filename from directory then sort accordingly
+        if (self.photoScrollView.photoSortedNameList != nil)
+        {
+            NSMutableArray* newList = [[NSMutableArray alloc] initWithCapacity:[self.photoScrollView.photoList count]];
+            int tmpCnt = [self.photoScrollView.photoSortedNameList count];
+            for (int i = 0; i < tmpCnt; i++)
+            {
+                NSString* fileName = self.photoScrollView.photoSortedNameList[i];
+                if ([self.photoScrollView.photoList containsObject:fileName])
+                    [newList addObject: fileName];
+            }
+            for (int i = 0; i < tmpCnt; i++)
+            {
+                NSString* fileName = self.photoScrollView.photoSortedNameList[i];
+                [self.photoScrollView.photoList removeObject:fileName];
+            }
+            [newList addObjectsFromArray:self.photoScrollView.photoList];
+            self.photoScrollView.photoList = newList;
+        }
+        //remove thumbnail file title
+        [self.photoScrollView.photoList removeObject:@"thumbnail"];
+        [self.photoScrollView.photoList removeObject:PHOTO_META_FILE_NAME];
+        _photoList = self.photoScrollView.photoList;
     }
     //tricky: in iPod, here will be called before viewForSectionHeader, so customViewForPhoto is nil
     if (customViewForPhoto != nil && nil == [customViewForPhoto viewWithTag:ADDED_PHOTOSCROLL_TAG_900]) 
@@ -512,17 +548,40 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     else
         ent.eventType = 0;
     
-    //else
-        //imageToBeWritten = nil; //if no photo taken this time, no need write to file again
     
-    //have to ask ATViewController to write photo files, because for new event, we do not have id for photo directory names yet
-    //photoViewController will write which to delete and wihich to set as thumbnail etc
-    NSString* thumbNailFileName = nil;
-    int thumbNailIndex = self.photoScrollView.selectedAsThumbnailIndex;
-    if (thumbNailIndex >= 0 && thumbNailIndex < [self.photoScrollView.photoList count])
-        thumbNailFileName = self.photoScrollView.photoList[thumbNailIndex];
-        
-    [self.delegate updateEvent:ent newAddedList:photoNewAddedList deletedList:photoDeletedList thumbnailFileName:thumbNailFileName];
+    NSMutableArray* finalFullSortedList = nil;
+    NSMutableDictionary* finalPhotoDescMap = nil;
+    NSArray* sortedPhotoList = self.photoScrollView.selectedAsSortIndexList;
+    if (sortedPhotoList != nil && [sortedPhotoList count] > 0)
+    {
+        NSMutableArray* newList = [[NSMutableArray alloc] init];
+        for (NSNumber* orderIdx in sortedPhotoList)
+        {
+            NSString* fileName = self.photoScrollView.photoList[[orderIdx intValue]];
+            [newList addObject:fileName];
+        }
+        for (NSString* tmp in newList)
+        {
+            [self.photoScrollView.photoList removeObject:tmp];
+        }
+        [newList addObjectsFromArray:self.photoScrollView.photoList];
+        self.photoScrollView.photoList = newList;
+        finalFullSortedList = self.photoScrollView.photoList;
+    }
+    
+    //TODO check if have description
+    NSDictionary* changedDescMap = self.photoScrollView.photoDescMap;
+    //TODO check if photo desc changed then ....
+    
+    NSMutableDictionary* finalPhotoMetaDataMap = nil;
+    if (finalPhotoDescMap != nil || finalFullSortedList != nil)
+    {
+        finalPhotoMetaDataMap = [[NSMutableDictionary alloc] init];
+        [finalPhotoMetaDataMap setObject:self.photoScrollView.photoList forKey:PHOTO_META_SORT_LIST_KEY];
+    }
+    
+    
+    [self.delegate updateEvent:ent newAddedList:photoNewAddedList deletedList:photoDeletedList photoMetaData:finalPhotoMetaDataMap];
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 
