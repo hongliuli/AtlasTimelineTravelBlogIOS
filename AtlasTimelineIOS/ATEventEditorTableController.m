@@ -272,6 +272,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     self.photoScrollView = [[ATPhotoScrollView alloc] initWithFrame:CGRectMake(0,5,editorPhotoViewWidth,editorPhotoViewHeight)];
     self.photoScrollView.tag = ADDED_PHOTOSCROLL_TAG_900;
     self.photoScrollView.eventEditor = self;
+    if (photoDirName == nil)
+        self.isFirstTimeAddPhoto = true;
     if (self.photoScrollView.photoList == nil && photoDirName != nil) //photoDirName==nil if first drop pin in map
     {
 
@@ -283,8 +285,14 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
         if(error != nil) {
             NSLog(@"Error in reading files: %@", [error localizedDescription]);
+            self.isFirstTimeAddPhoto = true;
             return;
         }
+        if ([tmpFileList count] == 0)
+            self.isFirstTimeAddPhoto = true;
+        else
+            self.isFirstTimeAddPhoto = false;
+        
         self.photoScrollView.photoList = [NSMutableArray arrayWithArray:tmpFileList];
         //Sort photo list. The sort will be saved to dropbox as a file together with photo description
         NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:self.eventId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
@@ -571,15 +579,31 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     
     //TODO check if have description
     NSDictionary* changedDescMap = self.photoScrollView.photoDescMap;
-    //TODO check if photo desc changed then ....
-    
+    NSMutableDictionary* originalMetaFileMap = [photoFilesMetaMap objectForKey:PHOTO_META_DESC_MAP_KEY];
+    if (changedDescMap != nil && [changedDescMap count] > 0)
+    { //check if photo desc changed then ....
+        if (originalMetaFileMap == nil)
+            originalMetaFileMap = [[NSMutableDictionary alloc] init];
+        for (NSString* key in changedDescMap) {
+            NSString* value = [changedDescMap objectForKey:key];
+            [originalMetaFileMap setObject:value forKey:key];
+        }
+        finalPhotoDescMap = originalMetaFileMap;
+    }
     NSMutableDictionary* finalPhotoMetaDataMap = nil;
     if (finalPhotoDescMap != nil || finalFullSortedList != nil)
     {
         finalPhotoMetaDataMap = [[NSMutableDictionary alloc] init];
         [finalPhotoMetaDataMap setObject:self.photoScrollView.photoList forKey:PHOTO_META_SORT_LIST_KEY];
+        if (finalPhotoDescMap == nil)
+            [finalPhotoMetaDataMap setObject:originalMetaFileMap forKey:PHOTO_META_DESC_MAP_KEY];
+        else
+            [finalPhotoMetaDataMap setObject:finalPhotoMetaDataMap forKey:PHOTO_META_DESC_MAP_KEY];
+        
+        //Add meta file to newAdded list so it will be synch to drop box
+        if (![photoNewAddedList containsObject:PHOTO_META_FILE_NAME])
+            [photoNewAddedList addObject:PHOTO_META_FILE_NAME];
     }
-    
     
     [self.delegate updateEvent:ent newAddedList:photoNewAddedList deletedList:photoDeletedList photoMetaData:finalPhotoMetaDataMap];
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case

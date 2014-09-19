@@ -49,7 +49,7 @@
 
 @property (strong, nonatomic) ADBannerView *iAdBannerView;
 @property (strong, nonatomic) GADBannerView *gAdBannerView;
-
+@property BOOL isFirstTimeAddPhoto;
 
 - (IBAction)saveAction:(id)sender;
 - (IBAction)deleteAction:(id)sender;

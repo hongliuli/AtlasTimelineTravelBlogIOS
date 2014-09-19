@@ -154,7 +154,9 @@
 
 - (void) didSelectRowAtIndexPath:(NSIndexPath *)indexPath  //called by tapGesture. This is not in a TableViewController, so no didSelect... delegate mechanism, have to process  by tap gesture
 {
-    //NSLog(@"select photo selected");
+    if (self.eventEditor.isFirstTimeAddPhoto)
+        return; //a brutal way to fix a bug that first time add photo then view it will crash
+    
     self.selectedPhotoIndex = indexPath.row;
     [ATEventEditorTableController setSelectedPhotoIdx:indexPath.row];
     ATPhotoScrollCell *cell = (ATPhotoScrollCell*)[self.horizontalTableView cellForRowAtIndexPath:indexPath];
