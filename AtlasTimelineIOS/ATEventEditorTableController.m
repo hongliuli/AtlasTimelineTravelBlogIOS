@@ -594,11 +594,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     if (finalPhotoDescMap != nil || finalFullSortedList != nil)
     {
         finalPhotoMetaDataMap = [[NSMutableDictionary alloc] init];
-        [finalPhotoMetaDataMap setObject:self.photoScrollView.photoList forKey:PHOTO_META_SORT_LIST_KEY];
-        if (finalPhotoDescMap == nil)
+        if (finalFullSortedList != nil)
+            [finalPhotoMetaDataMap setObject:self.photoScrollView.photoList forKey:PHOTO_META_SORT_LIST_KEY];
+        if (finalPhotoDescMap != nil)
             [finalPhotoMetaDataMap setObject:originalMetaFileMap forKey:PHOTO_META_DESC_MAP_KEY];
-        else
-            [finalPhotoMetaDataMap setObject:finalPhotoMetaDataMap forKey:PHOTO_META_DESC_MAP_KEY];
         
         //Add meta file to newAdded list so it will be synch to drop box
         if (![photoNewAddedList containsObject:PHOTO_META_FILE_NAME])

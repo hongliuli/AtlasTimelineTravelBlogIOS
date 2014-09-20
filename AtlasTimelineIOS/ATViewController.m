@@ -294,14 +294,14 @@
         switchEventListViewModeToVisibleOnMapFlag = false;
         eventListInVisibleMapArea = nil; //IMPORTANT: refreshEventListView will use this is nil or not to decide if in map event list view mode, do not refresh if scroll timewheel
         [switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon.png"] forState:UIControlStateNormal];
-        [self.mapView makeToast:NSLocalizedString(@"Show events in selected time period (default)",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(210, 90)]];
+        [self.mapView makeToast:NSLocalizedString(@"List events in same period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(210, 90)]];
         [self refreshEventListView:false];
     }
     else
     {
         switchEventListViewModeToVisibleOnMapFlag = true;
         [switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Maps-icon.png"] forState:UIControlStateNormal];
-        [self.mapView makeToast:NSLocalizedString(@"Show events currently on screen (map)",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(200, 90)]];
+        [self.mapView makeToast:NSLocalizedString(@"List events in same region",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(200, 90)]];
         [self refreshEventListView:false];
     }
 }
