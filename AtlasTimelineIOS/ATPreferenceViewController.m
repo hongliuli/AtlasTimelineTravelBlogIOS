@@ -322,6 +322,8 @@
             [[self myRestClient] createFolder:@"/ChronicleReader"]; //createFolder success/alreadyExist delegate will start the chain action, which will include delete Queue
         else if (dbDeletedPhotoCount > 0) //bypass process createFolder, only delete file for more efficient
             [self processEmptyDeletedPhotoQueue];
+        
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Photo backup has started!",nil)
                                                        message: @"Photos will be uploaded to your Dropbox account one by one, please watch for the decreasing number.\n\nThe upload is done if number is decreased to 0."
                                                       delegate: self
@@ -412,6 +414,7 @@
         }
         else
         {
+            [UIApplication sharedApplication].idleTimerDisabled = YES;
             downloadAllFromDropboxAlert = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"Import photos from Dropbox:/ChronicleReader/%@",nil), [ATHelper getSelectedDbFileName]]
                             message: [NSString stringWithFormat:NSLocalizedString(@"Download missing %@ photos from Dropbox. This operation can be repeated until all photos are downloaded.",nil),[ATHelper getSelectedDbFileName]]
                             delegate: self
