@@ -79,6 +79,9 @@
 
 #define PHOTO_META_FILE_NAME @"MetaFileForOrderAndDesc"
 
+#define PHOTO_META_SORT_LIST_KEY @"sort_key"
+#define PHOTO_META_DESC_MAP_KEY @"desc_key"
+
 @interface MFTopAlignedLabel : UILabel
 
 @end
@@ -1874,6 +1877,23 @@
     
     //TODO save metaFile
     NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:newData.uniqueId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
+    if (newAddedList != nil && [newAddedList count] > 0)
+    {
+        NSMutableDictionary* photoDescMap = [photoMetaData objectForKey:PHOTO_META_DESC_MAP_KEY];
+        NSDictionary* cloneMap = [NSDictionary dictionaryWithDictionary:photoDescMap];
+        for (NSString* fileName in cloneMap)
+        {
+            NSString* descTxt = [photoDescMap objectForKey:fileName];
+            NSString* fileName2 = fileName;
+            int prefixLen = [NEW_NOT_SAVED_FILE_PREFIX length];
+            if ([fileName hasPrefix:NEW_NOT_SAVED_FILE_PREFIX])
+            {
+                fileName2 = [fileName substringFromIndex:prefixLen];
+                [photoDescMap removeObjectForKey:fileName];
+                [photoDescMap setObject:descTxt forKey:fileName2];
+            }
+        }
+    }
     [photoMetaData writeToFile:photoMetaFilePath atomically:TRUE];
 }
 
@@ -1898,7 +1918,14 @@
                 [[NSFileManager defaultManager] createDirectoryAtPath:photoFinalDir withIntermediateDirectories:YES attributes:nil error:&error];
             [[NSFileManager defaultManager] moveItemAtPath:newPhotoTmpFile toPath:newPhotoFinalFileName error:&error];
             //Add to newPhotoQueue for sync to dropbox
-            [[self dataController] insertNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
+            if ([PHOTO_META_FILE_NAME isEqualToString:fileName] )
+            {
+                BOOL eventPhotoMetaFileExistInQueueFlag = [[self dataController] isItInNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
+                if (!eventPhotoMetaFileExistInQueueFlag)
+                    [[self dataController] insertNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
+            }
+            else
+                [[self dataController] insertNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
         }
         NSError* error;
         //remove the dir then recreate to clean up this temp dir

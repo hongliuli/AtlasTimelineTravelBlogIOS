@@ -20,6 +20,11 @@
 UIImageView* shareIconView;
 UILabel* shareCountLabel;
 UILabel* sortIdexLabel;
+UITextView* photoDescView;
+NSString* currentPhotoDescTxt;
+NSString* currentPhotoFileName;
+UITextView *photoDescInputView;
+UIImageView* hasPhotoDescImage;
 
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -59,7 +64,7 @@ UILabel* sortIdexLabel;
     UIButton *markerButton = [UIButton buttonWithType:UIButtonTypeCustom ];
     [markerButton setBackgroundImage:markerIcon forState:UIControlStateNormal];
     [markerButton addTarget:self action:@selector(sortSelectedAction:) forControlEvents:UIControlEventTouchUpInside];
-    markerButton.frame = (CGRect) { .size.width = 40, .size.height = 40,};
+    markerButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
     UIBarButtonItem* setThumbnailButton = [[UIBarButtonItem alloc] initWithCustomView:markerButton ];
     
     UIImage *shareIcon = [UIImage imageNamed:@"share.png"];
@@ -68,7 +73,13 @@ UILabel* sortIdexLabel;
     [shareButton addTarget:self action:@selector(setShareAction:) forControlEvents:UIControlEventTouchUpInside];
     shareButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
     UIBarButtonItem* setShareButton = [[UIBarButtonItem alloc] initWithCustomView:shareButton ];
-    
+   
+    UIImage *editIcon = [UIImage imageNamed:@"pencil-orange-icon.png"];
+    UIButton *editButton = [UIButton buttonWithType:UIButtonTypeCustom ];
+    [editButton setBackgroundImage:editIcon forState:UIControlStateNormal];
+    [editButton addTarget:self action:@selector(setEditAction:) forControlEvents:UIControlEventTouchUpInside];
+    editButton.frame = (CGRect) { .size.width = 30, .size.height = 30,};
+    UIBarButtonItem* setEditButton = [[UIBarButtonItem alloc] initWithCustomView:editButton ];
     UIBarButtonItem* deleteButton = [[UIBarButtonItem alloc]
                                      initWithBarButtonSystemItem: UIBarButtonSystemItemTrash target:self action:@selector(deleteAction:)];
     
@@ -79,7 +90,7 @@ UILabel* sortIdexLabel;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if (appDelegate.authorMode)
     {
-        items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, deleteButton, nil];
+        items = [NSArray arrayWithObjects: doneButton, fixedSpace, setThumbnailButton, fixedSpace, setShareButton, fixedSpace, setEditButton,fixedSpace, deleteButton, nil];
     }
     [self.toolbar setItems:items animated:NO];
     
@@ -89,13 +100,34 @@ UILabel* sortIdexLabel;
     [self.view bringSubviewToFront:self.toolbar];
     [self.view bringSubviewToFront:self.pageControl];
     
+    hasPhotoDescImage = [[UIImageView alloc] initWithFrame:CGRectMake(5, 50 , 30, 30)];
+    [hasPhotoDescImage setImage:[UIImage imageNamed:@"pencil-orange-icon.png"]];
+    [self.view addSubview:hasPhotoDescImage];
+    
     shareIconView = [[UIImageView alloc] initWithFrame:CGRectMake(50, [ATConstants screenHeight] - 110 , 30, 30)];
     shareCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, [ATConstants screenHeight] - 110 , 180, 30)];
     shareIconView.image = nil;
     shareCountLabel.backgroundColor = [UIColor colorWithRed: 0.55 green: 0.55 blue: 0.55 alpha: 0.5];
     shareCountLabel.textColor = [UIColor whiteColor];
+    
+    
+    int screenWidth = [ATConstants screenWidth];
+    int textWidth = screenWidth * 0.7;
+    photoDescView = [[UITextView alloc] initWithFrame:CGRectMake((screenWidth - textWidth)/2, 50 , textWidth, 110)];
+    photoDescView.backgroundColor = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0.5];
+    photoDescView.textColor = [UIColor whiteColor];
+    //photoDescView.textAlignment = NSTextAlignmentCenter;
+    photoDescView.font = [UIFont fontWithName:@"Helvetica" size:20];
+    photoDescView.editable = false;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        photoDescView.font = [UIFont fontWithName:@"Helvetica" size:13];
+    
+    [photoDescView.layer setCornerRadius:8.0f];
+    [photoDescView.layer setMasksToBounds:YES];
+    
     [self.view addSubview:shareIconView];
     [self.view addSubview:shareCountLabel];
+    [self.view addSubview:photoDescView];
     shareCountLabel.hidden = true;
     
     sortIdexLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, [ATConstants screenHeight] - 140 , 120, 30)];
@@ -164,7 +196,29 @@ UILabel* sortIdexLabel;
     {
         sortIdexLabel.hidden = true;
     }
+    
+    currentPhotoFileName =self.eventEditor.photoScrollView.photoList[index];
+    NSDictionary* photoDescMap = self.eventEditor.photoScrollView.photoDescMap;
+    currentPhotoDescTxt = nil;
+    photoDescView.hidden = true;
+    hasPhotoDescImage.hidden = true;
+    if (photoDescMap != nil)
+    {
+        currentPhotoDescTxt = [photoDescMap objectForKey:currentPhotoFileName];
+        if (currentPhotoDescTxt != nil)
+        {
+            hasPhotoDescImage.hidden = false;
+            photoDescView.text = currentPhotoDescTxt;
+            if (!self.toolbar.hidden)
+                photoDescView.hidden = false;
+        }
+        else //actually not neccessary
+        {
+            hasPhotoDescImage.hidden = true;
+        }
+    }
 }
+
 - (void) doneAction: (id)sender
 {
     int selectedPhotoIdx = self.pageControl.currentPage;
@@ -227,12 +281,97 @@ UILabel* sortIdexLabel;
     [self.eventEditor setShareCount];
 }
 
+- (void) setEditAction: (id)sender
+{
+    // Here we need to pass a full frame
+    CustomIOS7AlertView *alertView = [[CustomIOS7AlertView alloc] init];
+    
+    // Add some custom content to the alert view
+    UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 290, 200)];
+    
+    UILabel* photoDescLabel =[[UILabel alloc] initWithFrame:CGRectMake(10, 10, 290, 30)];
+    photoDescLabel.text = NSLocalizedString(@"Enter Photo Description:",nil);
+    [contentView addSubview:photoDescLabel];
+    
+    if (photoDescInputView == nil)
+        photoDescInputView= [[UITextView alloc] initWithFrame:CGRectMake(10, 45, 270, 145)];
+    if (currentPhotoDescTxt != nil && [currentPhotoDescTxt length] >0)
+        photoDescInputView.text = currentPhotoDescTxt;
+    else
+        photoDescInputView.text = @"";
+    [contentView addSubview:photoDescInputView];
+    [alertView setContainerView:contentView];
+    
+    // Modify the parameters
+    [alertView setButtonTitles:[NSMutableArray arrayWithObjects:NSLocalizedString(@"Continue",nil), NSLocalizedString(@"Delete",nil),NSLocalizedString(@"Cancel",nil), nil]];
+    [alertView setDelegate:self];
+    
+    // You may use a Block, rather than a delegate.
+    /*** I will use following delegate
+     [alertView setOnButtonTouchUpInside:^(CustomIOS7AlertView *alertView, int buttonIndex) {
+     NSLog(@"Block: Button at position %d is clicked on alertView %d.", buttonIndex, (int)[alertView tag]);
+     [alertView close];
+     }];
+     */
+    
+    [alertView setUseMotionEffects:true];
+    
+    // And launch the dialog
+    [alertView show];
+}
+- (void)customIOS7dialogButtonTouchUpInside: (CustomIOS7AlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
+{
+    if (buttonIndex == 0) //save button cliced
+    {
+        if (![photoDescInputView.text isEqualToString:currentPhotoDescTxt])
+        {
+            self.eventEditor.photoDescChangedFlag = true;
+            //TODO enable Save button
+            if (self.eventEditor.photoScrollView.photoDescMap == nil)
+                self.eventEditor.photoScrollView.photoDescMap = [[NSMutableDictionary alloc] init];
+            [self.eventEditor.photoScrollView.photoDescMap setObject:photoDescInputView.text forKey:currentPhotoFileName];
+            photoDescView.text = photoDescInputView.text;
+            currentPhotoDescTxt = photoDescInputView.text;
+            photoDescView.hidden = false;
+        }
+    }
+    else if (buttonIndex == 1) //delete button
+    {
+        if (currentPhotoDescTxt != nil && [currentPhotoDescTxt length] > 0)
+            self.eventEditor.photoDescChangedFlag = true;
+        [self.eventEditor.photoScrollView.photoDescMap removeObjectForKey:currentPhotoFileName];
+        photoDescView.hidden = true;
+    }
+    [alertView close];
+}
+
 - (void)tapToHideShowToolbar:(UIGestureRecognizer *)gestureRecognizer
 {
     if (self.toolbar.isHidden)
+    {
         self.toolbar.hidden = false;
+        NSDictionary* photoDescMap = self.eventEditor.photoScrollView.photoDescMap;
+        if ([photoDescMap objectForKey:currentPhotoFileName] != nil)
+            photoDescView.hidden = false;
+    }
     else
+    {
         self.toolbar.hidden = true;
+        photoDescView.hidden = true;
+    }
+    
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    int screenWidth = [ATConstants screenWidth];
+    int textWidth = screenWidth * 0.7;
+    [photoDescView setFrame:CGRectMake((screenWidth - textWidth)/2, 50 , textWidth, 120)];
+    
+    [sortIdexLabel setFrame:CGRectMake(50, [ATConstants screenHeight] - 140 , 120, 30)];
+    [shareCountLabel setFrame:CGRectMake(80, [ATConstants screenHeight] - 110 , 180, 30)];
+    [shareIconView setFrame:CGRectMake(50, [ATConstants screenHeight] - 110 , 30, 30)];
+    
 }
 
 @end

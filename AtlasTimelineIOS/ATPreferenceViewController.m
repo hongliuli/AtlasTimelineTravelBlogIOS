@@ -27,6 +27,9 @@
 #define ROW_SYNC_FROM_DROPBOX 2
 #define RESTORE_PHOTO_TITLE NSLocalizedString(@"Restore Photos",nil)
 
+#define PHOTO_META_FILE_NAME @"MetaFileForOrderAndDesc"
+
+
 @interface ATPreferenceViewController ()
 
 @end
@@ -444,16 +447,16 @@
 //this is createFolder delegate, important of my chain action
 - (void)restClient:(DBRestClient*)client createdFolder:(DBMetadata*)folder{
     //NSLog(@"+++++ Folder success Meta Data Path %@; filename %@; hasDirectory %d;",[folder path], [folder filename], [folder isDirectory]);
-    if ( [@"/ChronicleReader" isEqualToString:[folder path]])
+    if ( [@"/ChronicleMap" isEqualToString:[folder path]])
     {
-        NSString *destDir = [ NSString stringWithFormat:@"/ChronicleReader/%@",  [ATHelper getSelectedDbFileName] ];
+        NSString *destDir = [ NSString stringWithFormat:@"/ChronicleMap/%@",  [ATHelper getSelectedDbFileName] ];
         [[self myRestClient ] createFolder:destDir]; //chain action 1: create "source" directory if not so
     }
     else if ([[folder filename] isEqualToString:[ATHelper getSelectedDbFileName]])
     {
         [self startProcessNewPhotoQueueChainAction ];
     }
-    else //Part of chain: come here if created eventId directory
+    else //Part of chain: come here if this is first time create eventId directory
     {
         NSString *localPhotoPath = [ATHelper getPhotoDocummentoryPath];
         localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:currentPhotoName];
@@ -462,10 +465,34 @@
         // 2. then get 403 Forbidden error, then realize I have to ask dropbox to enable production mode
         if ([[NSFileManager defaultManager] fileExistsAtPath:localPhotoPath])
         {
-            [[self myRestClient] uploadFile: currentPhotoName toPath:[folder path] withParentRev:nil fromPath:localPhotoPath];
+            if (![PHOTO_META_FILE_NAME isEqualToString:currentPhotoName])
+                [[self myRestClient] uploadFile: currentPhotoName toPath:[folder path] withParentRev:nil fromPath:localPhotoPath];
+            else //use loadRevisions is the only way I can avoid creating mutiple revision when upload same file again and again
+                [[self myRestClient] loadRevisionsForFile:[NSString stringWithFormat:@"%@/%@",[folder path], PHOTO_META_FILE_NAME] limit:1];
         }
     }
 }
+
+- (void)restClient:(DBRestClient*)client loadedRevisions:(NSArray *)revisions forFile:(NSString *)path
+{
+    DBMetadata *file = revisions[0];
+    NSString *localPhotoPath = [ATHelper getPhotoDocummentoryPath];
+    localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
+    [[self myRestClient] uploadFile: PHOTO_META_FILE_NAME toPath:[path stringByDeletingLastPathComponent] withParentRev:file.rev fromPath:localPhotoPath]; //path included file nm, need special treat
+    
+}
+- (void)restClient:(DBRestClient*)client loadRevisionsFailedWithError:(NSError *)error
+{
+    //If file not exist before
+    NSString *localPhotoPath = [ATHelper getPhotoDocummentoryPath];
+    localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:localPhotoPath])
+    {
+        NSString* pathFileStr = (NSString*)[error.userInfo objectForKey:@"path"];
+        [[self myRestClient] uploadFile:PHOTO_META_FILE_NAME toPath:[pathFileStr stringByDeletingLastPathComponent] withParentRev:nil fromPath:localPhotoPath];
+    }
+}
+
 
 // Folder is the metadata for the newly created folder
 - (void)restClient:(DBRestClient*)client createFolderFailedWithError:(NSError*)error{
@@ -482,13 +509,18 @@
         {
             [self startProcessNewPhotoQueueChainAction ]; //start upload the 1st file
         }
-        else //Part of chain: come here if created eventId directory
+        else //Part of chain: come here if eventId directory already created before
         {
             NSString *localPhotoPath = [ATHelper getPhotoDocummentoryPath];
             localPhotoPath = [[localPhotoPath stringByAppendingPathComponent:currentEventId] stringByAppendingPathComponent:currentPhotoName];
             if ([[NSFileManager defaultManager] fileExistsAtPath:localPhotoPath])
             {
-                [[self myRestClient] uploadFile:currentPhotoName toPath:(NSString*)[error.userInfo objectForKey:@"path"] withParentRev:nil fromPath:localPhotoPath];
+                NSString* remotePath = (NSString*)[error.userInfo objectForKey:@"path"];
+                NSString* remotePathFile = [NSString stringWithFormat:@"%@/%@",remotePath,PHOTO_META_FILE_NAME];
+                if (![PHOTO_META_FILE_NAME isEqualToString:currentPhotoName])
+                    [[self myRestClient] uploadFile: currentPhotoName toPath:remotePath withParentRev:nil fromPath:localPhotoPath];
+                else
+                    [[self myRestClient] loadRevisionsForFile:remotePathFile limit:1];
             }
         }
     }

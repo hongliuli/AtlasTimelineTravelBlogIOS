@@ -50,6 +50,7 @@
 @property (strong, nonatomic) ADBannerView *iAdBannerView;
 @property (strong, nonatomic) GADBannerView *gAdBannerView;
 @property BOOL isFirstTimeAddPhoto;
+@property BOOL photoDescChangedFlag;
 
 - (IBAction)saveAction:(id)sender;
 - (IBAction)deleteAction:(id)sender;
