@@ -113,7 +113,7 @@
     CGSize screenSize = screenBound.size;
     
     NSString *version = [[UIDevice currentDevice] systemVersion];
-    BOOL isAtLeast8 = [version compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending;
+    BOOL isAtLeast8 = [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
     if (isAtLeast8)
         return screenSize.height;
     {
