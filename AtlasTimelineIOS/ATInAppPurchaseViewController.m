@@ -7,9 +7,8 @@
 //
 
 #import "ATInAppPurchaseViewController.h"
+#import "ATConstants.h"
 
-#define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
-#define SCREEN_HEIGHT ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.height : [[UIScreen mainScreen] bounds].size.width)
 #define PURCHASE_PROD_ID @"com.chroniclemap.unlimitedevents"
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
 
@@ -91,9 +90,9 @@ UILabel *purchaseStatusLabel;
                 // show wait view here
                 if (purchaseStatusLabel == nil)
                 {
-                    purchaseStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/2 - 80, SCREEN_HEIGHT - 30, 160, 60)];
+                    purchaseStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake([ATConstants screenWidth]/2 - 80, [ATConstants screenHeight] - 30, 160, 60)];
                     purchaseStatusLabel.backgroundColor = [UIColor lightGrayColor];
-                    purchaseStatusLabel.textAlignment = UITextAlignmentCenter;
+                    purchaseStatusLabel.textAlignment = NSTextAlignmentCenter;
                     purchaseStatusLabel.text = @"Processing...";
                 }
                 //[self.mapView addSubview:purchaseStatusLabel];

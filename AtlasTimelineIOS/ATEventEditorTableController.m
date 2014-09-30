@@ -634,35 +634,36 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     }
     if (alertView == alertCancel)
     {
-        if (buttonIndex == 0)
-        {
-            NSLog(@"user canceled upload");
-            // Any action can be performed here
-        }
-        else if (buttonIndex == 1)
-        {
-            //will delete selected event from annotation/db
-            [self.delegate cancelEvent];
-        }
+        [self.delegate cancelEvent];
     }
 }
 
 - (IBAction)cancelAction:(id)sender {
     int cnt = [photoNewAddedList count] ;
-    if (cnt > 0)
+    if (cnt > 0 || self.photoDescChangedFlag || [self.photoScrollView.selectedAsSortIndexList count] > 0)
     {
-        alertCancel = [[UIAlertView alloc]initWithTitle: [NSString stringWithFormat:NSLocalizedString(@"%d new photo(s) are not saved",nil),cnt]
-                                                message: [NSString stringWithFormat:NSLocalizedString(@"Cancel will lose your new photos.",nil)]
+        NSString* titleTxt = [NSString stringWithFormat:NSLocalizedString(@"%d new photo(s) are not saved",nil),cnt];
+        if (cnt == 0)
+        {
+            if (self.photoDescChangedFlag && [self.photoScrollView.selectedAsSortIndexList count] > 0)
+                titleTxt = @"New photo order/desc need save";
+            else if ([self.photoScrollView.selectedAsSortIndexList count] > 0)
+                titleTxt = NSLocalizedString(@"New photo order need save",nil);
+            else
+                titleTxt = NSLocalizedString(@"New photo desc need save",nil) ;
+        }
+        alertCancel = [[UIAlertView alloc]initWithTitle:titleTxt
+                                                message: [NSString stringWithFormat:NSLocalizedString(@"Warning: Photo change(s) are not saved.",nil)]
                                                delegate: self
-                                      cancelButtonTitle:NSLocalizedString(@"Do not cancel",nil)
-                                      otherButtonTitles:NSLocalizedString(@"Quit w/o save",nil),nil];
+                                      cancelButtonTitle:NSLocalizedString(@"Ok",nil)
+                                      otherButtonTitles:nil];
         
         
         [alertCancel show];
     }
     else
         [self.delegate cancelEvent];
-
+    
     [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
 }
 
@@ -759,7 +760,15 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     lblTotalCount.text = [NSString stringWithFormat:@"%d", [self.photoScrollView.photoList count] ];
     lblNewAddedCount.text = [NSString stringWithFormat:NSLocalizedString(@"[+%d/-%d unsaved!]",nil), [photoNewAddedList count], [photoDeletedList count] ];//color is red so use separate lbl
     if ([photoNewAddedList count] == 0 && [photoDeletedList count] == 0)
-        lblNewAddedCount.hidden = true;
+    {
+        if (self.photoDescChangedFlag > 0 || [self.photoScrollView.selectedAsSortIndexList count] > 0)
+        {
+            lblNewAddedCount.text = NSLocalizedString(@"change unsaved",nil);
+            lblNewAddedCount.hidden = false;
+        }
+        else
+            lblNewAddedCount.hidden = true;
+    }
     else
         lblNewAddedCount.hidden = false;
 }

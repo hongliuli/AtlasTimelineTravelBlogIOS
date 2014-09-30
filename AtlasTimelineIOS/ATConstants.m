@@ -5,8 +5,6 @@
 //  Created by Hong on 1/25/13.
 //  Copyright (c) 2013 hong. All rights reserved.
 //
-#define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
-#define SCREEN_HEIGHT ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.height : [[UIScreen mainScreen] bounds].size.width)
 
 #import "ATConstants.h"
 
@@ -91,24 +89,42 @@
 }
 + (int) screenWidth
 {
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    
-    if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
-        return [[UIScreen mainScreen] bounds].size.height;
-    }
-    else{
-        return [[UIScreen mainScreen] bounds].size.width;
+    CGRect screenBound = [[UIScreen mainScreen] bounds];
+    CGSize screenSize = screenBound.size;
+    NSString *version = [[UIDevice currentDevice] systemVersion];
+    BOOL isAtLeast8 = [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
+    if (isAtLeast8)
+        return screenSize.width;
+    else
+    {
+        UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+        
+        if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
+            return [[UIScreen mainScreen] bounds].size.height;
+        }
+        else{
+            return [[UIScreen mainScreen] bounds].size.width;
+        }
     }
 }
 + (int) screenHeight
 {
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-
-    if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
-        return [[UIScreen mainScreen] bounds].size.width;
-    }
-    else{
-        return [[UIScreen mainScreen] bounds].size.height;
+    CGRect screenBound = [[UIScreen mainScreen] bounds];
+    CGSize screenSize = screenBound.size;
+    
+    NSString *version = [[UIDevice currentDevice] systemVersion];
+    BOOL isAtLeast8 = [version compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending;
+    if (isAtLeast8)
+        return screenSize.height;
+    {
+        UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+        
+        if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
+            return [[UIScreen mainScreen] bounds].size.width;
+        }
+        else{
+            return [[UIScreen mainScreen] bounds].size.height;
+        }
     }
 }
 + (int) timeSliderX

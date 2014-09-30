@@ -6,9 +6,6 @@
 //  Copyright (c) 2012 hong. All rights reserved.
 //
 
-#define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
-#define SCREEN_HEIGHT ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.height : [[UIScreen mainScreen] bounds].size.width)
-
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
 #define ALERT_FOR_SWITCH_AUTHO_MODE 1
 #define ALERT_FOR_POPOVER_ERROR 2
@@ -151,6 +148,7 @@
     [ATHelper createPhotoDocumentoryPath];
     //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.locationManager = [[CLLocationManager alloc] init];
+    
     mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
     int searchBarHeight = [ATConstants searchBarHeight];
     int searchBarWidth = [ATConstants searchBarWidth];

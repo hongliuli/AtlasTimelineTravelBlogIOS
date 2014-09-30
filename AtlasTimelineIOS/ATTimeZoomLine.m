@@ -18,7 +18,6 @@
 #define LABEL_SCALE_TEXT_CONTAINER_Y -38
 #define ZOOM_LEVEL_TXT_Y -5
 #define ZOOM_LEVEL_BLOCK_HEIGHT 30
-#define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
 
 @implementation ATTimeZoomLine
 
@@ -182,11 +181,11 @@ NSDate* prevYearDate;
             deviceDeltaLandscape = 50;
             deviceDeltaPortrait = -100;
         }
-        int xCenter = SCREEN_WIDTH/2 -45;//self.mapViewController.timeScrollWindow.center.x;
+        int xCenter = [ATConstants screenWidth]/2 -45;//self.mapViewController.timeScrollWindow.center.x;
         xCenter = [ATConstants screenWidth]/2 -45 + deviceDeltaLandscape;
         UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
         if (UIInterfaceOrientationIsPortrait(interfaceOrientation))
-            xCenter = SCREEN_WIDTH/2 - 17 - deviceDeltaPortrait;
+            xCenter = [ATConstants screenWidth]/2 - 17 - deviceDeltaPortrait;
         //for Retina landscape iPhone5, need special adjust
         
         CGRect screenRect = [[UIScreen mainScreen] applicationFrame];
