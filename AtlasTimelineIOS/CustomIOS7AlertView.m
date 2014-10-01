@@ -86,7 +86,7 @@ CGFloat buttonSpacerHeight = 0;
         // Attached to the top most window (make sure we are using the right orientation):
     } else {
         NSString *version = [[UIDevice currentDevice] systemVersion];
-        BOOL isAtLeast8 = [version compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending;
+        BOOL isAtLeast8 = [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
         if (!isAtLeast8)
         {
             UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -273,7 +273,7 @@ CGFloat buttonSpacerHeight = 0;
     CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
     NSString *version = [[UIDevice currentDevice] systemVersion];
-    BOOL isAtLeast8 = [version compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending;
+    BOOL isAtLeast8 = [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
     if (!isAtLeast8)
     {
         UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -331,7 +331,7 @@ CGFloat buttonSpacerHeight = 0;
     CGFloat startRotation = [[self valueForKeyPath:@"layer.transform.rotation.z"] floatValue];
     CGAffineTransform rotation;
     NSString *version = [[UIDevice currentDevice] systemVersion];
-    BOOL isAtLeast8 = [version compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending;
+    BOOL isAtLeast8 = [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
     if (!isAtLeast8)
     {
         switch (interfaceOrientation) {
@@ -381,7 +381,7 @@ CGFloat buttonSpacerHeight = 0;
     
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     NSString *version = [[UIDevice currentDevice] systemVersion];
-    BOOL isAtLeast8 = [version compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending;
+    BOOL isAtLeast8 = [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
     if (!isAtLeast8)
     {
         if (UIInterfaceOrientationIsLandscape(interfaceOrientation)) {
