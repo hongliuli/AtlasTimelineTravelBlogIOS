@@ -17,7 +17,7 @@
 @property int selectedPhotoIndex;
 @property NSMutableSet* selectedAsShareIndexSet;
 @property NSMutableArray* selectedAsSortIndexList;
-@property NSMutableArray* photoSortedNameList;
+@property NSArray* photoSortedListFromMetaFile;
 @property NSMutableDictionary* photoDescMap;
 
 @end

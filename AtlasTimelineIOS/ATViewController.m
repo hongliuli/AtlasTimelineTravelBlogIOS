@@ -675,15 +675,6 @@
         appDelegate.focusedDate = [[NSDate alloc] init];
     [self.timeScrollWindow setNewFocusedDateFromAnnotation:appDelegate.focusedDate needAdjusted:FALSE];
     
-    //NOTE the trick to set background image for a bar buttonitem
-    if (locationbtn == nil)
-        locationbtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    else
-        [locationbtn removeFromSuperview];
-    locationbtn.frame = CGRectMake([ATConstants screenWidth] - 50, 90, 30, 30);
-    [locationbtn setImage:[UIImage imageNamed:@"currentLocation.jpg"] forState:UIControlStateNormal];
-    [locationbtn addTarget:self action:@selector(currentLocationClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self.mapView addSubview:locationbtn];
     [self displayZoomLine];
 }
 

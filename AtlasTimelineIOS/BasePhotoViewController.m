@@ -121,7 +121,7 @@ UILabel* hasPhotoDescLabel;
     
     int screenWidth = [ATConstants screenWidth];
     int textWidth = screenWidth * 0.7;
-    photoDescView = [[UITextView alloc] initWithFrame:CGRectMake((screenWidth - textWidth)/2, 50 , textWidth, 110)];
+    photoDescView = [[UITextView alloc] initWithFrame:CGRectMake((screenWidth - textWidth)/2, 20 , textWidth, 110)];
     photoDescView.backgroundColor = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0.5];
     photoDescView.textColor = [UIColor whiteColor];
     //photoDescView.textAlignment = NSTextAlignmentCenter;
@@ -387,7 +387,7 @@ UILabel* hasPhotoDescLabel;
 {
     int screenWidth = [ATConstants screenWidth];
     int textWidth = screenWidth * 0.7;
-    [photoDescView setFrame:CGRectMake((screenWidth - textWidth)/2, 10 , textWidth, 120)];
+    [photoDescView setFrame:CGRectMake((screenWidth - textWidth)/2, 20 , textWidth, 120)];
     
     [sortIdexLabel setFrame:CGRectMake(50, [ATConstants screenHeight] - 140 , 120, 30)];
     [shareCountLabel setFrame:CGRectMake(80, [ATConstants screenHeight] - 110 , 180, 30)];
