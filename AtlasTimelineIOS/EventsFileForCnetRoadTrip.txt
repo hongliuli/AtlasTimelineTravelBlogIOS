@@ -1,0 +1,618 @@
+[Date]2013-07-02
+[Tags]Frank Lloyd Wright Home and Studio, 951 Chicago Ave Oak Park, IL 60302
+[Loc]41.895168, -87.799708
+[Desc]Frank Lloyd Wright masterpieces abound in Oak Park
+The Midwest is full of famous Frank Lloyd Wright buildings like Taliesin, the Robie House, the SC Johnson headquarters, and others. But in a way, it all got started here, in this tony suburb of Chicago.
+
+When Wright was still working for someone else -- Chicago architect Louis Sullivan -- he set up shop in a building he designed himself. From 1889 to 1909, Wright and his family -- wife Catherine and six of his seven children -- lived here. The building was also expanded to include his expansive professional studio. Known as the Frank Lloyd Wright Home and Studio, this beautiful building is at the heart of a neighborhood full of Wright masterpieces (see gallery here).
+
+The property became Wright's architectural laboratory, as he tried out many of the ideas he became famous for -- open spaces, built-in furniture, windows that made it possible to see the greenery outside, and much more -- here before he implemented them in commissioned buildings.
+
+
+Full Story:
+http://www.cnet.com/news/at-frank-lloyd-wrights-home-a-lab-for-world-class-architecture/
+
+Galleries:
+http://www.cnet.com/pictures/frank-lloyd-wright-masterpieces-abound-in-oak-park-pictures/
+
+http://www.cnet.com/pictures/inside-frank-lloyd-wrights-architecture-lab-pictures/
+
+
+
+
+
+[Date]2013-07-03
+[Tags]Nuclear Energy Exhibit at Argonne National Lab
+[Loc]41.714506, -87.982560
+[Desc]In Chicago, the birthplace of the nuclear age 
+If it's possible to pinpoint the moment when the nuclear age began, it was December 2, 1942. Under the stands at the University of Chicago's Stagg Field, inside a closed-off squash court, 49 of the world's best physicists watched as the first-ever nuclear reactor went critical. And, having proved that such a self-sustaining chain reaction was possible, a key moment in the study of the nuclear synthesis of plutonium for bombs, the arms race was on.
+
+Known as Chicago Pile-1, this was the reactor that was built by Enrico Fermi and many others to demonstrate that a nuclear chain reaction was possible. The effort, done under the auspices of the University of Chicago's Metallurgical Laboratory, the precursor to Argonne National Lab, was a key step in the development of the Manhattan Project, the creation of the atomic bomb.
+
+
+http://www.cnet.com/pictures/in-chicago-the-birthplace-of-the-nuclear-age-pictures/
+
+
+
+[Date]2013-07-04
+[Tags]National Petascale Coputing Facility, NCSA - CHAMPAIGN, Ill
+[Loc]40.095358, -88.242155
+[Desc]Up close with America's national supercomputer, Blue Waters
+While those with high security clearances sometimes have access to powerful government supercomputers, academics, scientists, and engineers often have not. That's why the National Center for Supercomputing Applications launched Blue Waters, one of the world's most powerful supercomputers, in March. Funded with an initial $208 million grant and a five-year operations grant of $151 million by the National Science Foundation, Blue Waters was installed at the National Petascale Computing Facility at the University of Illinois at Champaign-Urbana.
+
+With the capacity of completing in excess of a quadrillion calculations per second on a sustained basis -- and ten times that at peak performance -- Blue Waters was meant to be ideal for providing the scientific community with the processing speed, data storage, memory, and communication necessary to take on many of the most complex computing tasks.
+
+The supercomputer comprises 22,640 Cray XE6 nodes and 3,072 Cray XK7 nodes with NVIDIA graphics processor acceleration. The XE6 nodes have 64 GB of memory per node, while the XK7s each have 32 GB of memory. Blue Waters also boasts a quick online storage capacity of 26 petabytes, and 380 petabytes of longer term tape data storage.
+
+
+http://www.cnet.com/pictures/up-close-with-americas-national-supercomputer-blue-waters-pictures/
+
+
+[Date]2013-07-05
+[Tags]Cloud Gate, Chicago, IL
+[Loc]41.882865, -87.623336
+[Desc]The amazing facets of Chicago's incredible 'Bean'
+If you've traveled to many cities around the world, you've no doubt seen a lot of public art. But there are few pieces in the world that can outshine "The Bean," as internationally renowned artist Anish Kapoor's wonderful "Cloud Gate" is affectionately called.
+
+http://www.cnet.com/pictures/the-amazing-facets-of-chicagos-incredible-bean-pictures/
+
+
+[Date]2013-07-08
+[Tags]Frederick C Robie House 5757 S Woodlawn Ave, Chicago, IL 60637
+[Loc]41.790035, -87.596002
+[Desc]Robie House, Frank Lloyd Wright's masterpiece, regains glory
+Given that Frank Lloyd Wright designed Fallingwater, Taliesin West, the Tokyo's Imperial Hotel, and many other great buildings, it's hard to say which one is his greatest.
+
+But after visiting Robie House here as part of Road Trip 2013, CNET reporter Daniel Terdiman thinks he might have seen the best Frank Lloyd Wright building of them all.
+
+With what is the quintessential example of Wright's Prairie Style of architecture, Robie House is a stunning work of art. Located at the University of Chicago, the house, completed in 1910 for businessman Frederick C. Robie, is in the middle of a major, multi-million-dollar renovation that should return it to its original glory.
+
+(more about Frank Lloyd Wright see 7/2 events)
+
+http://www.cnet.com/pictures/robie-house-frank-lloyd-wrights-masterpiece-regains-glory-pictures/
+
+
+
+[Date]2013-07-09
+[Tags]Dayton Aviation Heritage National Historical Park, Dayton OH
+[Loc]39.756349, -84.211770
+[Desc]How the Wright brothers won the race to invent the 
+Here in this southwestern Ohio city, the influence of the Wrights, the two brothers who in 1903 made the first-ever powered, manned flight, is everywhere. There's Wright State University. There's Wright-Patterson Air Force Base. There's the Dayton-Wright Brothers Airport. And the entire area is encompassed in the National Aviation Heritage Area.
+
+The Wright Company was the commercial aviation business venture of the Wright Brothers, established by them on 22 November 1909 in conjunction with several prominent industrialists from New York and Detroit with the intention of capitalizing on their invention of the practical airplane.[1][2] The company maintained its headquarters office in New York City and built its factory in Dayton, Ohio.
+
+http://www.cnet.com/pictures/how-the-wright-brothers-won-the-race-to-invent-the-airplane-pictures/
+
+
+[Date]2013-07-10
+[Tags]General Dynamics Land Systems, LIMA, Ohio
+[Loc]40.708831, -84.128484
+[Desc]Building the U.S. Army's M1A2 Abrams tank 
+For 35 years, Abrams tanks have been rolling off the assembly lines of General Dynamics Land Systems' Joint Systems Manufacturing Center plant in this western Ohio town, destined for the U.S. Army (and a few foreign customers).
+
+In 1996, the plant stopped making brand-new hulls and turrets for the the U.S. Army's Abrams tanks, instead choosing to recondition older M1A2 systems that were still in working order.
+
+
+http://www.cnet.com/pictures/building-the-u-s-armys-m1a2-abrams-tank-pictures/
+
+
+
+[Date]2013-07-13
+[Tags]AKRON, Ohio
+[Loc]41.035580, -81.470198
+[Desc]Making Goodyear's next-gen blimp 
+Anyone who has ever watched a major sporting event on TV is no doubt familiar with the famous Goodyear blimp. For decades, the tire giant's airships have flown over events of all kinds, providing aerial footage even as they advertise the company's tires.
+
+But now Goodyear is getting ready to retire its three American-made blimps and replace them with three zeppelins designed by Germany's Zeppelin Luftschifftechnik (ZLT).
+
+Why? For three main reasons. First, zeppelins fly differently than Goodyear's traditional blimps and offer television event directors the ability to have cameras essentially hover overhead and get better, more consistent shots. Second, the new airships are quieter. And finally, they fly faster, longer, and more efficiently.
+
+Though Goodyear announced its plans in 2011, few have seen the company's progress as it builds its new zeppelins -- which it will continue to call blimps in order to maintain the "Goodyear blimp" brand. But on Road Trip 2013, CNET reporter Daniel Terdiman stopped in at the company's Wingfoot Lake blimp operations near Akron and got a firsthand look at how the new zeppelin is coming together.
+
+http://www.cnet.com/pictures/making-goodyears-next-gen-blimp-pictures/
+
+
+[Date]2013-07-15
+[Tags]WRIGHT-PATTERSON AIR FORCE BASE, Ohio
+[Loc]39.818827, -84.048449
+[Desc]The Memphis Belle comes back to life 
+It's one of the most famous airplanes in America's military history, a B-17 that became part of lore by being the first heavy bomber to complete 25 missions in Europe during World War II, and return home.
+
+When the strategic bombing campaign against the Germans began in November 1942, it wasn't known if it would be successful. Many didn't make it through 25 missions -- the threshold for being able to go home -- but the Memphis Belle succeeded and instantly became a major public relations coup for the American military.
+
+After returning to the United States, the Memphis Belle was sent on a national war bond tour, making dozens of stops around the country and driving up spirits everywhere it went.
+
+After the war, the plane was relegated to a boneyard in Oklahoma before being rescued by the Mayor of Memphis. Then, the Air Force got a hold of the plane, and in 2005 brought it to the National Museum of the U.S. Air Force in Dayton and began a long-term restoration project, the goal of which is to return the plane to what it looked like when it was flying bombing missions in Europe.
+
+Now, the plane is being meticulously worked on by the experts in the museum's restoration shop, and CNET reporter Daniel Terdiman stopped by to check out the work during Road Trip 2013. It is expected that sometime late next year or in early 2015, the plane will be moved inside the museum itself, where the general public will be able to see the final restoration process.
+
+http://www.cnet.com/pictures/the-memphis-belle-comes-back-to-life-pictures/
+
+
+[Date]2013-07-16
+[Tags]Lionel Service Center, CANFIELD, Ohio
+[Loc]41.022670, -80.715475
+[Desc]How Lionel gets broken trains back on track 
+http://www.cnet.com/pictures/how-lionel-gets-broken-trains-back-on-track-pictures/
+
+
+[Date]2013-07-18
+[Tags]Hall of Heroes Museum, ELKHART, Ind
+[Loc]41.657884, -85.996233
+[Desc]With Superhero museum, who needs Comic-Con? 
+The world may be focused on Comic-Con in San Diego this week, but no one has a better claim to superhero supremacy than Allen Stewart.
+
+Tucked away on a leafy street in this northern Indiana town, Stewart runs the Hall of Heroes Super Hero Museum, part gigantic comic book collection, part homage to some of the greatest superhero artifacts ever produced.
+
+Among its treasures is this Batman suit from the original 1960s TV show and the suit that the original Batman, Adam West, wore when he made personal appearances.
+
+The suit was a gift to the museum this year from a man who had purchased it at auction years ago and who was liquidating some of his collection.
+
+http://www.cnet.com/pictures/with-superhero-museum-who-needs-comic-con-picturesiteman Air Force Base to the target and back. During these missions, normally lasting more than 30 hours and requiring numerous aerial refuelings, each B-2 delivered up to 40,000 pounds of precision weapons."
+
+http://www.cnet.com/pictures/a-century-of-the-best-of-the-u-s-air-force-pictures
+
+
+[Date]2013-07-22
+[Tags]National Museum of the United States Air Force, DAYTON, Ohio
+[Loc]40.333810, -84.133511
+[Desc]A century of the best of the U.S. Air Force 
+For fans of the history of aerial warfare, there is probably no better place to visit than the National Museum of the United States Air Force, based here at Wright-Patterson Air Force Base.
+
+As part of Road Trip 2013, CNET reporter Daniel Terdiman stopped at the museum and saw many of the most important aircraft in American history.
+
+Perhaps the most striking of all the planes in the museum is the B-2 Spirit stealth bomber, which first emerged from its Palmdale, Calif., hangar on November 22, 1988. According to the museum, "B-2 Spirit merged the high aerodynamic efficiency of the "flying wing" design with composite materials, special coatings and classified stealth technologies. As a result, the B-2 became virtually invisible to even the most sophisticated air defense radar systems....Based at Whiteman Air Force Base, Mo., the B-2 soon demonstrated its combat capabilities in Operation Allied Force over Serbia in 1999, Operation Enduring Freedom over Afghanistan in 2001, and Operation Iraqi Freedom over Iraq in 2003.
+
+"With a crew of only two -- the pilot in the left seat and the mission commander in the right -- a typical combat mission consisted of a non-stop flight from Whiteman Air Force Base to the target and back. During these missions, normally lasting more than 30 hours and requiring numerous aerial refuelings, each B-2 delivered up to 40,000 pounds of precision weapons."
+
+
+http://www.cnet.com/pictures/a-century-of-the-best-of-the-u-s-air-force-pictures/
+
+
+[Date]2013-07-23
+[Tags]OFFUTT AIR FORCE BASE, Neb
+[Loc]42.953223, -96.002904
+[Desc]A rare peek inside America's Doomsday plane 
+Fortunately, it has never come to this. But if the United States ever found itself in the middle of a nuclear war, it would need the ability to get a command and control center off the ground and away from potential attack targets in just minutes.
+
+That's precisely what the National Airborne Operations Center (NAOC) is all about. A set of four E-4Bs -- which are Boeing 747-200s modified to support the military's doomsday communications needs -- these planes were designed to allow the country's most senior military officials to stay in charge and control during a nuclear crisis, or something approaching that level of seriousness.
+
+The planes are based out of this Air Force Base, which is also home to U.S. Strategic Command, and was the longtime home of U.S. Strategic Air Command, just south of Omaha. CNET reporter Daniel Terdiman got a rare opportunity to look inside and out of one of the Doomsday planes as part of Road Trip 2013.
+
+http://www.cnet.com/pictures/a-rare-peek-inside-americas-doomsday-plane-pictures/
+
+
+[Date]2013-07-26
+[Tags]S.C Johonson, RACINE, Wis
+[Loc]42.714071, -87.787910
+[Desc]Why Frank Lloyd Wright piled 60 tons on a lily pad
+Frank Lloyd Wright is famous for many of the incredible homes he designed -- Fallingwater, the Robie House, Taliesin, and so many more. But his design for the SC Johnson Wax company headquarters in this town just south of Milwaukee has touched many more people on a daily basis than any of those masterpieces ever did.
+The highlight of the building is its world-renowned Great Workroom of the headquarters' administration building, a half-acre open space filled by nearly 60 21-foot-tall dendriform (shaped liked a tree) columns that almost seem to float throughout the room.
+
+The great triumph of the columns, which are also collectively known as a lily pad, is that they effortlessly hold up the roof, allowing for walls made partially of glass tubes -- a design that allows a great deal of natural light to flood the space during the day.
+
+As part of Road Trip 2013, CNET's Daniel Terdiman jumped at the chance to see how the great architect could achieve what to others seemed certain to defy the laws of physics.
+
+http://www.cnet.com/pictures/why-frank-lloyd-wright-piled-60-tons-on-a-lily-pad-pictures/
+
+[Date]2013-07-27
+[Tags]Bailey Yard, NORTH PLATTE, Neb
+[Loc]41.147739, -100.829484
+[Desc]Trains for miles! Inside the world's largest rail yard
+The Union Pacific's Bailey Yard is the world's largest rail yard. That means that every day, as many as 139 different trains roll through carrying about 14,000 rail cars.
+
+Bailey Yard covers 2,850 acres and eight total miles, and has long been key to UP's massive rail network, given its location central to the company's major east-west and north-south corridors.
+
+Although just about any cargo imaginable comes through Bailey Yard, coal is one of the most common, as hundreds of coal-laden cars make their way east from mines in Wyoming every day.
+
+http://www.cnet.com/pictures/trains-for-miles-inside-the-worlds-largest-rail-yard-pictures/
+
+
+
+[Date]2013-07-31
+[Tags]Indianapolis Motor Speedway, INDIANAPOLIS, Ind
+[Loc]39.795560, -86.235301
+[Desc]Victory! How Nascar gets faster (and safer) than ever 
+The trick was to make the fans happy, keep the drivers safe, level the playing field, and implement state-of-the-art technology. Did Nascar do it? Only time will tell.
+
+This year, Nascar, a sport that surpasses every sport but the NFL in popularity among Americans, went for the gold, rolling out an all-new generation of its race cars that ditched the common look among manufacturers that fans hated in the previous generation and cut weight. The result? Faster speeds and track records falling by the wayside week after week.
+
+Looking to understand how technology comes into play in a Nascar race, CNET's Daniel Terdiman traveled to the most hallowed track of all -- the Indianapolis Motor Speedway -- to take in the Brickyard 400 and see just how the sport's latest innovations impact a race where the fastest drivers can top out their speed at more than 187.5 miles an hour.
+
+One recent innovation is this laser scanning system that is used to take precise measurements of each car that will compete in a Nascar event in order to ensure that race teams are adhering to strict regulations about how the vehicles are engineered for a race.
+
+http://www.cnet.com/pictures/victory-how-nascar-gets-faster-and-safer-than-ever-pictures/
+
+
+
+[Date]2013-08-01
+[Tags]Terrafugia Inc, OSHKOSH, Wis
+[Loc]42.482628, -71.119500
+[Desc]Look! Up in the air! A real-life $279,000 flying car 
+Though it has been talked about for years and has even been seen at car shows and via online videos, Terrafugia's flying car had never been seen in the air in public before. That is until Wednesday, when it made its public flying debut at the EAA AirVenture air show in OshKosh.
+
+As part of Road Trip 2013, CNET's Daniel Terdiman got a chance to see the flying car actually fly. And then drive away.
+
+http://www.cnet.com/pictures/look-up-in-the-air-a-real-life-279000-flying-car-pictures/
+
+[Date]2013-08-02
+[Tags]OFFUTT AIR FORCE BASE, Neb
+[Loc]41.126520, -95.915281
+[Desc]Inside U.S. Strategic Command 
+ The scope of the entire U.S. military is vast, yet there is not a single military mission on Earth that is not supported in some way by U.S. Strategic Command.
+
+Known as Stratcom and based at this base south of Omaha, Strategic Command is one of America's three functional combatant commands (and one of nine overall) and covers the whole planet, the depths of the oceans, and up to 22,000 nautical miles into space.
+
+From operating B-2 bombers over Libya to space analysts looking into radiation fallout from Japan's 2011 earthquake and tsunami, Stratcom is involved.
+
+As part of Road Trip 2013, CNET's Daniel Terdiman visited Stratcom for a look at its history, its present and its future.
+
+http://www.cnet.com/pictures/inside-u-s-strategic-command-pictures/
+(date may not correct because it show 8/1 conflicting with flying car)
+
+[Date]2013-08-06
+[Tags]City Museum, ST. LOUIS
+[Loc]38.633449, -90.200586
+[Desc]The coolest 'museum' in the world, bar none 
+It's a rare museum that has a school bus hanging off the roof, let alone a bus that kids can climb on. But at the City Museum here, that's just one small piece of the fun.
+
+Hardly the kind of institution that would normally be called a museum, City Museum presents visitors with a cacophony of exciting choices: tunnels to climb through, 10-story slides to shoot down, a chance to sit on the world's largest pencil, and so much more.
+
+An ever-changing funhouse that was the brainchild of artist Bob Cassilly, City Museum now draws thousands of people every day who know that a visit means an adventure that will never be the same twice. As part of Road Trip 2013, CNET reporter Daniel Terdiman took a trip to City Museum at the behest of friends in California and in St. Louis, and of several readers. And though he had no idea what he was getting into, he has no regrets. And even days later, he's still smiling.
+
+http://www.cnet.com/pictures/the-coolest-museum-in-the-world-bar-none-pictures/
+
+
+[Date]2013-08-08
+[Tags]INDIANAPOLIS
+[Loc]39.804784, -86.236985
+[Desc]Road to Indy: The life of a Goodyear racing tire 
+ When you buy a set of new Goodyear tires for your car, you have every reason to expect that they'll last you 80,000 miles. But when a Nascar team gets its hands on a set of Goodyear's racing tires, the expectation is a little lower: just 100 miles.
+
+For years, Goodyear has had the exclusive contract to provide racing tires for Nascar. And that means that over the course of a year, Goodyear makes approximately 100,000 tires for Nascar teams, at a pricey $474 per.
+
+As part of Road Trip 2013, CNET reporter Daniel Terdiman stopped in at Goodyear's racing tire manufacturing facility in Akron to see how they're made, and then saw the other end of their lifecycle (although not the exact same tires) at one of Nascar's biggest events, the Brickyard 400, at the Indianapolis Motorspeedway.
+
+Goodyear's racing tires are made to exacting specifications and are tracked at every step of the way after being delivered to a race team. That's because everyone involved -- from the racing teams, to Nascar, to Goodyear -- wants to see how the tires perform, not least because simply looking at them and seeing how they're worn after a race can tell a lot about how the car that used them was driven.
+
+Nascar teams are trained to change a full set of tires in about 15 seconds, as seen here. But sometimes, even that many seconds is the difference between winning and losing. In this year's Brickyard 400, eventual winner Ryan Newman held off favorite Jimmie Johnson by electing to replace just two tires during his last pit stop, saving precious seconds.
+
+http://www.cnet.com/pictures/road-to-indy-the-life-of-a-goodyear-racing-tire-pictures/
+
+
+[Date]2014-06-17
+[Tags]AFTON, Okla
+[Loc]36.631267, -94.887448
+[Desc]It's hot rod heaven at Oklahoma custom car museum 
+In 1954, Darryl Starbird started building custom cars in Wichita, Kan. Soon he became one of the best-known hot rod builders in the world, as well as a producer of hundreds of car shows around the country.
+Now, he lives outside this tiny hamlet in northeast Oklahoma, and plays host to the National Hot Rod & Custom Car Hall of Fame Museum, a place that celebrates creative car design and modification over the years, and the people who do it best.
+As part of CNET Road Trip 2014, I took a detour off the main roads to visit.
+Opened in 1995 by Starbird, the museum is meant to be ground zero for fans of the genre to come and see both 26 of Starbirdís own vehicles, and two dozen others built by other stars in the field.
+This is Darryl Starbird's Trik Truk, built on a 1980 Chevrolet van base. Entirely handcrafted in sheetmetal, the van has a mid-engine blown injected 350 Chevy V8. It's painted in "House of Color" Candy Brandywine and Pearl White paint.
+
+http://www.cnet.com/pictures/its-hot-rod-heaven-at-oklahoma-custom-car-museum-pictures/
+
+
+[Date]2014-06-18
+[Tags]Dealey Plaza, Dallas
+[Loc]32.778829, -96.808307
+[Desc]In Dallas, JFK's memory still haunts
+Even if they've never been here before, most visitors to this giant Texas city will instantly recognize Dealey Plaza.
+
+The site of one of the most infamous moments in US history -- the assassination of President John F. Kennedy on November 22, 1963 -- this otherwise pleasant landscape will forever be known for the death of the 35th American president and the pall that event cast on the blossoming vigor of the 1960s.
+
+The Sixth Floor Museum at Dealey Plaza, located in what was in 1963 the Texas School Book Depository, offers a comprehensive look at the life -- and death -- of JFK.
+
+Among the compelling exhibits is the above FBI-created model of the president's motorcade moving down Elm Street at the moment Kennedy was shot. Made to determine whether it was possible JFK had been shot by presumed assassin Lee Harvey Oswald from the sixth floor of the book depository, the model establishes that the official explanation is at least plausible.
+
+http://www.cnet.com/pictures/in-dallas-jkfs-memory-still-haunts-pictures/
+
+[Date]2014-06-19
+[Tags]South West Airline headquater, Dallas
+[Loc]32.845419, -96.863337
+[Desc]Behind the scenes at Southwest Airlines 
+ If you've ever flown, you've doubtless sat through the list of emergency procedures at the beginning of the flight. But did you listen?
+
+Southwest Airlines flight attendants don't have the luxury of tuning out when they're training for their jobs, especially not when learning how to handle an onboard emergency like a fire.
+
+At its Dallas headquarters, Southwest runs this cabin trainer, known as the Poolie, which lets the flight crew practice what to do in a crisis.
+
+http://www.cnet.com/pictures/behind-the-scenes-at-southwest-airlines-pictures/
+
+
+[Date]2014-06-21
+[Tags]FORTH WORTH, Texas
+[Loc]33.032759, -97.305254
+[Desc]Making the world's most efficient locomotive 
+Who doesn't love trains? Especially when they're being manufactured?
+
+As part of Road Trip 2014, CNET reporter Daniel Terdiman visited General Electric Transportation's massive facility here, a 1-million-square-foot factory where the company makes locomotives.
+
+GE says these locomotives are the world's most efficient -- measured by generating the least emissions in the industry -- and are delivered to customers and are often hauling cargo the same day.
+
+First photo:
+Here, a locomotive is inside the paint shop. Currently, all locomotives made in the Fort Worth factory are being sold to BNSF Railway, so this machine will soon sport the orange and black livery of BNSF.
+
+http://www.cnet.com/pictures/making-the-worlds-most-efficient-locomotive-pictures/
+
+
+[Date]2014-06-24
+[Tags]Lockheed Martin Co, GRAND PRAIRIE, Texas 
+[Loc]32.717589, -97.028377
+[Desc]How robots can help soldiers haul their heavy gear
+One of the biggest issues facing U.S. military combat units is that individual soldiers or Marines carry, on average, 130 pounds of gear. Though they are usually fit and strong, that load can wear them down.
+
+Though it's very early in the game, the military is considering ways to take some of that weight off their shoulders, and one option is an autonomous ground vehicle system capable of carrying much of the non-essential gear soldiers and Marines take with them into the field.
+
+Several companies are vying for a potential military contract, and as part of Road Trip 2014, CNET reporter Daniel Terdiman visited Lockheed Martin's Missiles and Fire Control offices here for a demonstration of that company's Squad Mission Support System (SMSS)
+
+Full Story:
+http://www.cnet.com/news/this-robot-can-take-the-weight-off-soldiers-shoulders/
+
+http://www.cnet.com/pictures/how-robots-can-help-soldiers-haul-their-heavy-gear-pictures/
+
+
+
+
+
+[Date]2014-06-26
+[Tags]Naval Air Station, CORPUS CHRISTI, Texas
+[Loc]27.693037, -97.291432
+[Desc]How the Navy trains its pilots 
+If you're in the Navy and you want to fly planes, there's a pretty good chance you'll spend some time here.
+
+One of two bases where the Navy trains pilots, Naval Air Station Corpus Christi is home to two squadrons of would-be aviators. Today, they are flying both the venerable T-34 and the newer T-6B, but before long the T-34 will be phased out.
+
+One of the linchpins of pilot training here is using the T-6B simulator, and on Road Trip 2014, CNET reporter Daniel Terdiman got to try his hand at flying the "plane." 
+
+Full Story:
+http://www.cnet.com/news/when-they-say-fly-wanna-be-navy-pilots-say-how-high/
+
+
+http://www.cnet.com/pictures/how-the-navy-trains-its-pilots-pictures/
+
+
+
+
+
+[Date]2014-06-28
+[Tags]US Customs and Border Prodtection, San Antonio TX
+[Loc]27.805083, -97.498475
+[Desc]If you're smuggling drugs into the US from Mexico by Cessna, you might think you've got a clear shot at crossing over undetected, but US Customs and Border Protection thinks otherwise.
+
+Every day, CBP puts a fleet of aircraft into the skies in hopes of identifying, tracking, and ultimately interdicting smugglers coming in by air and by sea.
+
+As part of Road Trip 2014, CNET reporter Daniel Terdiman went to Texas and stopped by the CBP's National Air Security Operations Center -- Corpus Christi, and got on board one of the agency's P-3 Orions to see how the Feds track an unsuspecting smuggler in the skies.
+
+Full story:
+http://www.cnet.com/news/chasing-drug-laden-bogeys-across-the-skies/
+
+http://www.cnet.com/pictures/how-the-feds-chase-down-smugglers-in-the-sky-pictures/
+
+
+
+
+
+[Date]2014-06-30
+[Tags]Lackland Afb, San Antonio TX
+[Loc]29.384201, -98.581189
+[Desc]How the Air Force hardens planes against signal leakage 
+When the president of the United States flies anywhere, it goes without saying that he and his entourage want to be sure that any communications being generated on board Air Force One are safe from prying eyes (or ears).
+
+The same is true of communications aboard any Air Force aircraft, and that's why members of the 24th Air Force, based out of Lackland Air Force Base here, work hard to "harden" every plane the service flies, ensuring all communications are safe from eavesdroppers.
+
+As part of Road Trip 2014, CNET reporter Daniel Terdiman traveled to Lackland to see how the Air Force secures its aircraft and their communications from any kind of unintentional leakage.
+
+Photo 1:
+Working out of a special white RV parked alongside a C-5 -- the Air Force's largest airplane -- technicians demonstrated how they test for leaked signals.
+
+
+Full story:
+http://www.cnet.com/news/how-air-force-ones-communications-are-hardened/
+
+http://www.cnet.com/pictures/how-the-air-force-hardens-planes-against-signal-leakage-pictures/
+
+
+
+
+[Date]2014-07-01
+[Tags]University of Texas at Brownsville office.
+[Loc]25.893149, -97.486663
+[Desc]In Austin, Prof. Dumpster lives the good life 
+In a world of dwindling resources, the average American lifestyle is almost certainly unsustainable. Yet most people don't have a model for how to live differently.
+
+That's what Jeffrey Wilson, aka Professor Dumpster, wants to provide. An environmental sciences professor and dean at Huston Tillotson University here, Professor Dumpster is in the middle of a project meant to prove it's possible to live super minimally, and super efficiently.
+
+For a year, Professor Dumpster is living in a 33-square-foot dumpster -- outfitted, of course, for civilized living. But the goal is to do that living with zero waste, and extremely minimal use of power and water.
+
+As part of Road Trip 2014, CNET reporter Daniel Terdiman came to the Texas capital to see just how comfortable one can be living in a glorified trash can. Turns out, if you're willing to let go of a few creature comforts, it's not too bad.
+
+
+Full story:
+http://www.cnet.com/news/dumpster-living-professor-out-to-make-a-point/
+
+
+http://www.cnet.com/pictures/in-austin-prof-dumpster-lives-the-good-life-pictures/
+
+
+[Date]2014-07-03
+[Tags]LACKLAND aIR fORce Base, SAN ANTONIO, Texas
+[Loc]29.388482, -98.620123
+[Desc]Into the wild blue yonder: US Air Force basic training 
+Every year, the U.S. Air Force graduates about 35,000 new airmen. Each and every one of them comes to Lackland Air Force Base here, where they spend eight weeks in intensive basic training.
+
+It all begins each week when between 400 and 700 new trainees are brought to Lackland, where they must first get all their gear, including their boots and caps. If they survive the training, they get their airman's coin and join what they are told over and over again is "the best air force the world has ever known."
+
+CNET Road Trip 2014 visited Lackland to see the beginning and ending of the airmen's eight-week journey.
+
+Full Story:
+http://www.cnet.com/news/booting-up-the-eight-week-journey-for-the-usafs-new-usaf-airmen/
+
+
+http://www.cnet.com/pictures/into-the-wild-blue-yonder-u-s-air-force-basic-training-pictures/
+				.
+
+[Date]2014-07-06
+[Tags]Houston, TX
+[Loc]29.551895, -95.092404
+[Desc]Training astronauts 40 feet deep
+http://www.cnet.com/pictures/training-astronauts-40-feet-deep-pictures/
+
+
+[Date]2014-07-09
+[Tags]Graceland, MEMPHIS, Tenn
+[Loc]35.047686, -90.026055
+[Desc]Rockin' with Elvis at Graceland
+If you tell people you're visiting this city of 655,000 in the southwest corner of Tennessee, you'll almost always get asked, "Are you going to Graceland?"
+
+As part of CNET Road Trip 2014, I did stop in on Elvis Presley's former home. It's by no means a hotbed of technology, but it does offer quite a bit of history and context about the American music industry given Elvis' outsized impact on entertainment from the mid-1950s through the mid-'70s.
+
+His impact wasn't just cultural. He also won nearly every award the music industry offers, including countless gold and platinum records, many of which are seen here on the wall in what was once Elvis' racquetball court.
+
+http://www.cnet.com/pictures/rockin-with-elvis-at-graceland-pictures/
+
+
+[Date]2014-07-11
+[Tags]FedEx, MEMPHIS, Tenn
+[Loc]35.068208, -89.960958
+[Desc]Why FedEx beats up packages in a lab 
+You may think the boxes you send or receive through FedEx have it rough, but nothing they go through is like what the more than 4,000 a year that the company processes at its Package Lab are subjected to.
+
+The company offers a free service -- to any FedEx customer -- to test how a package will perform under very tough conditions. This is crucial for companies that ship lots of products. If they pass, great. If not, the lab offers recommendations on how to make them survive in the future.
+
+As part of CNET Road Trip 2014, I traveled to Memphis to see first-hand the kind of torture FedEx puts these packages through.
+Photo 1:
+Here, we see an engineer inspecting how a package is performing while being compressed with more than 50 pounds of pressure.
+
+Full Story:
+http://www.cnet.com/news/dropping-packages-at-fedex-and-getting-paid-for-it/
+
+http://www.cnet.com/pictures/why-fedex-beats-up-packages-in-a-lab-pictures/
+
+
+[Date]2014-07-12
+[Tags]FedEx Hub, MEMPHIS, Tenn
+[Loc]35.062895, -89.963646
+[Desc]At FedEx's Memphis hub, sorting 1.5 million packages
+Every night, at its World Hub here, FedEx sorts up to 1.5 million packages that come in from all over the glove. The packages arrive on about 140 planes and are sorted, and then sent on to their final destinations.
+
+As part of CNET Road Trip 2014, I traveled to the World Hub to see just how the shipping giant handles the literal flood of packages.
+
+Full story on world hub:
+http://www.cnet.com/news/at-fedex-sorting-packages-1-5-million-at-a-time/
+
+http://www.cnet.com/pictures/at-fedexs-memphis-hub-sorting-1-5-million-packages-pictures/
+
+[Date]2014-07-15
+[Tags]Thorncrown Chapel, EUREKA SPRINGS, Ark
+[Loc]36.416250, -93.772978
+[Desc]Thorncrown Chapel, Arkansas' great glass masterpiece
+Conceived as a folly by an alcoholic California schoolteacher, Thorncrown Chapel in this northwestern Arkansas hamlet, shocked the world. Designed by Frank Lloyd Wright's most-accomplished student, Fay Jones and opened in 1980, Thorncrown Chapel won many of architecture's most prestigious awards.
+
+As part of CNET Road Trip 2014, I came to the Ozarks to see the "Glass Chapel," Jones' biggest masterpiece, and a testament to the commitment of the schoolteacher, John Reed.
+
+Full Story:
+http://www.cnet.com/news/inside-thorncrown-chapel-the-ozarks-glass-masterpiece/
+
+http://www.cnet.com/pictures/thorncrown-chapel-arkansas-great-glass-masterpiece-pictures/
+
+[Date]2014-07-20
+[Tags]Price Tower, BARTLESVILLE, Okla
+[Loc]36.747812, -95.976434
+[Desc]Inside Frank Lloyd Wright's only skyscrape
+Frank Lloyd Wright designed hundreds of buildings over his long career, and he's arguably America's best architect. Yet there's only one Frank Lloyd Wright skyscraper: the 19-story Price Tower in this small town in northeast Oklahoma.
+
+The design is based on one Wright created for a building that was supposed to be erected in New York City in the 1930s. But economic hard times made it impossible for that building to become reality.
+
+When Hal Price, the owner of a global oil pipeline company came calling, Wright knew just the design he wanted for Price's new office building in Bartlesville.
+
+As part of CNET Road Trip 2014, I visited Price Tower to see how Wright's work translates into a tall office building.
+
+Full Story:
+http://www.cnet.com/news/price-tower-frank-lloyd-wrights-only-skyscraper/
+
+http://www.cnet.com/pictures/inside-frank-lloyd-wrights-only-skyscraper-pictures/
+
+
+[Date]2014-07-22
+[Tags]Boeing Co, WICHITA, Kan
+[Loc]37.608835, -97.283958
+[Desc]In Kansas, where 787 Dreamliners are born
+If you want to see 787 Dreamliners be fully assembled, you have to go to either Everett, Wash., or North Charleston, S.C. But if you want to see how the front section of the next-gen airplanes are made, you have to travel to Kansas.
+
+For decades, Boeing had a large presence in Wichita, but in 2005 the company decided to spin out its facility here as a private company. And that's how Spirit Aerosystems was born. Now, Spirit is involved in the manufacturing process for a number of major aircraft, including the Dreamliner, Boeing's 737, 777, and 747, as well as some of Airbus' airplanes.
+
+As part of CNET Road Trip 2014, I visited Spirit in Wichita to see how the Dreamliner's front section comes to life.
+
+Above, you can see what is known as a "barrel," the very beginning of a front section. The barrel is comprised of several smaller sections known as mandrels. Once the mandrels assembled, a giant machine methodically winds thousands of pounds of composite "slit tape" around the barrel, gradually forming the shape of the forward section.
+
+Full Story:
+http://www.cnet.com/news/in-wichita-the-787-dreamliner-gets-its-head-start/
+
+http://www.cnet.com/pictures/in-kansas-where-787-dreamliners-are-born-pictures/
+
+
+[Date]2014-07-26
+[Tags]Aerosystems, Wichita Kansas
+[Loc]37.625989, -97.283944
+[Desc]The great Boeing metal-airplane shop
+When most people think of Boeing commercial jet production, they likely think of Seattle, and the aviation giant's major facilities there.
+
+But if you want to know where the Boeing 737 -- the world's best-selling jet -- is really born, you have to come to Wichita.
+
+That's where Spirit Aerosystems, formerly a Boeing division, now a standalone company, manufactures 737 fuselages, as well as major components for every other Boeing commercial plane, including the composite 787 Dreamliner, and the aluminum 747, 757, 767, and 777.
+
+As part of CNET Road Trip 2014, I visited Spirit in Wichita to see how the 737 comes to life.
+Photo 1:
+Here, we see a Spirit technician working inside the all-aluminum front of a 737 cockpit, seen inside Spirit's massive facility here.
+
+Full Story:
+http://www.cnet.com/news/despite-tornadoes-and-derailments-the-737s-keep-on-coming/
+
+http://www.cnet.com/pictures/the-great-boeing-metal-airplane-shop-pictures/
+
+
+[Date]2014-07-30
+[Tags]FLOWER GARDEN BANKS, GULF OF MEXICO
+[Loc]29.275474, -94.815013
+[Desc]In the Gulf of Mexico, from oil rigs to fish havens
+Ever wondered what happens to an oil rig when it's no longer producing? Since 1990, 450 in the Gulf of Mexico have been transformed into artificial reefs as part of a series of state-run programs known as Rigs to Reefs.
+
+Thanks to the programs, which are run in Texas, Mississippi, Alabama, Louisiana, and Florida, the oil companies donate the rigs rather than tow them back to shore, and also donate half their cost savings.
+
+As part of CNET Road Trip 2014, I traveled more than 100 miles into the Gulf to check out one of the rigs -- technically known as a production platform -- from 100 feet below the surface, where thousands of fish, including this barracuda, have a comfortable home.
+
+Full Story:
+http://www.cnet.com/news/divers-delight-from-oil-rig-to-teeming-fish-habitat/
+
+http://www.cnet.com/pictures/in-the-gulf-of-mexico-from-oil-rigs-to-fish-havens-pictures/
+
+[Date]2014-08-12
+[Tags]Greensburg, KS
+[Loc]37.602998, -99.292753
+[Desc]Town goes all green after devastating tornado 
+On May 4, 2007, an EF-5 tornado -- the largest measured in the US in years -- flattened this small town, destroying 95 percent of its buildings.
+
+In the aftermath, the people of Greensburg decided to rebuild with an emphasis on green building principles, and in the years since has become a model for how to develop a sustainable community. It now boasts the highest per-capita percentage of LEED-certified buildings in the United States.
+
+As part of CNET Road Trip 2014, I visited Greensburg to see what "Green Town U.S.A." looked like. This is an aerial view, taken using a DJI Phantom 2 Vision-plus, of Greensburg's Silo Eco-Home, a bed and breakfast and live-in sustainable model home.
+
+Full Story:
+http://www.cnet.com/news/destroyed-by-tornado-town-saving-big-by-rebuilding-all-green/
+
+http://www.cnet.com/pictures/town-goes-all-green-after-devastating-tornado-pictures/
+
+
+[Date]2014-08-13
+[Tags]FORT WORTH, Texas
+[Loc]32.899657, -97.345731
+[Desc]$320 Million Bills
+It's hard to know how you're going to feel starting at $320 million in cash.
+
+As part of CNET Road Trip 2014, I got a chance to visit the Western Currency Facility, where the US Bureau of Engraving and Printing produces the majority of America's paper money.
+
+I wanted to see how the latest $100 bills, which have been in circulation since 2013, are made, from the engraving process through printing and packaging. The visit didn't disappoint, especially when I found myself standing in front of five "skids" of $100 bills totaling $320 million. There's a deep sense of longing mixed with an urge to be as nonchalant as you can in the face of such a visceral display of riches.
+
+http://www.cnet.com/pictures/all-about-the-benjamins-the-making-of-the-100-bill-pictures/
+
+
