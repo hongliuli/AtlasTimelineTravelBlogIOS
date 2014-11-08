@@ -53,10 +53,13 @@ UILabel* updatableLabel2;
     if (tmpKey == nil)
     {
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @""
-                                                       message: NSLocalizedString(@"Please download our ChronicleMap App, based on which this app was created, for your photo albums, trip planner and journal",nil)
-                                                      delegate: self
-                                             cancelButtonTitle:NSLocalizedString(@"Not Now",nil)
-                                             otherButtonTitles:NSLocalizedString(@"Download ChronicleMap App Now",nil), NSLocalizedString(@"No, Thanks",nil), nil];
+                            message: NSLocalizedString(@"Related Apps to download",nil)
+                            delegate: self
+                            cancelButtonTitle:NSLocalizedString(@"Not Now",nil)
+                            otherButtonTitles:NSLocalizedString(@"Chronicle Map",nil),
+                              @"World War II",
+                             // @"Cnet Road Trip",
+                              nil];
         [alert show];
     }
     
@@ -70,10 +73,13 @@ UILabel* updatableLabel2;
     {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/us/app/chroniclemap-events-itinerary/id649653093?ls=1&mt=8"]];
     }
-    else
+    if (buttonIndex == 2)
     {
-        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-        [userDefault setObject:@"yes" forKey:@"DO_NOT_PROMPT_DOWNLOAD"];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/us/app/second-world-war-on-chroniclemap/id893801070?ls=1&mt=8"]];
+    }
+    if (buttonIndex == 3)
+    {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.cnet.com"]]; //TODO change to app url
     }
 }
 

@@ -143,7 +143,10 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     {
         self.authorModeFlag = true;
     }
-    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        self.authorModeFlag = false;
+    }
     // I did not use iOS7's self.canDisplayBannerAds to automatically display adds, not sure why
     //if (ipad)
     [self initiAdBanner];
@@ -786,6 +789,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 //iad/gAd
 -(void)initiAdBanner
 {
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"Cnet" ])
+        return;
     if (!self.iAdBannerView)
     {
         //NSLog(@"----- iAdView height=%f ", self.view.frame.size.height);
@@ -805,6 +811,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
 -(void)initgAdBanner
 {
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"Cnet" ])
+        return;
     if (!self.gAdBannerView)
     {
         //NSLog(@"----- gAdView height=%f ", self.view.frame.size.height);

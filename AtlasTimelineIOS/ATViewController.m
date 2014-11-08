@@ -9,6 +9,7 @@
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
 #define ALERT_FOR_SWITCH_AUTHO_MODE 1
 #define ALERT_FOR_POPOVER_ERROR 2
+#define ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB 3
 
 #define AUTHOR_MODE_KEY @"AUTHOR_MODE_KEY"
 
@@ -131,6 +132,8 @@
     
     BOOL switchEventListViewModeToVisibleOnMapFlag;
     NSMutableArray* eventListInVisibleMapArea;
+    
+    UIButton *btnLoadPhoto;
 }
 
 @synthesize mapView = _mapView;
@@ -261,7 +264,7 @@
         buttonText = NSLocalizedString(@"To Author Mode",nil);
         
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:currentVer message:NSLocalizedString(
-            @"This App is supported by ChronicleMap App, which is the best App to record your own life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get a sizable portion of revenue. All you have to do is to write story in text in a simple format.\n\nDetail see www.chroniclemap.com/authorarea",nil)
+            @"This App is supported by ChronicleMap App, which is the best App to record your own life stories!\n\nIf you have a chronicle like this to tell, we can build the app for you free.\n\nDetail see www.chroniclemap.com/authorarea",nil)
             delegate:self
             cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
             otherButtonTitles:buttonText, NSLocalizedString(@"Feedback to Author",nil),nil];
@@ -406,7 +409,7 @@
         }
         if (buttonIndex == 2) //Feedback to
         {
-            NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+            NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
             //NSArray *toReceipients = @[@"aa@aa.com"];
             NSArray *toReceipients = @[NSLocalizedString(@"AuthorEmail",nil)]; //AuthorEmail is in Localizable.String file
             NSArray *ccReceipients = @[@"support@chroniclemap.com"]; //AuthorEmail is in Localizable.String file
@@ -423,6 +426,35 @@
     {
         NSLog(@"----- refreshAnn after popover error");
         [self refreshAnnotations];
+    }
+    if (alertView.tag == ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB)
+    {
+        if (buttonIndex == 1)
+        {
+            //[alertView dismissWithClickedButtonIndex:1 animated:YES];
+            //[self performSelectorInBackground:@selector(startLoadPhotosFromWeb:) withObject:nil];
+            //[self startLoadPhotosFromWeb];
+            UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+            spinner.frame = CGRectMake(0,0,320,320);
+            spinner.center = CGPointMake(self.view.frame.size.width/2,self.view.frame.size.height/2);
+            spinner.hidesWhenStopped = YES;
+            [self.view addSubview:spinner];
+            [spinner startAnimating];
+            [btnLoadPhoto setEnabled:false];
+            [UIApplication sharedApplication].idleTimerDisabled = YES;
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [self startLoadPhotosFromWeb];
+                // If you then need to execute something making sure it's on the main thread (updating the UI for example) after long process is done
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [spinner stopAnimating];
+                    [btnLoadPhoto setEnabled:true];
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Load photos completed",nil) message:NSLocalizedString(@"",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                    [alert show];
+                });
+            });
+        }
+        
     }
 }
 
@@ -2295,6 +2327,12 @@
     lblWording.text = NSLocalizedString(@"Author Mode:",nil);
     [authorView addSubview:lblWording];
     
+    btnLoadPhoto = [UIButton buttonWithType:UIButtonTypeSystem];
+    btnLoadPhoto.frame = CGRectMake(180, 5, 120, 40);
+    [btnLoadPhoto setTitle:NSLocalizedString(@"Get Web Photos",nil) forState:UIControlStateNormal];
+    btnLoadPhoto.titleLabel.font = [UIFont fontWithName:@"Arial" size:12];
+    [btnLoadPhoto addTarget:self action:@selector(loadPhotoClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [authorView addSubview: btnLoadPhoto];
 
     UIButton *btnDropbox = [UIButton buttonWithType:UIButtonTypeSystem];
     btnDropbox.frame = CGRectMake(5, 40, 120, 40);
@@ -2343,6 +2381,62 @@
     [appDelegate emptyEventList]; //this will cause eventListSorted to be generated again from internet
     [self refreshAnnotations];
     [self refreshEventListView:false];
+}
+
+-(void) loadPhotoClicked:(id)sender
+{
+    //will call startLoadPhotosFromWeb in alertview action
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(
+                @"Add photos and descriptions in batch!",nil)
+                message:NSLocalizedString(@"If all photos are from web with http:// URL, you can add photos in batch (Details at www.chroniclemap.com/authorarea)\n\nOnce started, wait until completion window occurs.\n\nYou may repeat this action if crashed during loading",nil)
+                            delegate:self
+                cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                otherButtonTitles: NSLocalizedString(@"Start",nil),nil];
+    alert.tag = ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB;
+    [alert show];
+}
+
+-(void) startLoadPhotosFromWeb
+{
+    NSDictionary* photoListDict = [ATHelper readPhotoListFromBundleFile];
+    if (photoListDict == nil || [photoListDict count] == 0)
+        photoListDict = [ATHelper readPhotoListFromInternet];
+    
+    for (NSString* key in photoListDict) {
+        NSArray* photoList = [photoListDict objectForKey:key];
+        NSMutableArray* uniqueIds = [[NSMutableArray alloc] init];
+        [uniqueIds addObject:key];
+        NSArray* events = [ATHelper getEventListWithUniqueIds:uniqueIds];
+        if (events == nil || [events count] == 0) //do nothing if could not find event for this photo list
+        {
+            NSLog(@"##### event for %@ does not exist, double check photoList file has right date", key);
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat: NSLocalizedString(@"Event for %@ does not exist",nil),key ] message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+            [alert show];
+            continue;
+        }
+        if (photoList == nil)
+            continue;
+        
+        NSMutableArray* photoUrlList = [[NSMutableArray alloc] init];
+        NSMutableArray* photoDescList = [[NSMutableArray alloc] init];
+        for (NSString* photoUrlAndDescStr in photoList)
+        {
+            if (photoUrlAndDescStr == nil || [photoUrlAndDescStr length] == 0)
+                continue;
+            NSString* desc = nil;
+            NSString* photoUrl = photoUrlAndDescStr;
+            //url and desc are separated by \n
+            NSRange range = [photoUrlAndDescStr rangeOfString:@"\n"];
+            if (range.location != NSNotFound)
+            {
+                photoUrl = [photoUrlAndDescStr substringToIndex:range.location];
+                desc = [photoUrlAndDescStr substringFromIndex:range.location + 1];
+            }
+            [photoUrlList addObject:photoUrl];
+            [photoDescList addObject:desc];
+        }
+        [ATHelper writePhotoToFileFromWeb:key newAddedList:photoUrlList newDescList:photoDescList];
+    }
 }
 
 -(void) photoDroboxClicked:(id)sender
@@ -2423,6 +2517,9 @@
 }
 -(void)initiAdBanner
 {
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"Cnet"])
+        return;
     if (!self.iAdBannerView)
     {
         CGRect rect = CGRectMake(0, AD_Y_POSITION_IPAD, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
@@ -2437,6 +2534,9 @@
 
 -(void)initgAdBanner
 {
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"Cnet" ])
+        return;
     if (!self.gAdBannerView)
     {
         CGRect rect = CGRectMake(0, 60, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);

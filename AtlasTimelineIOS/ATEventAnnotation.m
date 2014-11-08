@@ -31,9 +31,10 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
-    NSString *dateStr = [NSString stringWithFormat:@"[%@] ",
-                         [dateFormater stringFromDate:self.eventDate]];
-    return[NSString stringWithFormat:@"%@%@", dateStr, self.address];
+    NSString * dateStr = [dateFormater stringFromDate:self.eventDate];
+    int removeBC_ADPos = [dateStr rangeOfString:@" "].location;
+    dateStr = [NSString stringWithFormat:@"[%@] ",[dateStr substringToIndex:removeBC_ADPos]];
+    return[NSString stringWithFormat:@"%@%@",dateStr , self.address];
 }
 
 - (NSString *)title

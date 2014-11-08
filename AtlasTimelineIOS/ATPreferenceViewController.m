@@ -126,6 +126,7 @@
         {
             [spinner startAnimating];
             isRemoveSourceForUploadAll = true; //so if /ChronicleReader/myEvent not on dropbox yet, delete fail will know the case
+            //TODO seems delete does not work
             [[self myRestClient] deletePath:[NSString stringWithFormat:@"/ChronicleReader/%@", [ATHelper getSelectedDbFileName]]];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Photo upload started and [New] number is decreasing.\n If number reach 0 then full back up is done.\n If number stop at non-zero, then tap [Photo Backup] row to continue.",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
             [alert show];
@@ -327,7 +328,7 @@
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Photo backup has started!",nil)
                                                        message: @"Photos will be uploaded to your Dropbox account one by one, please watch for the decreasing number.\n\nThe upload is done if number is decreased to 0."
                                                       delegate: self
-                                             cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                                             cancelButtonTitle:NSLocalizedString(@"Wait unitil 0...",nil)
                                              otherButtonTitles:nil,nil];
         [alert show];
     }

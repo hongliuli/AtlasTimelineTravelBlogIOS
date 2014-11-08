@@ -16,8 +16,15 @@
 #define NEW_NOT_SAVED_FILE_PREFIX @"NEW"
 #define THUMB_WIDTH 120
 #define THUMB_HEIGHT 70
-#define JPEG_QUALITY 0.5
-#define THUMB_JPEG_QUALITY 0.3
+#define RESIZE_WIDTH 1024
+#define RESIZE_HEIGHT 768
+#define JPEG_QUALITY 1.0
+#define THUMB_JPEG_QUALITY 0.5
+
+#define PHOTO_META_SORT_LIST_KEY @"sort_key"
+#define PHOTO_META_DESC_MAP_KEY @"desc_key"
+#define PHOTO_META_FILE_NAME @"MetaFileForOrderAndDesc"
+
 
 @implementation ATHelper
 
@@ -275,7 +282,7 @@ UIPopoverController *verifyViewPopover;
 //   http://www.iosmanual.com/tutorials/how-to-add-bundle-files-in-to-the-project-framework/
 + (NSString*)getRootBundlePath
 {
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     //NSLog(@"------- mainBundle = %@, target=%@",[[NSBundle mainBundle] bundlePath],targetName);
     NSString* photoDir = [NSString stringWithFormat:@"PhotosFor%@", targetName ];
     return [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:photoDir];
@@ -708,5 +715,197 @@ UIPopoverController *verifyViewPopover;
         flagStr = @"Y";
     [userDefault setObject:flagStr forKey:@"ZoomToWeek"];
 }
+
+
+//###### If repeatly call it, the existing file will be overwritten?
+//###### If original file on web is too large in size, how it show
+//       This function also write desc meta file
++(void)writePhotoToFileFromWeb:(NSString*)eventId newAddedList:(NSArray*)newAddedList newDescList:(NSArray*)newDescList
+{
+    NSString *photoFinalDir = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
+    //TODO may need to check if photo directory with this eventId exist or not, otherwise create as in ATHealper xxxxxx
+    ATDataController* dataController = [[ATDataController alloc] initWithDatabaseFileName:[ATHelper getSelectedDbFileName]];
+
+    if (newAddedList != nil && [newAddedList count] > 0)
+    {
+        NSMutableDictionary *photoFilesMetaMap =[[NSMutableDictionary alloc] init];
+        NSMutableDictionary *photoDescMap = [[NSMutableDictionary alloc] init];
+        NSMutableArray* photoSortArray = [[NSMutableArray alloc] init];
+        
+        NSString* photoForThumbnail = nil;
+        int descIndex = 0;
+        for (NSString* photoUrl in newAddedList)
+        {
+            NSString* photoUrlHttp = [NSString stringWithFormat:@"http://%@",photoUrl ];
+            NSString* descStr = newDescList[descIndex];
+
+            NSString* fileName = [NSString stringWithFormat:@"%@_%d",[photoUrlHttp lastPathComponent],descIndex ];
+            [photoSortArray addObject:fileName];
+            
+            NSString* newPhotoFinalFileName = [photoFinalDir stringByAppendingPathComponent:fileName];
+            if (descIndex == 0)
+                photoForThumbnail = fileName;
+            descIndex++;
+            
+            if ([[NSFileManager defaultManager] fileExistsAtPath:newPhotoFinalFileName isDirectory:nil])
+            {
+                //NSLog(@"--- file exist already, continue %@", fileName);
+                [photoDescMap setObject:descStr forKey:fileName];
+                continue;
+            }
+            NSError *error;
+            BOOL eventPhotoDirExistFlag = [[NSFileManager defaultManager] fileExistsAtPath:photoFinalDir isDirectory:false];
+            if (!eventPhotoDirExistFlag)
+                [[NSFileManager defaultManager] createDirectoryAtPath:photoFinalDir withIntermediateDirectories:YES attributes:nil error:&error];
+            NSData * imageData = [[NSData alloc] initWithContentsOfURL: [NSURL URLWithString: photoUrlHttp]];
+            
+            UIImage * newPhoto = [[UIImage alloc] initWithData:imageData];
+            
+            int imageWidth = RESIZE_WIDTH;
+            int imageHeight = RESIZE_HEIGHT;
+            
+            if (newPhoto.size.height > newPhoto.size.width)
+            {
+                imageWidth = RESIZE_HEIGHT;
+                imageHeight = RESIZE_WIDTH;
+            }
+            UIImage *newImage = newPhoto;
+            imageData = nil;
+            if (newPhoto.size.height > imageHeight || newPhoto.size.width > imageWidth)
+            {
+                newImage = [ATHelper imageResizeWithImage:newPhoto scaledToSize:CGSizeMake(imageWidth, imageHeight)];
+            }
+            //NSLog(@"widh=%f, height=%f",newPhoto.size.width, newPhoto.size.height);
+            imageData = UIImageJPEGRepresentation(newImage, 1.0);
+            
+            if (imageData == nil)
+                NSLog(@" #############  Read photo fail: %@", photoUrlHttp);
+            
+            error = nil;
+            [imageData writeToFile:newPhotoFinalFileName options:nil error:&error];
+            
+            if (error != nil)
+                NSLog(@" #############  Write photo fail: %@", photoUrlHttp);
+            else
+            {
+                [photoDescMap setObject:descStr forKey:fileName];
+                [dataController insertNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
+            }
+            newImage = nil;
+            newPhoto = nil;
+            imageData = nil;
+        }
+        
+        [photoFilesMetaMap setObject:photoDescMap forKey:PHOTO_META_DESC_MAP_KEY];
+        [photoFilesMetaMap setObject:photoSortArray forKey:PHOTO_META_SORT_LIST_KEY];
+        NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
+        [photoFilesMetaMap writeToFile:photoMetaFilePath atomically:TRUE];
+        NSString* thumbPath = [photoFinalDir stringByAppendingPathComponent:@"thumbnail"];
+        
+        UIImage* photo = [UIImage imageWithContentsOfFile: [photoFinalDir stringByAppendingPathComponent:photoForThumbnail ]];
+        UIImage* thumbImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
+        NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
+        // NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
+        [imageData writeToFile:thumbPath atomically:NO];
+    }
+   
+}
+
+//This is a utitlity function to load photo from internet
++ (NSDictionary*) readPhotoListFromBundleFile
+{
+    NSString* eventFileName = @"PhotosUrlFile";
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:eventFileName ofType:@"txt"];
+    if (filePath == nil)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Please have file named PhotosUrlFile.txt in resource directory (will remove this requirement after implement document picker)",nil) message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+        [alert show];
+        return false;
+    }
+    NSDictionary* photoUrlDict = nil;
+    NSLog(@"========== read photo url filepath:%@,  fileNm=%@",filePath,eventFileName);
+    if (filePath) {
+        NSString *photoUrlListStr = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
+        if (photoUrlListStr != nil)
+            photoUrlDict = [ATHelper createPhotoUrlListFromString:photoUrlListStr];
+    }
+    return photoUrlDict;
+}
+
++ (NSDictionary*) readPhotoListFromInternet
+{
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* userEmail = [userDefault objectForKey:[ATConstants UserEmailKeyName]];
+    NSString* securityCode = [userDefault objectForKey:[ATConstants UserSecurityCodeKeyName]];
+    //continues to get from server
+    NSString* userId = userEmail;
+    
+    //download whatever this user uploaded into author_content table
+    NSURL* serviceUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@/downloadauthorphotourl?user_id=%@&security_code=%@",[ATConstants ServerURL], userId, securityCode]];
+    
+    NSData* downloadedData = [NSData dataWithContentsOfURL:serviceUrl];
+    
+    if (downloadedData == nil)
+    {
+        return nil;
+    }
+    else
+    {
+        NSString* contentStr = [[NSString alloc] initWithData:downloadedData encoding:NSUTF8StringEncoding];
+        return [ATHelper createPhotoUrlListFromString:contentStr];
+    }
+    
+}
+
++ (NSDictionary*) createPhotoUrlListFromString:(NSString*)eventsString
+{
+    NSMutableDictionary* photoListDict = [[NSMutableDictionary alloc] initWithCapacity:400];
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"yyyy-MM-dd"];
+    
+    if (eventsString != nil)
+    {
+        //[Date] must be the first Metadata for each event in file, and must already sorted?
+        NSArray* eventStrList = [eventsString componentsSeparatedByString: @"[Date]"];
+
+        for (NSString* eventStr in eventStrList)
+        {
+            if ([@"" isEqualToString:eventStr] || [@"\n" isEqualToString:eventStr])
+                continue;
+            NSString* tmp = [eventStr stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString* datePart = [tmp substringToIndex:10];
+            NSDate* dt = [dateFormat dateFromString:datePart];
+            if (dt == nil)
+            {
+                NSLog(@"  ##### read photo url convert date %@ failed", datePart);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read Event File date error",nil) message:NSLocalizedString(datePart,nil)
+                                                               delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                [alert show];
+                return nil;
+            }
+            
+            // https:// will not work
+            NSRange photoUrlAndDescRange = [tmp rangeOfString:@"http://" options: NSCaseInsensitiveSearch];
+                
+            if (photoUrlAndDescRange.location == NSNotFound) {
+                NSLog(@"  ##### readPhoto - http:// was not found in %@", tmp);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Read photo url error",nil) message:NSLocalizedString(tmp,nil)
+                                                               delegate:self  cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+                [alert show];
+                return nil;
+            }
+            
+            tmp = [tmp substringFromIndex:photoUrlAndDescRange.location];
+            //now first http start from 0
+            NSArray* photoUrlAndDescList = [tmp componentsSeparatedByString: @"http://"]; //https link does not work
+            
+            [photoListDict setObject:photoUrlAndDescList forKey:datePart];
+        }
+    }
+    
+    return photoListDict;
+    
+}
+
 
 @end

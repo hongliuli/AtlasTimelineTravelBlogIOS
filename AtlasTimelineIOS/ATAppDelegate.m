@@ -145,9 +145,11 @@
 
 - (NSArray*) readEventsFromBundleFile
 {
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     NSString* eventFileName = [NSString stringWithFormat:NSLocalizedString(@"EventsFileFor%@",nil), targetName ];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:eventFileName ofType:@"txt"];
+    if (filePath == nil) //no resource for this language, default use English
+        filePath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"EventsFileFor%@", targetName ] ofType:@"txt"];
     NSArray* eventArray = nil;
     NSLog(@"========== readEvents filepath:%@,  fileNm=%@",filePath,eventFileName);
     if (filePath) {
