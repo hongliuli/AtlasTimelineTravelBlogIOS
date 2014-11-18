@@ -57,6 +57,7 @@
 + (NSArray*) getEventListWithUniqueIds: (NSArray*)uniqueIds;
 + (NSString*) httpGetFromServer:(NSString*)serverUrl;
 + (void)startReplaceDb:(NSString*)selectedAtlasName :(NSArray*)downloadedJsonArray :(UIActivityIndicatorView*)spinner;
++ (BOOL) isAtLeast8;
 
 //set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable;

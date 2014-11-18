@@ -20,6 +20,7 @@
 
 //eventList is the center of performance issue, seems we need to load all events
 @property(strong, nonatomic) NSMutableArray* eventListSorted;
+@property(strong, nonatomic) NSMutableDictionary* uniqueIdToEventMap;
 @property(strong, nonatomic) NSMutableDictionary* overlayCollection;
 @property(strong, nonatomic) NSMutableDictionary* sharedOverlayCollection;
 @property(strong, nonatomic) NSMutableArray* friendList; //just put here to pass it from friendPickerView to friendAddView

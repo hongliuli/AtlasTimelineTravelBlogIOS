@@ -40,6 +40,8 @@ NSString* timeZoomLevelStr;
 UILabel* updatableLabel;
 UILabel* updatableLabel2;
 
+NSMutableArray* appStoreUrlList;
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -47,19 +49,37 @@ UILabel* updatableLabel2;
         // Initialization code
         // add subview etc here
     }
+    NSString* serviceUrl = [NSString stringWithFormat:@"http://www.chroniclemap.com//resources/newappshortlist.html"];
+    NSString* responseStr  = [ATHelper httpGetFromServer:serviceUrl];
+    NSMutableArray* appNameList = [[NSMutableArray alloc] init];
+    appStoreUrlList = [[NSMutableArray alloc] init];
     
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    NSString* tmpKey = [userDefault objectForKey:@"xxxDO_NOT_PROMPT_DOWNLOAD"];
-    if (tmpKey == nil)
+    if (responseStr != nil && [responseStr length] > 100)
+    {
+        NSArray* appList = [responseStr componentsSeparatedByString:@"\n"];
+        for (NSString* appStr in appList)
+        {
+            if (appStr != nil && [appStr length] > 20)
+            {
+                NSArray* appDetail = [appStr componentsSeparatedByString:@"|"];
+                [appNameList addObject:NSLocalizedString(appDetail[0],nil)];
+                [appStoreUrlList addObject:appDetail[1]];
+            }
+        }
+    }
+    [appNameList addObject:NSLocalizedString(@"More ...",nil)];
+    [appStoreUrlList addObject:NSLocalizedString(@"http://www.chroniclemap.com/resources/allapplist.html",nil)]; //TODO have chinese url
+
+    if ([appNameList count] > 0)
     {
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: @""
                             message: NSLocalizedString(@"Related Apps to download",nil)
                             delegate: self
                             cancelButtonTitle:NSLocalizedString(@"Not Now",nil)
-                            otherButtonTitles:NSLocalizedString(@"Chronicle Map",nil),
-                              @"World War II",
-                             // @"Cnet Road Trip",
-                              nil];
+                            otherButtonTitles: nil];
+        for( NSString *title in appNameList)  {
+            [alert addButtonWithTitle:title];
+        }
         [alert show];
     }
     
@@ -69,18 +89,9 @@ UILabel* updatableLabel2;
 {
     if (buttonIndex == 0) //Not Now
         return; //user clicked cancel button
-    if (buttonIndex == 1)
-    {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/us/app/chroniclemap-events-itinerary/id649653093?ls=1&mt=8"]];
-    }
-    if (buttonIndex == 2)
-    {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/us/app/second-world-war-on-chroniclemap/id893801070?ls=1&mt=8"]];
-    }
-    if (buttonIndex == 3)
-    {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.cnet.com"]]; //TODO change to app url
-    }
+    
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:appStoreUrlList[buttonIndex -1]]];
+
 }
 
 - (void) updateDateText

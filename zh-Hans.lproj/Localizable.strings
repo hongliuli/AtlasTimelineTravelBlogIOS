@@ -63,6 +63,8 @@
 "Backup Photos (Incremental)"="增量备份";
 "Backup/Restore myEvents data"="备份/恢复myEvents数据";
 "Backup/Restore Photos to Dropbox"="备份/恢复照片到Dropbox";
+"By Map"="按地图列表";
+"By Timewheel"="按期间列表";
 "Cancel"="取消";
 "Cancel will lose your photo changes."="取消会丢失照片修改.";
 "Cannot zoom-out anymore!"="不能再放大!";
@@ -191,6 +193,8 @@
 "Save failed"="保存失败";
 "Search Address     OR  "="搜索地址      或  ";
 "Scroll Date Magnifer"="滑动日期放大镜";
+"Scroll timewheel to list events in the selected period"="滑动时间轮，列表在同一时间段中的事件";
+"Scroll map to list events moving into the screen"="滑动地图，列表出现在地图上的事件";
 "search any description and address"="搜索事件－输入描述或地址任何部分";
 "   section %d   row %d"="   section %d   row %d";
 "Select All"="全选";
@@ -211,8 +215,6 @@
 "Share Episode Success!"="分享片断成功!";
 "Share Event"="分享事件";
 "Share my Episodes to Friends"="分享我的片断给朋友";
-"List events in same period"="列举在同一时间段中的事件";
-"List events in same region"="列举在同一区域中的事件";
 "Feedback to Author"="给作者建议";
 "Support Us"="支持我们";
 "Sync %i events to %@ on server"="同步 %i 个事件到服务器的[%@]";
@@ -246,6 +248,7 @@
 "WARNING: Local %@'s %@ events will be replaced!"="警告: 设备上 %@ 的 %@ 事件将被代替!";
 "%@ was downloaded before"="%@ 以前被下载过";
 "Write notes here"="写点东西";
+"WWII"="二战历史";
 "Yes"="是的";
 "Yes, Continue"="是的，继续";
 "There is a new version!"="有新版本!";

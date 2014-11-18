@@ -124,6 +124,15 @@
         [_eventListSorted addObject:entData];
     }
     
+    if (self.uniqueIdToEventMap == nil)
+    {
+        self.uniqueIdToEventMap = [[NSMutableDictionary alloc] init];
+        for (ATEventDataStruct* event in _eventListSorted)
+        {
+            [self.uniqueIdToEventMap setObject:event forKey:event.uniqueId];
+        }
+    }
+        
     
     return _eventListSorted;
 }

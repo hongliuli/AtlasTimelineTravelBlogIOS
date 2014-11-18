@@ -127,7 +127,7 @@
     ATEventEntity *eventEntity = [NSEntityDescription insertNewObjectForEntityForName:@"ATEventEntity" inManagedObjectContext:context];
     NSString* idVar = uniqueId; //when download, uniqueId is there already
     if (idVar == nil)
-        idVar= [self stringWithUUID];
+        idVar = [[NSUUID UUID] UUIDString];
    // NSLog(@"unique id is %@ ", idVar);
     eventEntity.uniqueId = idVar;
     eventEntity.address = addressPar;
@@ -214,12 +214,6 @@
     }
     NSError *saveError = nil;
     [context save:&saveError];
-}
-- (NSString*) stringWithUUID {
-    CFUUIDRef	uuidObj = CFUUIDCreate(nil);//create a new UUID
-    //get the string representation of the UUID
-    NSString	*uuidString = (__bridge NSString*)CFUUIDCreateString(nil, uuidObj);
-    return uuidString;
 }
 
 //------ photo queue. ATxxxPhotoQueue entity is so simple, I do not have strong type for them

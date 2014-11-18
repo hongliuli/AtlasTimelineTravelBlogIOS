@@ -26,6 +26,8 @@ NSString* currentPhotoFileName;
 UITextView *photoDescInputView;
 UILabel* hasPhotoDescLabel;
 
+UIView *descEditorContentView;
+
 - (id)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
@@ -52,7 +54,7 @@ UILabel* hasPhotoDescLabel;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+    descEditorContentView = nil;
     [self addChildViewController:self.pageViewController];
     [self.view addSubview:self.pageViewController.view];
     [self.pageViewController didMoveToParentViewController:self];
@@ -122,6 +124,7 @@ UILabel* hasPhotoDescLabel;
     int screenWidth = [ATConstants screenWidth];
     int textWidth = screenWidth * 0.7;
     photoDescView = [[UITextView alloc] initWithFrame:CGRectMake((screenWidth - textWidth)/2, 20 , textWidth, 110)];
+    photoDescView.center = CGPointMake(self.view.frame.size.width / 2, 60);
     photoDescView.backgroundColor = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0.5];
     photoDescView.textColor = [UIColor whiteColor];
     //photoDescView.textAlignment = NSTextAlignmentCenter;
@@ -152,6 +155,8 @@ UILabel* hasPhotoDescLabel;
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pvc viewControllerBeforeViewController:(PhotoViewController *)vc
 {
+    if (descEditorContentView != nil && descEditorContentView.hidden == false)
+        return nil;//[PhotoViewController photoViewControllerForPageIndex:(index)];
     NSUInteger index = vc.pageIndex;
     self.pageControl.currentPage = index;
     
@@ -162,6 +167,8 @@ UILabel* hasPhotoDescLabel;
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pvc viewControllerAfterViewController:(PhotoViewController *)vc
 {
+    if (descEditorContentView != nil && descEditorContentView.hidden == false)
+        return nil;// [PhotoViewController photoViewControllerForPageIndex:(index)];
     NSUInteger index = vc.pageIndex;
     self.pageControl.currentPage =  index;
     [self showHideIcons:index];
@@ -301,70 +308,87 @@ UILabel* hasPhotoDescLabel;
 
 - (void) setEditAction: (id)sender
 {
-    // Here we need to pass a full frame
-    CustomIOS7AlertView *alertView = [[CustomIOS7AlertView alloc] init];
-    
     // Add some custom content to the alert view
-    UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 290, 200)];
-    
-    UILabel* photoDescLabel =[[UILabel alloc] initWithFrame:CGRectMake(10, 10, 290, 30)];
-    photoDescLabel.text = NSLocalizedString(@"Enter Photo Description:",nil);
-    [contentView addSubview:photoDescLabel];
-    
-    if (photoDescInputView == nil)
-        photoDescInputView= [[UITextView alloc] initWithFrame:CGRectMake(10, 45, 270, 145)];
+    if (descEditorContentView == nil)
+    {
+        descEditorContentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 350, 280)];
+        descEditorContentView.backgroundColor = [UIColor colorWithRed: 0.8 green: 0.8 blue: 0.8 alpha: 0.8];
+        [descEditorContentView.layer setCornerRadius:7.0f];
+        [self.view addSubview:descEditorContentView];
+        
+        descEditorContentView.center = CGPointMake(self.view.frame.size.width / 2, 180);
+        descEditorContentView.hidden = false;
+        UILabel* photoDescLabel =[[UILabel alloc] initWithFrame:CGRectMake(10, 10, 290, 30)];
+        photoDescLabel.text = NSLocalizedString(@"Enter Photo Description:",nil);
+        [descEditorContentView addSubview:photoDescLabel];
+        
+        if (photoDescInputView == nil)
+            photoDescInputView= [[UITextView alloc] initWithFrame:CGRectMake(10, 45, 330, 180)];
+        
+        [descEditorContentView addSubview:photoDescInputView];
+        
+        UIButton *continueBtn = [UIButton buttonWithType:UIButtonTypeSystem];
+        continueBtn.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
+        continueBtn.frame = CGRectMake(15, 235, 80, 30);
+        [continueBtn setTitle:NSLocalizedString(@"Continue",nil) forState:UIControlStateNormal];
+        [continueBtn.titleLabel setTextColor:[UIColor blueColor]];
+        [continueBtn addTarget:self action:@selector(continueDescButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        [descEditorContentView addSubview:continueBtn];
+        
+        UIButton *deleteBtn = [UIButton buttonWithType:UIButtonTypeSystem];
+        deleteBtn.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
+        deleteBtn.frame = CGRectMake(110, 235, 80, 30);
+        [deleteBtn setTitle:NSLocalizedString(@"Delete",nil) forState:UIControlStateNormal];
+        [deleteBtn.titleLabel setTextColor:[UIColor blueColor]];
+        [deleteBtn addTarget:self action:@selector(deleteDescButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        [descEditorContentView addSubview:deleteBtn];
+        
+        UIButton *cancelBtn = [UIButton buttonWithType:UIButtonTypeSystem];
+        cancelBtn.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17];
+        cancelBtn.frame = CGRectMake(205, 235, 80, 30);
+        [cancelBtn setTitle:NSLocalizedString(@"Cancel",nil) forState:UIControlStateNormal];
+        [cancelBtn.titleLabel setTextColor:[UIColor blueColor]];
+        [cancelBtn addTarget:self action:@selector(cancelDescButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        [descEditorContentView addSubview:cancelBtn];
+    }
     if (currentPhotoDescTxt != nil && [currentPhotoDescTxt length] >0)
         photoDescInputView.text = currentPhotoDescTxt;
     else
         photoDescInputView.text = @"";
-    [contentView addSubview:photoDescInputView];
-    [alertView setContainerView:contentView];
-    
-    // Modify the parameters
-    [alertView setButtonTitles:[NSMutableArray arrayWithObjects:NSLocalizedString(@"Continue",nil), NSLocalizedString(@"Delete",nil),NSLocalizedString(@"Cancel",nil), nil]];
-    [alertView setDelegate:self];
-    
-    // You may use a Block, rather than a delegate.
-    /*** I will use following delegate
-     [alertView setOnButtonTouchUpInside:^(CustomIOS7AlertView *alertView, int buttonIndex) {
-     NSLog(@"Block: Button at position %d is clicked on alertView %d.", buttonIndex, (int)[alertView tag]);
-     [alertView close];
-     }];
-     */
-    
-    [alertView setUseMotionEffects:true];
-    
-    // And launch the dialog
-    [alertView show];
+    descEditorContentView.hidden = false;
+    [self.view bringSubviewToFront:descEditorContentView];
 }
-- (void)customIOS7dialogButtonTouchUpInside: (CustomIOS7AlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
-{
-    if (buttonIndex == 0) //continue button cliced
+
+- (void) continueDescButtonAction: (id)sender {
+    NSString* currentTxtTmp = currentPhotoDescTxt;
+    if (currentTxtTmp == nil)
+        currentTxtTmp = @"";
+    if (![photoDescInputView.text isEqualToString:currentTxtTmp])
     {
-        NSString* currentTxtTmp = currentPhotoDescTxt;
-        if (currentTxtTmp == nil)
-            currentTxtTmp = @"";
-        if (![photoDescInputView.text isEqualToString:currentTxtTmp])
-        {
-            self.eventEditor.photoDescChangedFlag = true;
-            //TODO enable Save button
-            if (self.eventEditor.photoScrollView.photoDescMap == nil)
-                self.eventEditor.photoScrollView.photoDescMap = [[NSMutableDictionary alloc] init];
-            [self.eventEditor.photoScrollView.photoDescMap setObject:photoDescInputView.text forKey:currentPhotoFileName];
-            photoDescView.text = photoDescInputView.text;
-            currentPhotoDescTxt = photoDescInputView.text;
-            photoDescView.hidden = false;
-        }
+        self.eventEditor.photoDescChangedFlag = true;
+        //TODO enable Save button
+        if (self.eventEditor.photoScrollView.photoDescMap == nil)
+            self.eventEditor.photoScrollView.photoDescMap = [[NSMutableDictionary alloc] init];
+        [self.eventEditor.photoScrollView.photoDescMap setObject:photoDescInputView.text forKey:currentPhotoFileName];
+        photoDescView.text = photoDescInputView.text;
+        currentPhotoDescTxt = photoDescInputView.text;
+        photoDescView.hidden = false;
     }
-    else if (buttonIndex == 1) //delete button
-    {
-        if (currentPhotoDescTxt != nil && [currentPhotoDescTxt length] > 0)
-            self.eventEditor.photoDescChangedFlag = true;
-        [self.eventEditor.photoScrollView.photoDescMap removeObjectForKey:currentPhotoFileName];
-        photoDescView.hidden = true;
-    }
-    [alertView close];
+    descEditorContentView.hidden = true;
 }
+
+- (void) deleteDescButtonAction: (id)sender {
+    if (currentPhotoDescTxt != nil && [currentPhotoDescTxt length] > 0)
+        self.eventEditor.photoDescChangedFlag = true;
+    [self.eventEditor.photoScrollView.photoDescMap removeObjectForKey:currentPhotoFileName];
+    photoDescView.hidden = true;
+    descEditorContentView.hidden = true;
+}
+
+- (void) cancelDescButtonAction: (id)sender {
+    descEditorContentView.hidden = true;
+}
+
 
 - (void)tapToHideShowToolbar:(UIGestureRecognizer *)gestureRecognizer
 {
@@ -393,7 +417,7 @@ UILabel* hasPhotoDescLabel;
     [shareCountLabel setFrame:CGRectMake(80, [ATConstants screenHeight] - 110 , 180, 30)];
     [shareIconView setFrame:CGRectMake(50, [ATConstants screenHeight] - 110 , 30, 30)];
     [hasPhotoDescLabel setFrame:CGRectMake([ATConstants screenWidth] - 80, 50 , 35, 40)];
-    //NSLog(@"  rotation scree height=%d",[ATConstants screenHeight]);
+    NSLog(@"  rotation scree height=%d",[ATConstants screenHeight]);
 }
 
 @end

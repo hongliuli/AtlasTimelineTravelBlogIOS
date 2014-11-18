@@ -93,7 +93,6 @@
     int debugCount;
     CGRect focusedLabelFrame;
     NSMutableArray* timeScaleArray;
-    int mapViewShowWhatFlag; //see MAPVIEW_SHOW_xxxxx macros
     
     NSMutableArray* selectedAnnotationNearestLocationList; //do not add to selectedAnnotationSet if too close
     NSMutableDictionary* selectedAnnotationSet;//hold uilabels for selected annotation's description
@@ -152,7 +151,7 @@
     //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.locationManager = [[CLLocationManager alloc] init];
     
-    mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+    self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
     int searchBarHeight = [ATConstants searchBarHeight];
     int searchBarWidth = [ATConstants searchBarWidth];
     [self.navigationItem.titleView setFrame:CGRectMake(0, 0, searchBarWidth, searchBarHeight)];
@@ -216,9 +215,13 @@
         switchEventListViewModeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     else
         [switchEventListViewModeBtn removeFromSuperview];
-    switchEventListViewModeBtn.frame = CGRectMake(20, 70, 40, 40);
-    [switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon.png"] forState:UIControlStateNormal];
+    switchEventListViewModeBtn.frame = CGRectMake(10, 73, 130, 30);
+    [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Timewheel",nil) forState:UIControlStateNormal];
+    //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon.png"] forState:UIControlStateNormal];
     [switchEventListViewModeBtn addTarget:self action:@selector(switchEventListViewMode:) forControlEvents:UIControlEventTouchUpInside];
+    //switchEventListViewModeBtn.titleLabel.backgroundColor = [UIColor blueColor];
+    switchEventListViewModeBtn.backgroundColor = [UIColor blueColor];
+    [switchEventListViewModeBtn.layer setCornerRadius:7.0f];
     [self.mapView addSubview:switchEventListViewModeBtn];
     switchEventListViewModeToVisibleOnMapFlag = false;
     eventListInVisibleMapArea = nil;
@@ -244,7 +247,7 @@
     }
     if (eventListView == nil) //viewDidAppear will be called when navigate back (such as from timeline/search view and full screen event editor, so need to check. Always be careful of viewDidAppear to not duplicate instances
     {
-        eventListView = [[ATEventListWindowView alloc] initWithFrame:CGRectMake(0,20, 0, 0)];
+        eventListView = [[ATEventListWindowView alloc] initWithFrame:CGRectMake(0,100, 0, 0)];
         [eventListView.tableView setBackgroundColor:[UIColor clearColor] ];// colorWithRed:1 green:1 blue:1 alpha:0.7]];
         [self.mapView addSubview:eventListView];
     }
@@ -297,16 +300,20 @@
     {
         switchEventListViewModeToVisibleOnMapFlag = false;
         eventListInVisibleMapArea = nil; //IMPORTANT: refreshEventListView will use this is nil or not to decide if in map event list view mode, do not refresh if scroll timewheel
-        [switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon.png"] forState:UIControlStateNormal];
-        [self.mapView makeToast:NSLocalizedString(@"List events in same period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(210, 90)]];
+        [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Timewheel",nil) forState:UIControlStateNormal];
+        switchEventListViewModeBtn.backgroundColor = [UIColor blueColor];
+        //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon"] forState:UIControlStateNormal];
+        [self.mapView makeToast:NSLocalizedString(@"Scroll timewheel to list events in the selected period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(350, 80)]];
         [self refreshEventListView:false];
     }
     else
     {
         switchEventListViewModeToVisibleOnMapFlag = true;
-        [switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Maps-icon.png"] forState:UIControlStateNormal];
-        [self.mapView makeToast:NSLocalizedString(@"List events in same region",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(200, 90)]];
-        [self refreshEventListView:false];
+        [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Map",nil) forState:UIControlStateNormal];
+        switchEventListViewModeBtn.backgroundColor = [UIColor orangeColor];
+        //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Maps-icon.png"] forState:UIControlStateNormal];
+        [self.mapView makeToast:NSLocalizedString(@"Scroll map to list events moving into the screen",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(340, 80)]];
+        [self updateEventListViewWithEventsOnMap];
     }
 }
 
@@ -799,21 +806,23 @@
 {
     if ([selectedAnnotationSet count] == 0) //if no selected nodes, use 2 step show/hide to have better user experience
     {
-        if (mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+        if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
         {
-            mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
+            self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
             self.timeScrollWindow.hidden = true;
             eventListView.hidden = true;
+            switchEventListViewModeBtn.hidden = true;
             self.timeZoomLine.hidden = true;
             [self hideDescriptionLabelViews];
             self.navigationController.navigationBarHidden = true;
             [self showAdAtTop:true];
         }
-        else if (mapViewShowWhatFlag == MAPVIEW_HIDE_ALL || mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+        else if (self.mapViewShowWhatFlag == MAPVIEW_HIDE_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
         {
-            mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+            self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
             self.timeScrollWindow.hidden=false;
             eventListView.hidden = false;
+            switchEventListViewModeBtn.hidden = false;
             self.timeZoomLine.hidden = false;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = false;
@@ -822,31 +831,34 @@
     }
     else //if has selected nodes, use 3-step show/hide
     {
-        if (mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
+        if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
         {
-            mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
+            self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
             self.timeScrollWindow.hidden = true;
             eventListView.hidden = true;
+            switchEventListViewModeBtn.hidden = true;
             self.timeZoomLine.hidden = true;
             [self hideDescriptionLabelViews];
             self.navigationController.navigationBarHidden = true;
             [self showAdAtTop:true];
         }
-        else if (mapViewShowWhatFlag == MAPVIEW_HIDE_ALL)
+        else if (self.mapViewShowWhatFlag == MAPVIEW_HIDE_ALL)
         {
-            mapViewShowWhatFlag = MAPVIEW_SHOW_PHOTO_LABEL_ONLY;
+            self.mapViewShowWhatFlag = MAPVIEW_SHOW_PHOTO_LABEL_ONLY;
             self.timeScrollWindow.hidden=true;
             eventListView.hidden = true;
+            switchEventListViewModeBtn.hidden = true;
             self.timeZoomLine.hidden = true;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = true;
             [self showAdAtTop:true];
         }
-        else if (mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+        else if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
         {
-            mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+            self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
             self.timeScrollWindow.hidden=false;
             eventListView.hidden = false;
+            switchEventListViewModeBtn.hidden = false;
             self.timeZoomLine.hidden = false;
             [self showDescriptionLabelViews:self.mapView];
             self.navigationController.navigationBarHidden = false;
@@ -1166,42 +1178,7 @@
     eventListInVisibleMapArea = nil;
     if (switchEventListViewModeToVisibleOnMapFlag)
     {
-        if (eventListInVisibleMapArea == nil)
-            eventListInVisibleMapArea = [[NSMutableArray alloc] init];
-        else
-            [eventListInVisibleMapArea removeAllObjects];
-        
-        if ([self zoomLevel] >= 7)
-        {
-            
-            NSSet *nearbySet = [self.mapView annotationsInMapRect:self.mapView.visibleMapRect];
-            NSMutableArray* uniqueIdSet = [[NSMutableArray alloc] init];
-            for(MKAnnotationView* annView in nearbySet)
-            {
-                if ([annView isKindOfClass:[MKUserLocation class]])
-                    continue; //filter out MKUserLocation pin
-                ATDefaultAnnotation* ann = (ATDefaultAnnotation*)annView;
-                if (ann.uniqueId != nil)
-                    [uniqueIdSet addObject:ann.uniqueId];
-            }
-            //big performance hit
-            ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-            NSArray* allEvents = [appDelegate eventListSorted];
-            int sizeInMap = [uniqueIdSet count];
-            int cnt = 0;
-            for(ATEventDataStruct* evt in allEvents)
-            {
-                if ([uniqueIdSet containsObject: evt.uniqueId])
-                {
-                    [eventListInVisibleMapArea insertObject:evt atIndex:0];
-                    cnt ++;
-                }
-                if (cnt == sizeInMap) //to improve performance for most case
-                    break;
-            }
-        }
-        if (eventListView.hidden == false)
-            [self refreshEventListView:false];
+        [self updateEventListViewWithEventsOnMap];
     }
     //******************
     
@@ -1219,6 +1196,7 @@
         
         self.timeScrollWindow.hidden=false;
         eventListView.hidden = false;
+        switchEventListViewModeBtn.hidden = false;
         self.timeZoomLine.hidden = false;
         [self showDescriptionLabelViews:self.mapView];
         self.navigationController.navigationBarHidden = false;
@@ -1230,6 +1208,47 @@
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     [userDefault setObject:[NSString stringWithFormat:@"%d",[self zoomLevel] ] forKey:@"BookmarkMapZoomLevel"];
     [userDefault synchronize];
+}
+
+- (void)updateEventListViewWithEventsOnMap
+{
+    if (eventListInVisibleMapArea == nil)
+        eventListInVisibleMapArea = [[NSMutableArray alloc] init];
+    else
+        [eventListInVisibleMapArea removeAllObjects];
+    
+    if ([self zoomLevel] >= 7)
+    {
+        
+        NSSet *nearbySet = [self.mapView annotationsInMapRect:self.mapView.visibleMapRect];
+        NSMutableArray* uniqueIdSet = [[NSMutableArray alloc] init];
+        for(MKAnnotationView* annView in nearbySet)
+        {
+            if ([annView isKindOfClass:[MKUserLocation class]])
+                continue; //filter out MKUserLocation pin
+            ATDefaultAnnotation* ann = (ATDefaultAnnotation*)annView;
+            if (ann.uniqueId != nil)
+                [uniqueIdSet addObject:ann.uniqueId];
+        }
+        //big performance hit
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        NSArray* allEvents = [appDelegate eventListSorted];
+        int sizeInMap = [uniqueIdSet count];
+        int cnt = 0;
+        for(ATEventDataStruct* evt in allEvents)
+        {
+            if ([uniqueIdSet containsObject: evt.uniqueId])
+            {
+                [eventListInVisibleMapArea insertObject:evt atIndex:0];
+                cnt ++;
+            }
+            if (cnt == sizeInMap) //to improve performance for most case
+                break;
+        }
+    }
+    if (eventListView.hidden == false)
+        [self refreshEventListView:false];
+
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
 {
@@ -1243,7 +1262,7 @@
         coordinate.longitude = [splitArray[1] doubleValue];
         CGPoint annotationViewPoint = [mapView convertCoordinate:coordinate
                                                    toPointToView:mapView];
-        if (mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+        if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
         {  //because mapRegion will call this function, so only show label this condition match
             bool tooCloseToShowFlag = false;
             
@@ -1446,9 +1465,10 @@
     appDelegate.focusedEvent = ent;
     
     [self setNewFocusedDateAndUpdateMap:ent needAdjusted:TRUE]; //No reason, have to do focusedRow++ when focused a event in time wheel
-    mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+    self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
     self.timeScrollWindow.hidden=false;
     eventListView.hidden = false;
+    switchEventListViewModeBtn.hidden = false;
     self.timeZoomLine.hidden = false;
     self.navigationController.navigationBarHidden = false;
     appDelegate.focusedEvent = ent;
@@ -1486,7 +1506,8 @@
             self.eventEditorPopover.popoverContentSize = CGSizeMake(380,480);
             
             //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user and call refreshAnn in alert delegate to fix it. (will not work without put into alert delegate)
-            if (view.window != nil)
+            BOOL isAtLeast8 = [ATHelper isAtLeast8];
+            if (view.window != nil || isAtLeast8)
                 [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
             else
             {
@@ -2092,20 +2113,20 @@
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
 {
     //when click on annotation, all timewheel/image will flip just as tap on map, so I will flip it back so keep same state as before tap on annotation
-    if (mapViewShowWhatFlag == 3)
-        mapViewShowWhatFlag = 1;
+    if (self.mapViewShowWhatFlag == 3)
+        self.mapViewShowWhatFlag = 1;
     else
-        mapViewShowWhatFlag ++;
+        self.mapViewShowWhatFlag ++;
     [self mapViewShowHideAction];
 }
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
 {
     //NSLog(@"de-selected anno");
     // if (mapViewShowWhatFlag == 1) //since select will always show it, deselect will do opposit always
-    if (mapViewShowWhatFlag == 3)
-        mapViewShowWhatFlag = 1;
+    if (self.mapViewShowWhatFlag == 3)
+        self.mapViewShowWhatFlag = 1;
     else
-        mapViewShowWhatFlag ++;
+        self.mapViewShowWhatFlag ++;
     [self mapViewShowHideAction];
 }
 - (double)longitudeToPixelSpaceX:(double)longitude
@@ -2169,7 +2190,7 @@
     if (callFromScrollTimewheel && switchEventListViewModeToVisibleOnMapFlag)
         return; //while in map eventListView mode, move timewheel will call this function as well, but do nothing. eventListInVisibleMapArea is set to nil in switch button action
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    int offset = 60;
+    int offset = 110;
     //try to move evetlistview to right side screenWidht - eventListViewCellWidth, but a lot of trouble, not know why
     //  even make x to 30, it will move more than 30, besides, not left side tap works
     CGRect newFrame = CGRectMake(0,offset,0,0);
@@ -2242,25 +2263,27 @@
         
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
         {
+            CGRect newBtnFrame = switchEventListViewModeBtn.frame;
+            
             if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
+            {
                 offset = offset - 10;
+                newBtnFrame = CGRectMake(newBtnFrame.origin.x, 66, newBtnFrame.size.width, newBtnFrame.size.height);
+            }
             else
+            {
                 offset = offset - 20;
+                newBtnFrame = CGRectMake(newBtnFrame.origin.x, 58, newBtnFrame.size.width, newBtnFrame.size.height);
+            }
+            [switchEventListViewModeBtn setFrame:newBtnFrame];
         }
-        int extra = 0;
-        if (cnt == 1)
-            extra = 60;
-        else if (cnt == 2)
-            extra = 80;
-        else if (cnt == 3 && UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
-            extra = 120;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-            extra = 60; //previouse it was 0, now change to 40 after add up/down arrow, so have extra space to show partial arrow button
-        newFrame = CGRectMake(0,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight] + extra);
+        
+        newFrame = CGRectMake(0,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight]);
     }
     
     self.timeScrollWindow.hidden=false;
     eventListView.hidden = false;
+    switchEventListViewModeBtn.hidden = false;
     self.timeZoomLine.hidden = false;
     [self showDescriptionLabelViews:self.mapView];
     self.navigationController.navigationBarHidden = false;
@@ -2270,7 +2293,7 @@
     aaa.size.height = aaa.size.height + 100; //Very careful: if add too much such as 500, it seems work, but left side of timewheel will click through when event list view is long. adjust this value to test down arrow button and left side of timewheel
     [eventListView setFrame:aaa];
     
-    [eventListView.tableView setFrame:newFrame];
+    [eventListView.tableView setFrame:CGRectMake(0,0,newFrame.size.width,newFrame.size.height)];
     if (eventListViewList != nil)
         [eventListView refresh: eventListViewList :switchEventListViewModeToVisibleOnMapFlag];
 }- (BOOL)date:(NSDate*)date isBetweenDate:(NSDate*)beginDate andDate:(NSDate*)endDate

@@ -7,6 +7,7 @@
 //
 
 #import "ATConstants.h"
+#import "ATHelper.h"
 
 @implementation ATConstants
 
@@ -91,9 +92,7 @@
 {
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
-    NSString *version = [[UIDevice currentDevice] systemVersion];
-    BOOL isAtLeast8 = [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
-    if (isAtLeast8)
+    if ([ATHelper isAtLeast8])
         return screenSize.width;
     else
     {
@@ -111,10 +110,8 @@
 {
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
-    
-    NSString *version = [[UIDevice currentDevice] systemVersion];
-    BOOL isAtLeast8 = [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
-    if (isAtLeast8)
+
+    if ([ATHelper isAtLeast8])
         return screenSize.height;
     {
         UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;

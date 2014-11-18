@@ -7,9 +7,8 @@
 
 #import <UIKit/UIKit.h>
 @class ATEventEditorTableController;
-#import "CustomIOS7AlertView.h"
 
-@interface BasePhotoViewController : UIViewController <UIPageViewControllerDataSource,CustomIOS7AlertViewDelegate>
+@interface BasePhotoViewController : UIViewController <UIPageViewControllerDataSource>
 
 @property (nonatomic, strong) UIPageViewController * pageViewController;
 @property (strong, nonatomic) IBOutlet UIPageControl *pageControl;

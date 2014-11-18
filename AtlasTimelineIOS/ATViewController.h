@@ -49,8 +49,7 @@
 
 @property (strong, nonatomic) ADBannerView *iAdBannerView;
 @property (strong, nonatomic) GADBannerView *gAdBannerView;
-
-
+@property int mapViewShowWhatFlag; //see MAPVIEW_SHOW_xxxxx macros
 
 - (void) prepareMapView;
 - (NSString*) getImageIdentifier:(NSDate*) eventDate :(NSString*) specialMarker;
