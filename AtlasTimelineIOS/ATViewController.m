@@ -133,6 +133,8 @@
     NSMutableArray* eventListInVisibleMapArea;
     
     UIButton *btnLoadPhoto;
+    
+    NSMutableArray* animationCameras;
 }
 
 @synthesize mapView = _mapView;
@@ -637,25 +639,15 @@
     
     if (zoomLevel < 0) //do not change zoom level if pass in negative zoom level. This used by Event List View select a event
     {
-        //MKZoomScale currentZoomScale = self.mapView.bounds.size.width / self.mapView.visibleMapRect.size.width;
-        //NSLog(@" zoom level: %f",currentZoomScale);
-        CLLocationCoordinate2D currentCenter = [self.mapView centerCoordinate];
-        
-        CLLocation *pointFrom=[[CLLocation alloc]initWithLatitude:ent.lat longitude:ent.lng];
-        CLLocation *pointTo=[[CLLocation alloc]initWithLatitude:currentCenter.latitude longitude:currentCenter.longitude];
-        CLLocationDistance distance=[pointFrom distanceFromLocation:pointTo]; //distance in meter
-        
-        MKCoordinateRegion myRegion = MKCoordinateRegionMakeWithDistance(self.mapView.centerCoordinate, distance, 0);
-        CGRect myRect = [self.mapView convertRegion: myRegion toRectToView: nil];
-        
-        float distanceOnScreen = myRect.size.width;
-        if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
-            distanceOnScreen = myRect.size.height;
-        //NSLog(@"distance on screen is %f",distanceOnScreen);
-        if (distanceOnScreen > 10000) //for long distance in screen size, do not animate which is too slow
-            [self.mapView setCenterCoordinate:centerCoordinate animated:NO];
-        else
+        if (switchEventListViewModeToVisibleOnMapFlag)
             [self.mapView setCenterCoordinate:centerCoordinate animated:YES];
+        else
+        {
+            CLLocationCoordinate2D coord;
+            coord.latitude = ent.lat;
+            coord.longitude = ent.lng;
+            [self goToCoordinate:coord];
+        }
     }
     else
     {
@@ -1144,23 +1136,17 @@
     [self showDescriptionLabelViews:self.mapView];
 }
 
-
-
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-    //NSLog(@"regione willChange size: %i    whiteFlag set count %i ", [selectedAnnotationSet count], [whiteFlagAnnotationSet count]);
-    for (id key in selectedAnnotationSet) {
-        UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
-        // ATEventAnnotation* eventAnn = (ATEventAnnotation*)key;
-        tmpLbl.hidden=true;
-    }
+    [self hideDescriptionLabelViews];
 }
 
 //After map scroll/zoom finish
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
-    //TODO could set option to enable/disable hide white flag, because if large nmber of selected note, then move map may be slow
+
     //     although currently we already have optimized it a lot
+    /*
     if (selectedAnnotationViewsFromDidAddAnnotation != nil && [self zoomLevel] >= ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE)
     {
         //NSLog(@"    in regionDidChange  size=%d",[selectedAnnotationViewsFromDidAddAnnotation count]);
@@ -1169,7 +1155,7 @@
             [[annView superview] bringSubviewToFront:annView];
         }
     }
-    
+     */
     //******************** get annotations on the screen map and show in event list view
     //Do following if 1) map mode for event viewlist
     //                2) map zoom level is at state level
@@ -1182,7 +1168,11 @@
     }
     //******************
     
-
+    if (animated) //means not caused by user scroll on map
+    {
+        [self goToNextCamera];
+    }
+    
     //NSLog(@"retion didChange, zoom level is %i", [self zoomLevel]);
     [self.timeZoomLine setNeedsDisplay];
     regionChangeTimeStart = [[NSDate alloc] init];
@@ -1204,11 +1194,100 @@
         selectedEventAnnInEventListView = nil;
         currentSelectedEvent = nil;
     }
+   
     //bookmark zoom level so app restart will restore state
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    [userDefault setObject:[NSString stringWithFormat:@"%d",[self zoomLevel] ] forKey:@"BookmarkMapZoomLevel"];
+        [userDefault setObject:[NSString stringWithFormat:@"%d",[self zoomLevel] ] forKey:@"BookmarkMapZoomLevel"];
     [userDefault synchronize];
+    
 }
+
+//////// From WWDC 2013 video "Map Kit in Perspective"
+-(void)goToNextCamera
+{
+    if (animationCameras.count == 0) {
+        return;
+    }
+    MKMapCamera * nextCamera = [animationCameras firstObject];
+    [animationCameras removeObjectAtIndex:0];
+    ////***** IMPORTANT change I made: NSAnimationContext from the video does not work, I found use UIView animateWithDuration
+    [UIView animateWithDuration:1.0f animations:^{
+        self.mapView.camera = nextCamera;;
+    } completion:NULL];
+    
+}
+-(void) performShortCmeraAnimation:(MKMapCamera*)end
+{
+    CLLocationCoordinate2D startingCoordinate = self.mapView.centerCoordinate;
+    MKMapPoint startingPoint = MKMapPointForCoordinate(startingCoordinate);
+    MKMapPoint endingPoint = MKMapPointForCoordinate(end.centerCoordinate);
+        
+    MKMapPoint midPoint = MKMapPointMake(startingPoint.x + ((endingPoint.x - startingPoint.x)/2.0),
+                                         startingPoint.y + ((endingPoint.y -startingPoint.y)/2.0));
+    CLLocationCoordinate2D midCoordinate = MKCoordinateForMapPoint(midPoint);
+    CLLocationDistance midAltitude = end.altitude *4;
+                                                     
+    MKMapCamera *midCamera = [MKMapCamera cameraLookingAtCenterCoordinate:end.centerCoordinate
+                                                        fromEyeCoordinate:midCoordinate eyeAltitude:midAltitude];
+    animationCameras = [[NSMutableArray alloc] init];
+    [animationCameras addObject:midCamera];
+    [animationCameras addObject:end];
+    [self goToNextCamera]; //this will kickout animation
+}
+-(void) performLongCmeraAnimation:(MKMapCamera*)end
+{
+    MKMapCamera *start = self.mapView.camera;
+    CLLocation *startLocation = [[CLLocation alloc] initWithCoordinate:start.centerCoordinate
+                                                    altitude:start.altitude
+                                                    horizontalAccuracy:0
+                                                      verticalAccuracy:0
+                                                             timestamp:nil];
+    CLLocation *endLocation = [[CLLocation alloc] initWithCoordinate:end.centerCoordinate
+                                                              altitude:end.altitude
+                                                    horizontalAccuracy:0
+                                                      verticalAccuracy:0
+                                                             timestamp:nil];
+    CLLocationDistance distance = [startLocation distanceFromLocation:endLocation];
+    CLLocationDistance midAltitude = distance;
+    MKMapCamera *midCamera1 = [MKMapCamera cameraLookingAtCenterCoordinate:start.centerCoordinate
+                                                         fromEyeCoordinate:start.centerCoordinate
+                                                               eyeAltitude:midAltitude];
+    MKMapCamera *midCamera2 = [MKMapCamera cameraLookingAtCenterCoordinate:end.centerCoordinate
+                                                         fromEyeCoordinate:end.centerCoordinate
+                                                               eyeAltitude:midAltitude];
+    animationCameras = [[NSMutableArray alloc] init];
+    [animationCameras addObject:midCamera1];
+    [animationCameras addObject:midCamera2];
+    [self goToNextCamera];
+    
+}
+-(void)goToCoordinate:(CLLocationCoordinate2D)coord
+{
+    MKMapCamera *end = [MKMapCamera cameraLookingAtCenterCoordinate:coord
+                                                  fromEyeCoordinate:coord
+                                                        eyeAltitude:500];
+    end.pitch = 55; //show 3d effect so building will show
+
+    MKMapCamera *start = self.mapView.camera;
+    CLLocation *startLocation = [[CLLocation alloc] initWithCoordinate:start.centerCoordinate
+                                                    altitude:start.altitude
+                                                    horizontalAccuracy:0 verticalAccuracy:0 timestamp:nil];
+    CLLocation *endLocation = [[CLLocation alloc] initWithCoordinate:end.centerCoordinate
+                                                            altitude:end.altitude
+                                                            horizontalAccuracy:0 verticalAccuracy:0 timestamp:nil];
+    CLLocationDistance distance = [startLocation distanceFromLocation:endLocation];
+    //now filter based on distance
+    if (distance < 2500) {
+        [self.mapView setCamera:end animated:YES];
+        return;
+    }
+    if (distance < 50000) {
+        [self performShortCmeraAnimation:end];
+        return;
+    }
+    [self performLongCmeraAnimation:end];
+}
+//////// end code from WWDC "Map Kit In Perspective"
 
 - (void)updateEventListViewWithEventsOnMap
 {
@@ -2540,6 +2619,7 @@
 }
 -(void)initiAdBanner
 {
+    return;
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     if ([targetName hasPrefix:@"Cnet"])
         return;

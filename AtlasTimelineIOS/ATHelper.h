@@ -56,6 +56,7 @@
 + (NSString*) clearMakerAllFromDescText: (NSString*)desc;
 + (NSArray*) getEventListWithUniqueIds: (NSArray*)uniqueIds;
 + (NSString*) httpGetFromServer:(NSString*)serverUrl;
++ (NSString*) httpGetFromServer:(NSString*)serverUrl :(BOOL)alertError;
 + (void)startReplaceDb:(NSString*)selectedAtlasName :(NSArray*)downloadedJsonArray :(UIActivityIndicatorView*)spinner;
 + (BOOL) isAtLeast8;
 

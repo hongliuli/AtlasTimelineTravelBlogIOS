@@ -50,7 +50,7 @@ NSMutableArray* appStoreUrlList;
         // add subview etc here
     }
     NSString* serviceUrl = [NSString stringWithFormat:@"http://www.chroniclemap.com//resources/newappshortlist.html"];
-    NSString* responseStr  = [ATHelper httpGetFromServer:serviceUrl];
+    NSString* responseStr  = [ATHelper httpGetFromServer:serviceUrl :false];
     NSMutableArray* appNameList = [[NSMutableArray alloc] init];
     appStoreUrlList = [[NSMutableArray alloc] init];
     
@@ -66,9 +66,10 @@ NSMutableArray* appStoreUrlList;
                 [appStoreUrlList addObject:appDetail[1]];
             }
         }
+        [appNameList addObject:NSLocalizedString(@"More ...",nil)];
+        [appStoreUrlList addObject:NSLocalizedString(@"http://www.chroniclemap.com/resources/allapplist.html",nil)]; //TODO have chinese url
     }
-    [appNameList addObject:NSLocalizedString(@"More ...",nil)];
-    [appStoreUrlList addObject:NSLocalizedString(@"http://www.chroniclemap.com/resources/allapplist.html",nil)]; //TODO have chinese url
+
 
     if ([appNameList count] > 0)
     {

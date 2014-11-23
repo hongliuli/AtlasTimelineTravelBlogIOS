@@ -465,6 +465,11 @@ UIPopoverController *verifyViewPopover;
 
 +(NSString*) httpGetFromServer:(NSString *)serverUrl
 {
+    return [ATHelper httpGetFromServer:serverUrl :true];
+}
+
++(NSString*) httpGetFromServer:(NSString *)serverUrl :(BOOL)alertError
+{
     serverUrl = [serverUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]; //will handle chinese etc
 
     NSURL* serviceUrl = [NSURL URLWithString:serverUrl];
@@ -476,15 +481,21 @@ UIPopoverController *verifyViewPopover;
     NSData *urlData=[NSURLConnection sendSynchronousRequest:serviceRequest returningResponse:&response error:&error];
     if (urlData == nil)
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Connect Server Fail!",nil) message:NSLocalizedString(@"Network may not be available, Please try later!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
-        [alert show];
+        if (alertError)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Connect Server Fail!",nil) message:NSLocalizedString(@"Network may not be available, Please try later!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+            [alert show];
+        }
         return nil;
     }
     NSString* responseStr = [[NSString alloc]initWithData:urlData encoding:NSUTF8StringEncoding];
     if ([responseStr hasPrefix:@"<html>"])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Connect Server Fail!",nil) message:NSLocalizedString(@"Temporary network problem, Please try again!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
-        [alert show];
+        if (alertError)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Connect Server Fail!",nil) message:NSLocalizedString(@"Temporary network problem, Please try again!",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
+            [alert show];
+        }
         return nil;
     }
     return responseStr;
@@ -617,7 +628,7 @@ UIPopoverController *verifyViewPopover;
 + (BOOL) isAtLeast8
 {
     NSString *version = [[UIDevice currentDevice] systemVersion];
-    return [version compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending;
+    return [version compare:@"80.0" options:NSNumericSearch] != NSOrderedAscending;
 }
 
 //---- set/get options
