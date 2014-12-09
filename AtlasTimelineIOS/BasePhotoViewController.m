@@ -246,7 +246,7 @@ UIView *descEditorContentView;
 - (void) doneAction: (id)sender
 {
     int selectedPhotoIdx = self.pageControl.currentPage;
-    [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
+    [self dismissViewControllerAnimated:YES completion: nil]; //use Modal with Done button is good both iPad/iPhone
     [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
     [self.eventEditor updatePhotoCountLabel];
 }
@@ -263,7 +263,7 @@ UIView *descEditorContentView;
     NSString* deletedFileName =self.eventEditor.photoScrollView.photoList[selectedPhotoIdx];
     //NSLog(@" deleted file = %@",deletedFileName);
     [self.eventEditor deleteCallback: deletedFileName];
-    [self dismissModalViewControllerAnimated:true]; //use Modal with Done button is good both iPad/iPhone
+    [self dismissViewControllerAnimated:YES completion: nil]; //use Modal with Done button is good both iPad/iPhone
 }
 - (void) sortSelectedAction: (id)sender
 {
