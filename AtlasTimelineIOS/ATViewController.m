@@ -476,7 +476,7 @@
     if (error) {
         NSLog(@"Error : %@",error);
     }
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
     
 }
 
