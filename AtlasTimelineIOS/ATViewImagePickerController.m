@@ -107,7 +107,7 @@ finishedSavingWithError:(NSError *)error
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion: nil];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
@@ -201,7 +201,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 - (void) doneAction: (id)sender //called after click my Done button, not ELCImagePicker's done
 {
     [self.delegate doneSelectPictures:self.chosenImages];
-    [self dismissModalViewControllerAnimated:true]; //TODO for iPad case. iPhone should use navigators
+    [self dismissViewControllerAnimated:YES completion: nil]; //TODO for iPad case. iPhone should use navigators
 }
 
 
