@@ -78,8 +78,11 @@ NSMutableArray* appStoreUrlList;
                             delegate: self
                             cancelButtonTitle:NSLocalizedString(@"Not Now",nil)
                             otherButtonTitles: nil];
+        NSString* appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+        NSLog(@" --- this app bunle name is %@", appName);
         for( NSString *title in appNameList)  {
-            [alert addButtonWithTitle:title];
+            if (![appName isEqualToString:title])
+                [alert addButtonWithTitle:title];
         }
         [alert show];
     }
