@@ -303,7 +303,7 @@
     {
         switchEventListViewModeToVisibleOnMapFlag = false;
         eventListInVisibleMapArea = nil; //IMPORTANT: refreshEventListView will use this is nil or not to decide if in map event list view mode, do not refresh if scroll timewheel
-        [switchEventListViewModeBtn setTitle:NSLocalizedString(@"按期间列表",nil) forState:UIControlStateNormal];
+        [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Time",nil) forState:UIControlStateNormal];
         switchEventListViewModeBtn.backgroundColor = [UIColor blueColor];
         //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon"] forState:UIControlStateNormal];
         [self.mapView makeToast:NSLocalizedString(@"Scroll timewheel to list events in the selected period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(350, 80)]];
