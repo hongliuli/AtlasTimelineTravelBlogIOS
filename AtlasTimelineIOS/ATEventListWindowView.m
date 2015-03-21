@@ -128,6 +128,7 @@ NSDateFormatter *dateFormatter;
         [cell.layer setCornerRadius:7.0f];
         [cell.layer setMasksToBounds:YES];
         [cell.layer setBorderWidth:1.0f];
+        [cell.layer setBorderColor:[UIColor lightGrayColor].CGColor];
         cell.contentView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
         //cell.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
         //[cell.layer setBorderColor:(__bridge CGColorRef)([UIColor lightGrayColor])];

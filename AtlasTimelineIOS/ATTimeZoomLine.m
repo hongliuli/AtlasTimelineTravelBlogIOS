@@ -14,10 +14,12 @@
 #import "ATTimeScrollWindowNew.h"
 #import "Toast+UIView.h"
 
+#define MOVABLE_VIEW_Y_POS 0
 #define MOVABLE_VIEW_HEIGHT 2
-#define LABEL_SCALE_TEXT_CONTAINER_Y -38
-#define ZOOM_LEVEL_TXT_Y -5
-#define ZOOM_LEVEL_BLOCK_HEIGHT 30
+#define LABEL_SCALE_TEXT_CONTAINER_Y -43 //Y position for movable manifier
+#define ZOOM_SCALE_TXT_Y -10
+#define ZOOM_SCALE_BLOCK_HEIGHT 15
+#define ZOOM_SCALE_BLOCK_Y_POS -15
 
 @implementation ATTimeZoomLine
 
@@ -64,19 +66,19 @@ NSDate* prevYearDate;
     if (self) {
         frameWidth = frame.size.width;
         // Initialization code
-        timeScaleLineView = [[UIView alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, -10, 90, MOVABLE_VIEW_HEIGHT)];
-        timeScaleZoomLeveText = [[UILabel alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, ZOOM_LEVEL_TXT_Y, 90, 15)];
+        timeScaleLineView = [[UIView alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, MOVABLE_VIEW_Y_POS, 90, MOVABLE_VIEW_HEIGHT)];
+        timeScaleZoomLeveText = [[UILabel alloc] initWithFrame:CGRectMake(frame.size.width/2 - 45, ZOOM_SCALE_TXT_Y, 90, 15)];
         timeScaleZoomLeveText.textColor = [UIColor colorWithRed:0.6 green:0.2 blue:0.2 alpha:1];
         timeScaleZoomLeveText.font = [UIFont fontWithName:@"Helvetica-bold" size:12];
         timeScaleZoomLeveText.textAlignment = NSTextAlignmentCenter;
         
-        CGRect frameLeft = CGRectMake(0, -10, 10, ZOOM_LEVEL_BLOCK_HEIGHT);
+        CGRect frameLeft = CGRectMake(0, ZOOM_SCALE_BLOCK_Y_POS, 10, ZOOM_SCALE_BLOCK_HEIGHT);
         timeScaleLeftBlock = [[UILabel alloc] initWithFrame:frameLeft];
-        [timeScaleLeftBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.25]];
-
-        CGRect frameRight = CGRectMake([ATConstants timeScrollWindowWidth] - 200, -10, 300, ZOOM_LEVEL_BLOCK_HEIGHT);
+        [timeScaleLeftBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.2]];
+        
+        CGRect frameRight = CGRectMake([ATConstants timeScrollWindowWidth] - 200, ZOOM_SCALE_BLOCK_Y_POS, 300, ZOOM_SCALE_BLOCK_HEIGHT);
         timeScaleRightBlock = [[UILabel alloc] initWithFrame:frameRight];
-        [timeScaleRightBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.25]];
+        [timeScaleRightBlock setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.2]];
         
         /*
         self.zoomLabel.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8 alpha:1 ];
@@ -345,9 +347,9 @@ NSDate* prevYearDate;
 
     CGContextSetLineWidth(context, 1.0);
     // Draw the base. 
-    CGContextMoveToPoint(context, 0,y);
-    CGContextAddLineToPoint(context, x, y);
-    
+    CGContextMoveToPoint(context, 0,0);
+    CGContextAddLineToPoint(context, x, 0);
+    /*
     //Draw 1st line at left-most
     CGContextMoveToPoint(context, 0,0);
     CGContextAddLineToPoint(context, 0, y);
@@ -363,7 +365,7 @@ NSDate* prevYearDate;
     //Draw last line at right most
     CGContextMoveToPoint(context, x,0);
     CGContextAddLineToPoint(context, x, y); 
-    
+    */
     CGContextStrokePath(context);
     [self drawEventDotsBySpan];
     
@@ -612,7 +614,7 @@ NSDate* prevYearDate;
         scaleStartAdj = -30;
     }
     
-    timeScaleLineView.frame = CGRectMake(scaleStartInPix + scaleStartAdj, 10, self.scaleLenForDisplay, MOVABLE_VIEW_HEIGHT);
+    timeScaleLineView.frame = CGRectMake(scaleStartInPix + scaleStartAdj, MOVABLE_VIEW_Y_POS, self.scaleLenForDisplay, MOVABLE_VIEW_HEIGHT);
     [timeScaleLineView setBackgroundColor:[UIColor colorWithRed:1.0 green:0.1 blue:0.1 alpha:1]];
     /*
     if (self.scaleLenForDisplay < 150)
@@ -628,8 +630,8 @@ NSDate* prevYearDate;
     */
     
     int x = self.frame.size.width;
-    CGRect frameLeft = CGRectMake(0, -10, scaleStartInPix + scaleStartAdj, 20);
-    CGRect frameRight = CGRectMake(scaleStartInPix + scaleStartAdj + self.scaleLenForDisplay, -10, x - (scaleStartInPix + scaleStartAdj + self.scaleLenForDisplay), 20);
+    CGRect frameLeft = CGRectMake(0, ZOOM_SCALE_BLOCK_Y_POS, scaleStartInPix + scaleStartAdj, ZOOM_SCALE_BLOCK_HEIGHT);
+    CGRect frameRight = CGRectMake(scaleStartInPix + scaleStartAdj + self.scaleLenForDisplay, ZOOM_SCALE_BLOCK_Y_POS, x - (scaleStartInPix + scaleStartAdj + self.scaleLenForDisplay), ZOOM_SCALE_BLOCK_HEIGHT);
     
     [timeScaleLeftBlock setFrame:frameLeft];
     [timeScaleRightBlock setFrame:frameRight];
@@ -640,7 +642,7 @@ NSDate* prevYearDate;
     labelScaleTextSecondLine.center = center;
     */
     CGPoint center2 = timeScaleLineView.center;
-    center2.y = ZOOM_LEVEL_TXT_Y;//this value decided y value when scroll time window
+    center2.y = ZOOM_SCALE_TXT_Y;//this value decided y value when scroll time window
     timeScaleZoomLeveText.center = center2;
     
     CGPoint center3 = timeScaleLineView.center;
@@ -656,14 +658,14 @@ NSDate* prevYearDate;
 - (void)drawEventDotsBySpan
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    float DOT_SIZE = 5.0;
-    float DOT_Y_POS = 3.0;
-    float DOT_Y_POS_GREEN = -25.0;
+    float DOT_SIZE = 6.0;
+    float DOT_Y_POS = 2;
+    float DOT_Y_POS_GREEN = 2.0;
     if (appDelegate.selectedPeriodInDays <= 30)
     {
         DOT_SIZE = 8.0;
-        DOT_Y_POS_GREEN = -30.0;
-        DOT_Y_POS = 0.0;
+        DOT_Y_POS_GREEN = 4.0;
+        DOT_Y_POS = 3;
     }
 
     Boolean eventVisibleOnMapFlag = false; //draw bar if there are event visible in map screen
@@ -717,7 +719,7 @@ NSDate* prevYearDate;
             if (eventVisibleOnMapFlag)
             {
                 CGContextSetRGBFillColor(context, 0,0.5,0.2, 1);
-                CGContextFillRect(context, CGRectMake(x, DOT_Y_POS_GREEN, DOT_SIZE, 8*DOT_SIZE));
+                CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS_GREEN, DOT_SIZE, DOT_SIZE));
                 previouseVisibleEventDrawXPos = x;
             }
             else
@@ -741,7 +743,7 @@ NSDate* prevYearDate;
             if (eventVisibleOnMapFlag)
             {
                 CGContextSetRGBFillColor(context, 0,0.5,0.2, 1);
-                CGContextFillRect(context, CGRectMake(x, DOT_Y_POS_GREEN, DOT_SIZE, 8*DOT_SIZE));
+                CGContextFillEllipseInRect(context, CGRectMake(x, DOT_Y_POS_GREEN, DOT_SIZE, DOT_SIZE));
                 previouseVisibleEventDrawXPos = x;
             }
             else

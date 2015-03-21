@@ -88,6 +88,7 @@
         
         self.horizontalTableView.dataSource = self;
         self.horizontalTableView.delegate = self;
+        /*
         UIView* topBorder = [[UIView alloc] initWithFrame:CGRectMake(-5,-5, frame.size.width + 10, 5)];
         topBorder.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"frame-top.png"]];
         UIView* bottomBorder = [[UIView alloc] initWithFrame:CGRectMake(-5,frame.size.height, frame.size.width +10, 5)];
@@ -100,7 +101,7 @@
         [self addSubview:bottomBorder];
         [self addSubview:leftBorder];
         [self addSubview:rightBorder];
-        
+        */
         [self addSubview:self.horizontalTableView];
         yearElapsedFromToday = 0;
         
