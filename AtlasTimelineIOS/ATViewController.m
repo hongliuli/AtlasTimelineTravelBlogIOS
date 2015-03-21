@@ -218,8 +218,8 @@
         switchEventListViewModeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     else
         [switchEventListViewModeBtn removeFromSuperview];
-    switchEventListViewModeBtn.frame = CGRectMake(10, 73, 130, 30);
-    [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Timewheel",nil) forState:UIControlStateNormal];
+    switchEventListViewModeBtn.frame = CGRectMake(10, 73, 100, 30);
+    [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Time",nil) forState:UIControlStateNormal];
     //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon.png"] forState:UIControlStateNormal];
     [switchEventListViewModeBtn addTarget:self action:@selector(switchEventListViewMode:) forControlEvents:UIControlEventTouchUpInside];
     //switchEventListViewModeBtn.titleLabel.backgroundColor = [UIColor blueColor];
@@ -303,7 +303,7 @@
     {
         switchEventListViewModeToVisibleOnMapFlag = false;
         eventListInVisibleMapArea = nil; //IMPORTANT: refreshEventListView will use this is nil or not to decide if in map event list view mode, do not refresh if scroll timewheel
-        [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Timewheel",nil) forState:UIControlStateNormal];
+        [switchEventListViewModeBtn setTitle:NSLocalizedString(@"按期间列表",nil) forState:UIControlStateNormal];
         switchEventListViewModeBtn.backgroundColor = [UIColor blueColor];
         //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon"] forState:UIControlStateNormal];
         [self.mapView makeToast:NSLocalizedString(@"Scroll timewheel to list events in the selected period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(350, 80)]];
