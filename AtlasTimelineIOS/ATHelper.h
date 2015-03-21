@@ -40,6 +40,8 @@
 + (NSString*)getRootBundlePath;
 + (NSString*)getPhotoDocummentoryPath;
 + (NSString*)getNewUnsavedEventPhotoPath;
++ (BOOL) isAtLeast8;
++ (BOOL) isAtLeastIOS8;
 
 //photo related
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;

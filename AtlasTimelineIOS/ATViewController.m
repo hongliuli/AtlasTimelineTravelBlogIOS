@@ -41,6 +41,7 @@
 #define MERCATOR_OFFSET 268435456
 #define MERCATOR_RADIUS 85445659.44705395
 #define ZOOM_LEVEL_TO_HIDE_DESC 3
+#define ZOOM_LEVEL_TO_HIDE_EVENTLIST_VIEW 5
 #define ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE 9
 
 #define DISTANCE_TO_HIDE 80
@@ -796,68 +797,123 @@
 */
 - (void) mapViewShowHideAction
 {
-    if ([selectedAnnotationSet count] == 0) //if no selected nodes, use 2 step show/hide to have better user experience
+    if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
     {
-        if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
-        {
-            self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
-            self.timeScrollWindow.hidden = true;
-            eventListView.hidden = true;
-            switchEventListViewModeBtn.hidden = true;
-            self.timeZoomLine.hidden = true;
-            [self hideDescriptionLabelViews];
-            self.navigationController.navigationBarHidden = true;
-            [self showAdAtTop:true];
-        }
-        else if (self.mapViewShowWhatFlag == MAPVIEW_HIDE_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
-        {
-            self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
-            self.timeScrollWindow.hidden=false;
-            eventListView.hidden = false;
-            switchEventListViewModeBtn.hidden = false;
-            self.timeZoomLine.hidden = false;
-            [self showDescriptionLabelViews:self.mapView];
-            self.navigationController.navigationBarHidden = false;
-            [self showAdAtTop:false];
-        }
+        self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
+        [self animatedHidePart1];
+        //[self hideDescriptionLabelViews];
+        [self.navigationController setNavigationBarHidden:true animated:TRUE];
     }
-    else //if has selected nodes, use 3-step show/hide
+    else if (self.mapViewShowWhatFlag == MAPVIEW_HIDE_ALL)
     {
-        if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
-        {
-            self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
-            self.timeScrollWindow.hidden = true;
-            eventListView.hidden = true;
-            switchEventListViewModeBtn.hidden = true;
-            self.timeZoomLine.hidden = true;
-            [self hideDescriptionLabelViews];
-            self.navigationController.navigationBarHidden = true;
-            [self showAdAtTop:true];
-        }
-        else if (self.mapViewShowWhatFlag == MAPVIEW_HIDE_ALL)
-        {
-            self.mapViewShowWhatFlag = MAPVIEW_SHOW_PHOTO_LABEL_ONLY;
-            self.timeScrollWindow.hidden=true;
-            eventListView.hidden = true;
-            switchEventListViewModeBtn.hidden = true;
-            self.timeZoomLine.hidden = true;
-            [self showDescriptionLabelViews:self.mapView];
-            self.navigationController.navigationBarHidden = true;
-            [self showAdAtTop:true];
-        }
-        else if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
-        {
-            self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
-            self.timeScrollWindow.hidden=false;
-            eventListView.hidden = false;
-            switchEventListViewModeBtn.hidden = false;
-            self.timeZoomLine.hidden = false;
-            [self showDescriptionLabelViews:self.mapView];
-            self.navigationController.navigationBarHidden = false;
-            [self showAdAtTop:false];
-        }
+        self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+        [self animatedShowPart1];
+        //[self showDescriptionLabelViews:self.mapView];
+        [self.navigationController setNavigationBarHidden:false animated:TRUE];
     }
+    /**** I decide to not use three-steps
+     if ([selectedAnnotationSet count] == 0) //if no selected nodes, use 2 step show/hide to have better user experience
+     {
+     if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+     {
+     self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
+     [self animatedHidePart1];
+     [self hideDescriptionLabelViews];
+     [self.navigationController setNavigationBarHidden:true animated:TRUE];
+     }
+     else if (self.mapViewShowWhatFlag == MAPVIEW_HIDE_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+     {
+     self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+     [self animatedShowPart1];
+     [self showDescriptionLabelViews:self.mapView];
+     [self.navigationController setNavigationBarHidden:false animated:TRUE];
+     }
+     }
+     else //if has selected nodes, use 3-step show/hide
+     {
+     if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
+     {
+     self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
+     [self animatedHidePart1];
+     [self hideDescriptionLabelViews];
+     [self.navigationController setNavigationBarHidden:true animated:TRUE];
+     }
+     else if (self.mapViewShowWhatFlag == MAPVIEW_HIDE_ALL)
+     {
+     self.mapViewShowWhatFlag = MAPVIEW_SHOW_PHOTO_LABEL_ONLY;
+     [self animatedHidePart1];
+     [self showDescriptionLabelViews:self.mapView];
+     [self.navigationController setNavigationBarHidden:TRUE animated:TRUE];
+     }
+     else if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+     {
+     self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+     [self animatedShowPart1];
+     [self showDescriptionLabelViews:self.mapView];
+     [self.navigationController setNavigationBarHidden:false animated:TRUE];
+     }
+     }
+     */
 }
+
+- (void) animatedHidePart1
+{
+    int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
+    int timeLineY = timeWindowY - 18;
+    [UIView animateWithDuration:0.5
+                          delay:0.0
+                        options:UIViewAnimationCurveEaseOut
+                     animations:^(void) {
+                         self.timeScrollWindow.alpha = 0;
+                         self.timeZoomLine.alpha = 0;
+                         eventListView.alpha = 0;
+                         switchEventListViewModeBtn.alpha = 0;
+                         CGRect frame = self.timeScrollWindow.frame;
+                         frame.origin.y = timeWindowY + 30;
+                         [self.timeScrollWindow setFrame:frame];
+                         frame = self.timeZoomLine.frame;
+                         frame.origin.y = timeLineY + 30;
+                         [self.timeZoomLine setFrame:frame];
+                         
+                         frame = eventListView.frame;
+                         frame.origin.x = -60;
+                         [eventListView setFrame:frame];
+                         frame = switchEventListViewModeBtn.frame;
+                         frame.origin.x = -60;
+                         [switchEventListViewModeBtn setFrame:frame];
+                     }
+                     completion:NULL];
+}
+- (void) animatedShowPart1
+{
+    int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
+    int timeLineY = timeWindowY - 18;
+    [UIView animateWithDuration:0.3
+                          delay:0.0
+                        options:UIViewAnimationCurveEaseOut
+                     animations:^(void) {
+                         self.timeScrollWindow.alpha = 1;
+                         self.timeZoomLine.alpha = 1;
+                         switchEventListViewModeBtn.alpha = 1;
+                         eventListView.alpha = 1;
+                         
+                         CGRect frame = self.timeScrollWindow.frame;
+                         frame.origin.y = timeWindowY;
+                         [self.timeScrollWindow setFrame:frame];
+                         frame = self.timeZoomLine.frame;
+                         frame.origin.y = timeLineY;
+                         [self.timeZoomLine setFrame:frame];
+                         
+                         frame = eventListView.frame;
+                         frame.origin.x = 0;
+                         [eventListView setFrame:frame];
+                         frame = switchEventListViewModeBtn.frame;
+                         frame.origin.x = 10;
+                         [switchEventListViewModeBtn setFrame:frame];
+                     }
+                     completion:NULL];
+}
+
 - (void)handleTapGesture:(UIGestureRecognizer *)gestureRecognizer
 {
     NSTimeInterval interval = [[[NSDate alloc] init] timeIntervalSinceDate:regionChangeTimeStart];
@@ -1017,9 +1073,11 @@
                 
                 [self setDescLabelSizeByZoomLevel:tmpLbl];
                 if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
-                    tmpLbl.hidden = true;
+                    //tmpLbl.hidden = true;
+                    tmpLbl.alpha = 0;
                 else
-                    tmpLbl.hidden=false;
+                    //tmpLbl.hidden=false;
+                    tmpLbl.alpha = 1;
                 
                 [selectedAnnotationSet setObject:tmpLbl forKey:key];
                 [self.view addSubview:tmpLbl];
@@ -1031,9 +1089,11 @@
                     tmpLbl.text = [ATHelper clearMakerAllFromDescText: ann.description ]; //need to change to take care of if user updated description in event editor
                 
                 if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
-                    tmpLbl.hidden = true;
+                    //tmpLbl.hidden = true;
+                    tmpLbl.alpha = 0;
                 else
-                    tmpLbl.hidden=false;
+                    tmpLbl.alpha = 1;
+                //tmpLbl.hidden=false;
             }
         }
         else
@@ -1314,7 +1374,7 @@
     else
         [eventListInVisibleMapArea removeAllObjects];
     
-    if ([self zoomLevel] >= 7)
+    if ([self zoomLevel] >= ZOOM_LEVEL_TO_HIDE_EVENTLIST_VIEW)
     {
         
         NSSet *nearbySet = [self.mapView annotationsInMapRect:self.mapView.visibleMapRect];
@@ -1359,7 +1419,7 @@
         coordinate.longitude = [splitArray[1] doubleValue];
         CGPoint annotationViewPoint = [mapView convertCoordinate:coordinate
                                                    toPointToView:mapView];
-        if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
+        if (TRUE) //self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
         {  //because mapRegion will call this function, so only show label this condition match
             bool tooCloseToShowFlag = false;
             
@@ -1377,7 +1437,8 @@
             }
             if (tooCloseToShowFlag && ![key isEqualToString:focuseKey])
             {
-                tmpLbl.hidden = true;
+                //tmpLbl.hidden = true;
+                tmpLbl.alpha = 0;
                 continue;
             }
             else
@@ -1389,9 +1450,20 @@
             CGSize size = tmpLbl.frame.size;
             [tmpLbl setFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, size.width, size.height)];
             if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
-                tmpLbl.hidden = true;
+            {
+                //tmpLbl.hidden = true;
+                tmpLbl.alpha = 0;
+            }
             else
-                tmpLbl.hidden=false;
+            {
+                [UIView animateWithDuration:0.5
+                                      delay:0.0
+                                    options:UIViewAnimationCurveEaseOut
+                                 animations:^(void) {
+                                     tmpLbl.alpha = 1;
+                                 }
+                                 completion:NULL];
+            }
         }
     }
     [selectedAnnotationNearestLocationList removeAllObjects];
@@ -1401,7 +1473,13 @@
 {
     for (id key in selectedAnnotationSet) {
         UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
-        tmpLbl.hidden=true;
+        [UIView animateWithDuration:0.5
+                              delay:0.0
+                            options:UIViewAnimationCurveEaseOut
+                         animations:^(void) {
+                             tmpLbl.alpha = 0;
+                         }
+                         completion:NULL];
     }
 }
 -(void) setDescLabelSizeByZoomLevel:(UILabel*)tmpLbl
@@ -1414,7 +1492,8 @@
     int labelWidth = 60;
     if (zoomLevel <= ZOOM_LEVEL_TO_HIDE_DESC)
     {
-        tmpLbl.hidden = true; //do nothing, caller already hidden the label;
+        //tmpLbl.hidden = true; //do nothing, caller already hidden the label;
+        tmpLbl.alpha = 0;
     }
     else if (zoomLevel <= 8)
     {
@@ -1601,8 +1680,10 @@
             self.eventEditorPopover.popoverContentSize = CGSizeMake(380,480);
             
             //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user and call refreshAnn in alert delegate to fix it. (will not work without put into alert delegate)
-            BOOL isAtLeast8 = [ATHelper isAtLeast8];
-            if (view.window != nil || isAtLeast8)
+            BOOL isAtLeastIOS8 = [ATHelper isAtLeastIOS8];
+            if (isAtLeastIOS8) //##### this part took me a few week, finally found solution so I can use xcode 6now
+                [self.eventEditorPopover presentPopoverFromRect:view.frame inView:self.mapView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+            else if (view.window != nil && !isAtLeastIOS8)
                 [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
             else
             {
@@ -2208,20 +2289,22 @@
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
 {
     //when click on annotation, all timewheel/image will flip just as tap on map, so I will flip it back so keep same state as before tap on annotation
-    if (self.mapViewShowWhatFlag == 3)
-        self.mapViewShowWhatFlag = 1;
+    if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
+        self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
     else
-        self.mapViewShowWhatFlag ++;
+        self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+    //self.mapViewShowWhatFlag ++;
     [self mapViewShowHideAction];
 }
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
 {
     //NSLog(@"de-selected anno");
     // if (mapViewShowWhatFlag == 1) //since select will always show it, deselect will do opposit always
-    if (self.mapViewShowWhatFlag == 3)
-        self.mapViewShowWhatFlag = 1;
+    if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
+        self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
     else
-        self.mapViewShowWhatFlag ++;
+        //self.mapViewShowWhatFlag ++;
+        self.mapViewShowWhatFlag = 3;
     [self mapViewShowHideAction];
 }
 - (double)longitudeToPixelSpaceX:(double)longitude

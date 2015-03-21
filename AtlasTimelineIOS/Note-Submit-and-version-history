@@ -1,7 +1,23 @@
 
+New Version (not released yet, add on 3/20/2015)
+    - animate show/hide
+    - Improved and simplified time wheel visual effect by removed border and gap.
+
+
+Version 1.3.1
+    - Fix event editor min/max bug
+    - display related Chronicle Map in Chinese as 霞客行
 
 version 1.3
-. Event List View grey date, bold title part
+    - Scroll map in camera mode when jump to another location, greatly enhance user experience on map.
+    - improve event list text readability by differing text darkness for date, title and content.
+    - Use text button to emphasis event list mode: timewheel or map mode.
+    - improve map mode eventview refresh loop performance
+    - Related apps list is from server.
+    - use a UIView to do photo description editor, removed a third party customizealertview for photo desc editor
+    - Improve select on event list view to make sure everytime will show thumbnail
+    - Tried hard to automatically switch event list view mode and give up. The main problem is in automatic mode, each time scroll map will cause many executions such as refresh event list view, very soon the memory warning will occure frequently. I tried to use timer or time delay technic, but always has glitch.
+    - xcode6 does not work for min/max event editor etc
 
 
 #### Photos are linked to GoogleDriver PhotosForWWII directory.####
