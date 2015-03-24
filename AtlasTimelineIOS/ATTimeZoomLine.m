@@ -144,20 +144,20 @@ NSDate* prevYearDate;
         //add the at front
         
         labelScaleTextContainer = [[UIView alloc] initWithFrame:CGRectMake(-30,LABEL_SCALE_TEXT_CONTAINER_Y, 80, 45)];
-        labelScaleTextContainer.backgroundColor = [UIColor  colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];
-        labelScaleTextContainer.layer.borderColor=[UIColor grayColor].CGColor;
-        labelScaleTextContainer.layer.borderWidth=1;
-        labelScaleTextContainer.layer.cornerRadius = 15;
+        //labelScaleTextContainer.backgroundColor = [UIColor  colorWithRed:0.8 green:0.8 blue:1.0 alpha:0.5 ];
+        //labelScaleTextContainer.layer.borderColor=[UIColor grayColor].CGColor;
+        //labelScaleTextContainer.layer.borderWidth=1;
+        //labelScaleTextContainer.layer.cornerRadius = 15;
         
         labelScaleText = [[UILabel alloc] initWithFrame:CGRectMake(0, 5, 80, 20)];
 
-        labelScaleText.textColor = [UIColor blueColor];
+        labelScaleText.textColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
         labelScaleText.font=[UIFont fontWithName:@"Helvetica-bold" size:20];
         labelScaleText.textAlignment = NSTextAlignmentCenter;
         
         labelScaleTextSecondLine = [[UILabel alloc] initWithFrame:CGRectMake(0,25, 80, 20)];
         labelScaleTextSecondLine.backgroundColor = [UIColor clearColor];
-        labelScaleTextSecondLine.textColor = [UIColor blueColor];
+        labelScaleTextSecondLine.textColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
         labelScaleTextSecondLine.font=[UIFont fontWithName:@"Helvetica" size:16];
         labelScaleTextSecondLine.textAlignment = NSTextAlignmentCenter;
         

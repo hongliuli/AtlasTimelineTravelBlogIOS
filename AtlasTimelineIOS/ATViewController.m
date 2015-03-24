@@ -213,17 +213,18 @@
     [self initiAdBanner];
     [self initgAdBanner];
     
-    //For eventlistview mode
     if (switchEventListViewModeBtn == nil)
-        switchEventListViewModeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        switchEventListViewModeBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     else
         [switchEventListViewModeBtn removeFromSuperview];
     switchEventListViewModeBtn.frame = CGRectMake(10, 73, 100, 30);
-    [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Time",nil) forState:UIControlStateNormal];
-    //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon.png"] forState:UIControlStateNormal];
+    [switchEventListViewModeBtn.titleLabel setFont:[UIFont fontWithName:@"Arial-Bold" size:25]];
+    [[switchEventListViewModeBtn layer] setBorderWidth:2.0f];
+    
+    [self setSwitchButtonTimeMode];
+    
     [switchEventListViewModeBtn addTarget:self action:@selector(switchEventListViewMode:) forControlEvents:UIControlEventTouchUpInside];
-    //switchEventListViewModeBtn.titleLabel.backgroundColor = [UIColor blueColor];
-    switchEventListViewModeBtn.backgroundColor = [UIColor blueColor];
+
     [switchEventListViewModeBtn.layer setCornerRadius:7.0f];
     [self.mapView addSubview:switchEventListViewModeBtn];
     switchEventListViewModeToVisibleOnMapFlag = false;
@@ -258,6 +259,18 @@
     
 }
 
+-(void)setSwitchButtonTimeMode
+{
+    [switchEventListViewModeBtn setTitleColor:[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0] forState:UIControlStateNormal];
+    [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Time",nil) forState:UIControlStateNormal];
+    [[switchEventListViewModeBtn layer] setBorderColor:[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0].CGColor];
+}
+-(void)setSwitchButtonMapMode
+{
+    [switchEventListViewModeBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Map",nil) forState:UIControlStateNormal];
+    [[switchEventListViewModeBtn layer] setBorderColor:[UIColor redColor].CGColor];
+}
 
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
@@ -296,30 +309,24 @@
     [self.mapView setRegion:region animated:YES];
 }
 
-
 -(void) switchEventListViewMode:(id)sender
 {
     if (switchEventListViewModeToVisibleOnMapFlag)
     {
         switchEventListViewModeToVisibleOnMapFlag = false;
         eventListInVisibleMapArea = nil; //IMPORTANT: refreshEventListView will use this is nil or not to decide if in map event list view mode, do not refresh if scroll timewheel
-        [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Time",nil) forState:UIControlStateNormal];
-        switchEventListViewModeBtn.backgroundColor = [UIColor blueColor];
-        //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Hourglass-icon"] forState:UIControlStateNormal];
+        [self setSwitchButtonTimeMode];
         [self.mapView makeToast:NSLocalizedString(@"Scroll timewheel to list events in the selected period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(350, 80)]];
         [self refreshEventListView:false];
     }
     else
     {
         switchEventListViewModeToVisibleOnMapFlag = true;
-        [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Map",nil) forState:UIControlStateNormal];
-        switchEventListViewModeBtn.backgroundColor = [UIColor orangeColor];
-        //[switchEventListViewModeBtn setImage:[UIImage imageNamed:@"Maps-icon.png"] forState:UIControlStateNormal];
+        [self setSwitchButtonMapMode];
         [self.mapView makeToast:NSLocalizedString(@"Scroll map to list events moving into the screen",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(340, 80)]];
         [self updateEventListViewWithEventsOnMap];
     }
 }
-
 
 #pragma mark - CLLocationManagerDelegate
 
@@ -716,7 +723,7 @@
     CGRect timeZoomLineFrame;
     int timeWindowWidth = [ATConstants timeScrollWindowWidth];
     int timeWindowX = [ATConstants timeScrollWindowX];
-    timeZoomLineFrame = CGRectMake(timeWindowX - 15,self.view.bounds.size.height - [ATConstants timeScrollWindowHeight], timeWindowWidth + 30,30);
+    timeZoomLineFrame = CGRectMake(timeWindowX,self.view.bounds.size.height - [ATConstants timeScrollWindowHeight], timeWindowWidth,30);
     if (self.timeZoomLine != nil)
         [self.timeZoomLine removeFromSuperview]; //incase orientation change
     self.timeZoomLine = [[ATTimeZoomLine alloc] initWithFrame:timeZoomLineFrame];
