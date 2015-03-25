@@ -727,6 +727,7 @@
     if (self.timeZoomLine != nil)
         [self.timeZoomLine removeFromSuperview]; //incase orientation change
     self.timeZoomLine = [[ATTimeZoomLine alloc] initWithFrame:timeZoomLineFrame];
+    self.timeZoomLine.userInteractionEnabled = false;
     self.timeZoomLine.backgroundColor = [UIColor clearColor];
     self.timeZoomLine.mapViewController = self;
     [self.view addSubview:self.timeZoomLine];
