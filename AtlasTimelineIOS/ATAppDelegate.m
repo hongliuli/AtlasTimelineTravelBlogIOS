@@ -6,7 +6,6 @@
 //  Copyright (c) 2012 hong. All rights reserved.
 //
 
-#import <DropboxSDK/DropboxSDK.h>
 #import "ATAppDelegate.h"
 #import "ATimelineTableViewController.h"
 #import "ATDataController.h"
@@ -432,25 +431,9 @@
     }
     controller = [self.storyBoard instantiateInitialViewController];
     [self.window setRootViewController:controller];
-    //NSLog(@" -------dropbox root is %@", kDBRootDropbox);
-    DBSession* dbSession =[[DBSession alloc] initWithAppKey:@"vmngs8cprefdyi3"
-                                                  appSecret:@"o9ct42rr0696dzq" root:kDBRootDropbox]; // either kDBRootAppFolder or kDBRootDropbox;
-    [DBSession setSharedSession:dbSession];
-    
-    [[DBSession sharedSession] unlinkAll];//IMPORTANT: so each restart will ask user login to drobox. Without this, once login to dropbox from app, even reinstall app will not ask to login again, there is no way to switch dropbox account
-    
-    return YES;
+     return YES;
 }
-- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-    if ([[DBSession sharedSession] handleOpenURL:url]) {
-        if ([[DBSession sharedSession] isLinked]) {
-            NSLog(@"App linked successfully!");
-            // At this point you can start making API calls
-        }
-        return YES;
-    }
-    // Add whatever other url handling code your app requires here
-    return NO;
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {    return NO;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

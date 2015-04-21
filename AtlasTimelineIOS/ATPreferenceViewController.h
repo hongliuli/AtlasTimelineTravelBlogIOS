@@ -8,11 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "ATViewController.h"
-#import <DropboxSDK/DropboxSDK.h>
 
-@interface ATPreferenceViewController : UITableViewController <DBRestClientDelegate>
+@interface ATPreferenceViewController : UITableViewController
 @property (weak, nonatomic) IBOutlet UILabel *detailLabel;
 @property (weak, nonatomic) ATViewController* mapViewParent;
-@property (nonatomic, strong) DBRestClient *_restClient;
 
 @end

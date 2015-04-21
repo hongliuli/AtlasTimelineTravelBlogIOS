@@ -7,9 +7,6 @@
 //
 
 #import "ATViewImagePickerController.h"
-#import "ELCImagePickerController.h"
-#import "ELCAlbumPickerController.h"
-#import "ELCAssetTablePicker.h"
 
 
 @interface ATViewImagePickerController ()
@@ -82,11 +79,6 @@ UIPopoverController *popoverController;
 
 - (IBAction) useCameraRoll: (id)sender
 {
-	ELCImagePickerController *elcPicker = [[ELCImagePickerController alloc] init];
-    elcPicker.maximumImagesCount = 9;
-	elcPicker.imagePickerDelegate = self;
-    
-    [self presentViewController:elcPicker animated:YES completion:nil];
 }
 
 
@@ -154,48 +146,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     {
         // Code here to support video if enabled
     }
-}
-//called when photo picked (protocal from ELCImagePicker)
-- (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
-{
-    NSLog(@"----- didFinish ");
-    [self dismissViewControllerAnimated:YES completion:nil];
-	
-    for (UIView *v in [_scrollView subviews]) {
-        [v removeFromSuperview];
-    }
-    
-	CGRect workingFrame = _scrollView.frame;
-	workingFrame.origin.x = 0;
-    workingFrame.origin.y=0; //copy from ELImmage demo without this, but I have to add this, do not know why
-    //NSLog(@"--- workingFrame  %f   %f   %f   %f", workingFrame.origin.x, workingFrame.origin.y, workingFrame.size.width, workingFrame.size.height);
-    
-    NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
-	
-	for (NSDictionary *dict in info) {
-        
-        UIImage *image = [dict objectForKey:UIImagePickerControllerOriginalImage];
-        [images addObject:image];
-        
-		UIImageView *imageview = [[UIImageView alloc] initWithImage:image];
-		[imageview setContentMode:UIViewContentModeScaleAspectFit ];//     UIViewContentModeScaleAspectFit];
-		imageview.frame = workingFrame;
-		
-		[_scrollView addSubview:imageview];
-		
-		workingFrame.origin.x = workingFrame.origin.x + workingFrame.size.width;
-	}
-    
-    self.chosenImages = images;
-	
-	[_scrollView setPagingEnabled:YES];
-	[_scrollView setContentSize:CGSizeMake(workingFrame.origin.x, workingFrame.size.height)];
-
-}
-//called after cancel
-- (void)elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker
-{
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void) doneAction: (id)sender //called after click my Done button, not ELCImagePicker's done

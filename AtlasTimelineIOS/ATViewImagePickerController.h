@@ -8,11 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <MobileCoreServices/MobileCoreServices.h>
-#import "ELCImagePickerController.h"
 
 @protocol ATImagePickerDelegate;
 
-@interface ATViewImagePickerController : UIViewController<ELCImagePickerControllerDelegate,UIScrollViewDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate>
+@interface ATViewImagePickerController : UIViewController<UIScrollViewDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (nonatomic, copy) NSArray *chosenImages;
