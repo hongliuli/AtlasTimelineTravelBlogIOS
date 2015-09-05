@@ -84,9 +84,18 @@
 {
     return @"marker-af-4.png";
 }
-+ (NSString*)WhiteFlagAnnotationIdentifier
++ (NSString*)WhiteFlagAnnotationIdentifier:(NSString*)eventTag
 {
-    return @"small-white-flag.png";
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+    {
+        if ([eventTag hasPrefix:@"Natur"])
+            return @"small-green-ball-icon.png";
+        else
+            return @"small-red-ball-icon.png";
+    }
+    else
+        return @"small-white-flag.png";
 }
 + (int) screenWidth
 {
@@ -291,15 +300,15 @@
 //Constants for Event List View
 + (int) eventListViewCellWidth{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return 270;
+        return 240;
     else
-        return 160;
+        return 130;
 }
 + (int) eventListViewCellHeight{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         return 120;
     else
-        return 100;
+        return 80;
 }
 + (int) eventListViewCellNum{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
@@ -321,13 +330,13 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         return 100;
     else
-        return 60;
+        return 50;
 }
 + (int) eventListViewPhotoHeight{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         return 70;
     else
-        return 40;
+        return 32;
 }
 
 

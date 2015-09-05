@@ -150,6 +150,7 @@
 {
     [super viewDidLoad];
     switchEventListViewModeToVisibleOnMapFlag = false; //eventListView for timewheel is more reasonable, so make it as default always, even not save to userDefault
+    
     [ATHelper createPhotoDocumentoryPath];
     //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.locationManager = [[CLLocationManager alloc] init];
@@ -221,13 +222,16 @@
     [switchEventListViewModeBtn.titleLabel setFont:[UIFont fontWithName:@"Arial-Bold" size:25]];
     [[switchEventListViewModeBtn layer] setBorderWidth:2.0f];
     
-    [self setSwitchButtonTimeMode];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+        [self setSwitchButtonMapMode];
+    else
+        [self setSwitchButtonTimeMode];
     
     [switchEventListViewModeBtn addTarget:self action:@selector(switchEventListViewMode:) forControlEvents:UIControlEventTouchUpInside];
 
     [switchEventListViewModeBtn.layer setCornerRadius:7.0f];
     [self.mapView addSubview:switchEventListViewModeBtn];
-    switchEventListViewModeToVisibleOnMapFlag = false;
     eventListInVisibleMapArea = nil;
     [self refreshEventListView:false];
 
@@ -261,12 +265,14 @@
 
 -(void)setSwitchButtonTimeMode
 {
+    switchEventListViewModeToVisibleOnMapFlag = false;
     [switchEventListViewModeBtn setTitleColor:[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0] forState:UIControlStateNormal];
     [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Time",nil) forState:UIControlStateNormal];
     [[switchEventListViewModeBtn layer] setBorderColor:[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0].CGColor];
 }
 -(void)setSwitchButtonMapMode
 {
+    switchEventListViewModeToVisibleOnMapFlag = true;
     [switchEventListViewModeBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Map",nil) forState:UIControlStateNormal];
     [[switchEventListViewModeBtn layer] setBorderColor:[UIColor redColor].CGColor];
@@ -313,7 +319,6 @@
 {
     if (switchEventListViewModeToVisibleOnMapFlag)
     {
-        switchEventListViewModeToVisibleOnMapFlag = false;
         eventListInVisibleMapArea = nil; //IMPORTANT: refreshEventListView will use this is nil or not to decide if in map event list view mode, do not refresh if scroll timewheel
         [self setSwitchButtonTimeMode];
         [self.mapView makeToast:NSLocalizedString(@"Scroll timewheel to list events in the selected period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(350, 80)]];
@@ -321,7 +326,6 @@
     }
     else
     {
-        switchEventListViewModeToVisibleOnMapFlag = true;
         [self setSwitchButtonMapMode];
         [self.mapView makeToast:NSLocalizedString(@"Scroll map to list events moving into the screen",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(340, 80)]];
         [self updateEventListViewWithEventsOnMap];
@@ -618,6 +622,10 @@
         }
         
     }
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+        appDelegate.selectedPeriodInDays = 3650;
+    
     if (self.timeZoomLine != nil)
         [self displayTimelineControls];//which one is better: [self.timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
     //NSLog(@"   ############## setConfigu startDate=%@    endDate=%@   startDateFormated=%@", self.startDate, self.endDate, [appDelegate.dateFormater stringFromDate:self.startDate]);
@@ -961,7 +969,7 @@
     // Following will filter out MKUserLocation annotation
     if ([annotation isKindOfClass:[ATDefaultAnnotation class]]) //ATDefaultAnnotation is when longPress
     {
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate :nil]; //keep this line here, do not move inside
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann :nil]; //keep this line here, do not move inside
         // try to dequeue an existing pin view first
         MKPinAnnotationView* pinView = (MKPinAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier:[ATConstants DefaultAnnotationIdentifier]];
         if (!pinView)
@@ -997,14 +1005,14 @@
     {
         NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
 
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate: specialMarkerName]; //keep this line here
+        selectedAnnotationIdentifier = [self getImageIdentifier:ann: specialMarkerName]; //keep this line here
         MKAnnotationView* annView;
         annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
         annView.annotation = annotation;
         NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
         //keey list of red  annotations
         BOOL isSpecialMarkerInFocused = false;
-        if (specialMarkerName != nil && ![selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier]] )
+        if (specialMarkerName != nil && ![selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier:ann.address]] )
         {
             //Remember special marker annotation identifier has alpha value delimited by ":" if not selected. Selected do not have :
             if ([selectedAnnotationIdentifier rangeOfString:@":"].location == NSNotFound)
@@ -1186,9 +1194,9 @@
         if (ann.eventDate == nil)
             continue;
         NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
-        NSString* identifer = [self getImageIdentifier:ann.eventDate :specialMarkerName];
+        NSString* identifer = [self getImageIdentifier:ann :specialMarkerName];
         //NSLog(@"  identifier is %@  date=%@",identifer, ann.eventDate);
-        if ([identifer isEqualToString: [ATConstants WhiteFlagAnnotationIdentifier]])
+        if ([identifer isEqualToString: [ATConstants WhiteFlagAnnotationIdentifier:ann.address]])
             [[annView superview] sendSubviewToBack:annView];
         if ([identifer isEqualToString: [ATConstants SelectedAnnotationIdentifier]])
         {
@@ -1636,7 +1644,7 @@
      [self.focusedEventLabel setHidden:true];
      }];
      ***********/
-    selectedAnnotationIdentifier = [self getImageIdentifier:ann.eventDate :ann.description];
+    selectedAnnotationIdentifier = [self getImageIdentifier:ann :ann.description];
     ATEventDataStruct* ent = [[ATEventDataStruct alloc] init];
     ent.address = ann.address;
     ent.lat = ann.coordinate.latitude;
@@ -1897,10 +1905,11 @@
     //[self showDescriptionLabelViews:self.mapView];
 }
 
-- (NSString*)getImageIdentifier:(NSDate *)eventDate :(NSString*)specialMarkerName
+- (NSString*)getImageIdentifier:(ATEventAnnotation *)ann :(NSString*)specialMarkerName
 {
     // NSLog(@"  --------------- %u", debugCount);
     //debugCount = debugCount + 1;
+    NSDate* eventDate = ann.eventDate;
 
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if (appDelegate.focusedDate == nil) //set in annotation Left button click
@@ -1923,7 +1932,7 @@
         else if (segmentDistance > 4 && segmentDistance <= 5)
             pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.4",pngNameWithAlpha ];
         else if (segmentDistance > 5)
-            return [ATConstants WhiteFlagAnnotationIdentifier];
+            return [ATConstants WhiteFlagAnnotationIdentifier:ann.address];
         
         return pngNameWithAlpha;
     }
@@ -1939,7 +1948,7 @@
     if (segmentDistance > 4 && segmentDistance <=5)
         return [ATConstants After4AnnotationIdentifier];
     if (segmentDistance > 5)
-        return [ATConstants WhiteFlagAnnotationIdentifier]; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
+        return [ATConstants WhiteFlagAnnotationIdentifier:ann.address]; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
     if (segmentDistance >= -2 && segmentDistance < -1)
         return [ATConstants Past1AnnotationIdentifier];
     if (segmentDistance >= -3 && segmentDistance < -2)
@@ -1949,7 +1958,7 @@
     if (segmentDistance>= - 5 && segmentDistance < -4 )
         return [ATConstants Past4AnnotationIdentifier];
     if (segmentDistance < -5 )
-        return [ATConstants WhiteFlagAnnotationIdentifier]; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
+        return [ATConstants WhiteFlagAnnotationIdentifier:ann.address]; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
     return nil;
 }
 

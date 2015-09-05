@@ -357,12 +357,12 @@
         //Here is to parse whole file again to get shareOverlay data (ShareOverlay data will be put at end of file)
         //Data format [ShareOverlay]key1 number,number number,number
         //            [ShareOverlay]key2 number,number number,number ...
-        int firstShareOverlayLoc = [eventsString rangeOfString:@"[ShareOverlay]"].location;
+        NSUInteger firstShareOverlayLoc = [eventsString rangeOfString:@"[ShareOverlay]"].location;
         if (firstShareOverlayLoc != NSNotFound)
         {
             if (lastEvent != nil) //remove [ShareOverlay] part from the last event
             {
-                int lastEventShareOverlayLoc = [lastEvent.eventDesc rangeOfString:@"[ShareOverlay]"].location;
+                NSUInteger lastEventShareOverlayLoc = [lastEvent.eventDesc rangeOfString:@"[ShareOverlay]"].location;
                 if (lastEventShareOverlayLoc != NSNotFound)
                     lastEvent.eventDesc = [lastEvent.eventDesc substringToIndex:lastEventShareOverlayLoc];
             }

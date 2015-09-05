@@ -30,6 +30,8 @@ BOOL eventListViewInMapModeFlag;
 
 UIColor *greyColor;
 UIFont *boldFont;
+UIFont *regularFont;
+UIFont *dateFontSize;
 
 NSDateFormatter *dateFormatter;
 
@@ -58,7 +60,14 @@ NSDateFormatter *dateFormatter;
         [dateFormatter setLocale:[NSLocale currentLocale]];
         greyColor=[UIColor darkGrayColor];
         boldFont=[UIFont fontWithName:@"Arial-BoldMT" size:13];
-
+        regularFont=[UIFont fontWithName:@"Arial" size:13];
+        dateFontSize=[UIFont fontWithName:@"Arial" size:13];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            boldFont=[UIFont fontWithName:@"Arial-BoldMT" size:11];
+            regularFont=[UIFont fontWithName:@"Arial" size:11];
+            dateFontSize=[UIFont fontWithName:@"Arial" size:10];
+        }
     }
     return self;
 }
@@ -122,7 +131,7 @@ NSDateFormatter *dateFormatter;
     {
         cell = [[ATEventListViewCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants eventListViewCellWidth], [ATConstants eventListViewCellHeight])];
         
-        cell.eventDescView.font = [UIFont fontWithName:@"Arial" size:13];
+        cell.eventDescView.font = regularFont;
 
         cell.selectionStyle = UITableViewCellStyleDefault;
         [cell.layer setCornerRadius:7.0f];
@@ -146,14 +155,14 @@ NSDateFormatter *dateFormatter;
 
     NSMutableAttributedString *attString=[[NSMutableAttributedString alloc] initWithString:descToDisplay];
     [attString addAttribute:NSForegroundColorAttributeName value:greyColor range:NSMakeRange(0, [dateStr length])];
-    int titleEndLocation = [descStr rangeOfString:@"\n"].location;
+    NSInteger titleEndLocation = [descStr rangeOfString:@"\n"].location;
     if (titleEndLocation < 80) //title is in file as [Desc]xxx yyy zzzz\n
     {
         titleStr = [descStr substringToIndex:titleEndLocation];
         descStr = [descStr substringFromIndex:titleEndLocation];
         descToDisplay = [NSString stringWithFormat:@"%@\n%@%@", dateStr,titleStr, descStr ];
         attString=[[NSMutableAttributedString alloc] initWithString:descToDisplay];
-        int dateStrLen = [dateStr length];
+        NSInteger dateStrLen = [dateStr length];
         [attString addAttribute:NSForegroundColorAttributeName value:greyColor range:NSMakeRange(0, dateStrLen)];
         [attString addAttribute:NSFontAttributeName value:boldFont range:NSMakeRange(dateStrLen, [titleStr length] + 1)];
     }
@@ -197,13 +206,13 @@ NSDateFormatter *dateFormatter;
         return [ATConstants eventListViewCellHeight];
 }
 
-- (BOOL) shouldHideArrowButtonRow:(int)row
+- (BOOL) shouldHideArrowButtonRow:(NSInteger)row
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     ATEventDataStruct* firstEvt = internalEventList[1];
     ATEventDataStruct* lastEvt = internalEventList[[internalEventList count] - 2];
-    int globalIdxFirst = [appDelegate.eventListSorted indexOfObject:firstEvt];
-    int globalIdxLast = [appDelegate.eventListSorted indexOfObject:lastEvt];
+    NSUInteger globalIdxFirst = [appDelegate.eventListSorted indexOfObject:firstEvt];
+    NSUInteger globalIdxLast = [appDelegate.eventListSorted indexOfObject:lastEvt];
     return ((globalIdxFirst == [appDelegate.eventListSorted count] - 1 &&  row == 0) ||
             (globalIdxLast == 0 && row == [internalEventList count] - 1));
 }

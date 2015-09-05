@@ -52,7 +52,7 @@
 @property int mapViewShowWhatFlag; //see MAPVIEW_SHOW_xxxxx macros
 
 - (void) prepareMapView;
-- (NSString*) getImageIdentifier:(NSDate*) eventDate :(NSString*) specialMarker;
+- (NSString*) getImageIdentifier:(ATEventAnnotation*) ann :(NSString*) specialMarker;
 - (Boolean) eventInPeriodRange:(NSDate*) eventDate;
 - (float) getDistanceFromFocusedDate:(NSDate*) eventDate;
 - (void) setSelectedPeriodLabel;
