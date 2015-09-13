@@ -32,8 +32,13 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
     NSString * dateStr = [dateFormater stringFromDate:self.eventDate];
-    int removeBC_ADPos = [dateStr rangeOfString:@" "].location;
-    dateStr = [NSString stringWithFormat:@"[%@] ",[dateStr substringToIndex:removeBC_ADPos]];
+    NSUInteger removeBC_ADPos = [dateStr rangeOfString:@" "].location;
+    dateStr = [dateStr substringToIndex:removeBC_ADPos];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+        dateStr = [ATHelper getYearPartHelper:self.eventDate];
+    
+    dateStr = [NSString stringWithFormat:@"[%@] ",dateStr];
     return[NSString stringWithFormat:@"%@%@",dateStr , self.address];
 }
 

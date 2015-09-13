@@ -144,6 +144,11 @@ NSDateFormatter *dateFormatter;
     }
 
     NSString* dateStr = [dateFormatter stringFromDate:evt.eventDate];
+    
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+        dateStr = [ATHelper getYearPartHelper:evt.eventDate];
+    
     NSString* descStr = evt.eventDesc;
     if ([descStr length] > 180)
     {

@@ -312,7 +312,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         if (self.photoScrollView.photoSortedListFromMetaFile != nil)
         {
             NSMutableArray* newList = [[NSMutableArray alloc] initWithCapacity:[self.photoScrollView.photoList count]];
-            int tmpCnt = [self.photoScrollView.photoSortedListFromMetaFile count];
+            NSUInteger tmpCnt = [self.photoScrollView.photoSortedListFromMetaFile count];
             for (int i = 0; i < tmpCnt; i++)
             {
                 NSString* fileName = self.photoScrollView.photoSortedListFromMetaFile[i];
@@ -604,7 +604,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 
 - (IBAction)deleteAction:(id)sender {
-    int cnt = [self.photoScrollView.photoList count] ;
+    NSUInteger cnt = [self.photoScrollView.photoList count] ;
     NSString* promptStr = NSLocalizedString(@"This event will be deleted!",nil);
     if (cnt > 0)
     {
@@ -653,7 +653,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
 
 - (IBAction)cancelAction:(id)sender {
-    int cnt = [photoNewAddedList count] ;
+    NSUInteger cnt = [photoNewAddedList count] ;
     if (cnt > 0 || self.photoDescChangedFlag || [self.photoScrollView.selectedAsSortIndexList count] > 0)
     {
         NSString* titleTxt = [NSString stringWithFormat:NSLocalizedString(@"%d new photo(s) are not saved",nil),cnt];
@@ -770,7 +770,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 - (void)updatePhotoCountLabel
 {
     //Change total/new added photos count
-    lblTotalCount.text = [NSString stringWithFormat:@"%d", [self.photoScrollView.photoList count] ];
+    lblTotalCount.text = [NSString stringWithFormat:@"%lu", [self.photoScrollView.photoList count] ];
     lblNewAddedCount.text = [NSString stringWithFormat:NSLocalizedString(@"[+%d/-%d unsaved!]",nil), [photoNewAddedList count], [photoDeletedList count] ];//color is red so use separate lbl
     if ([photoNewAddedList count] == 0 && [photoDeletedList count] == 0)
     {

@@ -34,9 +34,9 @@
     NSDate* timeWindowStartDate;
     NSDate* timeWindowEndDate;
     
-    int focusedRow; //set in cellForRow, used in zoom etc to scroll to focused date
-    int prevRow;
-    int currentNumberOfRow;
+    long focusedRow; //set in cellForRow, used in zoom etc to scroll to focused date
+    long prevRow;
+    long currentNumberOfRow;
     
     float gradulColor;
     
@@ -226,14 +226,14 @@
     NSDate* oldFocusedDate = appDelegate.focusedDate;
     NSDateComponents *components = [calendar components:NSDayCalendarUnit|NSMonthCalendarUnit fromDate:oldFocusedDate];
     //int year = [components year];
-    int oldMonth = [components month] - 1;
-    int oldDay = [components day] - 1;
+    long oldMonth = [components month] - 1;
+    long oldDay = [components day] - 1;
     NSDateComponents *addOldDateToNewFocusedDate = [[NSDateComponents alloc] init];
     NSDateComponents *addOldMonthToNewFocusedDate = [[NSDateComponents alloc] init];
     [addOldDateToNewFocusedDate setDay:oldDay];
     [addOldMonthToNewFocusedDate setMonth:oldMonth];
     
-    int currentRow = indexPath.row;
+    NSInteger currentRow = indexPath.row;
     if (prevRow == -1) //come here the first time
         prevRow = currentRow;
     int increaseDirection = 0;
@@ -344,7 +344,7 @@
     displayDate = [ATHelper dateByAddingComponentsRegardingEra:periodToAddForDisplay toDate:baseStartDate options:0];
     
     NSDateComponents *tmpCom = [calendar components:NSYearCalendarUnit|NSMonthCalendarUnit fromDate:displayDate];
-    int yearForImages = tmpCom.year;
+    NSInteger yearForImages = tmpCom.year;
     //IMPORTANT Since startDate always started at 01/01/yyyy, When move time by year/10year/..., date part will be lost, so need to add back
     appDelegate.focusedDate = [ATHelper dateByAddingComponentsRegardingEra:periodToAddForFocusedDate toDate:baseStartDate options:0];
     if (daysInPeriod == 365)
@@ -452,7 +452,7 @@
     //Following is special hack to force start/end event to be counted as one to be displayed  as Cyan color
     //NSLog(@"--Recurs dDate %@ | nDate=%@  idx1=%i  idx2=%i diff=%i", [format stringFromDate: displayDate], [format stringFromDate: nextExpectedDate], index1, index2, index1-index2);
     int displayCount = abs(index1 - index2);
-    int totalCnt = [appDelegate.eventListSorted count];
+    NSUInteger totalCnt = [appDelegate.eventListSorted count];
     NSDate* startDate;
     NSDate* endDate;
     
@@ -788,7 +788,7 @@
     NSDictionary* scaleDateDic = [ATHelper getScaleStartEndDate:appDelegate.focusedDate];
     NSDate* scaleEndDay = [scaleDateDic objectForKey:@"END"];
 
-    int eventCount = [appDelegate.eventListSorted count];
+    NSUInteger eventCount = [appDelegate.eventListSorted count];
     int closestEvtIdx = [self getIndexOfClosestDate:scaleEndDay :0 :FIRST_TIME_CALL];
     ATEventDataStruct* nextEvent = appDelegate.eventListSorted[closestEvtIdx];
     if ([nextEvent.eventDate compare:scaleEndDay] == NSOrderedAscending || [nextEvent.eventDate compare:scaleEndDay] == NSOrderedSame )
@@ -832,7 +832,7 @@
     if (focusedRow > currentNumberOfRow) //sometimes focusedRow will be too big that cause crash, need more investigate why, here is defenseively program to make sure it works
         focusedRow = currentNumberOfRow -1;
     
-    int scrollToRow = focusedRow;
+    long scrollToRow = focusedRow;
     //TODO xxxxxx very weired, my iPod touch have to add by 1, while iPad need decrease by 1 need more test
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && focusedRow + 1 > currentNumberOfRow)
         scrollToRow = focusedRow + 1;
@@ -847,10 +847,10 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSArray *paths = [self.horizontalTableView indexPathsForVisibleRows];
-    float rowDistance = 0;
+    long rowDistance = 0;
     for (NSIndexPath *path in paths) {
         ATTimeScrollCell* cell = (ATTimeScrollCell*)[self.horizontalTableView cellForRowAtIndexPath:path];
-        rowDistance = abs(focusedRow - path.row);
+        rowDistance = labs(focusedRow - path.row);
         if (rowDistance == 0)
         {
             if (appDelegate.selectedPeriodInDays > 365)
@@ -980,19 +980,19 @@
     }
     else if (selectedPeriodInDay == 365)
     {
-        focusedRow = abs(components.year * 12) + abs(components.month);
+        focusedRow = labs(components.year * 12) + labs(components.month);
     }
     else if (selectedPeriodInDay == 3650)
     {
-        focusedRow = abs(components.year);
+        focusedRow = labs(components.year);
     }
     else if (selectedPeriodInDay == 36500)
     {
-        focusedRow = abs(components.year / 10);
+        focusedRow = labs(components.year / 10);
     }
     else if (selectedPeriodInDay == 365000) //1000 year
     {
-        focusedRow = abs(components.year / 100);
+        focusedRow = labs(components.year / 100);
     }
     
     if (fromFocuseEventDate && UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)

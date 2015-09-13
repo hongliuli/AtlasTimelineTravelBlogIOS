@@ -281,7 +281,7 @@ NSMutableArray* appStoreUrlList;
     ATEventDataStruct* evt1 = nil;
     ATEventDataStruct* evt2 = nil;
 
-    int eventCnt = [appDelegate.eventListSorted count];
+    NSUInteger eventCnt = [appDelegate.eventListSorted count];
     if (eventCnt > 1)
     {
         evt1 = appDelegate.eventListSorted[eventCnt - 1];
@@ -348,6 +348,13 @@ NSMutableArray* appStoreUrlList;
     updatableLabel2.textColor = [UIColor whiteColor];
     [self addSubview:updatableLabel2];
     
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+    {
+        lbl.text = [NSString stringWithFormat: NSLocalizedString(@"1.   Red Dot for CULTURE Heritage, Green Dot for NATURAL Heritage",nil)];
+        updatableLabel.text = [NSString stringWithFormat: NSLocalizedString(@"2.   The selected period is 3 years around %@",nil), [ATHelper getYearPartHelper: appDelegate.focusedDate]];
+        updatableLabel2.text = [NSString stringWithFormat: NSLocalizedString(@"      The sites recognized by UNESCO in this period are colored as bellow, the darker the closer to %@",nil), [ATHelper getYearPartHelper: appDelegate.focusedDate]];
+    }
     currentYLocation = currentYLocation + 0.3 * itemHeight;
     CGRect frameColorImage = CGRectMake(initialX + 20*iPhoneSizeXFactor + 50, currentYLocation, imageAnn, imageAnn);
     UIImageView* annImage1 = [[UIImageView alloc] initWithFrame:frameColorImage ];

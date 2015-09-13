@@ -507,7 +507,7 @@ UIPopoverController *verifyViewPopover;
     if (spinner != nil)
         [spinner startAnimating];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    int cnt = [downloadedJsonArray count];
+    NSUInteger cnt = [downloadedJsonArray count];
     NSMutableArray* newEventList = [[NSMutableArray alloc] initWithCapacity:cnt];
     NSDateFormatter* usDateformater = [appDelegate.dateFormater copy];
     //always use USLocale to save date in JSON, so always use it to read. this resolve a big issue when user upload with one local and download with another local setting.
@@ -594,9 +594,13 @@ UIPopoverController *verifyViewPopover;
     }
     else if (periodIndays == 365)
     {
-        dateComponent.month = -5;
+        int monthToShift = 5;
+        NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+        if ([targetName hasPrefix:@"WorldHeritage"])
+            monthToShift = 18; //3yr 1.5 year each side so 18 month
+        dateComponent.month = -monthToShift;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
-        dateComponent.month = 5;
+        dateComponent.month = monthToShift;
         scaleEndDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];
     }
     else if (periodIndays == 3650)

@@ -28,6 +28,7 @@
 "1wk"="7天";
 "1mo"="1个月";
 "1yr"="1年";
+"3yr"="3年";
 "10yr"="10年";
 "100yr"="100年";
 "1000yr"="1000年";
@@ -273,10 +274,12 @@
 "Zooming out the timeline reached 1000-years range limit!"="已经到达最高缩小级别-1000年!";
 "Zoom the time:"="缩放时间:";
 "Zoom-out to reach far-away time more quickly."="缩小时间能帮助快速滑动时间.";
-
+"1.   Red Dot for CULTURE Heritage, Green Dot for NATURAL Heritage"="1.   地图上红色点代表文化遗产，绿色点代表自然遗产";
 "1.   Totally there are %d events span from %@ to %@"="1.   总共有 %d 个事件， 时间跨越从 %@ 到 %@";
 "2.   The selected date is %@ and the time zoom level is %@"="2.   当前选的时间是 %@ ， 时间缩放级别是 %@";
 "      So all events within %@ of %@ are colored as bellow, the darker the closer to it"="      就是说在%@内的所有事件都上了下列色彩：（离中心日期%@越近，颜色就越深）";
+"      The sites recognized by UNESCO in this period are colored as bellow, the darker the closer to %@"="      UNESCO在这时间承认的世界遗址被上了下列色彩：（离中心日期%@越近，颜色就越深)";
+"2.   The selected period is 3 years around %@"="2.   当前时间区间是以%@年为中心三年跨度";
 "1.   A red dot indicates the existence of events at that point of time"="1.   红点 - 表明在这个时间段存在事件";
 "2.   A green dot means the events at that point of time are currently on screen"="2.   绿点 - 表明在这个时间段上，有的事件正出现在屏幕的地图上";
 "     Green dot is helpful to find events/photos quickly. Learn more from Tip 2 in [Online Help]"="     绿点能极大地帮助快速找到事件或照片 - 首先滑动地图到你关心的区域，再滑动时间到有绿点位置";

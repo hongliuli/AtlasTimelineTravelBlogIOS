@@ -535,6 +535,9 @@ NSDate* prevYearDate;
     else if (periodIndays == 365)
     {
         timeScaleZoomLeveText.text = NSLocalizedString(@"1yr",nil);
+        NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+        if ([targetName hasPrefix:@"WorldHeritage"])
+            timeScaleZoomLeveText.text = NSLocalizedString(@"3yr",nil);
     }
     else if (periodIndays == 3650)
     {
