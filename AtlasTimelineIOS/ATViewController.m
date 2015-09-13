@@ -516,11 +516,11 @@
     {
         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         NSString* bookmarkIdxStr = [userDefault valueForKey:@"BookmarkEventIdx"];
-        int eventListSize = [eventList count];
+        NSUInteger eventListSize = [eventList count];
         ATEventDataStruct* entStruct = eventList[eventListSize -1]; //if no bookmark, always use earlist
         if (bookmarkIdxStr != nil)
         {
-            int bookmarkIdx = [bookmarkIdxStr intValue];
+            NSUInteger bookmarkIdx = [bookmarkIdxStr intValue];
             if (bookmarkIdx >= eventListSize)
                 bookmarkIdx = eventListSize - 1;
             entStruct = eventList[bookmarkIdx];
@@ -569,7 +569,7 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     
     NSArray * eventList = appDelegate.eventListSorted;
-    int eventCount = [eventList count];
+    NSUInteger eventCount = [eventList count];
     //IMPORTANT  startDate's date part should always start as year's start day 01/01,so event count in each bucket will be accurate
     if (eventCount == 0) //startDate be this year's start date, end day is today
     {
@@ -624,7 +624,7 @@
     }
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     if ([targetName hasPrefix:@"WorldHeritage"])
-        appDelegate.selectedPeriodInDays = 3650;
+        appDelegate.selectedPeriodInDays = 365;
     
     if (self.timeZoomLine != nil)
         [self displayTimelineControls];//which one is better: [self.timeZoomLine changeScaleLabelsDateFormat:self.startDate :self.endDate ];
@@ -1153,7 +1153,7 @@
     currentTapTouchKey = 0;
     currentTapTouchMove = false;
     UITouch *touch = [touches anyObject];
-    NSNumber* annViewKey = [NSNumber numberWithInt:touch.view.tag];
+    NSNumber* annViewKey = [NSNumber numberWithLong:touch.view.tag];
     if ([annViewKey intValue] > 0) //tag is set in viewForAnnotation when instance tmpLbl
         currentTapTouchKey = [annViewKey intValue];
 }
@@ -1161,7 +1161,7 @@
 //Only tap to start event editor, when swipe map and happen to swipe on photo, do not start event editor
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
     UITouch *touch = [touches anyObject];
-    NSNumber* annViewKey = [NSNumber numberWithInt:touch.view.tag];
+    NSNumber* annViewKey = [NSNumber numberWithLong:touch.view.tag];
     if ([annViewKey intValue] > 0 && [annViewKey intValue] == currentTapTouchKey)
         currentTapTouchMove = true;
 }
@@ -1169,7 +1169,7 @@
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
     UITouch *touch = [touches anyObject];
-    NSNumber* annViewKey = [NSNumber numberWithInt:touch.view.tag];
+    NSNumber* annViewKey = [NSNumber numberWithLong:touch.view.tag];
     if ([annViewKey intValue] > 0 && [annViewKey intValue] == currentTapTouchKey && !currentTapTouchMove)
     {
         MKAnnotationView* annView = [tmpLblUniqueIdMap objectForKey:annViewKey];
@@ -1406,7 +1406,7 @@
         //big performance hit
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         NSArray* allEvents = [appDelegate eventListSorted];
-        int sizeInMap = [uniqueIdSet count];
+        NSInteger sizeInMap = [uniqueIdSet count];
         int cnt = 0;
         for(ATEventDataStruct* evt in allEvents)
         {
@@ -1666,8 +1666,8 @@
     [self refreshEventListView:false];
     //bookmark selected event
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    int idx = [appDelegate.eventListSorted indexOfObject:ent];
-    [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
+    NSUInteger idx = [appDelegate.eventListSorted indexOfObject:ent];
+    [userDefault setObject:[NSString stringWithFormat:@"%lu",(unsigned long)idx ] forKey:@"BookmarkEventIdx"];
     [userDefault synchronize];
 }
 - (void) startEventEditor:(MKAnnotationView*)view
@@ -1738,6 +1738,9 @@
     [dateFormatter setLocale:[NSLocale currentLocale]];
     
     self.eventEditor.dateTxt.text = [dateFormatter stringFromDate:ann.eventDate];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+        self.eventEditor.dateTxt.text = [ATHelper getYearPartHelper:ann.eventDate];
     tmpDateHold = ann.eventDate;
 
     self.eventEditor.eventType = ann.eventType;
@@ -1790,7 +1793,7 @@
     
     // http://stackoverflow.com/questions/15061207/how-to-draw-a-straight-line-on-an-ios-map-without-moving-the-map-using-mkmapkit
     //add line by line, instead add all lines in one MKPolyline object, because I want to draw color differently in viewForOverlay
-    int size = [overlays count];
+    NSUInteger size = [overlays count];
     for(int i = 0; i < size; i++)
     {
         MKPolygon* polygon = overlays[i];
@@ -1968,9 +1971,13 @@
     NSTimeInterval interval = [eventDate timeIntervalSinceDate:appDelegate.focusedDate];
     float dayInterval = interval/86400;
     float segmentInDays = appDelegate.selectedPeriodInDays;
-    /** These logic is for my previouse thining that all point be shown, and color phase depends on selectedPeriodInDays
-     float segmentDistance = dayInterval/segmentInDays;
-     ***/
+    
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+    {
+        if (segmentInDays == 365)
+            segmentInDays = 1095; //3yr
+    }
     
     //Here, only show events withing selectedPeriodInDays, color phase will be selectedPeriodInDays/8
     float lenthOfEachSegment = segmentInDays/10 ; //or 8?
@@ -2013,10 +2020,9 @@
     if (tmpLbl != nil)
         [tmpLbl removeFromSuperview];
     [selectedAnnotationSet removeObjectForKey:key];//in case this is
-    int index = [list indexOfObject:tmp]; //implemented isEqual
+    NSUInteger index = [list indexOfObject:tmp]; //implemented isEqual
     if (index != NSNotFound)
         [list removeObjectAtIndex:index];
-    NSLog(@"   delete object at index %i",index);
     
     [self deletePhotoFilesByEventId:tmp.uniqueId];//put all phot into deletedPhotoQueue
     if (index == 0 || index == [list count]) //do not -1 since it already removed the element
@@ -2060,7 +2066,7 @@
     [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
     if ([newAddedList count] > 0) //this is for adding photo in reader, in real reader, we hardly come here
     {
-        int evtIndex = [appDelegate.eventListSorted indexOfObject:newData]; //implemented isEqual
+        NSUInteger evtIndex = [appDelegate.eventListSorted indexOfObject:newData]; //implemented isEqual
         if (evtIndex != NSNotFound)
         {
             ATEventDataStruct* evt = appDelegate.eventListSorted[evtIndex];
@@ -2120,7 +2126,7 @@
         {
             NSString* descTxt = [photoDescMap objectForKey:fileName];
             NSString* fileName2 = fileName;
-            int prefixLen = [NEW_NOT_SAVED_FILE_PREFIX length];
+            NSUInteger prefixLen = [NEW_NOT_SAVED_FILE_PREFIX length];
             if ([fileName hasPrefix:NEW_NOT_SAVED_FILE_PREFIX])
             {
                 fileName2 = [fileName substringFromIndex:prefixLen];
@@ -2412,7 +2418,7 @@
         
         eventListViewList = [[NSMutableArray alloc] init];
         
-        int cnt = [allEventSortedList count];
+        NSUInteger cnt = [allEventSortedList count];
         if (cnt == 0 )
         {
             [eventListView setFrame:newFrame];
@@ -2449,7 +2455,7 @@
         }
     }
     //above logic will remain startDateIdx/endDateIdx to be -1 if no events
-    int cnt = [eventListViewList count]; //Inside ATEventListWindow, this will add two rows for arrow button, one at top, one at bottom
+    NSUInteger cnt = [eventListViewList count]; //Inside ATEventListWindow, this will add two rows for arrow button, one at top, one at bottom
     if (cnt > 0)
     {
         numOfCellOnScreen = cnt;
