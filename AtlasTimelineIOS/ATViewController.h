@@ -67,6 +67,7 @@
 - (void) refreshEventListView:(BOOL)callFromScrollTimewheel;
 - (int) zoomLevel;
 - (void) closeAuthorView;
+- (void) hideTimeScrollAndNavigationBar:(BOOL)hideFlag;
 
 
 @end

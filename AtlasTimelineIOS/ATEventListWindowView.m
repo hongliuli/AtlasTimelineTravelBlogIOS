@@ -28,6 +28,9 @@ NSArray* internalEventList;
 BOOL isAtLeast7;
 BOOL eventListViewInMapModeFlag;
 
+int lastScrollContentOffset = 0;
+NSDate* lastScrollStartTime;
+
 UIColor *greyColor;
 UIFont *boldFont;
 UIFont *regularFont;
@@ -68,6 +71,7 @@ NSDateFormatter *dateFormatter;
             regularFont=[UIFont fontWithName:@"Arial" size:11];
             dateFontSize=[UIFont fontWithName:@"Arial" size:10];
         }
+        lastScrollStartTime = [NSDate date];
     }
     return self;
 }
@@ -304,6 +308,40 @@ NSDateFormatter *dateFormatter;
         [self.tableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedEventIdx inSection:0]
                                     atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
 }
+
+/****** following delegate works to detect scroll up/down.  */
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    NSTimeInterval timeInterval = abs([lastScrollStartTime timeIntervalSinceNow]);
+    if (timeInterval < 0.2)
+    {
+        lastScrollContentOffset = scrollView.contentOffset.y;
+        //NSLog(@"------Scroll within time");
+        return;
+    }
+    if (lastScrollContentOffset > scrollView.contentOffset.y)
+    {
+        lastScrollStartTime = [NSDate date];
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        ATViewController* mapView = appDelegate.mapViewController;
+        [mapView hideTimeScrollAndNavigationBar:false];
+        //NSLog(@"Scroll down");
+    }
+    else if (lastScrollContentOffset < scrollView.contentOffset.y)
+    {
+        lastScrollStartTime = [NSDate date];
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        ATViewController* mapView = appDelegate.mapViewController;
+        [mapView hideTimeScrollAndNavigationBar:false];
+        //NSLog(@"Scroll up");
+    }
+    
+    lastScrollContentOffset = scrollView.contentOffset.y;
+    
+    // do whatever you need to with scrollDirection here.
+}
+
+
 /*
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath

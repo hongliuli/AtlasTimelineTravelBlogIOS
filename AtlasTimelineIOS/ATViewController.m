@@ -136,6 +136,8 @@
     UIButton *btnLoadPhoto;
     
     NSMutableArray* animationCameras;
+    
+    BOOL firstTimeShowFlag;
 }
 
 @synthesize mapView = _mapView;
@@ -238,6 +240,7 @@
 }
 -(void) viewDidAppear:(BOOL)animated
 {
+    firstTimeShowFlag = true;
     [self displayTimelineControls]; //MOTHER FUCKER, I struggled long time when I decide to put timescrollwindow at bottom. Finally figure out have to put this code here in viewDidAppear. If I put it in viewDidLoad, then first time timeScrollWindow will be displayed in other places if I want to display at bottom, have to put it here
     [self.timeZoomLine showHideScaleText:false];
     [ATHelper setOptionDateFieldKeyboardEnable:false]; //always set default to not allow keyboard
@@ -811,20 +814,22 @@
     return retStr;
 }
 */
-- (void) mapViewShowHideAction
+- (void) toggleMapViewShowHideAction
 {
     if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
     {
         self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
         [self animatedHidePart1];
-        //[self hideDescriptionLabelViews];
+        //TODO may need option to see if hide ann icon or not
+        [self hideDescriptionLabelViews];
         [self.navigationController setNavigationBarHidden:true animated:TRUE];
     }
     else if (self.mapViewShowWhatFlag == MAPVIEW_HIDE_ALL)
     {
         self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
         [self animatedShowPart1];
-        //[self showDescriptionLabelViews:self.mapView];
+        //TODO may need option to see if hide ann icon or not
+        [self showDescriptionLabelViews:self.mapView];
         [self.navigationController setNavigationBarHidden:false animated:TRUE];
     }
     /**** I decide to not use three-steps
@@ -871,12 +876,71 @@
      }
      */
 }
+- (void) hideTimeScrollAndNavigationBar:(BOOL)hideFlag
+{
+    if (hideFlag)
+    {
+        self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
+        [self animatedHideTimeScrollAndNavigationBarPart1];
+        [self.navigationController setNavigationBarHidden:true animated:TRUE];
+    }
+    else
+    {
+        self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
+        [self animatedShowTimeScrollAndNavigationBarPart1];
+        [self.navigationController setNavigationBarHidden:false animated:TRUE];
+    }
+}
+
+
+- (void) animatedHideTimeScrollAndNavigationBarPart1
+{
+    int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
+    int timeLineY = timeWindowY;
+    [UIView animateWithDuration:0.3
+                          delay:0.0
+                        options:UIViewAnimationCurveEaseOut
+                     animations:^(void) {
+                         self.timeScrollWindow.alpha = 0;
+                         self.timeZoomLine.alpha = 0;
+                         CGRect frame = self.timeScrollWindow.frame;
+                         frame.origin.y = timeWindowY + 30;
+                         [self.timeScrollWindow setFrame:frame];
+                         frame = self.timeZoomLine.frame;
+                         frame.origin.y = timeLineY + 30;
+                         [self.timeZoomLine setFrame:frame];
+                     }
+                     completion:NULL];
+}
+- (void) animatedShowTimeScrollAndNavigationBarPart1
+{
+    int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
+    int timeLineY = timeWindowY;
+    [UIView animateWithDuration:0.3
+                          delay:0.0
+                        options:UIViewAnimationCurveEaseOut
+                     animations:^(void) {
+                         self.timeScrollWindow.alpha = 1;
+                         self.timeZoomLine.alpha = 1;
+                         switchEventListViewModeBtn.alpha = 1;
+                         eventListView.alpha = 1;
+                         
+                         CGRect frame = self.timeScrollWindow.frame;
+                         frame.origin.y = timeWindowY;
+                         [self.timeScrollWindow setFrame:frame];
+                         frame = self.timeZoomLine.frame;
+                         frame.origin.y = timeLineY;
+                         [self.timeZoomLine setFrame:frame];
+                     }
+                     completion:NULL];
+}
+
 
 - (void) animatedHidePart1
 {
     int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
     int timeLineY = timeWindowY;
-    [UIView animateWithDuration:0.5
+    [UIView animateWithDuration:0.3
                           delay:0.0
                         options:UIViewAnimationCurveEaseOut
                      animations:^(void) {
@@ -938,7 +1002,7 @@
         return;
     if ([gestureRecognizer numberOfTouches] == 1)
     {
-        [self mapViewShowHideAction];
+        [self toggleMapViewShowHideAction];
     }
 }
 
@@ -957,8 +1021,6 @@
     }
     else
         newAddedPin = pa;
-    
-    [self mapViewShowHideAction]; //select annotation will flip it, so double flip
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
@@ -1177,6 +1239,7 @@
         selectedEventAnnOnMap = annView;
         selectedEventAnnDataOnMap = [annView annotation];
         [self startEventEditor:annView];
+        [self toggleMapViewShowHideAction];
         [self refreshFocusedEvent];
     }
 }
@@ -1216,13 +1279,21 @@
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-    [self hideDescriptionLabelViews];
+    if (!firstTimeShowFlag) //always show all menus when first time show the view
+    {
+        [self hideDescriptionLabelViews];
+        [self hideTimeScrollAndNavigationBar:true];
+    }
+    else
+    {
+        [self hideTimeScrollAndNavigationBar:false];
+        firstTimeShowFlag = false;
+    }
 }
 
 //After map scroll/zoom finish
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
-
     //     although currently we already have optimized it a lot
     /*
     if (selectedAnnotationViewsFromDidAddAnnotation != nil && [self zoomLevel] >= ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE)
@@ -1245,7 +1316,7 @@
         [self updateEventListViewWithEventsOnMap];
     }
     //******************
-    
+
     if (animated) //means not caused by user scroll on map
     {
         [self goToNextCamera];
@@ -1254,7 +1325,7 @@
     //NSLog(@"retion didChange, zoom level is %i", [self zoomLevel]);
     [self.timeZoomLine setNeedsDisplay];
     regionChangeTimeStart = [[NSDate alloc] init];
-    [self showDescriptionLabelViews:mapView];
+    //[self showDescriptionLabelViews:mapView];
     [self.mapView bringSubviewToFront:eventListView]; //so eventListView will always cover map marker photo/txt icon (tmpLbl)
     
     //show annotation info window programmatically, especially for when select on event list view
@@ -2004,7 +2075,7 @@
 
 //delegate required implementation
 - (void)deleteEvent{
-    [self mapViewShowHideAction]; //de-select annotation will flip it, so double flip
+    [self toggleMapViewShowHideAction]; //de-select annotation will flip it, so double flip
     //delete the selectedAnnotation, also delete from db if has uniqueId in the selectedAnnotation
     [self.dataController deleteEvent:self.selectedAnnotation.uniqueId];
     [self.mapView removeAnnotation:self.selectedAnnotation];
@@ -2052,7 +2123,7 @@
     //update annotation by remove/add, then update database or added to database depends on if have id field in selectedAnnotation
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
 
-    [self mapViewShowHideAction]; //de-select annotation will flip it, so double flip
+    [self toggleMapViewShowHideAction]; //de-select annotation will flip it, so double flip
     newData.lat = self.selectedAnnotation.coordinate.latitude;
     newData.lng = self.selectedAnnotation.coordinate.longitude;
     
@@ -2311,24 +2382,16 @@
 //select/deselect tap will interfare my tap gesture handler, so try to resume timeline window original show/hide status
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
 {
-    //when click on annotation, all timewheel/image will flip just as tap on map, so I will flip it back so keep same state as before tap on annotation
-    if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
-        self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
-    else
-        self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
-    //self.mapViewShowWhatFlag ++;
-    [self mapViewShowHideAction];
+    //For callout caused by select from Event List View, then do not toggle
+    //For callout caused by tap on annotation in map, need to toogle back because tap on annotation will first call tap gesture on mkmapview
+    //Again, use regionChangeTimeStart to check: regionChangeTime is long, then must tap on annotation, otherwise, it should be tap on EventListView because it will trigger map scroll
+    NSTimeInterval interval = [[[NSDate alloc] init] timeIntervalSinceDate:regionChangeTimeStart];
+    if (interval > 0.3)  //When tap on annotation, last map scroll should been at least 0.2 seconds ago.
+        [self toggleMapViewShowHideAction];
 }
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
 {
-    //NSLog(@"de-selected anno");
-    // if (mapViewShowWhatFlag == 1) //since select will always show it, deselect will do opposit always
-    if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
-        self.mapViewShowWhatFlag = MAPVIEW_HIDE_ALL;
-    else
-        //self.mapViewShowWhatFlag ++;
-        self.mapViewShowWhatFlag = 3;
-    [self mapViewShowHideAction];
+
 }
 - (double)longitudeToPixelSpaceX:(double)longitude
 {
@@ -2482,12 +2545,7 @@
         newFrame = CGRectMake(0,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight]);
     }
     
-    self.timeScrollWindow.hidden=false;
-    eventListView.hidden = false;
-    switchEventListViewModeBtn.hidden = false;
-    self.timeZoomLine.hidden = false;
     [self showDescriptionLabelViews:self.mapView];
-    self.navigationController.navigationBarHidden = false;
     
     //important Tricky: bottom part of event list view is not clickable, thuse down arrow button always not clickable, add some height will works
     CGRect aaa = newFrame;
@@ -2497,7 +2555,9 @@
     [eventListView.tableView setFrame:CGRectMake(0,0,newFrame.size.width,newFrame.size.height)];
     if (eventListViewList != nil)
         [eventListView refresh: eventListViewList :switchEventListViewModeToVisibleOnMapFlag];
-}- (BOOL)date:(NSDate*)date isBetweenDate:(NSDate*)beginDate andDate:(NSDate*)endDate
+}
+
+- (BOOL)date:(NSDate*)date isBetweenDate:(NSDate*)beginDate andDate:(NSDate*)endDate
 {
     if ([date compare:beginDate] == NSOrderedAscending)
         return NO;
