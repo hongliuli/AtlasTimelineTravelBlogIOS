@@ -12,6 +12,8 @@
 #import "ATHelper.h"
 #import "ATEventDataStruct.h"
 
+#define ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS 991
+
 @implementation ATTutorialView
 
 int initialX;
@@ -49,6 +51,20 @@ NSMutableArray* appStoreUrlList;
         // Initialization code
         // add subview etc here
     }
+    
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+    {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Switch to Chronicle Map App",nil)
+                                                       message: NSLocalizedString(@"Use Chronicle Map App to organize your upcoming travel plans or view past events on map with timeline",nil)
+                                                      delegate: self
+                                             cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                             otherButtonTitles: NSLocalizedString(@"Switch Now",nil), nil];
+        alert.tag = ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS;
+        [alert show];
+        return self;
+    }
+    
     NSString* serviceUrl = [NSString stringWithFormat:@"http://www.chroniclemap.com//resources/newappshortlist.html"];
     NSString* responseStr  = [ATHelper httpGetFromServer:serviceUrl :false];
     NSMutableArray* appNameList = [[NSMutableArray alloc] init];
@@ -61,10 +77,12 @@ NSMutableArray* appStoreUrlList;
         {
             if (appStr != nil && [appStr length] > 20)
             {
-                NSArray* appDetail = [appStr componentsSeparatedByString:@"|"];
+                NSString* appStrTmp = [appStr stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+                NSArray* appDetail = [appStrTmp componentsSeparatedByString:@"|"];
                 [appNameList addObject:NSLocalizedString(appDetail[0],nil)];
                 [appStoreUrlList addObject:appDetail[1]];
             }
+
         }
         [appNameList addObject:NSLocalizedString(@"More ...",nil)];
         [appStoreUrlList addObject:NSLocalizedString(@"http://www.chroniclemap.com/resources/allapplist.html",nil)]; //TODO have chinese url
@@ -91,6 +109,19 @@ NSMutableArray* appStoreUrlList;
 }
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+    if (alertView.tag == ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS)
+    {
+        if (buttonIndex == 0) //Not Now
+            return; //user clicked cancel button
+        
+        if (![[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"chroniclemap://"]]) //ChronicleMap app custom URL
+        {
+            NSString* chronicleMapAppUrl = @"https://itunes.apple.com/us/app/chronicle-map-event-based/id649653093?ls=1&mt=8";
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:chronicleMapAppUrl]]; //download ChronicleMap from app store
+        }
+        return;
+    }
+    
     if (buttonIndex == 0) //Not Now
         return; //user clicked cancel button
     
@@ -309,7 +340,7 @@ NSMutableArray* appStoreUrlList;
     currentYLocation = currentYLocation + 2.5 *itemHeight - 5 *iPhoneSizeYFactor;
     CGRect frm = CGRectMake(initialX, currentYLocation, itemWidth * iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:frm];
-    lbl.text = NSLocalizedString(@"This is what is happening on your screen:",nil);
+    lbl.text = NSLocalizedString(@"This is what is on the Map:",nil);
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];
@@ -391,7 +422,7 @@ NSMutableArray* appStoreUrlList;
     currentYLocation = currentYLocation + itemHeight + 10;
     CGRect frm = CGRectMake(initialX, currentYLocation, itemWidth*iphoneSizeSpecialFactor, itemHeight);
     UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, initialY + 3 * itemHeight, itemWidth * iphoneSizeSpecialFactor, itemHeight)];
-    lbl.text = NSLocalizedString(@"Red Dot and Green Dot on Time Wheel",nil);
+    lbl.text = NSLocalizedString(@"Red/Green Dot on Time Wheel:",nil);
     lbl.font = [UIFont fontWithName:@"Arial" size:fontBig];
     lbl.backgroundColor = [UIColor clearColor];
     lbl.textColor = [UIColor whiteColor];

@@ -306,7 +306,15 @@ static UIImage *_ImageAtIndex(NSUInteger index)
 {
     NSString *photoName = _ImageNameAtIndex(index);
     if (photoName != nil)
-        return [ATHelper readPhotoFromFile:photoName eventId:[ATEventEditorTableController eventId]];
+    {
+        NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+        if ([targetName hasPrefix:@"WorldHeritage"])
+        {
+            return [ATHelper readPhotoFromFile:nil eventId: photoName];
+        }
+        else
+            return [ATHelper readPhotoFromFile:photoName eventId:[ATEventEditorTableController eventId]];
+    }
     else
         return nil;
 }

@@ -187,9 +187,9 @@ UIView *descEditorContentView;
  }
  */
 
--(void)showHideIcons:(int)index
+-(void)showHideIcons:(NSInteger)index
 {
-    if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:index]])
+    if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithLong:index]])
     {
         shareIconView.image = [UIImage imageNamed:@"share.png"];
         shareCountLabel.hidden = false;
@@ -201,9 +201,9 @@ UIView *descEditorContentView;
         shareCountLabel.hidden = true;
     }
     
-    if ([self.eventEditor.photoScrollView.selectedAsSortIndexList containsObject:[NSNumber numberWithInt:index]])
+    if ([self.eventEditor.photoScrollView.selectedAsSortIndexList containsObject:[NSNumber numberWithLong:index]])
     {
-        int sortIdx = [self.eventEditor.photoScrollView.selectedAsSortIndexList indexOfObject:[NSNumber numberWithInt:index]];
+        NSInteger sortIdx = [self.eventEditor.photoScrollView.selectedAsSortIndexList indexOfObject:[NSNumber numberWithLong:index]];
         sortIdexLabel.hidden = false;
         sortIdexLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Order: %d",nil),sortIdx + 1 ];
     }
@@ -245,7 +245,7 @@ UIView *descEditorContentView;
 
 - (void) doneAction: (id)sender
 {
-    int selectedPhotoIdx = self.pageControl.currentPage;
+    NSInteger selectedPhotoIdx = self.pageControl.currentPage;
     [self dismissViewControllerAnimated:YES completion: nil]; //use Modal with Done button is good both iPad/iPhone
     [self.eventEditor.photoScrollView.horizontalTableView scrollToRowAtIndexPath: [NSIndexPath indexPathForRow:selectedPhotoIdx inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
     [self.eventEditor updatePhotoCountLabel];
@@ -254,11 +254,11 @@ UIView *descEditorContentView;
 //TODO delete will cause issue to those marked as share, but I do not want to consider it, it weired that people will do share and delete in the same session
 - (void) deleteAction: (id)sender
 {
-    int selectedPhotoIdx = self.pageControl.currentPage;
-    if ([self.eventEditor.photoScrollView.selectedAsSortIndexList containsObject: [NSNumber numberWithInt:selectedPhotoIdx]])
-        [self.eventEditor.photoScrollView.selectedAsSortIndexList removeObject:[NSNumber numberWithInt:selectedPhotoIdx]];
-    if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:selectedPhotoIdx]])
-        [self.eventEditor.photoScrollView.selectedAsShareIndexSet removeObject:[NSNumber numberWithInt:selectedPhotoIdx]];
+    NSInteger selectedPhotoIdx = self.pageControl.currentPage;
+    if ([self.eventEditor.photoScrollView.selectedAsSortIndexList containsObject: [NSNumber numberWithLong:selectedPhotoIdx]])
+        [self.eventEditor.photoScrollView.selectedAsSortIndexList removeObject:[NSNumber numberWithLong:selectedPhotoIdx]];
+    if ([self.eventEditor.photoScrollView.selectedAsShareIndexSet containsObject:[NSNumber numberWithLong:selectedPhotoIdx]])
+        [self.eventEditor.photoScrollView.selectedAsShareIndexSet removeObject:[NSNumber numberWithLong:selectedPhotoIdx]];
     
     NSString* deletedFileName =self.eventEditor.photoScrollView.photoList[selectedPhotoIdx];
     //NSLog(@" deleted file = %@",deletedFileName);
@@ -267,9 +267,9 @@ UIView *descEditorContentView;
 }
 - (void) sortSelectedAction: (id)sender
 {
-    int selectedPhotoIdx = self.pageControl.currentPage;
+    NSInteger selectedPhotoIdx = self.pageControl.currentPage;
     
-    NSNumber *selectedPhotoIdxObj = [NSNumber numberWithInt: selectedPhotoIdx];
+    NSNumber *selectedPhotoIdxObj = [NSNumber numberWithLong: selectedPhotoIdx];
     if ([self.eventEditor.photoScrollView.selectedAsSortIndexList containsObject:selectedPhotoIdxObj])
     {
         [self.eventEditor.photoScrollView.selectedAsSortIndexList removeObject: selectedPhotoIdxObj];
@@ -278,7 +278,7 @@ UIView *descEditorContentView;
     else
     {
         [self.eventEditor.photoScrollView.selectedAsSortIndexList addObject:selectedPhotoIdxObj];
-        int count = [self.eventEditor.photoScrollView.selectedAsSortIndexList count];
+        NSInteger count = [self.eventEditor.photoScrollView.selectedAsSortIndexList count];
         
         sortIdexLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Order: %d",nil), count ];
         sortIdexLabel.hidden = false;
@@ -287,9 +287,9 @@ UIView *descEditorContentView;
 }
 - (void) setShareAction: (id)sender
 {
-    int selectedPhotoIdx = self.pageControl.currentPage;
+    NSInteger selectedPhotoIdx = self.pageControl.currentPage;
     
-    [self.eventEditor.photoScrollView.selectedAsShareIndexSet addObject:[NSNumber numberWithInt: selectedPhotoIdx]];
+    [self.eventEditor.photoScrollView.selectedAsShareIndexSet addObject:[NSNumber numberWithLong: selectedPhotoIdx]];
     [self.eventEditor.photoScrollView.horizontalTableView reloadData]; //show share icon will display on new
     shareCountLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d selected for sharing",nil),self.eventEditor.photoScrollView.selectedAsShareIndexSet.count ];
     if (shareIconView.image == nil)
@@ -301,7 +301,7 @@ UIView *descEditorContentView;
     {
         shareIconView.image = nil;
         shareCountLabel.hidden = true;
-        [self.eventEditor.photoScrollView.selectedAsShareIndexSet removeObject:[NSNumber numberWithInt: selectedPhotoIdx]];
+        [self.eventEditor.photoScrollView.selectedAsShareIndexSet removeObject:[NSNumber numberWithLong: selectedPhotoIdx]];
     }
     [self.eventEditor setShareCount];
 }

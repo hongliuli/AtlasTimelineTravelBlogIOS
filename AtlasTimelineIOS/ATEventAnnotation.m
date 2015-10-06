@@ -39,7 +39,7 @@
         dateStr = [ATHelper getYearPartHelper:self.eventDate];
     
     dateStr = [NSString stringWithFormat:@"[%@] ",dateStr];
-    return[NSString stringWithFormat:@"%@%@",dateStr , self.address];
+    return[NSString stringWithFormat:@"%@%@",dateStr , NSLocalizedString(self.address,nil)]; //add for WorldHeritage culture/natural
 }
 
 - (NSString *)title

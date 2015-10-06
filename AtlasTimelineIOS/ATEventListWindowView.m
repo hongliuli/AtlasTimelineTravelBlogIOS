@@ -194,7 +194,11 @@ NSDateFormatter *dateFormatter;
     if (evt.eventType == EVENT_TYPE_HAS_PHOTO && isAtLeast7) //excusionPaths is available only after 7
     {
         CGRect imageFrame = CGRectMake(0, 0, [ATConstants eventListViewPhotoWidht] - 2,[ATConstants eventListViewPhotoHeight] - 5);
-        cell.photoImage.image = [ATHelper readPhotoThumbFromFile:evt.uniqueId];
+        NSString* photoFileName = evt.uniqueId;
+        NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+        if ([targetName hasPrefix:@"WorldHeritage"])
+            photoFileName = [ATHelper getPhotoNameFromDescForWorldHeritage:evt.eventDesc];
+        cell.photoImage.image = [ATHelper readPhotoThumbFromFile:photoFileName];
         
         UIBezierPath * imgRect = [UIBezierPath bezierPathWithRect:imageFrame];
         cell.eventDescView.textContainer.exclusionPaths = @[imgRect];

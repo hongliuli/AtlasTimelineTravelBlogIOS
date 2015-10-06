@@ -50,6 +50,7 @@
 +(void)writePhotoToFileFromWeb:(NSString*)eventId newAddedList:(NSArray*)newAddedList newDescList:(NSArray*)newDescList;
 + (NSDictionary*) readPhotoListFromBundleFile;
 + (NSDictionary*) readPhotoListFromInternet;
++ (NSString*) getPhotoNameFromDescForWorldHeritage:descText;
 
 //misc
 + (UIColor *) colorWithHexString: (NSString *) stringToConvert;

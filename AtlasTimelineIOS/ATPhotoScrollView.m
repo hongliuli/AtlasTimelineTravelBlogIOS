@@ -95,15 +95,18 @@
     else
     {
         NSString* photoName = self.photoList[indexPath.row];
-        
-        cell.photo.image = [ATHelper readPhotoFromFile:photoName eventId:self.eventEditor.eventId];
+        NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+        if ([targetName hasPrefix:@"WorldHeritage"])
+            cell.photo.image = [ATHelper readPhotoFromFile:nil eventId:photoName];
+        else
+            cell.photo.image = [ATHelper readPhotoFromFile:photoName eventId:self.eventEditor.eventId];
         
         cell.photo.contentMode = UIViewContentModeScaleAspectFit;
         cell.photo.clipsToBounds = YES;
         UIImageView* iconShare = (UIImageView*)[cell.photo viewWithTag:SHARE_ICON_TAG];
         UILabel* lblExistingSortView = (UILabel*)[cell.photo viewWithTag:PHOTO_SORT_TAG];
         
-        if ([self.selectedAsShareIndexSet containsObject:[NSNumber numberWithInt:indexPath.row]])
+        if ([self.selectedAsShareIndexSet containsObject:[NSNumber numberWithLong:indexPath.row]])
         {
             if (iconShare == nil)
             {
@@ -117,15 +120,15 @@
             [iconShare removeFromSuperview];
         
         
-        if ([self.selectedAsSortIndexList containsObject:[NSNumber numberWithInt:indexPath.row]])
+        if ([self.selectedAsSortIndexList containsObject:[NSNumber numberWithLong:indexPath.row]])
         {
-            int sortIndex = [self.selectedAsSortIndexList indexOfObject:[NSNumber numberWithInt:indexPath.row]];
+            NSInteger sortIndex = [self.selectedAsSortIndexList indexOfObject:[NSNumber numberWithLong:indexPath.row]];
             UILabel *lblSortView = [[UILabel alloc] initWithFrame:CGRectMake(60, 10, 30, 30)];
             lblSortView.backgroundColor = [UIColor colorWithRed: 0.15 green: 0.15 blue: 0.15 alpha: 0.8];
             lblSortView.textColor = [UIColor whiteColor];
             lblSortView.font = [UIFont fontWithName:@"Helvetica-Bold" size:20.0];
             lblSortView.textAlignment = NSTextAlignmentCenter;
-            lblSortView.text = [NSString stringWithFormat:@"%d",sortIndex + 1];
+            lblSortView.text = [NSString stringWithFormat:@"%ld",sortIndex + 1];
             lblSortView.tag = PHOTO_SORT_TAG;
             [cell.photo addSubview:lblSortView];
             

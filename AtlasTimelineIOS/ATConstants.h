@@ -8,6 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+#define LanguageKey @"languageKey"
+#define EnglishValue @""
+#define ChineseValue @"_CH"
+
 @interface ATConstants : NSObject
 
 + (NSString*)selectedPeriodKey;

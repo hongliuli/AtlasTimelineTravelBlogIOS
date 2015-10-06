@@ -155,6 +155,10 @@
 {
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     NSString* eventFileName = [NSString stringWithFormat:NSLocalizedString(@"EventsFileFor%@",nil), targetName ];
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* languageValue = [userDefault objectForKey:LanguageKey];
+    if (languageValue != nil)
+        eventFileName = [NSString stringWithFormat:@"EventsFileFor%@%@", targetName, languageValue];
     NSString *filePath = [[NSBundle mainBundle] pathForResource:eventFileName ofType:@"txt"];
     if (filePath == nil) //no resource for this language, default use English
         filePath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"EventsFileFor%@", targetName ] ofType:@"txt"];

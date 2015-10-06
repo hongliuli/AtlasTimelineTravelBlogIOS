@@ -7,9 +7,10 @@
 //
 
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
-#define ALERT_FOR_SWITCH_AUTHO_MODE 1
+#define ALERT_FOR_SWITCH_LANGUAGE 1
 #define ALERT_FOR_POPOVER_ERROR 2
 #define ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB 3
+#define ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS 4
 
 #define AUTHOR_MODE_KEY @"AUTHOR_MODE_KEY"
 
@@ -138,6 +139,9 @@
     NSMutableArray* animationCameras;
     
     BOOL firstTimeShowFlag;
+    
+    NSString* languageToSelect;
+    UIBarButtonItem *settringButton;
 }
 
 @synthesize mapView = _mapView;
@@ -173,8 +177,10 @@
     //add two button at right (can not do in storyboard for multiple button): setting and Help, available in iOS5
     //   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     //   {
-    UIBarButtonItem *settringButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"About",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
-    
+
+    settringButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
+    //settringButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ios-menu-icon.png"]  style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
+    [self setLanguageToSelectTitle];
     //NOTE the trick to set background image for a bar buttonitem
     UIButton *helpbtn = [UIButton buttonWithType:UIButtonTypeCustom];
     helpbtn.frame = CGRectMake(0, 0, 30, 30);
@@ -184,8 +190,12 @@
     self.navigationItem.rightBarButtonItems = @[settringButton, helpButton];
     //   }
     
+    // Do any additional setup after loading the view, typically from a nib.
+    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
+                                          initWithTarget:self action:@selector(handleLongPressGesture:)];
+    lpgr.minimumPressDuration = 0.3;  //user must press for 0.5 seconds
+    [_mapView addGestureRecognizer:lpgr];
     
-	// Do any additional setup after loading the view, typically from a nib.
     // tap to show/hide timeline navigator
     UITapGestureRecognizer *tapgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
     [_mapView addGestureRecognizer:tapgr];
@@ -283,21 +293,58 @@
 
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
-    NSString* currentVer = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-    currentVer = [NSString stringWithFormat:@"Current Version: %@",currentVer ];
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
-    NSString* buttonText = NSLocalizedString(@"To View Mode",nil);
-    if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
-        buttonText = NSLocalizedString(@"To Author Mode",nil);
-        
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:currentVer message:NSLocalizedString(
+    NSString* selectLanguageText = NSLocalizedString(@"Select Language",nil);
+    //NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
+    //NSString* buttonText = NSLocalizedString(@"To View Mode",nil);
+    //if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
+    //    buttonText = NSLocalizedString(@"To Author Mode",nil);
+    
+    [self setLanguageToSelectTitle];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:selectLanguageText message:NSLocalizedString(
             @"This App is supported by ChronicleMap App, which is the best App to record your own life stories!\n\nIf you have a chronicle like this to tell, we can build the app for you free.\n\nDetail see www.chroniclemap.com/authorarea",nil)
             delegate:self
             cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-            otherButtonTitles:buttonText, NSLocalizedString(@"Feedback to Author",nil),nil];
-    alert.tag = ALERT_FOR_SWITCH_AUTHO_MODE;
+            otherButtonTitles:languageToSelect,
+               ///// NSLocalizedString(@"Feedback to Author",nil),
+                nil];
+    alert.tag = ALERT_FOR_SWITCH_LANGUAGE;
     [alert show];
+}
+
+-(void) setLanguageToSelectTitle
+{
+    languageToSelect = @"中文";
+    NSString * language = [[[NSLocale preferredLanguages] objectAtIndex:0] substringToIndex:2]; //return zh for chinese
+    NSString* serviceUrl = [NSString stringWithFormat:@"http://www.chroniclemap.com/resources/poi_list.html"];
+    if ([@"zh" isEqualToString:language])
+        languageToSelect = @"English";
+    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+    NSString* languageValue = [userDefault objectForKey:LanguageKey];
+    if (languageValue != nil)
+    {
+        if ([ChineseValue isEqualToString:languageValue])
+        {
+            serviceUrl = [NSString stringWithFormat:@"http://www.chroniclemap.com/resources/poi_list_zh.html"];
+            languageToSelect = @"English";
+        }
+        else{
+            serviceUrl = [NSString stringWithFormat:@"http://www.chroniclemap.com/resources/poi_list.html"];
+            languageToSelect = @"中文";
+        }
+    }
+    NSString* menuText = languageToSelect;
+    if ([@"English" isEqualToString:languageToSelect])
+        menuText = @"EN";
+    [settringButton setTitle:menuText];
+
+    ///// Add conditions to remove chinese selection if a target do not have chinese
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"CnetRoadTrip"])
+    {
+        [settringButton setImage:[UIImage imageNamed:@"ios-menu-icon.png"]];
+        languageToSelect = nil;
+    }
 }
 
 -(void) currentLocationClicked:(id)sender
@@ -403,7 +450,25 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     //if (alertView.tag == ALERT_FOR_SAVE)
-    if (alertView.tag == ALERT_FOR_SWITCH_AUTHO_MODE) {
+    if (alertView.tag == ALERT_FOR_SWITCH_LANGUAGE) {
+        if (buttonIndex == 1)
+        {
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            NSString* newLanguage = languageToSelect;
+            if ([@"English" isEqualToString:newLanguage])
+                [userDefaults setObject:EnglishValue forKey:LanguageKey];
+            else
+                [userDefaults setObject:ChineseValue forKey:LanguageKey];
+            [userDefaults synchronize];
+            ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+            appDelegate.eventListSorted = nil;
+            originalEventListSorted = appDelegate.eventListSorted;
+            filteredEventListSorted = [NSMutableArray arrayWithCapacity:[originalEventListSorted count]];
+            [self setLanguageToSelectTitle];
+            [self prepareMapView];
+            [self refreshEventListView:false];
+        }
+        /*
         if (buttonIndex == 1) //switch view/author mode
         {
             if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
@@ -445,6 +510,7 @@
             //[mailComposer setMessageBody:@"Testing message for the test mail" isHTML:NO];
             [self presentViewController:mailComposer animated:YES completion:nil];
         }
+         */
     }
     if (buttonIndex == 0 && alertView.tag == ALERT_FOR_POPOVER_ERROR)
     {
@@ -480,6 +546,17 @@
         }
         
     }
+    if (alertView.tag == ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS)
+    {
+        if (buttonIndex == 0) //Not Now
+            return; //user clicked cancel button
+       
+        if (![[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"chroniclemap://"]]) //ChronicleMap app custom URL
+        {
+            NSString* chronicleMapAppUrl = @"https://itunes.apple.com/us/app/chronicle-map-event-based/id649653093?ls=1&mt=8";
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:chronicleMapAppUrl]]; //download ChronicleMap from app store
+        }
+    }
 }
 
 #pragma mark - mail compose delegate
@@ -499,6 +576,24 @@
 {
     [self closeTutorialView];
 }
+
+- (void)handleLongPressGesture:(UIGestureRecognizer *)gestureRecognizer
+{
+    [self switchToChroniclemapApp];
+}
+
+- (void) switchToChroniclemapApp
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Switch to Chronicle Map App",nil)
+                                                   message: NSLocalizedString(@"Use Chronicle Map App to organize your upcoming travel plans or view past events on map with timeline",nil)
+                                                  delegate: self
+                                         cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                         otherButtonTitles: NSLocalizedString(@"Switch Now",nil), nil];
+    alert.tag = ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS;
+    [alert show];
+}
+
+
 //// called it after switch database
 - (void) prepareMapView
 {
@@ -724,6 +819,25 @@
     else
         appDelegate.focusedDate = [[NSDate alloc] init];
     [self.timeScrollWindow setNewFocusedDateFromAnnotation:appDelegate.focusedDate needAdjusted:FALSE];
+    
+    
+    //TODO tmpXcode5ScreenWidth should be decommissioned when use xcode6
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    int tmpXcode5ScreenWidth = [[UIScreen mainScreen] bounds].size.width;
+    if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
+        tmpXcode5ScreenWidth = [[UIScreen mainScreen] bounds].size.height;
+    }
+    
+    //NOTE the trick to set background image for a bar buttonitem
+    if (locationbtn == nil)
+        locationbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    else
+        [locationbtn removeFromSuperview];
+    //locationbtn.frame = CGRectMake([ATConstants screenWidth] - 50, 90, 30, 30);
+    locationbtn.frame = CGRectMake(tmpXcode5ScreenWidth - 50, 90, 30, 30);
+    [locationbtn setImage:[UIImage imageNamed:@"currentLocation.png"] forState:UIControlStateNormal];
+    [locationbtn addTarget:self action:@selector(currentLocationClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [self.mapView addSubview:locationbtn];
     
     [self displayZoomLine];
 }
@@ -1093,7 +1207,11 @@
                 tmpLbl = [[UILabel alloc] initWithFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, THUMB_WIDTH, THUMB_HEIGHT)]; //todo MFTopAlignedLabel
                 if (ann.eventType == EVENT_TYPE_HAS_PHOTO) //somehow it is a big number before save to db, need more study why not 1
                 {
-                    UIImage* img = [ATHelper readPhotoThumbFromFile:ann.uniqueId];
+                    NSString* photoFileName = ann.uniqueId;
+                    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+                    if ([targetName hasPrefix:@"WorldHeritage"])
+                        photoFileName = [ATHelper getPhotoNameFromDescForWorldHeritage:ann.description];
+                    UIImage* img = [ATHelper readPhotoThumbFromFile:photoFileName];
                     if (img != nil)
                     {
                         UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
@@ -1764,7 +1882,7 @@
         else
         {
             self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
-            self.eventEditorPopover.popoverContentSize = CGSizeMake(380,480);
+            self.eventEditorPopover.popoverContentSize = CGSizeMake(380,530);
             
             //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user and call refreshAnn in alert delegate to fix it. (will not work without put into alert delegate)
             BOOL isAtLeastIOS8 = [ATHelper isAtLeastIOS8];
@@ -2788,6 +2906,7 @@
 - (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
 {
 	[filteredEventListSorted removeAllObjects]; // First clear the filtered array.
+
 	for (ATEventDataStruct *ent in originalEventListSorted)
 	{
         if ([ent.eventDesc rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound
@@ -2964,8 +3083,8 @@
     
     //bookmark selected event
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    int idx = [appDelegate.eventListSorted indexOfObject:ent];
-    [userDefault setObject:[NSString stringWithFormat:@"%d",idx ] forKey:@"BookmarkEventIdx"];
+    NSInteger idx = [appDelegate.eventListSorted indexOfObject:ent];
+    [userDefault setObject:[NSString stringWithFormat:@"%ld",idx ] forKey:@"BookmarkEventIdx"];
     [userDefault synchronize];
     
     

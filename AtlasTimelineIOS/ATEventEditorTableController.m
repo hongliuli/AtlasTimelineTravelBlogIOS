@@ -45,8 +45,8 @@
 
 #define AUTHOR_MODE_KEY @"AUTHOR_MODE_KEY"
 
-#define SECTION_1_ADVERTISE_HEIGHT 40
-#define SECTION_2_HEIGHT 40
+#define SECTION_1_ADVERTISE_HEIGHT 50
+#define SECTION_2_HEIGHT 20
 
 #define PHOTO_META_FILE_NAME @"MetaFileForOrderAndDesc"
 #define PHOTO_META_SORT_LIST_KEY @"sort_key"
@@ -254,9 +254,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             self.photoSaveBtn.hidden = true;
         }
     }
-    else if (section ==  1 && (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)) //advertize
+    else if (section ==  3 )//&& (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)) //advertize
     {
-        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0, 300.0, SECTION_1_ADVERTISE_HEIGHT)];
+        customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, -20, 300.0, SECTION_1_ADVERTISE_HEIGHT)];
         [customView addSubview:self.gAdBannerView];
         [customView addSubview:self.iAdBannerView];
     }
@@ -284,8 +284,16 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         self.photoScrollView.photoList = [[NSMutableArray alloc] init];
         //read photo list and save tophotoScrollView
         NSError *error = nil;
-        NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:photoDirName];
         
+        NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+        if ([targetName hasPrefix:@"WorldHeritage"])
+        {
+            NSString* whId = [ATHelper getPhotoNameFromDescForWorldHeritage:self.description.text];
+            [self.photoScrollView.photoList addObject:whId];
+            _photoList = self.photoScrollView.photoList;
+            return;
+        }
+        NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:photoDirName];
         NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
         if(error != nil) {
             NSLog(@"Error in reading files: %@", [error localizedDescription]);
@@ -362,6 +370,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [self.description setFrame:frame2];
 
     }
+    if (indexPath.section == 2 && indexPath.row == 0) //reduce address text box height
+        height = 25;
+    
     return height;
     // return the height of the particular row in the table view
 }
@@ -390,12 +401,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     if (section == 0)
         return editorPhotoViewHeight + 15; //IMPORTANT, this will decide where is clickable for my photoScrollView and Add Photo button. 15 is the gap between Date and photo scroll
     else if (section == 1)
-    {
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-            return SECTION_1_ADVERTISE_HEIGHT;
-        else
-            return 0;
-    }
+        return 1;
+    else if (section == 3)
+        return SECTION_1_ADVERTISE_HEIGHT;
     else if (section == 2)
         return SECTION_2_HEIGHT;
     else
@@ -409,7 +417,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         return [super tableView:tableView heightForFooterInSection:section];
 }
 //called by photoScrollView's didSelect...
--(void)showPhotoView:(int)photoFileName image:image
+-(void)showPhotoView:(NSInteger)photoFileName image:image
 {
     //use Modal with Done button is good both iPad/iPhone
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -795,17 +803,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     if (!self.iAdBannerView)
     {
         //NSLog(@"----- iAdView height=%f ", self.view.frame.size.height);
-        CGRect rect = CGRectMake(0, [ATConstants screenHeight] - 50, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        CGRect rect = CGRectMake(0, 0, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
         self.iAdBannerView = [[ADBannerView alloc]initWithFrame:rect];
         self.iAdBannerView.delegate = self;
-        self.iAdBannerView.hidden = TRUE;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-        {
-            rect = CGRectMake(0, -20, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
-            [self.iAdBannerView setFrame:rect];
-        }
-        else
-            [self.view addSubview:self.iAdBannerView];
     }
 }
 
@@ -817,19 +817,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     if (!self.gAdBannerView)
     {
         //NSLog(@"----- gAdView height=%f ", self.view.frame.size.height);
-        CGRect rect = CGRectMake(0, [ATConstants screenHeight] - 50, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        CGRect rect = CGRectMake(0, 0, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
         self.gAdBannerView = [[GADBannerView alloc] initWithFrame:rect];
         self.gAdBannerView.adUnitID = @"ca-app-pub-5383516122867647/8499480217";
         self.gAdBannerView.rootViewController = self;
         self.gAdBannerView.delegate = self;
         self.gAdBannerView.hidden = TRUE;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-        {
-            rect = CGRectMake(0, -20, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
-            [self.gAdBannerView setFrame:rect];
-        }
-        else
-            [self.view addSubview:self.gAdBannerView];
     }
 }
 -(void)hideBanner:(UIView*)banner

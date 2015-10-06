@@ -60,7 +60,7 @@
 - (void)changeDateInLabel:(id)sender;
 - (void)datePicked:(id)sender;
 - (void)createPhotoScrollView:(NSString*) photoDirName;
-- (void)showPhotoView:(int)photoFileName image:(UIImage*)image;
+- (void)showPhotoView:(NSInteger)photoFileName image:(UIImage*)image;
 - (void)deleteCallback:(NSString*) photoFileName;
 - (void)resetEventEditor;
 - (void)setShareCount;
@@ -70,8 +70,8 @@
 + (NSArray*) photoList;
 + (NSString*) eventId;
 + (void)setEventId:(NSString*)eventId;
-+ (int) selectedPhotoIdx;
-+ (void) setSelectedPhotoIdx:(int)idx;
++ (NSInteger) selectedPhotoIdx;
++ (void) setSelectedPhotoIdx:(NSInteger)idx;
 
 @end
 

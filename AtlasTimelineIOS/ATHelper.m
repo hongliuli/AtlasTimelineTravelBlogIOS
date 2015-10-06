@@ -321,6 +321,13 @@ UIPopoverController *verifyViewPopover;
 
 +(UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir
 {
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+    {
+        NSString* fname = [NSString stringWithFormat:@"%@.jpg", photoDir];
+        photoFileName = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fname];
+        return [UIImage imageWithContentsOfFile:photoFileName];
+    }
     if ([photoFileName hasPrefix: NEW_NOT_SAVED_FILE_PREFIX]) //see EventEditor doneSelectPicture: where new added photos are temparirayly saved
     {
         photoFileName = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:photoFileName];
@@ -335,6 +342,24 @@ UIPopoverController *verifyViewPopover;
 
 +(UIImage*)readPhotoThumbFromFile:(NSString*)eventId
 {
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+    {
+        NSString* fname = [NSString stringWithFormat:@"%@_thumbnail", eventId];
+        NSString *thumbnailFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fname];
+        UIImage* thumnailImage = [UIImage imageWithContentsOfFile:thumbnailFile];
+        if (thumnailImage == nil)
+        {
+            fname = [NSString stringWithFormat:@"%@.jpg", eventId];
+            NSString *photoForThumbnail = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fname];
+
+            UIImage* photo = [UIImage imageWithContentsOfFile: photoForThumbnail];
+            thumnailImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
+            NSData* imageData = UIImageJPEGRepresentation(thumnailImage, JPEG_QUALITY);
+            [imageData writeToFile:thumbnailFile atomically:NO];
+        }
+        return thumnailImage;
+    }
     NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
     NSString* thumbPath = [fullPathToFile stringByAppendingPathComponent:@"thumbnail"];
     UIImage* thumnailImage = [UIImage imageWithContentsOfFile:thumbPath];
@@ -931,5 +956,14 @@ UIPopoverController *verifyViewPopover;
     
 }
 
++ (NSString*) getPhotoNameFromDescForWorldHeritage:descText
+{
+    NSInteger idx = [descText rangeOfString:@"http://whc.unesco.org/en/list/"].location;
+    NSString* urlPartWithId = [descText substringFromIndex:idx + 1];
+    NSString* stripedStr = [urlPartWithId substringFromIndex:29];
+    NSInteger slashIndex = [stripedStr rangeOfString:@"/"].location;
+    return [stripedStr substringToIndex:slashIndex];
+    
+}
 
 @end
