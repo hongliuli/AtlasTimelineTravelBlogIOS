@@ -250,7 +250,11 @@ NSMutableArray* appStoreUrlList;
     [self addLongPressSection];
     
     [self addWhatIsHappeningSection];
-    [self addRedGreenDotsSection];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if (![targetName hasPrefix:@"WorldHeritage"])
+    {
+        [self addRedGreenDotsSection];
+    }
 
     //////////////////////////////////////////[self addTimeZoomLevelSection2];
     [self addTimeZoomLevelSection1];
@@ -384,37 +388,45 @@ NSMutableArray* appStoreUrlList;
     {
         lbl.text = [NSString stringWithFormat: NSLocalizedString(@"1.   Red Dot for CULTURE Heritage, Green Dot for NATURAL Heritage",nil)];
         updatableLabel.text = [NSString stringWithFormat: NSLocalizedString(@"2.   The selected period is 3 years around %@",nil), [ATHelper getYearPartHelper: appDelegate.focusedDate]];
-        updatableLabel2.text = [NSString stringWithFormat: NSLocalizedString(@"      The sites recognized by UNESCO in this period are colored as bellow, the darker the closer to %@",nil), [ATHelper getYearPartHelper: appDelegate.focusedDate]];
+        updatableLabel2.text = [NSString stringWithFormat: NSLocalizedString(@"      The sites recognized by UNESCO in this period are in following larger red dot:",nil)];
+        currentYLocation = currentYLocation + 0.3 * itemHeight;
+        CGRect frameColorImage = CGRectMake(initialX + 20*iPhoneSizeXFactor + 50, currentYLocation, imageAnn, imageAnn);
+        UIImageView* annImage1 = [[UIImageView alloc] initWithFrame:frameColorImage ];
+        [annImage1 setImage:[UIImage imageNamed:@"marker-heritage-selected.png"]];
+        [self addSubview:annImage1];
     }
-    currentYLocation = currentYLocation + 0.3 * itemHeight;
-    CGRect frameColorImage = CGRectMake(initialX + 20*iPhoneSizeXFactor + 50, currentYLocation, imageAnn, imageAnn);
-    UIImageView* annImage1 = [[UIImageView alloc] initWithFrame:frameColorImage ];
-    [annImage1 setImage:[UIImage imageNamed:@"marker-bf-4.png"]];
-    [self addSubview:annImage1];
-    UIImageView* annImage2 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 50, frameColorImage.origin.y, imageAnn, imageAnn) ];
-    [annImage2 setImage:[UIImage imageNamed:@"marker-bf-3.png"]];
-    [self addSubview:annImage2];
-    UIImageView* annImage3 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 100, frameColorImage.origin.y, imageAnn, imageAnn) ];
-    [annImage3 setImage:[UIImage imageNamed:@"marker-bf-2.png"]];
-    [self addSubview:annImage3];
-    UIImageView* annImage4 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 150, frameColorImage.origin.y, imageAnn, imageAnn) ];
-    [annImage4 setImage:[UIImage imageNamed:@"marker-bf-2.png"]];
-    [self addSubview:annImage4];
-    UIImageView* annImage5 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 200, frameColorImage.origin.y, imageAnn, imageAnn) ];
-    [annImage5 setImage:[UIImage imageNamed:@"marker-selected.png"]];
-    [self addSubview:annImage5];
-    UIImageView* annImage6 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 250, frameColorImage.origin.y, imageAnn, imageAnn) ];
-    [annImage6 setImage:[UIImage imageNamed:@"marker-af-1.png"]];
-    [self addSubview:annImage6];
-    UIImageView* annImage7 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 300, frameColorImage.origin.y, imageAnn, imageAnn) ];
-    [annImage7 setImage:[UIImage imageNamed:@"marker-af-2.png"]];
-    [self addSubview:annImage7];
-    UIImageView* annImage8 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 350, frameColorImage.origin.y, imageAnn, imageAnn) ];
-    [annImage8 setImage:[UIImage imageNamed:@"marker-af-3.png"]];
-    [self addSubview:annImage8];
-    UIImageView* annImage9 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 400, frameColorImage.origin.y, imageAnn, imageAnn) ];
-    [annImage9 setImage:[UIImage imageNamed:@"marker-af-4.png"]];
-    [self addSubview:annImage9];
+    else
+    {
+        currentYLocation = currentYLocation + 0.3 * itemHeight;
+        CGRect frameColorImage = CGRectMake(initialX + 20*iPhoneSizeXFactor + 50, currentYLocation, imageAnn, imageAnn);
+        UIImageView* annImage1 = [[UIImageView alloc] initWithFrame:frameColorImage ];
+        [annImage1 setImage:[UIImage imageNamed:@"marker-bf-4.png"]];
+        [self addSubview:annImage1];
+        UIImageView* annImage2 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 50, frameColorImage.origin.y, imageAnn, imageAnn) ];
+        [annImage2 setImage:[UIImage imageNamed:@"marker-bf-3.png"]];
+        [self addSubview:annImage2];
+        UIImageView* annImage3 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 100, frameColorImage.origin.y, imageAnn, imageAnn) ];
+        [annImage3 setImage:[UIImage imageNamed:@"marker-bf-2.png"]];
+        [self addSubview:annImage3];
+        UIImageView* annImage4 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 150, frameColorImage.origin.y, imageAnn, imageAnn) ];
+        [annImage4 setImage:[UIImage imageNamed:@"marker-bf-2.png"]];
+        [self addSubview:annImage4];
+        UIImageView* annImage5 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 200, frameColorImage.origin.y, imageAnn, imageAnn) ];
+        [annImage5 setImage:[UIImage imageNamed:@"marker-selected.png"]];
+        [self addSubview:annImage5];
+        UIImageView* annImage6 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 250, frameColorImage.origin.y, imageAnn, imageAnn) ];
+        [annImage6 setImage:[UIImage imageNamed:@"marker-af-1.png"]];
+        [self addSubview:annImage6];
+        UIImageView* annImage7 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 300, frameColorImage.origin.y, imageAnn, imageAnn) ];
+        [annImage7 setImage:[UIImage imageNamed:@"marker-af-2.png"]];
+        [self addSubview:annImage7];
+        UIImageView* annImage8 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 350, frameColorImage.origin.y, imageAnn, imageAnn) ];
+        [annImage8 setImage:[UIImage imageNamed:@"marker-af-3.png"]];
+        [self addSubview:annImage8];
+        UIImageView* annImage9 = [[UIImageView alloc] initWithFrame:CGRectMake(frameColorImage.origin.x + 400, frameColorImage.origin.y, imageAnn, imageAnn) ];
+        [annImage9 setImage:[UIImage imageNamed:@"marker-af-4.png"]];
+        [self addSubview:annImage9];
+    }
 }
 
 - (void) addRedGreenDotsSection

@@ -83,6 +83,7 @@
 "Could not copy to Dropbox"="不能拷贝到Dropbox";
 "Could not import from Dropbox"="不能从Dropbox恢复照片";
 "Create Episode"="创建片断";
+"Cultural\n"="文化遗产";
 "Del"="删除";
 "Delete"="删除";
 "Delete [%@] From Server"="从服务器上删除[%@]";
@@ -145,6 +146,7 @@
 "May be the network is not available"="可能网络不通";
 "Misc"="杂项";
 "myEvents need to be Active"="myEvents需要被置为活跃";
+"Natural\n"="自然遗产";
 "Need your email address as ID to login when access server!"="当访问服务器时，需要你的电子邮件地址作为登录ID！";
 "Network may not be available, Please try later!"=" 网络不通，请稍后再试!";
 "No"="不";
@@ -184,7 +186,8 @@
 "Reached the max Zoom-In level Month!"="已经到达最高放大级别-月!";
 "Reached the max Zoom-In level Week!"="不能再放大，7天是最高放大级别!";
 "Record/navigate events on map in chronological order!"="以时间顺序，记录/浏览地图事件!";
-"Red Dot and Green Dot on Time Wheel"="时间轮上方的红点和绿点";
+"Red/Green Dot on Time Wheel:"="时间轮上方的红点和绿点:";
+"Related Apps to download"="相关 APP 下载：";
 "Replace"="替换";
 "Replace photos on Dropbox for %@"="替换Dropbox中%@的照片";
 "Reset to Default"="复位到缺省设置";
@@ -200,6 +203,7 @@
 "search any description and address"="搜索事件－输入描述或地址任何部分";
 "   section %d   row %d"="   section %d   row %d";
 "Select All"="全选";
+"Select Language"="选择语言";
 "Select Active from the downloaded contents/episodes"="从已下载的内容／片段中选一个为活跃的";
 "%d selected"="%d 个被选上";
 "Settings"="菜单";
@@ -217,6 +221,8 @@
 "Share Episode Success!"="分享片断成功!";
 "Share Event"="分享事件";
 "Share my Episodes to Friends"="分享我的片断给朋友";
+"Switch to Chronicle Map App"="切换到［霞客行］APP";
+"Switch Now"="现在切换";
 "Feedback to Author"="给作者建议";
 "Support Us"="支持我们";
 "Sync %i events to %@ on server"="同步 %i 个事件到服务器的[%@]";
@@ -227,10 +233,10 @@
 "The access to Address Book has previously been denied"="访问通讯录曾被拒绝";
 "The correct date format is MM/dd/yyyy Era (such as %@)"="正确日期格式：MM/dd/yyyy Era (例如 %@)";
 "The events in this episode is no longer in myEvents, please remove this episode."="这个片断中的该事件已不在myEvents中，请删除.";
-"This App is supported by ChronicleMap App, which is the best App to record your own life stories! (Download app from Apple Store)\n\nIf you have a historical story to tell as this app does, you can help us to build more and more Apps. You will own the App and get a sizable portion of revenue. All you have to do is to write story in text in a simple format.\n\nDetail see www.chroniclemap.com/authorarea"="该APP由ChronicleMap 开发。ChornicleMap APP 可以用来记录你的人生旅程，请从Apple APP Store下载！\n\n如果你有一个好的历史故事，帮助我们建立更大的历史事件APP库，则请联系我们，我们可以帮你拥有APP，得到可观的收入。你所要做的是把故事按照一个简单的正文格式写出来。\n\n详情访问 www.chroniclemap.com/authorarea";
+"This App is supported by ChronicleMap App, which is the best App to record your own life stories!\n\nIf you have a chronicle like this to tell, we can build the app for you free.\n\nDetail see www.chroniclemap.com/authorarea"="该APP由ChronicleMap 开发。ChornicleMap APP 可以用来记录你的人生旅程，请从Apple APP Store下载！\n\n如果你有一个好的历史故事，帮助我们建立更大的历史事件APP库，则请联系我们，我们可以帮你拥有APP，得到可观的收入。你所要做的是把故事按照一个简单的正文格式写出来。\n\n详情访问 www.chroniclemap.com/authorarea";
 "This content may not have photos."="该内容可能没有照片.";
 "This episode is empty!"="该片断是空的!";
-"This is what is happening on your screen:"="下面解释你当前屏幕上所显示了什么:";
+"This is what is on the Map:"="当前地图上所显内容:";
 "This event will be deleted!"="该事件将被删除!";
 "This may happen if the app was uninstalled before export all photos to dropbox /ChronicleMap/%@ folder!"="这种情况可能会发生如果卸载APP前照片还没有备份到Dropbox的 /ChronicleMap/%@文件夹!";
 "The product is restored, no charge is applied"="APP已恢复，你不用任何支付！";
@@ -241,6 +247,7 @@
 "Author Mode:"="作者方式";
 "Sync Dropbox"="同步";
 "Use keyboard to enter date"="使用键盘输入事件日期";
+"Use Chronicle Map App to organize your upcoming travel plans or view past events on map with timeline"="用［霞客行］APP计划你的旅游行程，翻阅过去行程记录和照片。";
 "Verify Success!"="验证代码成功!";
 "Verify Failed!"="验证代码失败!";
 "Video Tutorial and FAQ"="教程和 FAQ";
@@ -278,7 +285,7 @@
 "1.   Totally there are %d events span from %@ to %@"="1.   总共有 %d 个事件， 时间跨越从 %@ 到 %@";
 "2.   The selected date is %@ and the time zoom level is %@"="2.   当前选的时间是 %@ ， 时间缩放级别是 %@";
 "      So all events within %@ of %@ are colored as bellow, the darker the closer to it"="      就是说在%@内的所有事件都上了下列色彩：（离中心日期%@越近，颜色就越深）";
-"      The sites recognized by UNESCO in this period are colored as bellow, the darker the closer to %@"="      UNESCO在这时间承认的世界遗址被上了下列色彩：（离中心日期%@越近，颜色就越深)";
+"      The sites recognized by UNESCO in this period are in following larger red dot"="      UNESCO在这段时间承认的世界遗址用下面大红点表示";
 "2.   The selected period is 3 years around %@"="2.   当前时间区间是以%@年为中心三年跨度";
 "1.   A red dot indicates the existence of events at that point of time"="1.   红点 - 表明在这个时间段存在事件";
 "2.   A green dot means the events at that point of time are currently on screen"="2.   绿点 - 表明在这个时间段上，有的事件正出现在屏幕的地图上";

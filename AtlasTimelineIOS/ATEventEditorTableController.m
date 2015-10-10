@@ -220,12 +220,12 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         [customView addSubview:label];
         
         UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        shareButton.frame = CGRectMake(280, 0, 30, 30);
+        shareButton.frame = CGRectMake(280, -10, 30, 30);
         [shareButton setImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
         [shareButton addTarget:self action:@selector(shareButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [customView addSubview:shareButton];
         UIButton *sizeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        sizeButton.frame = CGRectMake(210, 0, 30, 30);
+        sizeButton.frame = CGRectMake(210, -10, 30, 30);
         BOOL fullFlag = [ATHelper getOptionEditorFullScreen];
         if (fullFlag)
             [sizeButton setImage:[UIImage imageNamed:@"window_minimize.png"] forState:UIControlStateNormal];
@@ -481,7 +481,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             [alertView show];
         }
         
-        APActivityProvider *ActivityProvider = [[APActivityProvider alloc] init];
+        APActivityProvider *ActivityProvider = [APActivityProvider alloc];
         ActivityProvider.eventEditor = self;
         NSMutableArray *activityItems = [[NSMutableArray alloc] init];
     

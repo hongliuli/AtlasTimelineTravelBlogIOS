@@ -367,7 +367,9 @@ NSDate* prevYearDate;
     CGContextAddLineToPoint(context, x, y); 
     */
     CGContextStrokePath(context);
-    [self drawEventDotsBySpan];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if (![targetName hasPrefix:@"WorldHeritage"])
+        [self drawEventDotsBySpan];
     
 
 }
@@ -672,7 +674,7 @@ NSDate* prevYearDate;
     }
 
     Boolean eventVisibleOnMapFlag = false; //draw bar if there are event visible in map screen
-    int size = [appDelegate.eventListSorted count] ;
+    NSUInteger size = [appDelegate.eventListSorted count] ;
     if (appDelegate.eventListSorted == nil || size < 1)
         return;
 

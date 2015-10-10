@@ -142,6 +142,8 @@
     
     NSString* languageToSelect;
     UIBarButtonItem *settringButton;
+    
+    NSDate* lastLongpresstie;
 }
 
 @synthesize mapView = _mapView;
@@ -193,7 +195,7 @@
     // Do any additional setup after loading the view, typically from a nib.
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
                                           initWithTarget:self action:@selector(handleLongPressGesture:)];
-    lpgr.minimumPressDuration = 0.3;  //user must press for 0.5 seconds
+    lpgr.minimumPressDuration = 0.8;  //user must press for 0.8 seconds
     [_mapView addGestureRecognizer:lpgr];
     
     // tap to show/hide timeline navigator
@@ -584,6 +586,11 @@
 
 - (void) switchToChroniclemapApp
 {
+    //Do not know why come here twice, so use a timer to prevent the second one
+    NSTimeInterval interval = [[[NSDate alloc] init] timeIntervalSinceDate:lastLongpresstie];
+    if (interval < 1)
+        return;
+    lastLongpresstie = [NSDate date];
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Switch to Chronicle Map App",nil)
                                                    message: NSLocalizedString(@"Use Chronicle Map App to organize your upcoming travel plans or view past events on map with timeline",nil)
                                                   delegate: self
@@ -2129,28 +2136,40 @@
         return pngNameWithAlpha;
     }
     // For regular marker, I tried to use alpha instead of different marker image, but the looks on view is bad, so keep it following way
-    if (segmentDistance >= -1 && segmentDistance <= 1)
-        return [ATConstants SelectedAnnotationIdentifier];
-    if (segmentDistance > 1 && segmentDistance <=2)
-        return [ATConstants After1AnnotationIdentifier];
-    if (segmentDistance > 2 && segmentDistance <=3)
-        return [ATConstants After2AnnotationIdentifier];
-    if (segmentDistance > 3 && segmentDistance <= 4)
-        return [ATConstants After3AnnotationIdentifier];
-    if (segmentDistance > 4 && segmentDistance <=5)
-        return [ATConstants After4AnnotationIdentifier];
-    if (segmentDistance > 5)
-        return [ATConstants WhiteFlagAnnotationIdentifier:ann.address]; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
-    if (segmentDistance >= -2 && segmentDistance < -1)
-        return [ATConstants Past1AnnotationIdentifier];
-    if (segmentDistance >= -3 && segmentDistance < -2)
-        return [ATConstants Past2AnnotationIdentifier];
-    if (segmentDistance >= -4 && segmentDistance < -3)
-        return [ATConstants Past3AnnotationIdentifier];
-    if (segmentDistance>= - 5 && segmentDistance < -4 )
-        return [ATConstants Past4AnnotationIdentifier];
-    if (segmentDistance < -5 )
-        return [ATConstants WhiteFlagAnnotationIdentifier:ann.address]; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
+    
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName hasPrefix:@"WorldHeritage"])
+    {
+        if (segmentDistance <= 5 && segmentDistance >= -5)
+            return @"marker-heritage-selected.png";
+        else
+            return [ATConstants WhiteFlagAnnotationIdentifier:ann.address];
+    }
+    else
+    {
+        if (segmentDistance >= -1 && segmentDistance <= 1)
+            return [ATConstants SelectedAnnotationIdentifier];
+        if (segmentDistance > 1 && segmentDistance <=2)
+            return [ATConstants After1AnnotationIdentifier];
+        if (segmentDistance > 2 && segmentDistance <=3)
+            return [ATConstants After2AnnotationIdentifier];
+        if (segmentDistance > 3 && segmentDistance <= 4)
+            return [ATConstants After3AnnotationIdentifier];
+        if (segmentDistance > 4 && segmentDistance <=5)
+            return [ATConstants After4AnnotationIdentifier];
+        if (segmentDistance > 5)
+            return [ATConstants WhiteFlagAnnotationIdentifier:ann.address]; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
+        if (segmentDistance >= -2 && segmentDistance < -1)
+            return [ATConstants Past1AnnotationIdentifier];
+        if (segmentDistance >= -3 && segmentDistance < -2)
+            return [ATConstants Past2AnnotationIdentifier];
+        if (segmentDistance >= -4 && segmentDistance < -3)
+            return [ATConstants Past3AnnotationIdentifier];
+        if (segmentDistance>= - 5 && segmentDistance < -4 )
+            return [ATConstants Past4AnnotationIdentifier];
+        if (segmentDistance < -5 )
+            return [ATConstants WhiteFlagAnnotationIdentifier:ann.address]; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
+    }
     return nil;
 }
 
