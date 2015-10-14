@@ -481,7 +481,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
             [alertView show];
         }
         
-        APActivityProvider *ActivityProvider = [APActivityProvider alloc];
+        APActivityProvider *ActivityProvider = [[APActivityProvider alloc] initWithPlaceholderItem:@""];
         ActivityProvider.eventEditor = self;
         NSMutableArray *activityItems = [[NSMutableArray alloc] init];
     
@@ -913,7 +913,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSDateFormatter *dateFormater = appDelegate.dateFormater;
     NSDate* date = [dateFormater dateFromString:self.eventEditor.dateTxt.text];
-    if (![ATHelper isBCDate:date])
+    if ( date != nil && ![ATHelper isBCDate:date])
         dateStr = [dateStr substringWithRange:NSMakeRange(0, 10)];
         
     NSString *googleMap = [NSString stringWithFormat:@"https://maps.google.com/maps?q=%f,%f&spn=65.61535,79.013672",self.eventEditor.coordinate.latitude, self.eventEditor.coordinate.longitude ];
