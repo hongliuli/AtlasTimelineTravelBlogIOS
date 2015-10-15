@@ -96,7 +96,7 @@ NSDateFormatter *dateFormatter;
 
     ATEventDataStruct* evt = internalEventList[indexPath.row];
     //REMEMBER internalEventList has added row to first and last for arrow button (code
-    if (indexPath.row == 0) // first one is up arrow
+    if (indexPath.row == 0 && !eventListViewInMapModeFlag) // first one is up arrow
     {
         UITableViewCell* cell = [[UITableViewCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants eventListViewCellWidth], 40)];
         if ([self shouldHideArrowButtonRow:indexPath.row])
@@ -113,7 +113,7 @@ NSDateFormatter *dateFormatter;
         cell.backgroundColor= [UIColor clearColor];
         return cell;
     }
-    if (indexPath.row == [internalEventList count] - 1) //last one is down arrow
+    if (indexPath.row == [internalEventList count] - 1 && !eventListViewInMapModeFlag) //last one is down arrow
     {
         UITableViewCell* cell = [[UITableViewCell alloc] initWithFrame:CGRectMake(0, 0, [ATConstants eventListViewCellWidth], 40)];
         if ([self shouldHideArrowButtonRow:indexPath.row])
@@ -207,7 +207,7 @@ NSDateFormatter *dateFormatter;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row == 0 || indexPath.row == [internalEventList count] - 1)
+    if (!eventListViewInMapModeFlag && (indexPath.row == 0 || indexPath.row == [internalEventList count] - 1))
     {
         //Do not show arrow button if reach last or begin of events
         if ([self shouldHideArrowButtonRow:indexPath.row] || eventListViewInMapModeFlag)
@@ -222,8 +222,11 @@ NSDateFormatter *dateFormatter;
 - (BOOL) shouldHideArrowButtonRow:(NSInteger)row
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    ATEventDataStruct* firstEvt = internalEventList[1];
-    ATEventDataStruct* lastEvt = internalEventList[[internalEventList count] - 2];
+    int initPosForArrow = 1;
+    if (eventListViewInMapModeFlag)
+        initPosForArrow = 0; //now arrow for map mode
+    ATEventDataStruct* firstEvt = internalEventList[initPosForArrow];
+    ATEventDataStruct* lastEvt = internalEventList[[internalEventList count] - 1 - initPosForArrow];
     NSUInteger globalIdxFirst = [appDelegate.eventListSorted indexOfObject:firstEvt];
     NSUInteger globalIdxLast = [appDelegate.eventListSorted indexOfObject:lastEvt];
     return ((globalIdxFirst == [appDelegate.eventListSorted count] - 1 &&  row == 0) ||
@@ -246,29 +249,29 @@ NSDateFormatter *dateFormatter;
     ATViewController* mapView = appDelegate.mapViewController;
     ATEventDataStruct* evt = internalEventList[indexPath.row];
     
-    if (indexPath.row == 0) //tapped on up arrow button
+    if (indexPath.row == 0 && !eventListViewInMapModeFlag) //tapped on up arrow button
     {
         //NSLog(@"******* up arrow, find previouse event to scroll to");
         ATEventDataStruct* firstEvt = internalEventList[1];
-        int globalIdx = [appDelegate.eventListSorted indexOfObject:firstEvt];
+        NSInteger globalIdx = [appDelegate.eventListSorted indexOfObject:firstEvt];
         evt = appDelegate.eventListSorted[globalIdx + 1]; //no need to check range here
         
         [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
         [mapView showOverlays];
         [mapView refreshEventListView:false];
     }
-    else if (indexPath.row == [internalEventList count] - 1)
+    else if (indexPath.row == [internalEventList count] - 1 && !eventListViewInMapModeFlag)
     {
         //NSLog(@"******* down arrow, find next event");
         ATEventDataStruct* lastEvt = internalEventList[[internalEventList count] -2];//Minus 2 because the -1 is a dummy row for arrow
-        int globalIdx = [appDelegate.eventListSorted indexOfObject:lastEvt];
+        NSInteger globalIdx = [appDelegate.eventListSorted indexOfObject:lastEvt];
         evt = appDelegate.eventListSorted[globalIdx -1]; //no need to check range here
         
         [mapView setNewFocusedDateAndUpdateMapWithNewCenter : evt :-1]; //do not change map zoom level
         [mapView showOverlays];
         [mapView refreshEventListView:false];
     }
-    else{ //Do not change focused event for up/down arrow cause
+    else{ //Above: Do not change focused event for up/down arrow cause (map mode has no arrow
         appDelegate.focusedDate = evt.eventDate;
         appDelegate.focusedEvent = evt;  //appDelegate.focusedEvent is added when implement here
         int zoomLeve = -1;
@@ -291,15 +294,20 @@ NSDateFormatter *dateFormatter;
 {
     eventListViewInMapModeFlag = eventListViewInMapModeFlagArg;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    [eventList addObject:[[ATEventDataStruct alloc] init]];
-    [eventList insertObject:[[ATEventDataStruct alloc] init] atIndex:0];
+    int initialStartPos = 0; //consider arrow image
+    if (!eventListViewInMapModeFlag)
+    {
+        initialStartPos = 1; //in mapmode,no arrow image
+        [eventList addObject:[[ATEventDataStruct alloc] init]];
+        [eventList insertObject:[[ATEventDataStruct alloc] init] atIndex:0];
+    }
     internalEventList = eventList;
     [self.tableView reloadData];
     [self.tableView layoutIfNeeded]; //must have for following work
     if (appDelegate.focusedEvent == nil)
         return;
-    int selectedEventIdx = 1; //previouse is 0. after add Up/Down arrow cell, change to 1 is better
-    for (int i=1; i< [eventList count] - 1; i++)
+    int selectedEventIdx = initialStartPos; //previouse is 0. after add Up/Down arrow cell, change to 1 is better
+    for (int i=initialStartPos; i< [eventList count] - initialStartPos; i++)
     {
         ATEventDataStruct* evt = eventList[i];
         if ([evt.uniqueId isEqual:appDelegate.focusedEvent.uniqueId])

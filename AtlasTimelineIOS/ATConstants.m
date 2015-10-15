@@ -101,7 +101,7 @@
 {
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
-    if ([ATHelper isAtLeast8])
+    if ([ATHelper isAtLeastIOS8])
         return screenSize.width;
     else
     {
@@ -120,7 +120,7 @@
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
 
-    if ([ATHelper isAtLeast8])
+    if ([ATHelper isAtLeastIOS8])
         return screenSize.height;
     {
         UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;

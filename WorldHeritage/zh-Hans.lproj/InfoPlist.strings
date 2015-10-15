@@ -1,2 +1,4 @@
 /* Localized versions of Info.plist keys */
 "CFBundleDisplayName" = "世界遗产";
+"NSLocationWhenInUseUsageDescription"="App would like to use your location.";
+"NSLocationAlwaysUsageDescription"="App would like to use your location.";

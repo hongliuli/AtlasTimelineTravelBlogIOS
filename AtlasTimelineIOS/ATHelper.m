@@ -654,11 +654,7 @@ UIPopoverController *verifyViewPopover;
     [ret setObject:scaleEndDay forKey:@"END"];
     return ret;
 }
-+ (BOOL) isAtLeast8
-{
-    NSString *version = [[UIDevice currentDevice] systemVersion];
-    return [version compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending;
-}
+
 + (BOOL) isAtLeastIOS8
 {
     NSString *version = [[UIDevice currentDevice] systemVersion];

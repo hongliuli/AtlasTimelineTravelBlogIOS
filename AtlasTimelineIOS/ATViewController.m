@@ -144,6 +144,9 @@
     UIBarButtonItem *settringButton;
     
     NSDate* lastLongpresstie;
+    
+    NSDate* lastUpdateMapInRegionDidChange;
+    BOOL showAnnNumberFlag;
 }
 
 @synthesize mapView = _mapView;
@@ -162,6 +165,12 @@
     [ATHelper createPhotoDocumentoryPath];
     //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.locationManager = [[CLLocationManager alloc] init];
+    //add for ios8
+    self.locationManager.delegate = self;
+    if ([ATHelper isAtLeastIOS8]) {
+        [self.locationManager requestWhenInUseAuthorization];
+        [self.locationManager requestAlwaysAuthorization];
+    }
     
     self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
     int searchBarHeight = [ATConstants searchBarHeight];
@@ -356,15 +365,16 @@
     
     [self.locationManager startUpdatingLocation];
     
+    CLLocationCoordinate2D currentCenterCoordinate;
     CLLocation *newLocation = [self.locationManager location];
-    CLLocationCoordinate2D centerCoordinate;
-    centerCoordinate.latitude = newLocation.coordinate.latitude;
-    centerCoordinate.longitude = newLocation.coordinate.longitude;
-    MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:14];
-    MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
+    currentCenterCoordinate.latitude = newLocation.coordinate.latitude;
+    currentCenterCoordinate.longitude = newLocation.coordinate.longitude;
+    MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:currentCenterCoordinate andZoomLevel:14];
+    MKCoordinateRegion region = MKCoordinateRegionMake(currentCenterCoordinate, span);
     
     // set the region like normal
     [self.mapView setRegion:region animated:YES];
+
 }
 
 -(void) switchEventListViewMode:(id)sender
@@ -829,11 +839,7 @@
     
     
     //TODO tmpXcode5ScreenWidth should be decommissioned when use xcode6
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    int tmpXcode5ScreenWidth = [[UIScreen mainScreen] bounds].size.width;
-    if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
-        tmpXcode5ScreenWidth = [[UIScreen mainScreen] bounds].size.height;
-    }
+    int tmpXcode5ScreenWidth = [ATConstants screenWidth];
     
     //NOTE the trick to set background image for a bar buttonitem
     if (locationbtn == nil)
@@ -1187,8 +1193,17 @@
     else if ([annotation isKindOfClass:[ATAnnotationSelected class]]) //all that read from db will be ATAnnotationSelected type
     {
         NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
-
         selectedAnnotationIdentifier = [self getImageIdentifier:ann: specialMarkerName]; //keep this line here
+        /*
+        if (showAnnNumberFlag)
+        {
+            NSUInteger idx = [self getIndexFromEventListInVisibleMapArea: ann.uniqueId];
+            if (idx >= 0)
+            {
+                selectedAnnotationIdentifier = @"marker_info.png";
+            }
+        }
+        */
         MKAnnotationView* annView;
         annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
         annView.annotation = annotation;
@@ -1335,6 +1350,17 @@
     return nil;
 }
 
+-(NSUInteger) getIndexFromEventListInVisibleMapArea:(NSString*)uniqueId
+{
+    NSUInteger i = 0;
+    for (ATEventDataStruct* evt in eventListInVisibleMapArea)
+    {
+        if ([evt.uniqueId isEqualToString: uniqueId])
+            return i;
+        i++;
+    }
+    return -1;
+}
 //All View is a UIResponder, all UIresponder objects can implement touchesBegan
 -(void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
     currentTapTouchKey = 0;
@@ -1404,6 +1430,7 @@
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
+    showAnnNumberFlag = FALSE;
     if (!firstTimeShowFlag) //always show all menus when first time show the view
     {
         [self hideDescriptionLabelViews];
@@ -1473,7 +1500,21 @@
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         [userDefault setObject:[NSString stringWithFormat:@"%d",[self zoomLevel] ] forKey:@"BookmarkMapZoomLevel"];
     [userDefault synchronize];
-    
+/*
+    if (eventListInVisibleMapArea != nil && [eventListInVisibleMapArea count] < 10)
+    {
+        NSTimeInterval interval = [[[NSDate alloc] init] timeIntervalSinceDate:lastUpdateMapInRegionDidChange];
+        lastLongpresstie = [NSDate date];
+        if (interval < 1)
+            return;
+        else
+        {
+            showAnnNumberFlag = TRUE;
+            [self updateEventListViewWithEventsOnMap]; //TODO xxxxxx
+            [self refreshAnnotations];
+        }
+    }
+ */
 }
 
 //////// From WWDC 2013 video "Map Kit in Perspective"

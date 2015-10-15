@@ -40,7 +40,6 @@
 + (NSString*)getRootBundlePath;
 + (NSString*)getPhotoDocummentoryPath;
 + (NSString*)getNewUnsavedEventPhotoPath;
-+ (BOOL) isAtLeast8;
 + (BOOL) isAtLeastIOS8;
 
 //photo related
@@ -61,7 +60,6 @@
 + (NSString*) httpGetFromServer:(NSString*)serverUrl;
 + (NSString*) httpGetFromServer:(NSString*)serverUrl :(BOOL)alertError;
 + (void)startReplaceDb:(NSString*)selectedAtlasName :(NSArray*)downloadedJsonArray :(UIActivityIndicatorView*)spinner;
-+ (BOOL) isAtLeast8;
 
 //set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable;

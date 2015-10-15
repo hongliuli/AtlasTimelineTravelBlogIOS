@@ -1,22 +1,37 @@
 - How to new a target:  http://samwize.com/2014/05/22/create-multiple-targets-slash-apps-for-1-xcode-project/
 - How to create schemas when have multiple target:
-    . create schema for each target so we can pick which target to run or to distribute
-    . When create schema, uncheck all checkbox, only keep checked box for this target
-    . Note the schema name will also be the archive name after archive
+  . create schema for each target so we can pick which target to run or to distribute
+  . When create schema, uncheck all checkbox, only keep checked box for this target
+  . Note the schema name will also be the archive name after archive
 - How to run a target: Product->Schema->pick the schema to run
-- How to distribute a target: first pick right schema in Product->Schema, then archive, ..
-- If need new app icons, generate 4 icons, save to certain directory, then in Target properties ->Geneeral -> App icons change icon for following 4 files:
-        . 57x57, 114x114, 72x72, 154x154
-- What to do when issue with provisioning/identities/ etc etc
-        http://anthonytietjen.blogspot.com/2012/08/overcoming-trouble-validating-your.html
-- How to copy photos from Documents to Bundle: (so end user does not need to upload to dropbox, I can get photo this way)
-    xcode6->Windows->Devices->Download xcappdata; then "Show Package Content" to get photo file.
-    (Then copy to Google Driver, and xcode link it, make sure assign to right target in "Show File Inspector)
-- Where to keep file for PhotoUrl.txt file:
-    This file will not package into distributon. After implement document picker, this file can be any name. But for now it has to be this name for all targets.
-    For now I will save it in google driver such as PhotoUrl_cnetroadtrip.txt etc
+- How to distribute a target:
+  First make sure the new Target has signed: in Target -> General -> Identity we may see warning: No Signing Identity Found, then click Fix it button ...
+  Then pick right schema in Product->Schema, then archive, ..
+  If archive finish and both Validate/Submit button grey-out:
+  in this case mostly we can see Archive Type: Generic Xcode Archive (it should be iOS App). The reason is that some sub-project, such as GData.xcodeproj, has some target set "Skip Install" to NO in Build Setting, change them to YES will work.
+- How to add app-icon/launch images for target
+  New approach:
+  1. Make sure Images.xcassets is associated with all targets (somehow this file physically located under worldheritage directory)
+  2. click Images.xcassets, create following: (name convetion is arbitary, as long as easy to associate)
+     - Appicon-xxxx
+     - Launchimage-xxxx
+     and drag appropriate images from finder to here
+  3. In target's General tab, make sure above Appicon-xxxx is assigned in "App icons and launch images" section
 
-    
+  Old approach:
+      If need new app icons, generate 4 icons, save to certain directory, then in Target properties ->Info->"CFBundleIcons-iPad" and "icon files" add file
+
+- What to do when issue with provisioning/identities/ etc etc
+http://anthonytietjen.blogspot.com/2012/08/overcoming-trouble-validating-your.html
+
+- How to copy photos from Documents to Bundle: (so end user does not need to upload to dropbox, I can get photo this way)
+xcode6->Windows->Devices->Download xcappdata; then "Show Package Content" to get photo file.
+(Then copy to Google Driver, and xcode link it, make sure assign to right target in "Show File Inspector)
+- Where to keep file for PhotoUrl.txt file:
+This file will not package into distributon. After implement document picker, this file can be any name. But for now it has to be this name for all targets.
+For now I will save it in google driver such as PhotoUrl_cnetroadtrip.txt etc
+
+
 Duplicate from AtlastimelineiOS
 http://stackoverflow.com/questions/17744319/duplicate-and-rename-xcode-project-associated-folders
 
@@ -38,4 +53,17 @@ check the file is in your Xcode project; and, if it is,
 check it's included in the 'Copy Bundle Resources' phase underneath your selected Target (in the project tree view on the left in the normal Xcode window layout) and, if it is,
 look inside the generated application bundle (find your product, right click, select 'Reveal in Finder', from Finder right click on the app and select 'Show Package Contents', then look for your file in there) to make sure that it's there.
     
+Special code for World Heritage
+-------------------------------
+- Photo directory will be heritageCode, which is part of url in Desc field
+- make three set of annotation icons red dots for culture, green for nature, red/green for mix. Use Tags to decide what icon set to use
+- in small zoom, only show those before certain year, then show all if zoom is larger enough
+
+
+SenTestingKit Mach-O linker error
+---------------------------------
+I got above error after ask to convert SenTesting to XCTest (when use xcode 7), and finally find adding below two linke to "Search Framework Path" in BuildSetting:
+        "$(SDKROOT)/Developer/Library/Frameworks"
+        "$(DEVELOPER_LIBRARY_DIR)/Frameworks"
+Also must put above in top order
 
