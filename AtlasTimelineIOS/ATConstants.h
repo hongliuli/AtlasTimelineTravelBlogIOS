@@ -32,7 +32,7 @@
 + (NSString*) After2AnnotationIdentifier;
 + (NSString*) After3AnnotationIdentifier;
 + (NSString*) After4AnnotationIdentifier;
-+ (NSString*) WhiteFlagAnnotationIdentifier:(NSString*)eventTag;
++ (NSString*) WhiteFlagAnnotationIdentifier:(BOOL)mapMode :(NSString*)eventTag;
 + (int) screenWidth;
 + (int) screenHeight;
 + (int) timeScrollNumOfDateLabels;

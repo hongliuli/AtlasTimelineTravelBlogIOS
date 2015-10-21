@@ -84,10 +84,9 @@
 {
     return @"marker-af-4.png";
 }
-+ (NSString*)WhiteFlagAnnotationIdentifier:(NSString*)eventTag
++ (NSString*)WhiteFlagAnnotationIdentifier:(BOOL)mapMode :(NSString*)eventTag
 {
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if (mapMode)
     {
         if ([eventTag hasPrefix:@"Natur"])
             return @"small-green-ball-icon.png";

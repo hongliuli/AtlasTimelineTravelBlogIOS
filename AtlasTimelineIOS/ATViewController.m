@@ -42,7 +42,8 @@
 #define MERCATOR_OFFSET 268435456
 #define MERCATOR_RADIUS 85445659.44705395
 #define ZOOM_LEVEL_TO_HIDE_DESC 3
-#define ZOOM_LEVEL_TO_HIDE_EVENTLIST_VIEW 5
+#define ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE 7
+#define ZOOM_LEVEL_TO_HIDE_EVENTLIST_VIEW 6
 #define ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE 9
 
 #define DISTANCE_TO_HIDE 80
@@ -96,8 +97,8 @@
     CGRect focusedLabelFrame;
     NSMutableArray* timeScaleArray;
     
-    NSMutableArray* selectedAnnotationNearestLocationList; //do not add to selectedAnnotationSet if too close
-    NSMutableDictionary* selectedAnnotationSet;//hold uilabels for selected annotation's description
+    NSMutableArray* selectedAnnotationNearestLocationList; //do not add to annotationToShowImageSet if too close
+    NSMutableDictionary* annotationToShowImageSet;//hold uilabels for selected annotation's description
     NSMutableDictionary* tmpLblUniqueIdMap;
     int tmpLblUniqueMapIdx;
     NSMutableSet* selectedAnnotationViewsFromDidAddAnnotation;
@@ -146,7 +147,7 @@
     NSDate* lastLongpresstie;
     
     NSDate* lastUpdateMapInRegionDidChange;
-    BOOL showAnnNumberFlag;
+    int prevZoomLevel;
 }
 
 @synthesize mapView = _mapView;
@@ -171,7 +172,7 @@
         [self.locationManager requestWhenInUseAuthorization];
         [self.locationManager requestAlwaysAuthorization];
     }
-    
+
     self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
     int searchBarHeight = [ATConstants searchBarHeight];
     int searchBarWidth = [ATConstants searchBarWidth];
@@ -211,7 +212,7 @@
     UITapGestureRecognizer *tapgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
     [_mapView addGestureRecognizer:tapgr];
     
-    selectedAnnotationSet = [[NSMutableDictionary alloc] init];
+    annotationToShowImageSet = [[NSMutableDictionary alloc] init];
     tmpLblUniqueIdMap = [[NSMutableDictionary alloc] init];
     tmpLblUniqueMapIdx = 1;
     selectedAnnotationNearestLocationList = [[NSMutableArray alloc] init];
@@ -293,6 +294,7 @@
     [switchEventListViewModeBtn setTitleColor:[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0] forState:UIControlStateNormal];
     [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Time",nil) forState:UIControlStateNormal];
     [[switchEventListViewModeBtn layer] setBorderColor:[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0].CGColor];
+    [self refreshAnnotations];
 }
 -(void)setSwitchButtonMapMode
 {
@@ -300,6 +302,7 @@
     [switchEventListViewModeBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Map",nil) forState:UIControlStateNormal];
     [[switchEventListViewModeBtn layer] setBorderColor:[UIColor redColor].CGColor];
+    [self refreshAnnotations];
 }
 
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
@@ -746,15 +749,15 @@
     //NSLog(@"   ############## setConfigu startDate=%@    endDate=%@   startDateFormated=%@", self.startDate, self.endDate, [appDelegate.dateFormater stringFromDate:self.startDate]);
 }
 
-- (void) cleanSelectedAnnotationSet
+- (void) cleanAnnotationToShowImageSet
 {
-    if (selectedAnnotationSet != nil)
+    if (annotationToShowImageSet != nil)
     {
-        for (id key in selectedAnnotationSet) {
-            UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+        for (id key in annotationToShowImageSet) {
+            UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
             [tmpLbl removeFromSuperview];
         }
-        [selectedAnnotationSet removeAllObjects];
+        [annotationToShowImageSet removeAllObjects];
         [selectedAnnotationNearestLocationList removeAllObjects];
     }
     [tmpLblUniqueIdMap removeAllObjects];
@@ -960,7 +963,7 @@
         [self.navigationController setNavigationBarHidden:false animated:TRUE];
     }
     /**** I decide to not use three-steps
-     if ([selectedAnnotationSet count] == 0) //if no selected nodes, use 2 step show/hide to have better user experience
+     if ([annotationToShowImageSet count] == 0) //if no selected nodes, use 2 step show/hide to have better user experience
      {
      if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL || self.mapViewShowWhatFlag == MAPVIEW_SHOW_PHOTO_LABEL_ONLY)
      {
@@ -1194,133 +1197,54 @@
     {
         NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
         selectedAnnotationIdentifier = [self getImageIdentifier:ann: specialMarkerName]; //keep this line here
-        /*
-        if (showAnnNumberFlag)
-        {
-            NSUInteger idx = [self getIndexFromEventListInVisibleMapArea: ann.uniqueId];
-            if (idx >= 0)
-            {
-                selectedAnnotationIdentifier = @"marker_info.png";
-            }
-        }
-        */
+        
         MKAnnotationView* annView;
         annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
         annView.annotation = annotation;
         NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
         //keey list of red  annotations
         BOOL isSpecialMarkerInFocused = false;
-        if (specialMarkerName != nil && ![selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier:ann.address]] )
+        if (specialMarkerName != nil && ![selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier:switchEventListViewModeToVisibleOnMapFlag :ann.address]] )
         {
             //Remember special marker annotation identifier has alpha value delimited by ":" if not selected. Selected do not have :
             if ([selectedAnnotationIdentifier rangeOfString:@":"].location == NSNotFound)
                 isSpecialMarkerInFocused = true;
         }
-        if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]] || isSpecialMarkerInFocused)
+        
+        /*
+         * Show annotation tmpLbl for annotation which is darkest color in time mode.
+         *      In map mode, show tmpLbl if annotation on map is less than 10
+         */
+        if (!switchEventListViewModeToVisibleOnMapFlag)
         {
-            UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
-            if (tmpLbl == nil)
+            if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]] || isSpecialMarkerInFocused)
             {
-                //CGPoint windowPoint = [annView convertPoint:[annView center] toView:self.mapView];
-                CGPoint annotationViewPoint = [theMapView convertCoordinate:annView.annotation.coordinate
-                                                              toPointToView:theMapView];
-                
-                //NSLog(@"x=%f  y=%f",annotationViewPoint.x, annotationViewPoint.y);
-                tmpLbl = [[UILabel alloc] initWithFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, THUMB_WIDTH, THUMB_HEIGHT)]; //todo MFTopAlignedLabel
-                if (ann.eventType == EVENT_TYPE_HAS_PHOTO) //somehow it is a big number before save to db, need more study why not 1
-                {
-                    NSString* photoFileName = ann.uniqueId;
-                    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-                    if ([targetName hasPrefix:@"WorldHeritage"])
-                        photoFileName = [ATHelper getPhotoNameFromDescForWorldHeritage:ann.description];
-                    UIImage* img = [ATHelper readPhotoThumbFromFile:photoFileName];
-                    if (img != nil)
-                    {
-                        UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
-                        [imgView setAlpha:0.85];
-                        imgView.tag = HAVE_IMAGE_INDICATOR; //later used to get subview
-                        /*
-                         imgView.contentMode = UIViewContentModeScaleAspectFill;
-                         imgView.clipsToBounds = YES;
-                         imgView.layer.cornerRadius = 8;
-                         imgView.layer.borderColor = [UIColor brownColor].CGColor;
-                         imgView.layer.borderWidth = 1;
-                         */
-                        
-                        //[imgView setFrame:CGRectMake(-30, -25, 100, 80)];
-                        tmpLbl.text = @"                             \r\r\r\r\r\r";
-                        tmpLbl.backgroundColor = [UIColor clearColor];
-                        imgView.frame = CGRectMake(imgView.frame.origin.x, imgView.frame.origin.y, tmpLbl.frame.size.width, tmpLbl.frame.size.height);
-                        //[tmpLbl setAutoresizesSubviews:true];
-                        [tmpLbl addSubview: imgView];
-                        tmpLbl.layer.cornerRadius = 8;
-                        tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
-                        tmpLbl.layer.borderWidth = 1;
-                    }
-                    else
-                    {
-                        //xxxxxx TODO if user switch source from server, photo may not be in local yet, then
-                        //             should display text only and add download request in download queue
-                        // ########## This is a important lazy download concept #############
-                        tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
-                        tmpLbl.text = [NSString stringWithFormat:@" %@", [ATHelper clearMakerAllFromDescText: ann.description ]];
-                        tmpLbl.layer.cornerRadius = 8;
-                        tmpLbl.layer.borderColor = [UIColor redColor].CGColor;
-                        tmpLbl.layer.borderWidth = 1;
-                    }
-                }
-                else
-                {
-                    tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
-                    tmpLbl.text = [NSString stringWithFormat:@" %@", [ATHelper clearMakerAllFromDescText: ann.description ]];
-                    tmpLbl.layer.cornerRadius = 8;
-                    //If the event has photo before but the photos do not exist anymore, then show text with red board
-                    //If this happen, the photo may in Dropbox. if not  in dropbox, then it lost forever.
-                    //To change color, add a photo and delete it, then it will change to brown border
-                    tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
-                    tmpLbl.layer.borderWidth = 1;
-                }
-                
-                tmpLbl.userInteractionEnabled = YES;
-                [tmpLblUniqueIdMap setObject:annView forKey:[NSNumber numberWithInt:tmpLblUniqueMapIdx ]];
-                tmpLbl.tag = tmpLblUniqueMapIdx;
-                tmpLblUniqueMapIdx++;
-                //tmpLbl.textAlignment = UITextAlignmentCenter;
-                tmpLbl.lineBreakMode = NSLineBreakByWordWrapping;
-                
-                
-                [self setDescLabelSizeByZoomLevel:tmpLbl];
-                if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
-                    //tmpLbl.hidden = true;
-                    tmpLbl.alpha = 0;
-                else
-                    //tmpLbl.hidden=false;
-                    tmpLbl.alpha = 1;
-                
-                [selectedAnnotationSet setObject:tmpLbl forKey:key];
-                [self.view addSubview:tmpLbl];
-                
+                [self addTmpLblToMap:annotation];
             }
-            else //if already in the set, need make sure it will be shown
+            else
             {
-                if (ann.eventType == EVENT_TYPE_NO_PHOTO)
-                    tmpLbl.text = [ATHelper clearMakerAllFromDescText: ann.description ]; //need to change to take care of if user updated description in event editor
-                
-                if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
-                    //tmpLbl.hidden = true;
-                    tmpLbl.alpha = 0;
-                else
-                    tmpLbl.alpha = 1;
-                //tmpLbl.hidden=false;
+                UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
+                if ( tmpLbl != nil)
+                {
+                    [annotationToShowImageSet removeObjectForKey:key];
+                    [tmpLbl removeFromSuperview];
+                }
             }
         }
-        else
+        else //in map mode
         {
-            UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
-            if ( tmpLbl != nil)
+            if ([self zoomLevel] >= ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE)
             {
-                [selectedAnnotationSet removeObjectForKey:key];
-                [tmpLbl removeFromSuperview];
+                [self addTmpLblToMap:annotation];
+            }
+            else
+            {
+                UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
+                if ( tmpLbl != nil)
+                {
+                    [annotationToShowImageSet removeObjectForKey:key];
+                    [tmpLbl removeFromSuperview];
+                }
             }
         }
         /*
@@ -1350,17 +1274,6 @@
     return nil;
 }
 
--(NSUInteger) getIndexFromEventListInVisibleMapArea:(NSString*)uniqueId
-{
-    NSUInteger i = 0;
-    for (ATEventDataStruct* evt in eventListInVisibleMapArea)
-    {
-        if ([evt.uniqueId isEqualToString: uniqueId])
-            return i;
-        i++;
-    }
-    return -1;
-}
 //All View is a UIResponder, all UIresponder objects can implement touchesBegan
 -(void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
     currentTapTouchKey = 0;
@@ -1410,7 +1323,7 @@
         NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
         NSString* identifer = [self getImageIdentifier:ann :specialMarkerName];
         //NSLog(@"  identifier is %@  date=%@",identifer, ann.eventDate);
-        if ([identifer isEqualToString: [ATConstants WhiteFlagAnnotationIdentifier:ann.address]])
+        if ([identifer isEqualToString: [ATConstants WhiteFlagAnnotationIdentifier:switchEventListViewModeToVisibleOnMapFlag :ann.address]])
             [[annView superview] sendSubviewToBack:annView];
         if ([identifer isEqualToString: [ATConstants SelectedAnnotationIdentifier]])
         {
@@ -1430,7 +1343,6 @@
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
-    showAnnNumberFlag = FALSE;
     if (!firstTimeShowFlag) //always show all menus when first time show the view
     {
         [self hideDescriptionLabelViews];
@@ -1481,16 +1393,10 @@
     [self.mapView bringSubviewToFront:eventListView]; //so eventListView will always cover map marker photo/txt icon (tmpLbl)
     
     //show annotation info window programmatically, especially for when select on event list view
-    if (selectedEventAnnInEventListView != nil)
+    if (currentSelectedEvent != nil)
     {
-        [self.mapView selectAnnotation:selectedEventAnnInEventListView.annotation animated:YES];
-        
-        self.timeScrollWindow.hidden=false;
-        eventListView.hidden = false;
-        switchEventListViewModeBtn.hidden = false;
-        self.timeZoomLine.hidden = false;
-        [self showDescriptionLabelViews:self.mapView];
-        self.navigationController.navigationBarHidden = false;
+        ATEventAnnotation* ann = selectedEventAnnInEventListView.annotation;
+        [self.mapView selectAnnotation:ann animated:YES];
         
         selectedEventAnnInEventListView = nil;
         currentSelectedEvent = nil;
@@ -1500,21 +1406,131 @@
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
         [userDefault setObject:[NSString stringWithFormat:@"%d",[self zoomLevel] ] forKey:@"BookmarkMapZoomLevel"];
     [userDefault synchronize];
-/*
-    if (eventListInVisibleMapArea != nil && [eventListInVisibleMapArea count] < 10)
+
+    if (switchEventListViewModeToVisibleOnMapFlag)
     {
-        NSTimeInterval interval = [[[NSDate alloc] init] timeIntervalSinceDate:lastUpdateMapInRegionDidChange];
-        lastLongpresstie = [NSDate date];
-        if (interval < 1)
-            return;
+        if ([self zoomLevel] > ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE && prevZoomLevel <= ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE)
+            [self refreshAnnotations];
+    }
+    else
+    {
+        if ([self zoomLevel] > ZOOM_LEVEL_TO_HIDE_DESC && prevZoomLevel <= ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE)
+            [self refreshAnnotations];
+    }
+    prevZoomLevel = [self zoomLevel];
+}
+
+-(void) addTmpLblToMap:(ATDefaultAnnotation*)annotation
+{
+    MKAnnotationView* annView;
+    annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
+    annView.annotation = annotation;
+    NSString *key=[NSString stringWithFormat:@"%f|%f",annotation.coordinate.latitude, annotation.coordinate.longitude];
+    UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
+    if (tmpLbl == nil)
+    {
+        //CGPoint windowPoint = [annView convertPoint:[annView center] toView:self.mapView];
+        CGPoint annotationViewPoint = [self.mapView convertCoordinate:annView.annotation.coordinate
+                                                      toPointToView:self.mapView];
+        
+        //NSLog(@"x=%f  y=%f",annotationViewPoint.x, annotationViewPoint.y);
+        tmpLbl = [[UILabel alloc] initWithFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, THUMB_WIDTH, THUMB_HEIGHT)]; //todo MFTopAlignedLabel
+        if (annotation.eventType == EVENT_TYPE_HAS_PHOTO) //somehow it is a big number before save to db, need more study why not 1
+        {
+            NSString* photoFileName = annotation.uniqueId;
+            NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+            if ([targetName hasPrefix:@"WorldHeritage"])
+                photoFileName = [ATHelper getPhotoNameFromDescForWorldHeritage:annotation.description];
+            UIImage* img = [ATHelper readPhotoThumbFromFile:photoFileName];
+            if (img != nil)
+            {
+                UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
+                [imgView setAlpha:0.85];
+                imgView.tag = HAVE_IMAGE_INDICATOR; //later used to get subview
+                /*
+                 imgView.contentMode = UIViewContentModeScaleAspectFill;
+                 imgView.clipsToBounds = YES;
+                 imgView.layer.cornerRadius = 8;
+                 imgView.layer.borderColor = [UIColor brownColor].CGColor;
+                 imgView.layer.borderWidth = 1;
+                 */
+                
+                //[imgView setFrame:CGRectMake(-30, -25, 100, 80)];
+                tmpLbl.text = @"                             \r\r\r\r\r\r";
+                tmpLbl.backgroundColor = [UIColor clearColor];
+                imgView.frame = CGRectMake(imgView.frame.origin.x, imgView.frame.origin.y, tmpLbl.frame.size.width, tmpLbl.frame.size.height);
+                //[tmpLbl setAutoresizesSubviews:true];
+                [tmpLbl addSubview: imgView];
+                tmpLbl.layer.cornerRadius = 8;
+                tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
+                tmpLbl.layer.borderWidth = 1;
+            }
+            else
+            {
+                //xxxxxx TODO if user switch source from server, photo may not be in local yet, then
+                //             should display text only and add download request in download queue
+                // ########## This is a important lazy download concept #############
+                tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
+                tmpLbl.text = [NSString stringWithFormat:@" %@", [ATHelper clearMakerAllFromDescText: annotation.description ]];
+                tmpLbl.layer.cornerRadius = 8;
+                tmpLbl.layer.borderColor = [UIColor redColor].CGColor;
+                tmpLbl.layer.borderWidth = 1;
+            }
+        }
         else
         {
-            showAnnNumberFlag = TRUE;
-            [self updateEventListViewWithEventsOnMap]; //TODO xxxxxx
-            [self refreshAnnotations];
+            tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
+            tmpLbl.text = [NSString stringWithFormat:@" %@", [ATHelper clearMakerAllFromDescText: annotation.description ]];
+            tmpLbl.layer.cornerRadius = 8;
+            //If the event has photo before but the photos do not exist anymore, then show text with red board
+            //If this happen, the photo may in Dropbox. if not  in dropbox, then it lost forever.
+            //To change color, add a photo and delete it, then it will change to brown border
+            tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
+            tmpLbl.layer.borderWidth = 1;
         }
+        
+        tmpLbl.userInteractionEnabled = YES;
+        [tmpLblUniqueIdMap setObject:annView forKey:[NSNumber numberWithInt:tmpLblUniqueMapIdx ]];
+        tmpLbl.tag = tmpLblUniqueMapIdx;
+        tmpLblUniqueMapIdx++;
+        //tmpLbl.textAlignment = UITextAlignmentCenter;
+        tmpLbl.lineBreakMode = NSLineBreakByWordWrapping;
+        
+        
+        [self setDescLabelSizeByZoomLevel:tmpLbl];
+        if ([self showAnnotationTmpLbl])
+            tmpLbl.hidden = true;
+            //tmpLbl.alpha = 0;
+        else
+            //tmpLbl.hidden=false;
+            tmpLbl.hidden=false;
+        
+        [annotationToShowImageSet setObject:tmpLbl forKey:key];
+        [self.view addSubview:tmpLbl];
+        
     }
- */
+    else //if already in the set, need make sure it will be shown
+    {
+        if (annotation.eventType == EVENT_TYPE_NO_PHOTO)
+            tmpLbl.text = [ATHelper clearMakerAllFromDescText: annotation.description ]; //need to change to take care of if user updated description in event editor
+        
+        if ([self showAnnotationTmpLbl])
+            tmpLbl.hidden = true;
+            //tmpLbl.alpha = 0;
+        else
+            //tmpLbl.alpha = 1;
+            tmpLbl.hidden=false;
+    }
+}
+
+- (BOOL)showAnnotationTmpLbl
+{
+    BOOL ret = false;
+    if (switchEventListViewModeToVisibleOnMapFlag)
+        ret = [self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE;
+    else
+        ret = [self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC;
+    return ret;
 }
 
 //////// From WWDC 2013 video "Map Kit in Perspective"
@@ -1644,6 +1660,7 @@
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         NSArray* allEvents = [appDelegate eventListSorted];
         NSInteger sizeInMap = [uniqueIdSet count];
+
         int cnt = 0;
         for(ATEventDataStruct* evt in allEvents)
         {
@@ -1655,6 +1672,7 @@
             if (cnt == sizeInMap) //to improve performance for most case
                 break;
         }
+
     }
     if (eventListView.hidden == false)
         [self refreshEventListView:false];
@@ -1664,9 +1682,9 @@
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     NSString *focuseKey=[NSString stringWithFormat:@"%f|%f",appDelegate.focusedEvent.lat, appDelegate.focusedEvent.lng];
-    for (id key in selectedAnnotationSet) {
+    for (id key in annotationToShowImageSet) {
         NSArray *splitArray = [key componentsSeparatedByString:@"|"];
-        UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+        UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
         CLLocationCoordinate2D coordinate;
         coordinate.latitude=[splitArray[0] doubleValue];
         coordinate.longitude = [splitArray[1] doubleValue];
@@ -1690,22 +1708,24 @@
             }
             if (tooCloseToShowFlag && ![key isEqualToString:focuseKey])
             {
-                //tmpLbl.hidden = true;
-                tmpLbl.alpha = 0;
+                tmpLbl.hidden = true;
+                tmpLbl.alpha = 0.3;
                 continue;
             }
             else
             {
+                tmpLbl.hidden = false;
                 [selectedAnnotationNearestLocationList addObject: [NSValue valueWithCGPoint:annotationViewPoint]];
             }
             
             [self setDescLabelSizeByZoomLevel:tmpLbl];
             CGSize size = tmpLbl.frame.size;
             [tmpLbl setFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, size.width, size.height)];
-            if ([self zoomLevel] <= ZOOM_LEVEL_TO_HIDE_DESC)
+            if ([self showAnnotationTmpLbl])
             {
-                //tmpLbl.hidden = true;
-                tmpLbl.alpha = 0;
+                
+                tmpLbl.hidden = true;
+                tmpLbl.alpha = 0.3;
             }
             else
             {
@@ -1713,7 +1733,8 @@
                                       delay:0.0
                                     options:UIViewAnimationCurveEaseOut
                                  animations:^(void) {
-                                     tmpLbl.alpha = 1;
+                                     tmpLbl.alpha = 1.0;
+                                     tmpLbl.hidden = false; //// add after retreat
                                  }
                                  completion:NULL];
             }
@@ -1724,13 +1745,13 @@
 
 - (void) hideDescriptionLabelViews
 {
-    for (id key in selectedAnnotationSet) {
-        UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+    for (id key in annotationToShowImageSet) {
+        UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
         [UIView animateWithDuration:0.5
                               delay:0.0
                             options:UIViewAnimationCurveEaseOut
                          animations:^(void) {
-                             tmpLbl.alpha = 0;
+                             tmpLbl.alpha = 0.3;
                          }
                          completion:NULL];
     }
@@ -1743,7 +1764,7 @@
     tmpLbl.numberOfLines = 0;
     tmpLbl.font = [UIFont fontWithName:@"Arial" size:11];
     int labelWidth = 60;
-    if (zoomLevel <= ZOOM_LEVEL_TO_HIDE_DESC)
+    if ([self showAnnotationTmpLbl])
     {
         //tmpLbl.hidden = true; //do nothing, caller already hidden the label;
         tmpLbl.alpha = 0;
@@ -2137,11 +2158,11 @@
     [ annotationsToRemove removeObject:self.mapView.userLocation ] ;
     [ self.mapView removeAnnotations:annotationsToRemove ] ;
     [self.mapView addAnnotations:annotationsToRemove];
-    [self cleanSelectedAnnotationSet];
+    [self cleanAnnotationToShowImageSet];
     if (tutorialView != nil)
         [tutorialView updateDateText];
     //[2014-01-06]
-    //*** By moving following to didAddAnnotation(), I solved the issue that forcuse an event to date cause all image to show, because above [self.mapView addAnnotations:...] will run parallel to bellow [self showDescr..] while this depends on selectedAnnotationSet prepared in viewForAnnotation, thuse cause problem
+    //*** By moving following to didAddAnnotation(), I solved the issue that forcuse an event to date cause all image to show, because above [self.mapView addAnnotations:...] will run parallel to bellow [self showDescr..] while this depends on annotationToShowImageSet prepared in viewForAnnotation, thuse cause problem
     //[self showDescriptionLabelViews:self.mapView];
 }
 
@@ -2172,19 +2193,18 @@
         else if (segmentDistance > 4 && segmentDistance <= 5)
             pngNameWithAlpha = [NSString stringWithFormat:@"%@:0.4",pngNameWithAlpha ];
         else if (segmentDistance > 5)
-            return [ATConstants WhiteFlagAnnotationIdentifier:ann.address];
+            return [ATConstants WhiteFlagAnnotationIdentifier:switchEventListViewModeToVisibleOnMapFlag :ann.address];
         
         return pngNameWithAlpha;
     }
     // For regular marker, I tried to use alpha instead of different marker image, but the looks on view is bad, so keep it following way
-    
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+
+    if (switchEventListViewModeToVisibleOnMapFlag)
     {
         if (segmentDistance <= 5 && segmentDistance >= -5)
             return @"marker-heritage-selected.png";
         else
-            return [ATConstants WhiteFlagAnnotationIdentifier:ann.address];
+            return [ATConstants WhiteFlagAnnotationIdentifier:switchEventListViewModeToVisibleOnMapFlag :ann.address];
     }
     else
     {
@@ -2199,7 +2219,7 @@
         if (segmentDistance > 4 && segmentDistance <=5)
             return [ATConstants After4AnnotationIdentifier];
         if (segmentDistance > 5)
-            return [ATConstants WhiteFlagAnnotationIdentifier:ann.address]; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
+            return [ATConstants WhiteFlagAnnotationIdentifier:switchEventListViewModeToVisibleOnMapFlag :ann.address]; //Do not show if outside range, but tap annotation is added, just not show and tap will cause annotation show
         if (segmentDistance >= -2 && segmentDistance < -1)
             return [ATConstants Past1AnnotationIdentifier];
         if (segmentDistance >= -3 && segmentDistance < -2)
@@ -2209,7 +2229,7 @@
         if (segmentDistance>= - 5 && segmentDistance < -4 )
             return [ATConstants Past4AnnotationIdentifier];
         if (segmentDistance < -5 )
-            return [ATConstants WhiteFlagAnnotationIdentifier:ann.address]; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
+            return [ATConstants WhiteFlagAnnotationIdentifier:switchEventListViewModeToVisibleOnMapFlag :ann.address]; //do not show if outside range,  but tap annotation is added, just not show and tap will cause annotation show
     }
     return nil;
 }
@@ -2265,10 +2285,10 @@
     
     NSString *key=[NSString stringWithFormat:@"%f|%f",self.selectedAnnotation.coordinate.latitude, self.selectedAnnotation.coordinate.longitude];
     //remove photo/text icon as well if there are
-    UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+    UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
     if (tmpLbl != nil)
         [tmpLbl removeFromSuperview];
-    [selectedAnnotationSet removeObjectForKey:key];//in case this is
+    [annotationToShowImageSet removeObjectForKey:key];//in case this is
     NSUInteger index = [list indexOfObject:tmp]; //implemented isEqual
     if (index != NSNotFound)
         [list removeObjectAtIndex:index];
@@ -2323,16 +2343,16 @@
         }
     }
     NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
-    UILabel* tmpLbl = [selectedAnnotationSet objectForKey:key];
+    UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
     if (tmpLbl != nil)
     {
         [tmpLbl removeFromSuperview];
-        [selectedAnnotationSet removeObjectForKey:key]; //so when update a event with new photo or text, the new photo/text will occure immediately because all annotations will be redraw for possible date change
+        [annotationToShowImageSet removeObjectForKey:key]; //so when update a event with new photo or text, the new photo/text will occure immediately because all annotations will be redraw for possible date change
     }
     if ([deletedList count] > 0 && [self.eventEditor.photoScrollView.photoList count] == 0)
     { //This is to fix floating photo if removed last photo in an event
         NSString *key=[NSString stringWithFormat:@"%f|%f", selectedEventAnnotation.coordinate.latitude, selectedEventAnnotation.coordinate.longitude];
-        [selectedAnnotationSet removeObjectForKey:key];
+        [annotationToShowImageSet removeObjectForKey:key];
     }
     
     //Need remove/add annotation or following will work?
