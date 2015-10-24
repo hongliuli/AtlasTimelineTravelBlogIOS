@@ -270,8 +270,9 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 }
  
 //called by mapView after know eventId
-- (void) createPhotoScrollView:(NSString *)photoDirName
+- (void) createPhotoScrollView:(ATEventAnnotation *)ann
 {
+    NSString* photoDirName = ann.uniqueId;
     self.photoDescChangedFlag = false;
     self.photoScrollView = [[ATPhotoScrollView alloc] initWithFrame:CGRectMake(0,5,editorPhotoViewWidth,editorPhotoViewHeight)];
     self.photoScrollView.tag = ADDED_PHOTOSCROLL_TAG_900;
@@ -288,7 +289,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
         if ([targetName hasPrefix:@"WorldHeritage"])
         {
-            NSString* whId = [ATHelper getPhotoNameFromDescForWorldHeritage:self.description.text];
+            NSString* whId = [ATHelper getPhotoNameFromDescForWorldHeritage:ann.description];
             [self.photoScrollView.photoList addObject:whId];
             _photoList = self.photoScrollView.photoList;
             return;
@@ -307,7 +308,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         
         self.photoScrollView.photoList = [NSMutableArray arrayWithArray:tmpFileList];
         //Sort photo list. The sort will be saved to dropbox as a file together with photo description
-        NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:self.eventId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
+        NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:ann.uniqueId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
         
         //photoFileMetaMap will be nil if no file ???
         photoFilesMetaMap = [NSMutableDictionary dictionaryWithContentsOfFile:photoMetaFilePath];
@@ -453,8 +454,8 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     //xxxx
     BOOL fullFlag = [ATHelper getOptionEditorFullScreen];
     [ATHelper setOptionEditorFullScreen:!fullFlag];
-    [self.delegate cancelEvent];
-    [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case
+    //[self.delegate cancelEvent];
+    [self dismissViewControllerAnimated:NO completion:nil]; //for iPhone case. If remove this, ipad min size click will crash
     [self.delegate restartEditor];
 }
 - (IBAction)shareButtonAction:(id)sender {

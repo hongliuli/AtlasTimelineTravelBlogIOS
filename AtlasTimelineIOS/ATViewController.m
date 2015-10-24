@@ -114,7 +114,7 @@
     int timeLinkDepthDirectionFuture;
     int timeLinkDepthDirectionPast;
     NSMutableArray* overlaysToBeCleaned ;
-
+    
     ATAnnotationFocused* focusedAnnotationIndicator;
     int currentTapTouchKey;
     bool currentTapTouchMove;
@@ -172,24 +172,24 @@
         [self.locationManager requestWhenInUseAuthorization];
         [self.locationManager requestAlwaysAuthorization];
     }
-
+    
     self.mapViewShowWhatFlag = MAPVIEW_SHOW_ALL;
     int searchBarHeight = [ATConstants searchBarHeight];
     int searchBarWidth = [ATConstants searchBarWidth];
     [self.navigationItem.titleView setFrame:CGRectMake(0, 0, searchBarWidth, searchBarHeight)];
-
+    
     //Find this spent me long time: searchBar used titleView place which is too short, thuse tap on searchbar right side keyboard will not show up, now it is good
-	[self calculateSearchBarFrame];
+    [self calculateSearchBarFrame];
     
     // create a custom navigation bar button and set it to always says "Back"
-	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
-	temporaryBarButtonItem.title = NSLocalizedString(@"Back",nil);
-	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+    UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+    temporaryBarButtonItem.title = NSLocalizedString(@"Back",nil);
+    self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
     
     //add two button at right (can not do in storyboard for multiple button): setting and Help, available in iOS5
     //   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     //   {
-
+    
     settringButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
     //settringButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ios-menu-icon.png"]  style:UIBarButtonItemStyleBordered target:self action:@selector(settingsClicked:)];
     [self setLanguageToSelectTitle];
@@ -253,12 +253,12 @@
         [self setSwitchButtonTimeMode];
     
     [switchEventListViewModeBtn addTarget:self action:@selector(switchEventListViewMode:) forControlEvents:UIControlEventTouchUpInside];
-
+    
     [switchEventListViewModeBtn.layer setCornerRadius:7.0f];
     [self.mapView addSubview:switchEventListViewModeBtn];
     eventListInVisibleMapArea = nil;
     [self refreshEventListView:false];
-
+    
 }
 -(void) viewDidAppear:(BOOL)animated
 {
@@ -271,7 +271,7 @@
     filteredEventListSorted = [NSMutableArray arrayWithCapacity:[originalEventListSorted count]];
     [self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"List",nil)];
     [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"Search Event", nil)];
-
+    
     
     if ([appDelegate.eventListSorted count] == 0)
     {
@@ -290,6 +290,8 @@
 
 -(void)setSwitchButtonTimeMode
 {
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    appDelegate.mapModeFlag = false;
     switchEventListViewModeToVisibleOnMapFlag = false;
     [switchEventListViewModeBtn setTitleColor:[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0] forState:UIControlStateNormal];
     [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Time",nil) forState:UIControlStateNormal];
@@ -298,6 +300,8 @@
 }
 -(void)setSwitchButtonMapMode
 {
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    appDelegate.mapModeFlag = true;
     switchEventListViewModeToVisibleOnMapFlag = true;
     [switchEventListViewModeBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [switchEventListViewModeBtn setTitle:NSLocalizedString(@"By Map",nil) forState:UIControlStateNormal];
@@ -316,12 +320,12 @@
     [self setLanguageToSelectTitle];
     
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:selectLanguageText message:NSLocalizedString(
-            @"This App is supported by ChronicleMap App, which is the best App to record your own life stories!\n\nIf you have a chronicle like this to tell, we can build the app for you free.\n\nDetail see www.chroniclemap.com/authorarea",nil)
-            delegate:self
-            cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-            otherButtonTitles:languageToSelect,
-               ///// NSLocalizedString(@"Feedback to Author",nil),
-                nil];
+                                                                                                         @"This App is supported by ChronicleMap App, which is the best App to record your own life stories!\n\nIf you have a chronicle like this to tell, we can build the app for you free.\n\nDetail see www.chroniclemap.com/authorarea",nil)
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                          otherButtonTitles:languageToSelect,
+                          ///// NSLocalizedString(@"Feedback to Author",nil),
+                          nil];
     alert.tag = ALERT_FOR_SWITCH_LANGUAGE;
     [alert show];
 }
@@ -351,7 +355,7 @@
     if ([@"English" isEqualToString:languageToSelect])
         menuText = @"EN";
     [settringButton setTitle:menuText];
-
+    
     ///// Add conditions to remove chinese selection if a target do not have chinese
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     if ([targetName hasPrefix:@"CnetRoadTrip"])
@@ -377,7 +381,7 @@
     
     // set the region like normal
     [self.mapView setRegion:region animated:YES];
-
+    
 }
 
 -(void) switchEventListViewMode:(id)sender
@@ -484,47 +488,47 @@
             [self refreshEventListView:false];
         }
         /*
-        if (buttonIndex == 1) //switch view/author mode
-        {
-            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-            {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Only available in iPad Version",nil)
-                                                                message:NSLocalizedString(@"",nil)
-                                                               delegate:self
-                                                      cancelButtonTitle:NSLocalizedString(@"OK",nil)
-                                                      otherButtonTitles:nil];
-                [alert show];
-                return;
-            }
-            NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-            NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
-            
-            if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
-            {
-                BOOL loginFlag = [ATHelper checkUserEmailAndSecurityCode:self];
-                if (!loginFlag)
-                    return;
-                [self startAuthorView];
-            }
-            else
-            {
-                [self closeAuthorView];
-            }
-        }
-        if (buttonIndex == 2) //Feedback to
-        {
-            NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-            //NSArray *toReceipients = @[@"aa@aa.com"];
-            NSArray *toReceipients = @[NSLocalizedString(@"AuthorEmail",nil)]; //AuthorEmail is in Localizable.String file
-            NSArray *ccReceipients = @[@"support@chroniclemap.com"]; //AuthorEmail is in Localizable.String file
-            MFMailComposeViewController* mailComposer = [[MFMailComposeViewController alloc]init];
-            mailComposer.mailComposeDelegate = self;
-            [mailComposer setToRecipients:toReceipients];
-            [mailComposer setCcRecipients:ccReceipients];
-            [mailComposer setSubject:NSLocalizedString(targetName,nil)];
-            //[mailComposer setMessageBody:@"Testing message for the test mail" isHTML:NO];
-            [self presentViewController:mailComposer animated:YES completion:nil];
-        }
+         if (buttonIndex == 1) //switch view/author mode
+         {
+         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+         {
+         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Only available in iPad Version",nil)
+         message:NSLocalizedString(@"",nil)
+         delegate:self
+         cancelButtonTitle:NSLocalizedString(@"OK",nil)
+         otherButtonTitles:nil];
+         [alert show];
+         return;
+         }
+         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
+         NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
+         
+         if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
+         {
+         BOOL loginFlag = [ATHelper checkUserEmailAndSecurityCode:self];
+         if (!loginFlag)
+         return;
+         [self startAuthorView];
+         }
+         else
+         {
+         [self closeAuthorView];
+         }
+         }
+         if (buttonIndex == 2) //Feedback to
+         {
+         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+         //NSArray *toReceipients = @[@"aa@aa.com"];
+         NSArray *toReceipients = @[NSLocalizedString(@"AuthorEmail",nil)]; //AuthorEmail is in Localizable.String file
+         NSArray *ccReceipients = @[@"support@chroniclemap.com"]; //AuthorEmail is in Localizable.String file
+         MFMailComposeViewController* mailComposer = [[MFMailComposeViewController alloc]init];
+         mailComposer.mailComposeDelegate = self;
+         [mailComposer setToRecipients:toReceipients];
+         [mailComposer setCcRecipients:ccReceipients];
+         [mailComposer setSubject:NSLocalizedString(targetName,nil)];
+         //[mailComposer setMessageBody:@"Testing message for the test mail" isHTML:NO];
+         [self presentViewController:mailComposer animated:YES completion:nil];
+         }
          */
     }
     if (buttonIndex == 0 && alertView.tag == ALERT_FOR_POPOVER_ERROR)
@@ -565,7 +569,7 @@
     {
         if (buttonIndex == 0) //Not Now
             return; //user clicked cancel button
-       
+        
         if (![[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"chroniclemap://"]]) //ChronicleMap app custom URL
         {
             NSString* chronicleMapAppUrl = @"https://itunes.apple.com/us/app/chronicle-map-event-based/id649653093?ls=1&mt=8";
@@ -718,7 +722,7 @@
         dayComponent.month = -5;
         
         NSDate* newStartDt = [theCalendar dateByAddingComponents:dayComponent toDate:eventStart.eventDate options:0];
-
+        
         self.startDate = [ATHelper getYearStartDate: newStartDt];
         self.endDate = eventEnd.eventDate;
         
@@ -817,7 +821,7 @@
     
     
     
-
+    
     //add focused Label. it is invisible most time, only used for animation effect when click left callout on annotation
     if (appDelegate.focusedDate == nil)
         appDelegate.focusedDate = [[NSDate alloc] init];
@@ -912,38 +916,38 @@
     [self.timeZoomLine changeScaleText];
 }
 /*
-- (NSString*) getSelectedPeriodLabel
-{
-    
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSString* retStr=@"";
-    if (appDelegate.selectedPeriodInDays == 7)
-    {
-        retStr = @"Span: 1week";
-    }
-    else if (appDelegate.selectedPeriodInDays == 30)
-    {
-        retStr = @"Span: 1mon";
-    }
-    else if (appDelegate.selectedPeriodInDays == 365)
-    {
-        retStr = @"Span: 1yr";
-    }
-    else if (appDelegate.selectedPeriodInDays == 3650)
-    {
-        retStr = @"Span: 10yrs";
-    }
-    else if (appDelegate.selectedPeriodInDays == 36500)
-    {
-        retStr = @"Span: 100yrs";
-    }
-    else if (appDelegate.selectedPeriodInDays == 365000)
-    {
-        retStr = @"Span:1000yrs";
-    }
-    return retStr;
-}
-*/
+ - (NSString*) getSelectedPeriodLabel
+ {
+ 
+ ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+ NSString* retStr=@"";
+ if (appDelegate.selectedPeriodInDays == 7)
+ {
+ retStr = @"Span: 1week";
+ }
+ else if (appDelegate.selectedPeriodInDays == 30)
+ {
+ retStr = @"Span: 1mon";
+ }
+ else if (appDelegate.selectedPeriodInDays == 365)
+ {
+ retStr = @"Span: 1yr";
+ }
+ else if (appDelegate.selectedPeriodInDays == 3650)
+ {
+ retStr = @"Span: 10yrs";
+ }
+ else if (appDelegate.selectedPeriodInDays == 36500)
+ {
+ retStr = @"Span: 100yrs";
+ }
+ else if (appDelegate.selectedPeriodInDays == 365000)
+ {
+ retStr = @"Span:1000yrs";
+ }
+ return retStr;
+ }
+ */
 - (void) toggleMapViewShowHideAction
 {
     if (self.mapViewShowWhatFlag == MAPVIEW_SHOW_ALL)
@@ -1360,14 +1364,14 @@
 {
     //     although currently we already have optimized it a lot
     /*
-    if (selectedAnnotationViewsFromDidAddAnnotation != nil && [self zoomLevel] >= ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE)
-    {
-        //NSLog(@"    in regionDidChange  size=%d",[selectedAnnotationViewsFromDidAddAnnotation count]);
-        for (MKAnnotationView* annView in selectedAnnotationViewsFromDidAddAnnotation)
-        {
-            [[annView superview] bringSubviewToFront:annView];
-        }
-    }
+     if (selectedAnnotationViewsFromDidAddAnnotation != nil && [self zoomLevel] >= ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE)
+     {
+     //NSLog(@"    in regionDidChange  size=%d",[selectedAnnotationViewsFromDidAddAnnotation count]);
+     for (MKAnnotationView* annView in selectedAnnotationViewsFromDidAddAnnotation)
+     {
+     [[annView superview] bringSubviewToFront:annView];
+     }
+     }
      */
     //******************** get annotations on the screen map and show in event list view
     //Do following if 1) map mode for event viewlist
@@ -1380,7 +1384,7 @@
         [self updateEventListViewWithEventsOnMap];
     }
     //******************
-
+    
     if (animated) //means not caused by user scroll on map
     {
         [self goToNextCamera];
@@ -1401,23 +1405,26 @@
         selectedEventAnnInEventListView = nil;
         currentSelectedEvent = nil;
     }
-   
+    
     //bookmark zoom level so app restart will restore state
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-        [userDefault setObject:[NSString stringWithFormat:@"%d",[self zoomLevel] ] forKey:@"BookmarkMapZoomLevel"];
+    [userDefault setObject:[NSString stringWithFormat:@"%d",[self zoomLevel] ] forKey:@"BookmarkMapZoomLevel"];
     [userDefault synchronize];
-
+    
     if (switchEventListViewModeToVisibleOnMapFlag)
     {
+        //must have this, otherwise, in map mode, when deeply zoom-in, tmpLbl may not show because the way addTmpLbl() works in map mode
         if ([self zoomLevel] > ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE && prevZoomLevel <= ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE)
             [self refreshAnnotations];
     }
     else
     {
-        if ([self zoomLevel] > ZOOM_LEVEL_TO_HIDE_DESC && prevZoomLevel <= ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE)
+        //must have this, otherwise in timemode, tmpLbl will not move when move map
+        if ([self zoomLevel] > ZOOM_LEVEL_TO_HIDE_EVENTLIST_VIEW)
             [self refreshAnnotations];
     }
     prevZoomLevel = [self zoomLevel];
+    
 }
 
 -(void) addTmpLblToMap:(ATDefaultAnnotation*)annotation
@@ -1499,7 +1506,7 @@
         [self setDescLabelSizeByZoomLevel:tmpLbl];
         if ([self showAnnotationTmpLbl])
             tmpLbl.hidden = true;
-            //tmpLbl.alpha = 0;
+        //tmpLbl.alpha = 0;
         else
             //tmpLbl.hidden=false;
             tmpLbl.hidden=false;
@@ -1515,7 +1522,7 @@
         
         if ([self showAnnotationTmpLbl])
             tmpLbl.hidden = true;
-            //tmpLbl.alpha = 0;
+        //tmpLbl.alpha = 0;
         else
             //tmpLbl.alpha = 1;
             tmpLbl.hidden=false;
@@ -1551,12 +1558,12 @@
     CLLocationCoordinate2D startingCoordinate = self.mapView.centerCoordinate;
     MKMapPoint startingPoint = MKMapPointForCoordinate(startingCoordinate);
     MKMapPoint endingPoint = MKMapPointForCoordinate(end.centerCoordinate);
-        
+    
     MKMapPoint midPoint = MKMapPointMake(startingPoint.x + ((endingPoint.x - startingPoint.x)/2.0),
                                          startingPoint.y + ((endingPoint.y -startingPoint.y)/2.0));
     CLLocationCoordinate2D midCoordinate = MKCoordinateForMapPoint(midPoint);
     CLLocationDistance midAltitude = end.altitude *4;
-                                                     
+    
     MKMapCamera *midCamera = [MKMapCamera cameraLookingAtCenterCoordinate:end.centerCoordinate
                                                         fromEyeCoordinate:midCoordinate eyeAltitude:midAltitude];
     animationCameras = [[NSMutableArray alloc] init];
@@ -1568,15 +1575,15 @@
 {
     MKMapCamera *start = self.mapView.camera;
     CLLocation *startLocation = [[CLLocation alloc] initWithCoordinate:start.centerCoordinate
-                                                    altitude:start.altitude
+                                                              altitude:start.altitude
                                                     horizontalAccuracy:0
                                                       verticalAccuracy:0
                                                              timestamp:nil];
     CLLocation *endLocation = [[CLLocation alloc] initWithCoordinate:end.centerCoordinate
-                                                              altitude:end.altitude
-                                                    horizontalAccuracy:0
-                                                      verticalAccuracy:0
-                                                             timestamp:nil];
+                                                            altitude:end.altitude
+                                                  horizontalAccuracy:0
+                                                    verticalAccuracy:0
+                                                           timestamp:nil];
     CLLocationDistance distance = [startLocation distanceFromLocation:endLocation];
     CLLocationDistance midAltitude = distance;
     MKMapCamera *midCamera1 = [MKMapCamera cameraLookingAtCenterCoordinate:start.centerCoordinate
@@ -1659,7 +1666,7 @@
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         NSArray* allEvents = [appDelegate eventListSorted];
         NSInteger sizeInMap = [uniqueIdSet count];
-
+        
         int cnt = 0;
         for(ATEventDataStruct* evt in allEvents)
         {
@@ -1671,11 +1678,11 @@
             if (cnt == sizeInMap) //to improve performance for most case
                 break;
         }
-
+        
     }
     if (eventListView.hidden == false)
         [self refreshEventListView:false];
-
+    
 }
 - (void) showDescriptionLabelViews:(MKMapView*)mapView
 {
@@ -1798,7 +1805,7 @@
     CGRect newFrame = tmpLbl.frame;
     newFrame.size.height = labelHeight;
     newFrame.size.width=labelWidth;
-
+    
     tmpLbl.frame = newFrame;
     //Add above labelHeight and remove this line for iOS 9 otherwise height will always 0 --- [tmpLbl sizeToFit];
     UIImageView* imgView = (UIImageView*)[tmpLbl viewWithTag:HAVE_IMAGE_INDICATOR];
@@ -1938,13 +1945,16 @@
     self.selectedAnnotation = ann;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
-
+    
     //if (self.eventEditor == nil) {
-    //With above IF, photoScrollview will not be recreated.
-    //But without it, max/min will get null description etc.
+    //With or without above IF is all related to sizeButton only:
+    //(and following happens for iOS 9)
+    //  - With it, photoScrollview will not be recreated. and from min to max will crash very weired
+    //  - But without it, when click max/min button and after bellow popover or present statement, eventEidtor's UIView fileds such as description/eventDate etc will still be nil. SO FAR, I has no solution, it will be with this bug in new release
     self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
     self.eventEditor.delegate = self;
     //}
+    
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         BOOL optionIPADFullScreen = [ATHelper getOptionEditorFullScreen];
@@ -1955,11 +1965,11 @@
         else
         {
             self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
-            self.eventEditorPopover.popoverContentSize = CGSizeMake(380,530);
+            self.eventEditorPopover.popoverContentSize = CGSizeMake(420,580);
             
             //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user and call refreshAnn in alert delegate to fix it. (will not work without put into alert delegate)
             BOOL isAtLeastIOS8 = [ATHelper isAtLeastIOS8];
-            if (isAtLeastIOS8) //##### this part took me a few week, finally found solution so I can use xcode 6 now
+            if (isAtLeastIOS8) //##### weird, after this step self.eventEditor.description etc will be nil
                 [self.eventEditorPopover presentPopoverFromRect:view.frame inView:self.mapView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
             else if (view.window != nil && !isAtLeastIOS8)
                 [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
@@ -1983,7 +1993,6 @@
     //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
     [self.eventEditor resetEventEditor];
     
-    
     self.eventEditor.coordinate = ann.coordinate;
     if ([ann.description isEqualToString:NEWEVENT_DESC_PLACEHOLD])
     {
@@ -2004,15 +2013,15 @@
     if ([targetName hasPrefix:@"WorldHeritage"])
         self.eventEditor.dateTxt.text = [ATHelper getYearPartHelper:ann.eventDate];
     tmpDateHold = ann.eventDate;
-
+    
     self.eventEditor.eventType = ann.eventType;
     self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
     self.eventEditor.eventId = ann.uniqueId;
     //self.eventEditor.view.backgroundColor = [UIColor clearColor];//  [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3]; //this will make full screen editor black
-
+    
     [ATEventEditorTableController setEventId:ann.uniqueId];
     //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
-    [self.eventEditor createPhotoScrollView: ann.uniqueId ];
+    [self.eventEditor createPhotoScrollView: ann ];
     [self showOverlays]; //added in Reader version
 }
 
@@ -2045,12 +2054,12 @@
     
     
     //following prepare mkPoi
-
+    
     NSArray* overlays = [self prepareOverlays:focusedEvent];
-
+    
     //TODO ### have problem here for Reader
     [overlaysToBeCleaned addObjectsFromArray:overlays];
-
+    
     
     
     // http://stackoverflow.com/questions/15061207/how-to-draw-a-straight-line-on-an-ios-map-without-moving-the-map-using-mkmapkit
@@ -2117,7 +2126,7 @@
                 overlayRegion2D[i] = workingCoordinate;
             }
         }
-
+        
         MKPolygon* polygon = [MKPolygon polygonWithCoordinates:overlayRegion2D count:[shareOverlayArray count]];
         free(overlayRegion2D);
         [returnOverlays addObject:polygon];
@@ -2175,7 +2184,7 @@
     // NSLog(@"  --------------- %u", debugCount);
     //debugCount = debugCount + 1;
     NSDate* eventDate = ann.eventDate;
-
+    
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if (appDelegate.focusedDate == nil) //set in annotation Left button click
         appDelegate.focusedDate = [[NSDate alloc] init];
@@ -2202,7 +2211,7 @@
         return pngNameWithAlpha;
     }
     // For regular marker, I tried to use alpha instead of different marker image, but the looks on view is bad, so keep it following way
-
+    
     if (switchEventListViewModeToVisibleOnMapFlag)
     {
         if (segmentDistance <= 5 && segmentDistance >= -5)
@@ -2324,7 +2333,7 @@
 - (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList photoMetaData:(NSDictionary *)photoMetaData{
     //update annotation by remove/add, then update database or added to database depends on if have id field in selectedAnnotation
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-
+    
     [self toggleMapViewShowHideAction]; //de-select annotation will flip it, so double flip
     newData.lat = self.selectedAnnotation.coordinate.latitude;
     newData.lng = self.selectedAnnotation.coordinate.longitude;
@@ -2376,9 +2385,9 @@
     ann.eventType=newData.eventType;
     [self.mapView addAnnotation:ann];
     
-   
     
-     appDelegate.focusedDate = ann.eventDate;
+    
+    appDelegate.focusedDate = ann.eventDate;
     [self setNewFocusedDateAndUpdateMap:newData needAdjusted:FALSE];
     [self setTimeScrollConfiguration];
     [self displayTimelineControls];
@@ -2483,7 +2492,7 @@
                 if (!success)
                     NSLog(@"Error: %@", [error localizedDescription]);
                 else
-                   [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
+                    [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
             }
         }
     }
@@ -2577,8 +2586,8 @@
         self.preferencePopover = [(UIStoryboardPopoverSegue *)segue popoverController];
     }
     /*if ([segue.identifier isEqualToString:@"iphone_settings"]) {
-        [self performSegueWithIdentifier:@"iphone_settings" sender:self]; //preference_storyboard_id
-    }*/
+     [self performSegueWithIdentifier:@"iphone_settings" sender:self]; //preference_storyboard_id
+     }*/
 }
 
 //select/deselect tap will interfare my tap gesture handler, so try to resume timeline window original show/hide status
@@ -2593,7 +2602,7 @@
 }
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view
 {
-
+    
 }
 - (double)longitudeToPixelSpaceX:(double)longitude
 {
@@ -2782,7 +2791,7 @@
     [userDefault setObject:@"UPDATE_MODE" forKey:AUTHOR_MODE_KEY];
     appDelegate.authorMode = true;
     [userDefault synchronize];
-
+    
     [UIView transitionWithView:self.mapView
                       duration:0.5
                        options:UIViewAnimationTransitionFlipFromRight //any animation
@@ -2819,7 +2828,7 @@
     btnLoadPhoto.titleLabel.font = [UIFont fontWithName:@"Arial" size:12];
     [btnLoadPhoto addTarget:self action:@selector(loadPhotoClicked:) forControlEvents:UIControlEventTouchUpInside];
     [authorView addSubview: btnLoadPhoto];
-
+    
     UIButton *btnDropbox = [UIButton buttonWithType:UIButtonTypeSystem];
     btnDropbox.frame = CGRectMake(5, 40, 120, 40);
     [btnDropbox setTitle:NSLocalizedString(@"Sync Dropbox",nil) forState:UIControlStateNormal];
@@ -2873,11 +2882,11 @@
 {
     //will call startLoadPhotosFromWeb in alertview action
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(
-                @"Add photos and descriptions in batch!",nil)
-                message:NSLocalizedString(@"If all photos are from web with http:// URL, you can add photos in batch (Details at www.chroniclemap.com/authorarea)\n\nOnce started, wait until completion window occurs.\n\nYou may repeat this action if crashed during loading",nil)
-                            delegate:self
-                cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-                otherButtonTitles: NSLocalizedString(@"Start",nil),nil];
+                                                                              @"Add photos and descriptions in batch!",nil)
+                                                    message:NSLocalizedString(@"If all photos are from web with http:// URL, you can add photos in batch (Details at www.chroniclemap.com/authorarea)\n\nOnce started, wait until completion window occurs.\n\nYou may repeat this action if crashed during loading",nil)
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
+                                          otherButtonTitles: NSLocalizedString(@"Start",nil),nil];
     alert.tag = ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB;
     [alert show];
 }
@@ -2966,7 +2975,7 @@
     static NSString *searchCellIdentifier = @"searchCellIdentifier";
     ATCell* cell = nil;
     if (tableView == self.searchDisplayController.searchResultsTableView)
-	{
+    {
         cell = (ATCell*)[tableView dequeueReusableCellWithIdentifier:searchCellIdentifier];
         
         if (cell == nil) {
@@ -2989,10 +2998,10 @@
 
 - (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
 {
-	[filteredEventListSorted removeAllObjects]; // First clear the filtered array.
-
-	for (ATEventDataStruct *ent in originalEventListSorted)
-	{
+    [filteredEventListSorted removeAllObjects]; // First clear the filtered array.
+    
+    for (ATEventDataStruct *ent in originalEventListSorted)
+    {
         if ([ent.eventDesc rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound
             || [ent.address rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound )
             //if (result == NSOrderedSame)
@@ -3000,7 +3009,7 @@
             [filteredEventListSorted insertObject:ent atIndex:0]; //list in time from early to late
         }
         
-	}
+    }
 }
 -(void)initiAdBanner
 {
@@ -3153,11 +3162,11 @@
 {
     //NSLog(@"detail view clicked row is %i" , indexPath.row);
     ATEventDataStruct* ent = nil;
-
+    
     ATCell *cell = (ATCell*)[tableView cellForRowAtIndexPath:indexPath];
     ent = cell.entity;
     
-
+    
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     appDelegate.focusedDate = ent.eventDate;
     appDelegate.focusedEvent = ent;  //appDelegate.focusedEvent is added when implement here

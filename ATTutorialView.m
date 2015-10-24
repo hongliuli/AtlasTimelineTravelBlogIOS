@@ -384,7 +384,7 @@ NSMutableArray* appStoreUrlList;
     [self addSubview:updatableLabel2];
     
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"WorldHeritage"] && appDelegate.mapModeFlag)
     {
         lbl.text = [NSString stringWithFormat: NSLocalizedString(@"1.   Red Dot for CULTURE Heritage, Green Dot for NATURAL Heritage",nil)];
         updatableLabel.text = [NSString stringWithFormat: NSLocalizedString(@"2.   The selected period is 3 years around %@",nil), [ATHelper getYearPartHelper: appDelegate.focusedDate]];

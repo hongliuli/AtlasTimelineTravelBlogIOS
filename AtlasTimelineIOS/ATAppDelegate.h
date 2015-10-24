@@ -33,6 +33,7 @@
 @property NSString* optionEnableDateMagnifierMove;
 
 @property BOOL authorMode;
+@property BOOL mapModeFlag;
 
 -(void) emptyEventList;
 
