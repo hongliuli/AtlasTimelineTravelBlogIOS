@@ -1302,7 +1302,7 @@
         
         selectedEventAnnOnMap = annView;
         selectedEventAnnDataOnMap = [annView annotation];
-        [self startEventEditor:annView];
+        [self startEventEditor:touch.view]; //changed from annView to touch.view for iOS 9
         [self toggleMapViewShowHideAction];
         [self refreshFocusedEvent];
     }
@@ -1429,9 +1429,8 @@
     UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
     if (tmpLbl == nil)
     {
-        //CGPoint windowPoint = [annView convertPoint:[annView center] toView:self.mapView];
         CGPoint annotationViewPoint = [self.mapView convertCoordinate:annView.annotation.coordinate
-                                                      toPointToView:self.mapView];
+                                                        toPointToView:self.mapView];
         
         //NSLog(@"x=%f  y=%f",annotationViewPoint.x, annotationViewPoint.y);
         tmpLbl = [[UILabel alloc] initWithFrame:CGRectMake(annotationViewPoint.x -20, annotationViewPoint.y+5, THUMB_WIDTH, THUMB_HEIGHT)]; //todo MFTopAlignedLabel
@@ -1764,6 +1763,7 @@
     tmpLbl.numberOfLines = 0;
     tmpLbl.font = [UIFont fontWithName:@"Arial" size:11];
     int labelWidth = 60;
+    int labelHeight = 45;
     if ([self showAnnotationTmpLbl])
     {
         //tmpLbl.hidden = true; //do nothing, caller already hidden the label;
@@ -1776,28 +1776,31 @@
     else if (zoomLevel <= 10)
     {
         tmpLbl.numberOfLines=4;
-        labelWidth = 100;
+        labelWidth = 90;
+        labelHeight = 73;
     }
     else if (zoomLevel <= 13)
     {
         tmpLbl.font = [UIFont fontWithName:@"Arial" size:13];
         tmpLbl.numberOfLines=5;
         labelWidth = 100;
+        labelHeight = 80;
     }
     else
     {
         tmpLbl.font = [UIFont fontWithName:@"Arial" size:14];
         tmpLbl.numberOfLines=5;
         labelWidth = 120;
+        labelHeight = 100;
     }
     
     //HONG if height > CONSTANT, then do not change, I do not like biggerImage unless in a big zooing
     CGRect newFrame = tmpLbl.frame;
-    newFrame.size.height = expectedLabelSize.height;
+    newFrame.size.height = labelHeight;
     newFrame.size.width=labelWidth;
+
     tmpLbl.frame = newFrame;
-    //if (!CGColorGetPattern(tmpLbl.backgroundColor.CGColor))
-    [tmpLbl sizeToFit];
+    //Add above labelHeight and remove this line for iOS 9 otherwise height will always 0 --- [tmpLbl sizeToFit];
     UIImageView* imgView = (UIImageView*)[tmpLbl viewWithTag:HAVE_IMAGE_INDICATOR];
     if (imgView != nil)
     {
@@ -1928,7 +1931,7 @@
     [userDefault setObject:[NSString stringWithFormat:@"%lu",(unsigned long)idx ] forKey:@"BookmarkEventIdx"];
     [userDefault synchronize];
 }
-- (void) startEventEditor:(MKAnnotationView*)view
+- (void) startEventEditor:(UIView*)view
 {
     ATEventAnnotation* ann = selectedEventAnnDataOnMap; // [view annotation];
     selectedEventAnnotation = ann;
@@ -1937,7 +1940,8 @@
     UIStoryboard* storyboard = appDelegate.storyBoard;
 
     //if (self.eventEditor == nil) {
-    //I just learned from iOS5 tutor pdf, there is a way to create segue for accessory buttons, I do not want to change, Will use it in iPhone storyboard
+    //With above IF, photoScrollview will not be recreated.
+    //But without it, max/min will get null description etc.
     self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
     self.eventEditor.delegate = self;
     //}
@@ -1955,7 +1959,7 @@
             
             //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user and call refreshAnn in alert delegate to fix it. (will not work without put into alert delegate)
             BOOL isAtLeastIOS8 = [ATHelper isAtLeastIOS8];
-            if (isAtLeastIOS8) //##### this part took me a few week, finally found solution so I can use xcode 6now
+            if (isAtLeastIOS8) //##### this part took me a few week, finally found solution so I can use xcode 6 now
                 [self.eventEditorPopover presentPopoverFromRect:view.frame inView:self.mapView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
             else if (view.window != nil && !isAtLeastIOS8)
                 [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
