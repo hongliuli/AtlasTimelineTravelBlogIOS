@@ -110,7 +110,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
     self.description.dataDetectorTypes = UIDataDetectorTypeLink;
     //CGRect frame = self.description.frame;
     CGRect frame = CGRectMake(0, 0, 0, 0);
-    frame.size.width = EDITOR_PHOTOVIEW_WIDTH - 20;
+    frame.size.width = EDITOR_PHOTOVIEW_WIDTH - 40;
     frame.size.height = [self getEventEditorDescriptionHeight ];
     [self.description setFrame:frame];
     self.description.font =[UIFont fontWithName:@"Helvetica" size:15];

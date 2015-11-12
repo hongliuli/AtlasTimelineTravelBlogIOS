@@ -15,6 +15,7 @@
 #import <iAd/iAd.h>
 #import "GADBannerView.h"
 #import <MessageUI/MessageUI.h>
+#import "ADClusterMapView.h"
 
 @class ATAppDelegate;
 @class ATEventAnnotation;
@@ -28,7 +29,7 @@
 }
 
 
-@property (strong, nonatomic) IBOutlet MKMapView *mapView;
+@property (strong, nonatomic) IBOutlet ADClusterMapView *mapView;
 @property (nonatomic, retain, readonly) ATDataController *dataController;
 @property (strong, nonatomic) IBOutlet CLLocationManager *locationManager;
 @property (strong, nonatomic) IBOutlet CLGeocoder *geoCoder;

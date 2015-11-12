@@ -35,6 +35,7 @@
 #import "ATEventListWindowView.h"
 #import "ATCell.h"
 #import "Toast+UIView.h"
+#import "ADClusterAnnotation.h"
 
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
@@ -110,7 +111,7 @@
     ATTutorialView* tutorialView;
     
     ATInAppPurchaseViewController* purchase; // have to be global because itself has delegate to use it self
-    ATEventAnnotation* selectedEventAnnotation;
+    ADClusterAnnotation* selectedEventAnnotation;
     int timeLinkDepthDirectionFuture;
     int timeLinkDepthDirectionPast;
     NSMutableArray* overlaysToBeCleaned ;
@@ -130,7 +131,7 @@
     ATEventDataStruct* currentSelectedEvent;
     MKAnnotationView* selectedEventAnnInEventListView;
     MKAnnotationView* selectedEventAnnOnMap;
-    ATEventAnnotation* selectedEventAnnDataOnMap;
+    ADClusterAnnotation* selectedEventAnnDataOnMap;
     
     BOOL switchEventListViewModeToVisibleOnMapFlag;
     NSMutableArray* eventListInVisibleMapArea;
@@ -658,13 +659,14 @@
         }
         
         [self setNewFocusedDateAndUpdateMapWithNewCenter : entStruct :bookmarkedZoomLevel]; //initially set map zoom to a reasonable zoom level so annotation marker icon can show
-        [self showOverlays];
+        //[self showOverlays];
     }
     
     //add annotation. ### this is the loop where we can adding NSLog to print individual items
+    NSMutableArray* annotations = [[NSMutableArray alloc] init];
     for (ATEventDataStruct* ent in eventList) {
         CLLocationCoordinate2D coord = CLLocationCoordinate2DMake((CLLocationDegrees)ent.lat, (CLLocationDegrees)ent.lng);
-        ATAnnotationSelected *eventAnnotation = [[ATAnnotationSelected alloc] initWithLocation:coord];
+        ATEventAnnotation *eventAnnotation = [[ATEventAnnotation alloc] initWithLocation:coord];
         eventAnnotation.uniqueId = ent.uniqueId;
         if (ent.eventDate == nil)
             NSLog(@"---- nil date");
@@ -672,8 +674,17 @@
         eventAnnotation.description=ent.eventDesc;
         eventAnnotation.eventDate=ent.eventDate;
         eventAnnotation.eventType = ent.eventType;
-        [self.mapView addAnnotation:eventAnnotation];
+        //NSLog(@"-- %@   %@    %@",eventAnnotation.uniqueId, eventAnnotation.description, eventAnnotation.eventDate);
+        [annotations addObject:eventAnnotation];
     }
+    @try {
+        [self.mapView setAnnotations:annotations];
+    }
+    @catch (NSException * e) {
+        NSLog(@"################## exception #####");
+        NSLog(@"Exception: %@", e);
+    }
+
     
     appDelegate.mapViewController = self; //my way of share object, used in ATHelper
     [self setTimeScrollConfiguration]; //I misplaced before above loop and get strange error
@@ -1147,7 +1158,7 @@
     pa.eventDate = appDelegate.focusedDate;
     pa.description=NEWEVENT_DESC_PLACEHOLD;
     pa.address = locatedAt;
-    [_mapView addAnnotation:pa];
+    [_mapView setAnnotations:@[pa]];
     if (newAddedPin != nil)
     {
         [_mapView removeAnnotation:newAddedPin];
@@ -1157,125 +1168,169 @@
         newAddedPin = pa;
 }
 
-- (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
+- (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)oriAnn
 {
-    ATDefaultAnnotation* ann = (ATDefaultAnnotation*)annotation;
+    ATEventAnnotation * annotation =  [self getFirstUnderlyingAnnFromADCluster:oriAnn];
+
+    ATEventAnnotation* ann = (ATEventAnnotation*)annotation;
     
-    
-    // Following will filter out MKUserLocation annotation
-    if ([annotation isKindOfClass:[ATDefaultAnnotation class]]) //ATDefaultAnnotation is when longPress
+    NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
+    selectedAnnotationIdentifier = [self getImageIdentifier:ann: specialMarkerName]; //keep this line here
+    if (annotation == nil) //TODO this will happen a lot when map zoom at level 1 or 2, so always show wihie flag/small red dot if this happen. This is a bug of ADClusterMapView I belive
     {
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann :nil]; //keep this line here, do not move inside
-        // try to dequeue an existing pin view first
-        MKPinAnnotationView* pinView = (MKPinAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier:[ATConstants DefaultAnnotationIdentifier]];
-        if (!pinView)
+        //NSLog(@" -- nil annotation");
+        if (switchEventListViewModeToVisibleOnMapFlag)
+            selectedAnnotationIdentifier = @"small-red-ball-icon.png";
+        else
+            selectedAnnotationIdentifier = @"small-white-flag.png";
+    }
+    MKAnnotationView* annView;
+    annView = [self getImageAnnotationView:selectedAnnotationIdentifier :oriAnn];
+    annView.annotation = oriAnn;
+    NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
+    //keey list of red  annotations
+    BOOL isSpecialMarkerInFocused = false;
+    if (specialMarkerName != nil && ![selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier:switchEventListViewModeToVisibleOnMapFlag :ann.address]] )
+    {
+        //Remember special marker annotation identifier has alpha value delimited by ":" if not selected. Selected do not have :
+        if ([selectedAnnotationIdentifier rangeOfString:@":"].location == NSNotFound)
+            isSpecialMarkerInFocused = true;
+    }
+    
+    /*
+     * Show annotation tmpLbl for annotation which is darkest color in time mode.
+     *      In map mode, show tmpLbl if annotation on map is less than 10
+     */
+    if (!switchEventListViewModeToVisibleOnMapFlag)
+    {
+        if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]] || isSpecialMarkerInFocused)
         {
-            // if an existing pin view was not available, create one
-            MKPinAnnotationView* customPinView = [[MKPinAnnotationView alloc]
-                                                  initWithAnnotation:annotation reuseIdentifier:[ATConstants DefaultAnnotationIdentifier]];
-            customPinView.pinColor = MKPinAnnotationColorPurple;
-            customPinView.animatesDrop = YES;
-            customPinView.canShowCallout = YES;
-            
-            UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-            rightButton.accessibilityLabel=@"right";
-            customPinView.rightCalloutAccessoryView = rightButton;
-            
-            UIButton* leftButton = [UIButton buttonWithType:UIButtonTypeInfoLight ];
-            [leftButton setTintColor:[UIColor clearColor]];
-            [leftButton setBackgroundImage:[UIImage imageNamed:@"focuseIcon.png"] forState:UIControlStateNormal];
-            
-            leftButton.accessibilityLabel=@"left";
-            customPinView.leftCalloutAccessoryView = leftButton;
-            return customPinView;
-            
+            [self addTmpLblToMap:oriAnn];
         }
         else
         {
-            //NSLog(@"+++++++++ reused default annotation +++++ at address %@", [annotation title]);
-            pinView.annotation = annotation;
+            UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
+            if ( tmpLbl != nil)
+            {
+                [annotationToShowImageSet removeObjectForKey:key];
+                [tmpLbl removeFromSuperview];
+            }
         }
-        return pinView;
     }
-    else if ([annotation isKindOfClass:[ATAnnotationSelected class]]) //all that read from db will be ATAnnotationSelected type
+    else //in map mode
     {
-        NSString* specialMarkerName = [ATHelper getMarkerNameFromDescText: ann.description];
-        selectedAnnotationIdentifier = [self getImageIdentifier:ann: specialMarkerName]; //keep this line here
-        
-        MKAnnotationView* annView;
-        annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
-        annView.annotation = annotation;
-        NSString *key=[NSString stringWithFormat:@"%f|%f",ann.coordinate.latitude, ann.coordinate.longitude];
-        //keey list of red  annotations
-        BOOL isSpecialMarkerInFocused = false;
-        if (specialMarkerName != nil && ![selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier:switchEventListViewModeToVisibleOnMapFlag :ann.address]] )
+        if ([self zoomLevel] >= ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE)
         {
-            //Remember special marker annotation identifier has alpha value delimited by ":" if not selected. Selected do not have :
-            if ([selectedAnnotationIdentifier rangeOfString:@":"].location == NSNotFound)
-                isSpecialMarkerInFocused = true;
+            [self addTmpLblToMap:oriAnn];
         }
-        
-        /*
-         * Show annotation tmpLbl for annotation which is darkest color in time mode.
-         *      In map mode, show tmpLbl if annotation on map is less than 10
-         */
-        if (!switchEventListViewModeToVisibleOnMapFlag)
+        else
         {
-            if ([selectedAnnotationIdentifier isEqualToString: [ATConstants SelectedAnnotationIdentifier]] || isSpecialMarkerInFocused)
+            UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
+            if ( tmpLbl != nil)
             {
-                [self addTmpLblToMap:annotation];
-            }
-            else
-            {
-                UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
-                if ( tmpLbl != nil)
-                {
-                    [annotationToShowImageSet removeObjectForKey:key];
-                    [tmpLbl removeFromSuperview];
-                }
+                [annotationToShowImageSet removeObjectForKey:key];
+                [tmpLbl removeFromSuperview];
             }
         }
-        else //in map mode
-        {
-            if ([self zoomLevel] >= ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE)
-            {
-                [self addTmpLblToMap:annotation];
-            }
-            else
-            {
-                UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
-                if ( tmpLbl != nil)
-                {
-                    [annotationToShowImageSet removeObjectForKey:key];
-                    [tmpLbl removeFromSuperview];
-                }
-            }
-        }
-        /*
-         if ([selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier]])
-         {
-         [[annView superview] sendSubviewToBack:annView];
-         }
-         */
-        //annView.hidden = false;
-        
-        if (currentSelectedEvent != nil)
-        {
-            if ([currentSelectedEvent.uniqueId isEqualToString:ann.uniqueId])
-            {
-                selectedEventAnnInEventListView = annView;
-            }
-        }
-        return annView;
     }
-    else if ([annotation isKindOfClass:[ATAnnotationFocused class]]) //Focused annotation is added when tab focused
-    {
-        MKAnnotationView* annView = [self getImageAnnotationView:@"focusedFlag.png" :annotation];
-        annView.annotation = annotation;
-        return annView;
-    }
+    /*
+     if ([selectedAnnotationIdentifier isEqualToString:[ATConstants WhiteFlagAnnotationIdentifier]])
+     {
+     [[annView superview] sendSubviewToBack:annView];
+     }
+     */
+    //annView.hidden = false;
     
-    return nil;
+    if (currentSelectedEvent != nil)
+    {
+        if ([currentSelectedEvent.uniqueId isEqualToString:ann.uniqueId])
+        {
+            selectedEventAnnInEventListView = annView;
+        }
+    }
+    return annView;
+}
+
+ //TODO following use number as cluster annotation basically works, but has these issues:
+ //   1. number of cluster show not quite always right especially after merge, seems orignalAnnotations() has problem
+ //   2. select from event list view to high-light selected annotation not working well
+ //So I comment it out for now
+/*
+- (MKAnnotationView *)mapView:(ADClusterMapView *)mapView viewForClusterAnnotation:(id<MKAnnotation>)annotation {
+    ADClusterAnnotation* cluster = (ADClusterAnnotation*)annotation;
+    NSArray* annList =  [cluster originalAnnotations];
+    int cnt = [annList count];
+
+    BOOL hasFocusedEvent = FALSE;
+    for (ATEventAnnotation* x in annList)
+    {
+        if ([x.uniqueId isEqualToString:currentSelectedEvent.uniqueId])
+        {
+            hasFocusedEvent = TRUE;
+            break;
+        }
+    }
+    if (hasFocusedEvent)
+    {
+        NSLog(@"##### focused is %@", currentSelectedEvent.eventDesc);
+    }
+    NSString* identifier = [NSString stringWithFormat:@"clusterIdentifier_%d",cnt];
+    MKAnnotationView * pinView = (MKAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
+    
+    if (!pinView) {
+        
+        
+NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
+        
+        UILabel* letterLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,50,50)];
+        letterLabel.text = [NSString stringWithFormat:@"%d",cnt];
+        if (cnt == 0) //when zoom map to level 1, originalAnnotations() will have error
+            letterLabel.text = @"..";
+        letterLabel.layer.cornerRadius = 50;
+        letterLabel.textAlignment = NSTextAlignmentCenter;
+        letterLabel.layer.borderWidth = 2;
+        letterLabel.font = [UIFont fontWithName:@"Arial-Bold" size:14];
+        letterLabel.textColor = [UIColor redColor];
+
+        
+        pinView = [[MKAnnotationView alloc] initWithAnnotation:annotation
+                                               reuseIdentifier:identifier];
+        pinView.image = [self imageForView:letterLabel];
+        pinView.canShowCallout = YES;
+    }
+    else {
+        NSLog(@"--reu-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
+        pinView.annotation = annotation;
+    }
+    if (hasFocusedEvent)
+    {
+        UILabel* tmp = [[UILabel alloc] initWithFrame:CGRectMake(0,30,90,30)];
+        tmp.text = @"Selected";
+        tmp.backgroundColor = [UIColor whiteColor];
+        //[pinView setBackgroundColor:[UIColor blueColor]];
+        //[pinView setSelected:TRUE animated:TRUE];
+        [pinView showToast:tmp];
+    }
+    return pinView;
+}
+*/
+- (NSInteger)numberOfClustersInMapView:(ADClusterMapView *)mapView {
+    return 120; //change this to smaller number if use viewForCluster...
+}
+
+- (UIImage *)imageForView:(UIView *)view
+{
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, 0);
+    
+    if ([view respondsToSelector:@selector(drawViewHierarchyInRect:afterScreenUpdates:)])
+        [view drawViewHierarchyInRect:view.bounds afterScreenUpdates:YES];  // if we have efficient iOS 7 method, use it ...
+    else
+        [view.layer renderInContext:UIGraphicsGetCurrentContext()];         // ... otherwise, fall back to tried and true methods
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
 }
 
 //All View is a UIResponder, all UIresponder objects can implement touchesBegan
@@ -1399,7 +1454,8 @@
     //show annotation info window programmatically, especially for when select on event list view
     if (currentSelectedEvent != nil)
     {
-        ATEventAnnotation* ann = selectedEventAnnInEventListView.annotation;
+        ADClusterAnnotation* oriAnn = selectedEventAnnInEventListView.annotation;
+        ATEventAnnotation* ann =  [self getFirstUnderlyingAnnFromADCluster:oriAnn];
         [self.mapView selectAnnotation:ann animated:YES];
         
         selectedEventAnnInEventListView = nil;
@@ -1427,11 +1483,28 @@
     
 }
 
--(void) addTmpLblToMap:(ATDefaultAnnotation*)annotation
+-(ATEventAnnotation*) getFirstUnderlyingAnnFromADCluster:(ADClusterAnnotation*)oriAnn
 {
+    ATEventAnnotation * annotation = nil;
+    if ([oriAnn isKindOfClass:[ADClusterAnnotation class]])
+    {
+        ADClusterAnnotation* annotation1 = (ADClusterAnnotation*)oriAnn;
+        if ([oriAnn cluster] != nil) //TODO many not need this check
+            annotation = [annotation1 originalAnnotations][0];
+    }
+    else
+    {
+        NSLog(@" ####### viewForAnnotation is not ADClusterAnnotation class");
+    }
+    return annotation;
+}
+
+-(void) addTmpLblToMap:(ADClusterAnnotation*)oriAnn
+{
+    ATEventAnnotation * annotation = [self getFirstUnderlyingAnnFromADCluster:oriAnn];
     MKAnnotationView* annView;
-    annView = [self getImageAnnotationView:selectedAnnotationIdentifier :annotation];
-    annView.annotation = annotation;
+    annView = [self getImageAnnotationView:selectedAnnotationIdentifier :oriAnn];
+    annView.annotation = oriAnn;
     NSString *key=[NSString stringWithFormat:@"%f|%f",annotation.coordinate.latitude, annotation.coordinate.longitude];
     UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
     if (tmpLbl == nil)
@@ -1658,15 +1731,20 @@
         {
             if ([annView isKindOfClass:[MKUserLocation class]])
                 continue; //filter out MKUserLocation pin
-            ATDefaultAnnotation* ann = (ATDefaultAnnotation*)annView;
-            if (ann.uniqueId != nil)
-                [uniqueIdSet addObject:ann.uniqueId];
+            if ([annView isKindOfClass:[ADClusterAnnotation class]])
+            {
+                ADClusterAnnotation* annView1 = (ADClusterAnnotation*)annView;
+                
+                ATEventAnnotation* ann = [self getFirstUnderlyingAnnFromADCluster:annView1];
+                if (ann.uniqueId != nil)
+                    [uniqueIdSet addObject:ann.uniqueId];
+            }
         }
         //big performance hit
         ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
         NSArray* allEvents = [appDelegate eventListSorted];
         NSInteger sizeInMap = [uniqueIdSet count];
-        
+    
         int cnt = 0;
         for(ATEventDataStruct* evt in allEvents)
         {
@@ -1832,7 +1910,6 @@
 }
 - (MKAnnotationView*) getImageAnnotationView:(NSString*)annotationIdentifier :(id <MKAnnotation>)annotation
 {
-    {
         MKAnnotationView* annView = (MKAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier:annotationIdentifier];
         if (!annView)
         {
@@ -1869,9 +1946,8 @@
         }
         else
             //NSLog(@"+++++++++ resuse %@ annotation at %@",annotationIdentifier, [annotation title]);
-            
-            return annView;
-    }
+
+        return annView;
 }
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
@@ -1891,7 +1967,7 @@
     //MKMapView* mapView = self.mapView;
     MKAnnotationView* view = selectedEventAnnOnMap;
     //need use base class ATEventAnnotation here to handle call out for all type of annotation
-    ATEventAnnotation* ann = [view annotation];
+    ATEventAnnotation* ann = [self getFirstUnderlyingAnnFromADCluster:[view annotation]];
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     /********** remove annimation of focuse event, I think it is not neccessary
      //get view location of an annotation
@@ -1940,9 +2016,9 @@
 }
 - (void) startEventEditor:(UIView*)view
 {
-    ATEventAnnotation* ann = selectedEventAnnDataOnMap; // [view annotation];
-    selectedEventAnnotation = ann;
-    self.selectedAnnotation = ann;
+    ATEventAnnotation* ann = [self getFirstUnderlyingAnnFromADCluster: selectedEventAnnDataOnMap]; // [view annotation];
+    selectedEventAnnotation = selectedEventAnnDataOnMap;
+    self.selectedAnnotation = selectedEventAnnDataOnMap;
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIStoryboard* storyboard = appDelegate.storyBoard;
     
@@ -2050,7 +2126,7 @@
     else
         [self.mapView removeAnnotation:focusedAnnotationIndicator];
     focusedAnnotationIndicator.coordinate = workingCoordinate;
-    [self.mapView addAnnotation:focusedAnnotationIndicator];
+    /////TODO exception with cluster [self.mapView addAnnotation:focusedAnnotationIndicator];
     
     
     //following prepare mkPoi
@@ -2170,7 +2246,11 @@
     //TODO filter out those annotation outside the periodRange ...
     [ annotationsToRemove removeObject:self.mapView.userLocation ] ;
     [ self.mapView removeAnnotations:annotationsToRemove ] ;
-    [self.mapView addAnnotations:annotationsToRemove];
+    if (annotationsToRemove != nil)
+    {
+        //NSLog(@"########  annotationRemoved #######");
+        [self.mapView setAnnotations:annotationsToRemove];
+    }
     [self cleanAnnotationToShowImageSet];
     if (tutorialView != nil)
         [tutorialView updateDateText];
@@ -2330,95 +2410,6 @@
     if (self.preferencePopover != nil)
         [self.preferencePopover dismissPopoverAnimated:true];
 }
-- (void)updateEvent:(ATEventDataStruct*)newData newAddedList:(NSArray *)newAddedList deletedList:(NSArray*)deletedList photoMetaData:(NSDictionary *)photoMetaData{
-    //update annotation by remove/add, then update database or added to database depends on if have id field in selectedAnnotation
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    
-    [self toggleMapViewShowHideAction]; //de-select annotation will flip it, so double flip
-    newData.lat = self.selectedAnnotation.coordinate.latitude;
-    newData.lng = self.selectedAnnotation.coordinate.longitude;
-    
-    newData.uniqueId = self.selectedAnnotation.uniqueId;
-    newData.eventDate = tmpDateHold;
-    
-    NSString* thumbNailFileName = nil;
-    if (self.eventEditor.photoScrollView.photoList != nil && [self.eventEditor.photoScrollView.photoList count]>0)
-        thumbNailFileName = self.eventEditor.photoScrollView.photoList[0];
-    
-    [self writePhotoToFile:newData.uniqueId newAddedList:newAddedList deletedList:deletedList photoForThumbNail:thumbNailFileName];//write file before add nodes to map, otherwise will have black photo on map
-    if ([newAddedList count] > 0) //this is for adding photo in reader, in real reader, we hardly come here
-    {
-        NSUInteger evtIndex = [appDelegate.eventListSorted indexOfObject:newData]; //implemented isEqual
-        if (evtIndex != NSNotFound)
-        {
-            ATEventDataStruct* evt = appDelegate.eventListSorted[evtIndex];
-            evt.eventType = EVENT_TYPE_HAS_PHOTO;
-        }
-    }
-    NSString *key=[NSString stringWithFormat:@"%f|%f",newData.lat, newData.lng];
-    UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
-    if (tmpLbl != nil)
-    {
-        [tmpLbl removeFromSuperview];
-        [annotationToShowImageSet removeObjectForKey:key]; //so when update a event with new photo or text, the new photo/text will occure immediately because all annotations will be redraw for possible date change
-    }
-    if ([deletedList count] > 0 && [self.eventEditor.photoScrollView.photoList count] == 0)
-    { //This is to fix floating photo if removed last photo in an event
-        NSString *key=[NSString stringWithFormat:@"%f|%f", selectedEventAnnotation.coordinate.latitude, selectedEventAnnotation.coordinate.longitude];
-        [annotationToShowImageSet removeObjectForKey:key];
-    }
-    
-    //Need remove/add annotation or following will work?
-    [self.selectedAnnotation setDescription:newData.eventDesc];
-    [self.selectedAnnotation setAddress:newData.address];
-    [self.selectedAnnotation setEventDate:newData.eventDate];
-    [self.selectedAnnotation setEventType:newData.eventType];
-    //---I want to update info in annotation pop, but following will drop a new pin and no popup
-    //---Following always add pin annotation because selectedAnnotation does not what type of annotation
-    [self.mapView removeAnnotation:self.selectedAnnotation];
-    ATAnnotationSelected *ann = [[ATAnnotationSelected alloc] init];
-    ann.uniqueId = newData.uniqueId;
-    [ann setCoordinate:self.selectedAnnotation.coordinate];
-    ann.address = newData.address;
-    ann.description=newData.eventDesc;
-    ann.eventDate=tmpDateHold;
-    ann.eventType=newData.eventType;
-    [self.mapView addAnnotation:ann];
-    
-    
-    
-    appDelegate.focusedDate = ann.eventDate;
-    [self setNewFocusedDateAndUpdateMap:newData needAdjusted:FALSE];
-    [self setTimeScrollConfiguration];
-    [self displayTimelineControls];
-    
-    if (self.timeZoomLine != nil)
-        [self.timeZoomLine setNeedsDisplay];
-    if (self.eventEditorPopover != nil)
-        [self.eventEditorPopover dismissPopoverAnimated:true];
-    [self refreshEventListView:false];
-    
-    //TODO save metaFile
-    NSString *photoMetaFilePath = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:newData.uniqueId] stringByAppendingPathComponent:PHOTO_META_FILE_NAME];
-    if (newAddedList != nil && [newAddedList count] > 0)
-    {
-        NSMutableDictionary* photoDescMap = [photoMetaData objectForKey:PHOTO_META_DESC_MAP_KEY];
-        NSDictionary* cloneMap = [NSDictionary dictionaryWithDictionary:photoDescMap];
-        for (NSString* fileName in cloneMap)
-        {
-            NSString* descTxt = [photoDescMap objectForKey:fileName];
-            NSString* fileName2 = fileName;
-            NSUInteger prefixLen = [NEW_NOT_SAVED_FILE_PREFIX length];
-            if ([fileName hasPrefix:NEW_NOT_SAVED_FILE_PREFIX])
-            {
-                fileName2 = [fileName substringFromIndex:prefixLen];
-                [photoDescMap removeObjectForKey:fileName];
-                [photoDescMap setObject:descTxt forKey:fileName2];
-            }
-        }
-    }
-    [photoMetaData writeToFile:photoMetaFilePath atomically:TRUE];
-}
 
 //Save photo to file. Called by updateEvent after write event to db
 //I should put image process functions such as resize/convert to JPEG etc in ImagePickerController
@@ -2562,11 +2553,11 @@
         region.center.longitude = placemark.region.center.longitude;
         
         CLLocationCoordinate2D searchPoint = CLLocationCoordinate2DMake(region.center.latitude, region.center.longitude);
-        ATDefaultAnnotation *pa = [[ATDefaultAnnotation alloc] initWithLocation:searchPoint];
+        ATEventAnnotation *pa = [[ATEventAnnotation alloc] initWithLocation:searchPoint];
         pa.eventDate = [NSDate date];
         pa.description=NEWEVENT_DESC_PLACEHOLD;//@"add by search";
         pa.address = theSearchBar.text; //TODO should get from placemarker
-        [_mapView addAnnotation:pa];
+        [_mapView setAnnotations:@[pa]];
         
         MKCoordinateSpan span;
         double radius = placemark.region.radius / 1000; // convert to km
@@ -2967,6 +2958,7 @@
     [userDefault removeObjectForKey:[ATConstants UserEmailKeyName]];
     [userDefault removeObjectForKey:[ATConstants UserSecurityCodeKeyName]];
 }
+
 
 /////// following is for search bar actions
 
