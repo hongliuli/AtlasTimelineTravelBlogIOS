@@ -1813,11 +1813,14 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
             }
             else
             {
+                float alpha = 1.0;
+                if (eventListView.alpha < 1)
+                    alpha = 0.2; //intentionally make it 0.2 instead of 0.3 after move map in hide mode
                 [UIView animateWithDuration:0.5
                                       delay:0.0
                                     options:UIViewAnimationCurveEaseOut
                                  animations:^(void) {
-                                     tmpLbl.alpha = 1.0;
+                                     tmpLbl.alpha = alpha;
                                      tmpLbl.hidden = false; //// add after retreat
                                  }
                                  completion:NULL];
@@ -1847,8 +1850,8 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
                                        constrainedToSize:tmpLbl.frame.size lineBreakMode:NSLineBreakByWordWrapping];
     tmpLbl.numberOfLines = 0;
     tmpLbl.font = [UIFont fontWithName:@"Arial" size:11];
-    int labelWidth = 60;
-    int labelHeight = 45;
+    int labelWidth = 50;
+    int labelHeight = 42;
     if ([self showAnnotationTmpLbl])
     {
         //tmpLbl.hidden = true; //do nothing, caller already hidden the label;
@@ -1861,22 +1864,22 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     else if (zoomLevel <= 10)
     {
         tmpLbl.numberOfLines=4;
-        labelWidth = 90;
-        labelHeight = 73;
+        labelWidth = 60;
+        labelHeight = 47;
     }
     else if (zoomLevel <= 13)
     {
         tmpLbl.font = [UIFont fontWithName:@"Arial" size:13];
         tmpLbl.numberOfLines=5;
-        labelWidth = 100;
-        labelHeight = 80;
+        labelWidth = 90;
+        labelHeight = 68;
     }
     else
     {
         tmpLbl.font = [UIFont fontWithName:@"Arial" size:14];
         tmpLbl.numberOfLines=5;
-        labelWidth = 120;
-        labelHeight = 100;
+        labelWidth = 100;
+        labelHeight = 70;
     }
     
     //HONG if height > CONSTANT, then do not change, I do not like biggerImage unless in a big zooing
