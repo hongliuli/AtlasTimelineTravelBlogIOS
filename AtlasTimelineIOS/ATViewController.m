@@ -1085,13 +1085,16 @@
 {
     int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
     int timeLineY = timeWindowY;
-    [UIView animateWithDuration:0.3
+    int hideX = -190;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        hideX = -110;
+    [UIView animateWithDuration:0.4
                           delay:0.0
                         options:UIViewAnimationCurveEaseOut
                      animations:^(void) {
                          self.timeScrollWindow.alpha = 0;
                          self.timeZoomLine.alpha = 0;
-                         eventListView.alpha = 0;
+                         eventListView.alpha = 0.9; //ad-hoc notice: cannot be 1 because tmpLbl show/hide depends on this value is 1 or less
                          switchEventListViewModeBtn.alpha = 0;
                          CGRect frame = self.timeScrollWindow.frame;
                          frame.origin.y = timeWindowY + 30;
@@ -1101,10 +1104,10 @@
                          [self.timeZoomLine setFrame:frame];
                          
                          frame = eventListView.frame;
-                         frame.origin.x = -60;
+                         frame.origin.x = hideX;
                          [eventListView setFrame:frame];
                          frame = switchEventListViewModeBtn.frame;
-                         frame.origin.x = -60;
+                         frame.origin.x = hideX;
                          [switchEventListViewModeBtn setFrame:frame];
                      }
                      completion:NULL];
@@ -2662,7 +2665,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     int offset = 110;
     //try to move evetlistview to right side screenWidht - eventListViewCellWidth, but a lot of trouble, not know why
     //  even make x to 30, it will move more than 30, besides, not left side tap works
-    CGRect newFrame = CGRectMake(0,offset,0,0);
+    CGRect newFrame = eventListView.frame; // CGRectMake(0,offset,0,0);
     int numOfCellOnScreen = 0;
     
     
@@ -2747,7 +2750,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
             [switchEventListViewModeBtn setFrame:newBtnFrame];
         }
         
-        newFrame = CGRectMake(0,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight]);
+         newFrame = CGRectMake(newFrame.origin.x ,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight]);
     }
     
     [self showDescriptionLabelViews:self.mapView];
