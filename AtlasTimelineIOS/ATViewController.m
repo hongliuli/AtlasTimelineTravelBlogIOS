@@ -2749,9 +2749,8 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
             }
             [switchEventListViewModeBtn setFrame:newBtnFrame];
         }
-        
-         newFrame = CGRectMake(newFrame.origin.x ,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight]);
     }
+    newFrame = CGRectMake(newFrame.origin.x ,offset,[ATConstants eventListViewCellWidth],numOfCellOnScreen * [ATConstants eventListViewCellHeight]);
     
     [self showDescriptionLabelViews:self.mapView];
     
