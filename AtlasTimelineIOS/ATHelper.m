@@ -322,7 +322,7 @@ UIPopoverController *verifyViewPopover;
 +(UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir
 {
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
     {
         NSString* fname = [NSString stringWithFormat:@"%@.jpg", photoDir];
         photoFileName = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fname];
@@ -343,7 +343,7 @@ UIPopoverController *verifyViewPopover;
 +(UIImage*)readPhotoThumbFromFile:(NSString*)eventId
 {
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
     {
         NSString* fname = [NSString stringWithFormat:@"%@_thumbnail", eventId];
         NSString *thumbnailFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fname];
@@ -621,7 +621,7 @@ UIPopoverController *verifyViewPopover;
     {
         int monthToShift = 5;
         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-        if ([targetName hasPrefix:@"WorldHeritage"])
+        if ([targetName hasPrefix:@"AtlasTravelReader"])
             monthToShift = 18; //3yr 1.5 year each side so 18 month
         dateComponent.month = -monthToShift;
         scaleStartDay = [calendar dateByAddingComponents:dateComponent toDate:focusedDate options:0];

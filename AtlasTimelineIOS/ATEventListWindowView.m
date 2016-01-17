@@ -150,7 +150,7 @@ NSDateFormatter *dateFormatter;
     NSString* dateStr = [dateFormatter stringFromDate:evt.eventDate];
     
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
         dateStr = [ATHelper getYearPartHelper:evt.eventDate];
     
     NSString* descStr = evt.eventDesc;
@@ -196,7 +196,7 @@ NSDateFormatter *dateFormatter;
         CGRect imageFrame = CGRectMake(0, 0, [ATConstants eventListViewPhotoWidht] - 2,[ATConstants eventListViewPhotoHeight] - 5);
         NSString* photoFileName = evt.uniqueId;
         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-        if ([targetName hasPrefix:@"WorldHeritage"])
+        if ([targetName hasPrefix:@"AtlasTravelReader"])
             photoFileName = [ATHelper getPhotoNameFromDescForWorldHeritage:evt.eventDesc];
         cell.photoImage.image = [ATHelper readPhotoThumbFromFile:photoFileName];
         

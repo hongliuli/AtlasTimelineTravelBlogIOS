@@ -9,17 +9,57 @@
 ######
 ######
 
-Version 2.02
+Use ADClusterMapView to replace MKMapView
+------------------------------------------
+( https://github.com/applidium/ADClusterMapView/blob/master/README.md )
+1. Storyboard need change to use ADClusterMapView instead of MKMapView
+2. ATViewController.h need change
+3. ATViewController.h need to change addAnnotation to setAnnotation
+   AND need to add all annotation in a array, not currently one by one
+4. Can not add extra annotation in this version, so no focused row
+5. somehow an exception weired exception, I coment out a line in
+    clusterAnnotationForOriginalAnnotation()
+   (when debug, it is correct, but not know why it get assert error)
+
+
+new version
+------------
+1. Hide tmpLbl (set alpha=0.2) in hide mode (when eventListView.alpha < 1)
+2. reduce tmpLbl size (too big before, especially when on iPhone)
+3. Change behave of hiding event list view: leave small portion of it visible for better user experience
+
+
+version 2.03 (released in Nov, 2015)
+------------
+1. use ADClusterMapView. But still have some small bug:
+    . ocassionally, start event editor will have no contents
+    . in map zoon level 1 or 2, viewForAnnotation() have annotation with nil cluster (I belive is ADClusterMapView bug),
+      I got around this by use white flag or small red dot
+2. Fixed event editor popup view description width
+
+
+
+Version 2.02 (released Oct, 2015)
 ------------
 Migrate to Xcode7:
     1)remove senTestingKit
     2)disable bitcode in buildSettings
     3)remove init for Activity but can not send email does not work, need study
     4)http does not work anymore, need do: Configuring App Transport Security Exceptions in iOS 9 and OSX 10.11
-
+5) Big issue with iOS 9: (want to release with following outstanding issue)
+- tmpLbl will not show, found fitToSize() will make width 0, fixed by add labelHeight var
+- now tmpLbl does show, but click on tmpLbl the popup eventEditor show wrong place. Fixed by pass touch.view to startEventEditor:(UIView*)
+- Not Fixed: max/min event editor will crash in createPhotoScrollView() when get whId.
+The reason is eventEditor.description (and others) are nil after call popover in following flow:
+    sizeButtonAction() -> delegate.restartEditor() -> startEventEditor()
+       ... self.eventEditorPopover presentPopoverFromRect ...
+    usually after it, self.eventEditor.description will not be nil, but if come from sizeButtonAction, after above presentPopoverFromRect, self.eventEditor.description will be still nil
+    By uncomments "if self.eventEditor == nil", eventEditor.description etc will be better (min-to-max works, but max-min will have untraceable crash [** A **]), but photoScrollView will have issue
+[** A **] crash info:
+UIPopoverPresentationController (<UIPopoverPresentationController: 0x149179b80>) should have a non-nil sourceView or barButtonItem set before the presentation occurs
 
 Version 2.01 (released Heritage on oct 5)
--------------
+------------
 1. Add World Herigate target
 2. Replicate new fundtionality from CM: hide menu when scroll map
 3. Add Language selection

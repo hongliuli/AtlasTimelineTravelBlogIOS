@@ -248,7 +248,7 @@
     [[switchEventListViewModeBtn layer] setBorderWidth:2.0f];
     
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
         [self setSwitchButtonMapMode];
     else
         [self setSwitchButtonTimeMode];
@@ -756,7 +756,7 @@
         
     }
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
         appDelegate.selectedPeriodInDays = 365;
     
     if (self.timeZoomLine != nil)
@@ -1521,7 +1521,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         {
             NSString* photoFileName = annotation.uniqueId;
             NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-            if ([targetName hasPrefix:@"WorldHeritage"])
+            if ([targetName hasPrefix:@"AtlasTravelReader"])
                 photoFileName = [ATHelper getPhotoNameFromDescForWorldHeritage:annotation.description];
             UIImage* img = [ATHelper readPhotoThumbFromFile:photoFileName];
             if (img != nil)
@@ -2092,7 +2092,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     
     self.eventEditor.dateTxt.text = [dateFormatter stringFromDate:ann.eventDate];
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
         self.eventEditor.dateTxt.text = [ATHelper getYearPartHelper:ann.eventDate];
     tmpDateHold = ann.eventDate;
     
@@ -2341,7 +2341,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     float segmentInDays = appDelegate.selectedPeriodInDays;
     
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
     {
         if (segmentInDays == 365)
             segmentInDays = 1095; //3yr
@@ -3011,9 +3011,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
 -(void)initiAdBanner
 {
     return;
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"Cnet"])
-        return;
+
     if (!self.iAdBannerView)
     {
         CGRect rect = CGRectMake(0, AD_Y_POSITION_IPAD, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
@@ -3029,8 +3027,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
 -(void)initgAdBanner
 {
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"Cnet" ])
-        return;
+
     if (!self.gAdBannerView)
     {
         CGRect rect = CGRectMake(0, 60, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);

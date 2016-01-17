@@ -308,7 +308,7 @@ static UIImage *_ImageAtIndex(NSUInteger index)
     if (photoName != nil)
     {
         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-        if ([targetName hasPrefix:@"WorldHeritage"])
+        if ([targetName hasPrefix:@"AtlasTravelReader"])
         {
             return [ATHelper readPhotoFromFile:nil eventId: photoName];
         }

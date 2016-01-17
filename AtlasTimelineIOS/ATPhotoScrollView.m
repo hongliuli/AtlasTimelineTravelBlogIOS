@@ -96,7 +96,7 @@
     {
         NSString* photoName = self.photoList[indexPath.row];
         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-        if ([targetName hasPrefix:@"WorldHeritage"])
+        if ([targetName hasPrefix:@"AtlasTravelReader"])
             cell.photo.image = [ATHelper readPhotoFromFile:nil eventId:photoName];
         else
             cell.photo.image = [ATHelper readPhotoFromFile:photoName eventId:self.eventEditor.eventId];

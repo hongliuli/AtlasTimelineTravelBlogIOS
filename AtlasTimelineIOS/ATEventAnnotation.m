@@ -35,7 +35,7 @@
     NSUInteger removeBC_ADPos = [dateStr rangeOfString:@" "].location;
     dateStr = [dateStr substringToIndex:removeBC_ADPos];
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
         dateStr = [ATHelper getYearPartHelper:self.eventDate];
     
     dateStr = [NSString stringWithFormat:@"[%@] ",dateStr];

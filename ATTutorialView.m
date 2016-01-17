@@ -53,7 +53,7 @@ NSMutableArray* appStoreUrlList;
     }
     
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"])
+    if ([targetName hasPrefix:@"AtlasTravelReader"])
     {
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle: NSLocalizedString(@"Switch to Chronicle Map App",nil)
                                                        message: NSLocalizedString(@"Use Chronicle Map App to organize your upcoming travel plans or view past events on map with timeline",nil)
@@ -251,7 +251,7 @@ NSMutableArray* appStoreUrlList;
     
     [self addWhatIsHappeningSection];
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if (![targetName hasPrefix:@"WorldHeritage"])
+    if (![targetName hasPrefix:@"AtlasTravelReader"])
     {
         [self addRedGreenDotsSection];
     }
@@ -384,7 +384,7 @@ NSMutableArray* appStoreUrlList;
     [self addSubview:updatableLabel2];
     
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"WorldHeritage"] && appDelegate.mapModeFlag)
+    if ([targetName hasPrefix:@"AtlasTravelReader"] && appDelegate.mapModeFlag)
     {
         lbl.text = [NSString stringWithFormat: NSLocalizedString(@"1.   Red Dot for CULTURE Heritage, Green Dot for NATURAL Heritage",nil)];
         updatableLabel.text = [NSString stringWithFormat: NSLocalizedString(@"2.   The selected period is 3 years around %@",nil), [ATHelper getYearPartHelper: appDelegate.focusedDate]];

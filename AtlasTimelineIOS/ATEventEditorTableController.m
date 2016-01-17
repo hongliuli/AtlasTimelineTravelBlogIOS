@@ -287,7 +287,7 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
         NSError *error = nil;
         
         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-        if ([targetName hasPrefix:@"WorldHeritage"])
+        if ([targetName hasPrefix:@"AtlasTravelReader"])
         {
             NSString* whId = [ATHelper getPhotoNameFromDescForWorldHeritage:ann.description];
             [self.photoScrollView.photoList addObject:whId];
@@ -798,9 +798,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 //iad/gAd
 -(void)initiAdBanner
 {
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"Cnet" ])
-        return;
     if (!self.iAdBannerView)
     {
         //NSLog(@"----- iAdView height=%f ", self.view.frame.size.height);
@@ -812,9 +809,6 @@ forRowAtIndexPath: (NSIndexPath*)indexPath
 
 -(void)initgAdBanner
 {
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"Cnet" ])
-        return;
     if (!self.gAdBannerView)
     {
         //NSLog(@"----- gAdView height=%f ", self.view.frame.size.height);

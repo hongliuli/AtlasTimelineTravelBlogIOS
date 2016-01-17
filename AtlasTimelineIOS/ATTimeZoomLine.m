@@ -368,7 +368,7 @@ NSDate* prevYearDate;
     */
     CGContextStrokePath(context);
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if (![targetName hasPrefix:@"WorldHeritage"])
+    if (![targetName hasPrefix:@"AtlasTravelReader"])
         [self drawEventDotsBySpan];
     
 
@@ -538,7 +538,7 @@ NSDate* prevYearDate;
     {
         timeScaleZoomLeveText.text = NSLocalizedString(@"1yr",nil);
         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-        if ([targetName hasPrefix:@"WorldHeritage"])
+        if ([targetName hasPrefix:@"AtlasTravelReader"])
             timeScaleZoomLeveText.text = NSLocalizedString(@"3yr",nil);
     }
     else if (periodIndays == 3650)
