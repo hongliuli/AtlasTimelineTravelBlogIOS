@@ -2020,6 +2020,94 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     [userDefault setObject:[NSString stringWithFormat:@"%lu",(unsigned long)idx ] forKey:@"BookmarkEventIdx"];
     [userDefault synchronize];
 }
+
+- (void) startEventEditor:(UIView*)view
+{
+    self.webViewController = [[ATTravelWebViewController alloc] init];
+
+
+    [self.navigationController pushViewController:self.webViewController animated:true];
+
+    //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
+    
+    NSString* htmlStr = @"<p>\
+    埃及领土的绝大部分是沙漠或荒漠, 只有尼罗河两岸几公里的狭长地带, 尼罗三角洲, 以及海边地区可以居住. 尼罗河西侧是一望无际的大沙漠, 属于世界上最大的撒哈拉沙漠的东部边缘. 令人惊奇的是, 在西部沙漠深处散布有若干绿洲. 位于Bahariya与Farafra绿洲之间的白沙漠是举世闻名的著名景观.<br />\
+    <br />\
+    白沙漠隐藏在沙漠深处, 只能从Bahariya绿洲包车(4轮驱动)前往. 沙漠行程也是最具未知数的旅程, 曾有不少人费时费力跑到Bahariya绿洲, 还是遗憾地无功而返. 这也是俺去埃及之前唯一安排好的行程. 提前一个月就开始在alamu的摊子里找驴友, 最后找好英国来的三个人和德国来的三个人, 约好一同去沙漠. 到了开罗后又有荷兰来的三个人加入, 最后是十个人加上一个导游兼翻译(实际上没有管许多事情).<br />\
+    <br />\
+    从开罗出发, 一辆面包车把人接齐了, 开往Bahariya绿洲. 刚出开罗, 就进入了辽阔的荒漠. 面包车行驶其中, 就象是飘浮在大海上的一叶轻舟. 大约3个小时以后, 俺们一行人来到绿洲, 见到了绿洲的著名人士, 从游客变成主人的韩国女士. 也许是常接待中国人的缘故, 她竟然可以说中文. 不过一会儿就露馅了, 问厕所在哪里, 看她一脸茫然, 又跟上一句洗手间在哪里, 终于听懂了. 偷笑.<br />\
+    <br />\
+    1. 一望无际的西部荒漠, 寸草不生<br />\
+    <img src='http://farm3.static.flickr.com/2240/2244834097_4caa738a40_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    2. Bahariya绿洲的民居<br />\
+    <img src='http://farm3.static.flickr.com/2112/2245627822_0df545de32_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    3. Bahariya绿洲的街道<br />\
+    <img src='http://farm3.static.flickr.com/2354/2244833897_18310b8b41_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    4. Bahariya绿洲的旅游警察局<br />\
+    <img src='http://farm3.static.flickr.com/2068/2245626996_1641b8dc9f_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    (ZT, by mengxu)嫁到沙漠绿洲的韩国女人: 从游客变成主人<br />\
+    <img src='http://farm3.static.flickr.com/2302/2089463065_b1b39f3b62_o.jpg' style='width: 478px;' /><br />\
+    <br />\
+    5. 吸引韩国女人嫁到沙漠绿洲的男人<br />\
+    <img src='http://farm3.static.flickr.com/2276/2244833049_d31a6c74db_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    吃过韩国女人做的阿拉伯午饭,带上食物,水,木头,还有睡袋毯子等,一行人分乘两辆吉普车进军沙漠. 不久就来到了黑沙漠. 一路碰到好几个韩国旅游团. 以后在卢克索, 阿斯旺, 西奈, 约旦, 以色列, 到处都看到韩国旅行团. 韩国游客比其他亚洲游客的总和还多, 也是一个令人惊奇的意外发现.<br />\
+    <br />\
+    6. 黑沙漠实际上就是地质年代比较新的火山融岩残留物<br />\
+    <img src='http://farm3.static.flickr.com/2098/2244833149_98a89a73d4_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    7. 在辽阔的大地母亲胸怀里, 一切都是那样渺小<br />\
+    <img src='http://farm3.static.flickr.com/2179/2244833119_feb471f645_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    8. 韩国游客奋力攀登, 加油! 不过有几位还是半途而废.<br />\
+    <img src='http://farm3.static.flickr.com/2018/2245627124_89a5443cf1_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    一路上还停了两处景点,玩沙,捡各种形状的火山融岩形成的花状小石头. 俺们催促司机抓紧时间,终于在日落时分赶到了白沙漠. 看到了朝思夜想的美丽景色,驴友们跳上跳下,跑前跑后,到处留影.<br />\
+    <br />\
+    9. 夕照下的白沙漠之小鸡蘑菇<br />\
+    <img src='http://farm3.static.flickr.com/2269/2245628136_4c3153c8a4_o.jpg' style='width: 100%;' /><br />\
+    <br />\
+    &nbsp;</p>\
+    \
+    <table border='0' cellpadding='2' cellspacing='0' class='main' width='100%'><!-- Begin .post title -->\
+    <tbody>\
+    <tr>\
+    <td align='right' valign='top' width='10'>&bull;</td>\
+    <td valign='top'>&nbsp;</td>\
+    </tr>\
+    <!-- End .post title --><!-- Begin .post title -->\
+    <tr>\
+    <td align='right' valign='top' width='10'>&bull;</td>\
+    <td valign='top'>&nbsp;</td>\
+    </tr>\
+    <!-- End .post title --><!-- Begin .post title -->\
+    <tr>\
+    <td align='right' valign='top' width='10'>&bull;</td>\
+    <td valign='top'>&nbsp;</td>\
+    </tr>\
+    <!-- End .post title --><!-- Begin .post title -->\
+    <tr>\
+    <td align='right' valign='top' width='10'>&bull;</td>\
+    <td valign='top'>&nbsp;</td>\
+    </tr>\
+    <!-- End .post title --><!-- Begin .post title -->\
+    <tr>\
+    <td align='right' valign='top' width='10'>&bull;</td>\
+    <td valign='top'>&nbsp;</td>\
+    </tr>\
+    <!-- End .post title -->\
+    </tbody>\
+    </table>";
+     
+    [self.webViewController loadFromHtmlText:htmlStr];
+
+}
+
+/*
 - (void) startEventEditor:(UIView*)view
 {
     ATEventAnnotation* ann = [self getFirstUnderlyingAnnFromADCluster: selectedEventAnnDataOnMap]; // [view annotation];
@@ -2106,7 +2194,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     [self.eventEditor createPhotoScrollView: ann ];
     [self showOverlays]; //added in Reader version
 }
-
+*/
 //always start from focusedEvent
 - (void) showOverlays
 {

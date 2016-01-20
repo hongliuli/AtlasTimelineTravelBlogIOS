@@ -10,6 +10,7 @@
 #import <MapKit/MapKit.h>
 #import "ATDataController.h"
 #import "ATEventEditorTableController.h"
+#import "ATTravelWebViewController.h"
 #import "ATPreferenceViewController.h"
 #import <StoreKit/StoreKit.h>
 #import <iAd/iAd.h>
@@ -36,6 +37,7 @@
 @property (strong, nonatomic) IBOutlet CLLocation *location;
 @property (strong, nonatomic) IBOutlet UIPopoverController* eventEditorPopover;
 @property (strong, nonatomic) IBOutlet ATEventEditorTableController* eventEditor;
+@property (strong, nonatomic) IBOutlet ATTravelWebViewController* webViewController;
 @property (strong, nonatomic) ATEventAnnotation* selectedAnnotation;
 @property (strong, nonatomic) UILabel* focusedEventLabel;
 //@property (strong, nonatomic) UISlider * scaleSlider;
