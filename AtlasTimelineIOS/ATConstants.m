@@ -338,7 +338,7 @@
         return 32;
 }
 + (int) revealViewPreferenceWidth{
-    return 320;
+    return [self screenWidth] *0.9;;
 }
 + (int) revealViewEventEditorWidth{
     //if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))

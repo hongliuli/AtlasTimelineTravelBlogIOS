@@ -486,7 +486,7 @@
     {
         if (row == 0)
         {
-            cell.textLabel.text = NSLocalizedString(@"World Top Attractions",nil);
+            cell.textLabel.text = @"其它旅行玩家博客";
             [cell.imageView setImage:[UIImage imageNamed:@"star-red-orig-purple.png"]];
         }
     }
