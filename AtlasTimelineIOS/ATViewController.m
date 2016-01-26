@@ -37,6 +37,8 @@
 #import "Toast+UIView.h"
 #import "ADClusterAnnotation.h"
 
+#import "SWRevealViewController.h"
+
 #define EVENT_TYPE_NO_PHOTO 0
 #define EVENT_TYPE_HAS_PHOTO 1
 
@@ -162,6 +164,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    appDelegate.rightSideMenuRevealedFlag = FALSE;
     switchEventListViewModeToVisibleOnMapFlag = false; //eventListView for timewheel is more reasonable, so make it as default always, even not save to userDefault
     
     [ATHelper createPhotoDocumentoryPath];
@@ -181,6 +185,10 @@
     
     //Find this spent me long time: searchBar used titleView place which is too short, thuse tap on searchbar right side keyboard will not show up, now it is good
     [self calculateSearchBarFrame];
+    
+    SWRevealViewController *revealController = [self revealViewController];
+    [revealController panGestureRecognizer];
+    [revealController tapGestureRecognizer];
     
     // create a custom navigation bar button and set it to always says "Back"
     UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
@@ -312,23 +320,57 @@
 
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
-    NSString* selectLanguageText = NSLocalizedString(@"Select Language",nil);
-    //NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
-    //NSString* buttonText = NSLocalizedString(@"To View Mode",nil);
-    //if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
-    //    buttonText = NSLocalizedString(@"To Author Mode",nil);
+    /*
+     NSString* currentVer = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+     currentVer = [NSString stringWithFormat:@"Current Version: %@",currentVer ];
+     
+     NSString* link = @"http://www.chroniclemap.com/";
+     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
+     NSURLResponse* response=nil;
+     NSError* error=nil;
+     NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+     NSString* returnStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+     
+     if(error == nil && returnStr != nil && [returnStr rangeOfString:@"Current Version:"].length > 0)
+     {
+     if ([returnStr rangeOfString:currentVer].length == 0)
+     {
+     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"There is a new version!",nil)
+     message:NSLocalizedString(@"Please update from App Store",nil)
+     delegate:nil
+     cancelButtonTitle:NSLocalizedString(@"OK",nil)
+     otherButtonTitles:nil];
+     [alert show];
+     }
+     }
+     */
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    SWRevealViewController *revealController = [self revealViewController];
+    UIViewController* controller = revealController.rightViewController;
+    if (appDelegate.rightSideMenuRevealedFlag && ![controller isKindOfClass:[ATEventEditorTableController class]])
+    { //if right side is preference already, just toggle it
+        [revealController rightRevealToggle:nil];
+        return;
+    }
     
-    [self setLanguageToSelectTitle];
+    //any other case need to reload preference
+    revealController.rightViewRevealWidth = [ATConstants revealViewPreferenceWidth];
+    UINavigationController* prefNavController = [appDelegate getPreferenceViewNavController];
+    revealController.rightViewController = prefNavController;
+    ATPreferenceViewController* prefController = prefNavController.childViewControllers[0];
+    //TODO  need to get user purchased 锦囊
+    //[prefController refreshDisplayStatusAndData];
+    [[prefController tableView] reloadData];
     
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:selectLanguageText message:NSLocalizedString(
-                                                                                                         @"This App is supported by ChronicleMap App, which is the best App to record your own life stories!\n\nIf you have a chronicle like this to tell, we can build the app for you free.\n\nDetail see www.chroniclemap.com/authorarea",nil)
-                                                   delegate:self
-                                          cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-                                          otherButtonTitles:languageToSelect,
-                          ///// NSLocalizedString(@"Feedback to Author",nil),
-                          nil];
-    alert.tag = ALERT_FOR_SWITCH_LANGUAGE;
-    [alert show];
+    if (!appDelegate.rightSideMenuRevealedFlag)
+    { //if was not shown (but not preference, which is eventEditor
+        
+        [revealController rightRevealToggle:nil];
+    }
+    
+    
+    // if (!appDelegate.rightSideMenuRevealedFlag)
+    //    [revealController rightRevealToggle:nil];
 }
 
 -(void) setLanguageToSelectTitle
@@ -1562,7 +1604,8 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         else
         {
             tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
-            tmpLbl.text = [NSString stringWithFormat:@" %@", [ATHelper clearMakerAllFromDescText: annotation.description ]];
+            NSArray* tmpArr = [annotation.description componentsSeparatedByString:@"http"];
+            tmpLbl.text = tmpArr[0];
             tmpLbl.layer.cornerRadius = 8;
             //If the event has photo before but the photos do not exist anymore, then show text with red board
             //If this happen, the photo may in Dropbox. if not  in dropbox, then it lost forever.
@@ -2023,10 +2066,29 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
 
 - (void) startEventEditor:(UIView*)view
 {
-    self.webViewController = [[ATTravelWebViewController alloc] init];
+    ATEventAnnotation* ann = [self getFirstUnderlyingAnnFromADCluster: selectedEventAnnDataOnMap]; // [view annotation];
+    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (self.webViewController == nil)
+        self.webViewController = [[ATTravelWebViewController alloc] init];
+    else
+        [self.webViewController setFrame];
 
+    SWRevealViewController *revealController = [self revealViewController];
+    //
+    //TODO if current revealed right side is preference, then do nothing?
+    //
+    revealController.rightViewController = self.webViewController;
+    revealController.rightViewRevealWidth = [ATConstants revealViewEventEditorWidth];
+    
+    if (!appDelegate.rightSideMenuRevealedFlag)
+        [revealController rightRevealToggle:nil];
+    else
+    {
+        [revealController rightRevealToggle:nil];
+        [revealController rightRevealToggle:nil];
+    }
 
-    [self.navigationController pushViewController:self.webViewController animated:true];
+    //[self.navigationController pushViewController:self.webViewController animated:true];
 
     //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
     
@@ -2103,7 +2165,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     </tbody>\
     </table>";
      
-    [self.webViewController loadFromHtmlText:htmlStr];
+    [self.webViewController loadFromHtmlText:ann.description];
 
 }
 

@@ -23,7 +23,7 @@
 @class ATTimeScrollWindowNew;
 @class ATTimeZoomLine;
 
-@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate, ADBannerViewDelegate,GADBannerViewDelegate, MFMailComposeViewControllerDelegate>
+@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate, ADBannerViewDelegate,GADBannerViewDelegate, MFMailComposeViewControllerDelegate, WKNavigationDelegate>
 {
     ATDataController *dataController;
 

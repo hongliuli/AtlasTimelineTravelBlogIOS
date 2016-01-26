@@ -955,11 +955,14 @@ UIPopoverController *verifyViewPopover;
 + (NSString*) getPhotoNameFromDescForWorldHeritage:descText
 {
     NSInteger idx = [descText rangeOfString:@"http://whc.unesco.org/en/list/"].location;
+    if (idx >999999) //not found
+        return @"";
     NSString* urlPartWithId = [descText substringFromIndex:idx + 1];
     NSString* stripedStr = [urlPartWithId substringFromIndex:29];
     NSInteger slashIndex = [stripedStr rangeOfString:@"/"].location;
     return [stripedStr substringToIndex:slashIndex];
     
 }
+
 
 @end

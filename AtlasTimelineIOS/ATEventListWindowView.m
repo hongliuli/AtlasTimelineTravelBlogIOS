@@ -165,11 +165,11 @@ NSDateFormatter *dateFormatter;
     NSMutableAttributedString *attString=[[NSMutableAttributedString alloc] initWithString:descToDisplay];
     [attString addAttribute:NSForegroundColorAttributeName value:greyColor range:NSMakeRange(0, [dateStr length])];
     NSInteger titleEndLocation = [descStr rangeOfString:@"\n"].location;
-    if (titleEndLocation < 80) //title is in file as [Desc]xxx yyy zzzz\n
+    if (titleEndLocation < 180) //title is in file as [Desc]xxx yyy zzzz\n
     {
         titleStr = [descStr substringToIndex:titleEndLocation];
         descStr = [descStr substringFromIndex:titleEndLocation];
-        descToDisplay = [NSString stringWithFormat:@"%@\n%@%@", dateStr,titleStr, descStr ];
+        descToDisplay = [NSString stringWithFormat:@"%@\n%@", dateStr,titleStr ];
         attString=[[NSMutableAttributedString alloc] initWithString:descToDisplay];
         NSInteger dateStrLen = [dateStr length];
         [attString addAttribute:NSForegroundColorAttributeName value:greyColor range:NSMakeRange(0, dateStrLen)];
@@ -190,7 +190,7 @@ NSDateFormatter *dateFormatter;
         [cell.checkIcon setHidden:true];
         cell.backgroundColor = [UIColor clearColor];
     }
-        
+   /***** no photos for webview
     if (evt.eventType == EVENT_TYPE_HAS_PHOTO && isAtLeast7) //excusionPaths is available only after 7
     {
         CGRect imageFrame = CGRectMake(0, 0, [ATConstants eventListViewPhotoWidht] - 2,[ATConstants eventListViewPhotoHeight] - 5);
@@ -203,6 +203,7 @@ NSDateFormatter *dateFormatter;
         UIBezierPath * imgRect = [UIBezierPath bezierPathWithRect:imageFrame];
         cell.eventDescView.textContainer.exclusionPaths = @[imgRect];
     }
+    */
     return cell;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

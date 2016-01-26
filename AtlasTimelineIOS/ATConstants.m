@@ -299,15 +299,15 @@
 //Constants for Event List View
 + (int) eventListViewCellWidth{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return 240;
+        return 150;
     else
-        return 130;
+        return 90;
 }
 + (int) eventListViewCellHeight{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        return 120;
+        return 70;
     else
-        return 80;
+        return 60;
 }
 + (int) eventListViewCellNum{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
@@ -337,7 +337,15 @@
     else
         return 32;
 }
-
++ (int) revealViewPreferenceWidth{
+    return 320;
+}
++ (int) revealViewEventEditorWidth{
+    //if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
+        return [self screenWidth] *0.9;
+    //else
+      //  return 850;
+}
 
 
 + (BOOL) isLandscapeInPhone{

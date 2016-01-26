@@ -11,7 +11,10 @@
 
 @interface ATTravelWebViewController : UIViewController
 
+@property (strong, nonatomic) WKWebView* webView;
+
 -(void) loadFromHtmlText:(NSString*) htmlStr;
 -(void) loadFromlUrl: (NSString*) url;
+-(void) setFrame;
 
 @end

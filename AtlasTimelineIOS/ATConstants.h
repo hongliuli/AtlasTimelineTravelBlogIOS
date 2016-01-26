@@ -58,6 +58,8 @@
 + (int) eventListViewCellNum;
 + (int) eventListViewPhotoWidht;
 + (int) eventListViewPhotoHeight;
++ (int) revealViewPreferenceWidth;
++ (int) revealViewEventEditorWidth;
 
 + (NSString*) defaultSourceName;
 + (NSString*) UserEmailKeyName;

@@ -8,6 +8,8 @@
 
 #import "ATTravelWebViewController.h"
 #import <WebKit/WebKit.h>
+#import "SWRevealViewController.h"
+#import "ATConstants.h"
 
 @interface ATTravelWebViewController ()
 
@@ -15,16 +17,17 @@
 
 @implementation ATTravelWebViewController
 
-WKWebView* webView;
-
 - (void)viewDidLoad {
     [super viewDidLoad];
+    UISwipeGestureRecognizer *rightSwiper = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeRight)];
+    rightSwiper.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.view addGestureRecognizer:rightSwiper];
     //this is called after call WKWebView loadRequest
 }
 
 -(void) loadFromHtmlText:(NSString*) htmlStr
 {
-    [webView loadHTMLString:htmlStr baseURL:nil];
+    [self.webView loadHTMLString:htmlStr baseURL:nil];
 }
 -(void) loadFromlUrl: (NSString*) url
 {
@@ -36,7 +39,7 @@ WKWebView* webView;
      */
     NSURL * urlObj = [NSURL URLWithString:url];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:urlObj];
-    [webView loadRequest:requestObj];
+    [self.webView loadRequest:requestObj];
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -45,15 +48,26 @@ WKWebView* webView;
     if (self) {
         // Custom initialization
         //Following can not be in viewDidLoad because it is called after call WKWebView loadRequest()
-        if (webView == nil)
+        if (self.webView == nil)
         {
-            webView = [[WKWebView alloc] initWithFrame: [[self view] bounds]];
-            webView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-            [self.view addSubview:webView];
+            self.webView = [[WKWebView alloc] initWithFrame: [[self view] bounds]];
+            [self setFrame];
+            [self.view addSubview:self.webView];
         }
     }
     return self;
 }
+
+- (void) setFrame
+{
+    self.webView.frame = CGRectMake(0, 0, [ATConstants revealViewEventEditorWidth], self.view.frame.size.height);
+}
+
+- (void)swipeRight {
+    SWRevealViewController *revealController = [self revealViewController];
+    [revealController rightRevealToggle:nil];
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "ATViewController.h"
 
+@class SWRevealViewController;
 @interface ATAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) NSString* sourceName;
@@ -35,6 +36,10 @@
 @property BOOL authorMode;
 @property BOOL mapModeFlag;
 
--(void) emptyEventList;
+@property BOOL rightSideMenuRevealedFlag;
+@property (strong, nonatomic) SWRevealViewController *viewController;
 
+-(void) emptyEventList;
+- (NSArray*) createdEventListFromString:(NSString*)eventsString;
+-(UINavigationController*) getPreferenceViewNavController; //for SWReveal
 @end
