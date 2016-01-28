@@ -159,9 +159,9 @@ NSInteger selectedPoiGroupIdxForDeselect;
     if (![[UIApplication sharedApplication] openURL:[NSURL URLWithString:poiAppUrl]]) //World Heritage app store url
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil
-                                                        message:NSLocalizedString(@"Avaialble soon!",nil)
+                                                        message:NSLocalizedString(@"即将推出!",nil)
                                                        delegate:nil
-                                              cancelButtonTitle:NSLocalizedString(@"OK",nil)
+                                              cancelButtonTitle:NSLocalizedString(@"好的",nil)
                                               otherButtonTitles:nil];
         [alert show];
     }

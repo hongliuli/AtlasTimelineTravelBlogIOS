@@ -172,33 +172,18 @@ UINavigationController* preferenceViewNavController;
     //####
     NSString* responseStr  = [ATHelper httpGetFromServer:serviceUrl :false];
     
-    if (responseStr == nil)
-    {
-        responseStr = [userDefaults objectForKey:@"BLOGGER_DATA"];
-    }
-    else
-    {
-        [userDefaults setObject:responseStr forKey:@"BLOGGER_DATA"];
-    }
-    
     if (responseStr != nil)
     {
-        //Asia.html has format of :
-        /*
-         [Date]xxxxx
-         [loc]23.22,1.222
-         [Desc]
-         ....
-         
-         [Date]xxxx
-         .....
-         */
-        //////TODO
-        
-        //TODO [refer to createdEventListFromString function in Reader version]
         retEventList = [self createdEventListFromString:responseStr];
-        
+        if (retEventList != nil) //cache new fetched internet data only parse successfull (such as no wrong date format in [Date] section
+            [userDefaults setObject:responseStr forKey:@"BLOGGER_DATA"]; //cache internet data only after parse succesfully
     }
+    if (retEventList == nil)
+    {
+        responseStr = [userDefaults objectForKey:@"BLOGGER_DATA"];
+        retEventList = [self createdEventListFromString:responseStr];
+    }
+
     return retEventList;
 }
 

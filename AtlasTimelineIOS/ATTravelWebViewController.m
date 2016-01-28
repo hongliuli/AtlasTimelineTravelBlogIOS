@@ -60,7 +60,9 @@
 
 - (void) setFrame
 {
-    self.webView.frame = CGRectMake(0, 0, [ATConstants revealViewEventEditorWidth], self.view.frame.size.height);
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat screenHeight = screenRect.size.height;
+    self.webView.frame = CGRectMake(0, 0, [ATConstants revealViewEventEditorWidth], screenHeight);
 }
 
 - (void)swipeRight {

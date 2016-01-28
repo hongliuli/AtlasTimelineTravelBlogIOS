@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="14F1509" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="ARr-NR-22L">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="14F1605" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="ARr-NR-22L">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <scenes>
@@ -14,11 +15,6 @@
                     </mapView>
                     <navigationItem key="navigationItem" id="Ieb-ix-0Y1">
                         <nil key="title"/>
-                        <barButtonItem key="leftBarButtonItem" title="List/Search" id="bcH-qZ-1el">
-                            <connections>
-                                <segue destination="rCH-rC-6N0" kind="push" identifier="map_to_timeline" id="q8b-Bd-Jvc"/>
-                            </connections>
-                        </barButtonItem>
                         <view key="titleView" opaque="NO" contentMode="scaleToFill" id="41j-U8-uq6">
                             <rect key="frame" x="231" y="5" width="307" height="34"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -74,7 +70,7 @@
                         </searchBar>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="detailDisclosureButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="EventCellIdentifier" rowHeight="47" id="XKM-AF-gyU" customClass="ATCell">
-                                <rect key="frame" x="0.0" y="66" width="768" height="47"/>
+                                <rect key="frame" x="0.0" y="130" width="768" height="47"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="XKM-AF-gyU" id="zAU-Cn-LdX">
                                     <rect key="frame" x="0.0" y="0.0" width="648" height="46"/>
@@ -160,7 +156,7 @@
                             <outlet property="delegate" destination="C9F-5k-BIg" id="BXw-ah-dDV"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Tools" id="xUt-Am-zqg"/>
+                    <navigationItem key="navigationItem" title="菜单" id="xUt-Am-zqg"/>
                     <value key="contentSizeForViewInPopover" type="size" width="360" height="480"/>
                     <connections>
                         <segue destination="NMC-lL-hT0" kind="push" identifier="user_verify_seque_id" id="Pco-Zh-Oq6"/>
@@ -556,7 +552,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PeriodCell" textLabel="CQI-h9-YQE" detailTextLabel="Q5T-yH-xK1" style="IBUITableViewCellStyleSubtitle" id="iOA-4n-w6l">
-                                <rect key="frame" x="0.0" y="22" width="768" height="44"/>
+                                <rect key="frame" x="0.0" y="86" width="768" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="iOA-4n-w6l" id="4bR-Tg-5Dy">
                                     <rect key="frame" x="0.0" y="0.0" width="768" height="43"/>
@@ -566,7 +562,7 @@
                                             <rect key="frame" x="68" y="2" width="39" height="22"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Q5T-yH-xK1">
@@ -585,7 +581,7 @@
                             <outlet property="delegate" destination="ahB-Xf-DSV" id="P72-Nh-iNY"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Choose Attractions" id="8Kj-Gk-qpp"/>
+                    <navigationItem key="navigationItem" title="旅行名家博客" id="8Kj-Gk-qpp"/>
                     <value key="contentSizeForViewInPopover" type="size" width="360" height="420"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0E5-VE-iUR" userLabel="First Responder" sceneMemberID="firstResponder"/>

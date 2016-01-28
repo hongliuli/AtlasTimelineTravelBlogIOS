@@ -251,11 +251,7 @@
     [switchEventListViewModeBtn.titleLabel setFont:[UIFont fontWithName:@"Arial-Bold" size:25]];
     [[switchEventListViewModeBtn layer] setBorderWidth:2.0f];
     
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"AtlasTravelReader"])
-        [self setSwitchButtonMapMode];
-    else
-        [self setSwitchButtonTimeMode];
+    [self setSwitchButtonMapMode];
     
     [switchEventListViewModeBtn addTarget:self action:@selector(switchEventListViewMode:) forControlEvents:UIControlEventTouchUpInside];
     
@@ -274,8 +270,8 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     originalEventListSorted = appDelegate.eventListSorted;
     filteredEventListSorted = [NSMutableArray arrayWithCapacity:[originalEventListSorted count]];
-    [self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"List",nil)];
-    [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"Search Event", nil)];
+    //[self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"List",nil)];
+    [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"搜索标题", nil)];
     
     
     if ([appDelegate.eventListSorted count] == 0)
@@ -1123,9 +1119,8 @@
 {
     int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
     int timeLineY = timeWindowY;
-    int hideX = -190;
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-        hideX = -110;
+    int hideX = - [ATConstants eventListViewCellWidth] * 0.9;
+
     [UIView animateWithDuration:0.4
                           delay:0.0
                         options:UIViewAnimationCurveEaseOut
@@ -2134,6 +2129,34 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         [self.webViewController.webView loadRequest:requestURL];
     }
 }
+- (void)webView:(WKWebView *)webView
+didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
+{
+    NSString* htmlStr = @"<html><style type=\"text/css\" media=\"screen\"><!--#content\
+    {\
+    position: absolute;\
+    top: 50%;\
+    left: 50%;\
+    width: 300px;\
+    height: 70px\
+    }\
+    --></style>\
+    </head>\
+    <body>\
+    <div id=\"content\">\
+    <font color=\"DarkGray\">Network Unavailabe (没有网路联接)</font>\
+    </div>\
+    </body>\
+    </html>";
+    [self.webViewController.webView stopLoading];
+    prevBlogUrl = @"";
+    [self.webViewController.webView loadHTMLString:htmlStr baseURL:  nil];
+}
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation
+      withError:(NSError *)error
+{
+     NSLog(@"22222");
+}
 /*
 - (void) startEventEditor:(UIView*)view
 {
@@ -2649,6 +2672,8 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     [self displayTimelineControls];
     [self calculateSearchBarFrame]; //in iPhone, make search bar wider in landscape
     [self closeTutorialView];
+    //if (self.webViewController != nil)
+    //    [self.webViewController setFrame];
 }
 
 -(void)searchBarSearchButtonClicked:(UISearchBar *)theSearchBar

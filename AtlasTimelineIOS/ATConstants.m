@@ -301,7 +301,7 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         return 150;
     else
-        return 90;
+        return 100;
 }
 + (int) eventListViewCellHeight{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
@@ -338,7 +338,7 @@
         return 32;
 }
 + (int) revealViewPreferenceWidth{
-    return [self screenWidth] *0.9;;
+    return 300;
 }
 + (int) revealViewEventEditorWidth{
     //if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
