@@ -12,10 +12,8 @@
 #define ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB 3
 #define ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS 4
 
-#define AUTHOR_MODE_KEY @"AUTHOR_MODE_KEY"
-
 #import <QuartzCore/QuartzCore.h>
-
+#import <GoogleMobileAds/GoogleMobileAds.h>
 #import "ATViewController.h"
 #import "ATDefaultAnnotation.h"
 #import "ATAnnotationSelected.h"
@@ -23,7 +21,6 @@
 #import "ATDataController.h"
 #import "ATEventEntity.h"
 #import "ATEventDataStruct.h"
-#import "ATEventEditorTableController.h"
 #import "ATAppDelegate.h"
 #import "ATConstants.h"
 #import "ATTimeZoomLine.h"
@@ -127,7 +124,6 @@
     NSMutableArray* filteredEventListSorted;
     NSMutableArray* originalEventListSorted;
     
-    UIView* authorView;
     NSDate* tmpDateHold;
     
     ATEventDataStruct* currentSelectedEvent;
@@ -203,8 +199,11 @@
     //   {
     
     settringButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ios-menu-icon.png"]  style:UIBarButtonItemStylePlain target:self action:@selector(settingsClicked:)];
+    UIImage* imaged = [UIImage imageNamed:@"花子-45.png"];
+    UIBarButtonItem* aboutButton = [[UIBarButtonItem alloc] initWithImage:[imaged imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:nil target:self action:@selector(aboutClicked:)];
 
     self.navigationItem.rightBarButtonItems = @[settringButton];
+    self.navigationItem.leftBarButtonItems = @[aboutButton];
     //   }
     
     // Do any additional setup after loading the view, typically from a nib.
@@ -227,20 +226,8 @@
     //{
     self.searchDisplayController.searchBar.searchBarStyle = UISearchBarStyleMinimal; //otherwise, there will be a gray background around search bar
     //}
-    //author mode
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
-    
-    if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
-    {
-        [self closeAuthorView];
-    }
-    else
-    {
-        [self startAuthorView];
-    }
+
     // I did not use iOS7's self.canDisplayBannerAds to automatically display adds, not sure why
-    [self initiAdBanner];
     [self initgAdBanner];
     
     if (switchEventListViewModeBtn == nil)
@@ -310,6 +297,11 @@
     [self refreshAnnotations];
 }
 
+-(void) aboutClicked:(id)sender
+{
+    [self displayPageOnRightRevealPanel:@"http://blog.sina.com.cn/huazitt"];
+}
+
 -(void) settingsClicked:(id)sender  //IMPORTANT only iPad will come here, iPhone has push segue on storyboard
 {
     /*
@@ -339,7 +331,7 @@
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     SWRevealViewController *revealController = [self revealViewController];
     UIViewController* controller = revealController.rightViewController;
-    if (appDelegate.rightSideMenuRevealedFlag && ![controller isKindOfClass:[ATEventEditorTableController class]])
+    if (appDelegate.rightSideMenuRevealedFlag )
     { //if right side is preference already, just toggle it
         [revealController rightRevealToggle:nil];
         return;
@@ -522,49 +514,6 @@
             [self prepareMapView];
             [self refreshEventListView:false];
         }
-        /*
-         if (buttonIndex == 1) //switch view/author mode
-         {
-         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-         {
-         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Only available in iPad Version",nil)
-         message:NSLocalizedString(@"",nil)
-         delegate:self
-         cancelButtonTitle:NSLocalizedString(@"OK",nil)
-         otherButtonTitles:nil];
-         [alert show];
-         return;
-         }
-         NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-         NSString* currentAuthorMode = [userDefault valueForKey:AUTHOR_MODE_KEY];
-         
-         if (currentAuthorMode == nil || [currentAuthorMode isEqualToString:@"VIEW_MODE"])
-         {
-         BOOL loginFlag = [ATHelper checkUserEmailAndSecurityCode:self];
-         if (!loginFlag)
-         return;
-         [self startAuthorView];
-         }
-         else
-         {
-         [self closeAuthorView];
-         }
-         }
-         if (buttonIndex == 2) //Feedback to
-         {
-         NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-         //NSArray *toReceipients = @[@"aa@aa.com"];
-         NSArray *toReceipients = @[NSLocalizedString(@"AuthorEmail",nil)]; //AuthorEmail is in Localizable.String file
-         NSArray *ccReceipients = @[@"support@chroniclemap.com"]; //AuthorEmail is in Localizable.String file
-         MFMailComposeViewController* mailComposer = [[MFMailComposeViewController alloc]init];
-         mailComposer.mailComposeDelegate = self;
-         [mailComposer setToRecipients:toReceipients];
-         [mailComposer setCcRecipients:ccReceipients];
-         [mailComposer setSubject:NSLocalizedString(targetName,nil)];
-         //[mailComposer setMessageBody:@"Testing message for the test mail" isHTML:NO];
-         [self presentViewController:mailComposer animated:YES completion:nil];
-         }
-         */
     }
     if (buttonIndex == 0 && alertView.tag == ALERT_FOR_POPOVER_ERROR)
     {
@@ -1076,6 +1025,7 @@
 {
     int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
     int timeLineY = timeWindowY;
+    [self showBanner:self.gAdBannerView];
     [UIView animateWithDuration:0.3
                           delay:0.0
                         options:UIViewAnimationCurveEaseOut
@@ -1095,6 +1045,7 @@
 {
     int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
     int timeLineY = timeWindowY;
+    [self hideBanner:self.gAdBannerView];
     [UIView animateWithDuration:0.3
                           delay:0.0
                         options:UIViewAnimationCurveEaseOut
@@ -1120,7 +1071,7 @@
     int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
     int timeLineY = timeWindowY;
     int hideX = - [ATConstants eventListViewCellWidth] * 0.9;
-
+    [self showBanner:self.gAdBannerView];
     [UIView animateWithDuration:0.4
                           delay:0.0
                         options:UIViewAnimationCurveEaseOut
@@ -1149,6 +1100,7 @@
 {
     int timeWindowY = self.view.bounds.size.height - [ATConstants timeScrollWindowHeight];
     int timeLineY = timeWindowY;
+    [self hideBanner:self.gAdBannerView];
     [UIView animateWithDuration:0.3
                           delay:0.0
                         options:UIViewAnimationCurveEaseOut
@@ -2060,6 +2012,14 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     ATEventAnnotation* ann = [self getFirstUnderlyingAnnFromADCluster: selectedEventAnnDataOnMap]; // [view annotation];
     if (ann == nil)
         return;
+    NSArray* tmp = [ann.description componentsSeparatedByString:@"\n"];
+    NSString* blogUrl = tmp[1];
+    
+    [self displayPageOnRightRevealPanel:blogUrl];
+}
+
+- (void) displayPageOnRightRevealPanel:(NSString*) blogUrl
+{
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     if (self.webViewController == nil)
     {
@@ -2093,20 +2053,20 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     position: absolute;\
     top: 50%;\
     left: 50%;\
-    width: 70px;\
+    width: 400px;\
     height: 70px\
     }\
     --></style>\
     </head>\
     <body>\
     <div id=\"content\">\
-        <img src=\"Hourglass-icon.png\">\
+        <center><img src=\"Hourglass-icon.png\"></center>\
+        <br>\
+        <font color=\"DarkGray\" size=\"11\">Loading ... <br>(正在加载 。。。)</font>\
     </div>\
     </body>\
     </html>";
     
-    NSArray* tmp = [ann.description componentsSeparatedByString:@"\n"];
-    NSString* blogUrl = tmp[1];
     if ([blogUrl isEqualToString: prevBlogUrl])
         return;
     else
@@ -2144,7 +2104,7 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
     </head>\
     <body>\
     <div id=\"content\">\
-    <font color=\"DarkGray\">Network Unavailabe (没有网路联接)</font>\
+    <font color=\"DarkGray\" size=\"13\">Network Unavailabe<br> (没有网路联接)</font>\
     </div>\
     </body>\
     </html>";
@@ -2157,94 +2117,7 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
 {
      NSLog(@"22222");
 }
-/*
-- (void) startEventEditor:(UIView*)view
-{
-    ATEventAnnotation* ann = [self getFirstUnderlyingAnnFromADCluster: selectedEventAnnDataOnMap]; // [view annotation];
-    selectedEventAnnotation = selectedEventAnnDataOnMap;
-    self.selectedAnnotation = selectedEventAnnDataOnMap;
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    UIStoryboard* storyboard = appDelegate.storyBoard;
-    
-    //if (self.eventEditor == nil) {
-    //With or without above IF is all related to sizeButton only:
-    //(and following happens for iOS 9)
-    //  - With it, photoScrollview will not be recreated. and from min to max will crash very weired
-    //  - But without it, when click max/min button and after bellow popover or present statement, eventEidtor's UIView fileds such as description/eventDate etc will still be nil. SO FAR, I has no solution, it will be with this bug in new release
-    self.eventEditor = [storyboard instantiateViewControllerWithIdentifier:@"event_editor_id"];
-    self.eventEditor.delegate = self;
-    //}
-    
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        BOOL optionIPADFullScreen = [ATHelper getOptionEditorFullScreen];
-        if (optionIPADFullScreen)
-        {
-            [self.navigationController presentViewController:self.eventEditor animated:YES completion:nil];
-        }
-        else
-        {
-            self.eventEditorPopover = [[UIPopoverController alloc] initWithContentViewController:self.eventEditor];
-            self.eventEditorPopover.popoverContentSize = CGSizeMake(420,580);
-            
-            //Following view.window=nil case is weird. When tap on text/image to start eventEditor, system will crash after around 10 times. Googling found it will happen when view.window=nil, so have to alert user and call refreshAnn in alert delegate to fix it. (will not work without put into alert delegate)
-            BOOL isAtLeastIOS8 = [ATHelper isAtLeastIOS8];
-            if (isAtLeastIOS8) //##### weird, after this step self.eventEditor.description etc will be nil
-                [self.eventEditorPopover presentPopoverFromRect:view.frame inView:self.mapView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-            else if (view.window != nil && !isAtLeastIOS8)
-                [self.eventEditorPopover presentPopoverFromRect:view.bounds inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-            else
-            {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"A minor error occurs",nil)
-                                                                message:NSLocalizedString(@"Please try again!",nil)
-                                                               delegate:self
-                                                      cancelButtonTitle:NSLocalizedString(@"OK",nil)
-                                                      otherButtonTitles:nil];
-                alert.tag = ALERT_FOR_POPOVER_ERROR;
-                [alert show];
-            }
-        }
-    }
-    else {
-        //[self performSegueWithIdentifier:@"eventeditor_segue_id" sender:nil];
-        //[self.navigationController presentModalViewController:self.eventEditor animated:YES]; //pushViewController: self.eventEditor animated:YES];
-        [self.navigationController presentViewController:self.eventEditor animated:YES completion:nil];
-    }
-    //has to set value here after above presentXxxxx method, otherwise the firsttime will display empty text
-    [self.eventEditor resetEventEditor];
-    
-    self.eventEditor.coordinate = ann.coordinate;
-    if ([ann.description isEqualToString:NEWEVENT_DESC_PLACEHOLD])
-    {
-        self.eventEditor.description.textColor = [UIColor lightGrayColor];
-    }
-    
-    self.eventEditor.description.text = ann.description;
-    self.eventEditor.address.text= ann.address;
-    self.eventEditor.address.editable = false;
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
-    [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-    [dateFormatter setLocale:[NSLocale currentLocale]];
-    
-    self.eventEditor.dateTxt.text = [dateFormatter stringFromDate:ann.eventDate];
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"AtlasTravelReader"])
-        self.eventEditor.dateTxt.text = [ATHelper getYearPartHelper:ann.eventDate];
-    tmpDateHold = ann.eventDate;
-    
-    self.eventEditor.eventType = ann.eventType;
-    self.eventEditor.hasPhotoFlag = EVENT_TYPE_NO_PHOTO; //not set to ann.eventType because we want to use this flag to decide if need save image again
-    self.eventEditor.eventId = ann.uniqueId;
-    //self.eventEditor.view.backgroundColor = [UIColor clearColor];//  [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3]; //this will make full screen editor black
-    
-    [ATEventEditorTableController setEventId:ann.uniqueId];
-    //if (ann.eventType == EVENT_TYPE_HAS_PHOTO)
-    [self.eventEditor createPhotoScrollView: ann ];
-    [self showOverlays]; //added in Reader version
-}
-*/
+
 //always start from focusedEvent
 - (void) showOverlays
 {
@@ -2672,8 +2545,10 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
     [self displayTimelineControls];
     [self calculateSearchBarFrame]; //in iPhone, make search bar wider in landscape
     [self closeTutorialView];
-    //if (self.webViewController != nil)
-    //    [self.webViewController setFrame];
+    
+    CGRect frame = self.gAdBannerView.frame;
+    frame.origin.y = [ATConstants screenHeight] - GAD_SIZE_320x50.height;
+    self.gAdBannerView.frame = frame;
 }
 
 -(void)searchBarSearchButtonClicked:(UISearchBar *)theSearchBar
@@ -2915,105 +2790,6 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
     return YES;
 }
 
-- (void) startAuthorView
-{
-    if (authorView == nil)
-    {
-        authorView = [[UIView alloc] initWithFrame:CGRectMake(0,0,0,0)];
-        [authorView.layer setCornerRadius:10.0f];
-    }
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    [userDefault setObject:@"UPDATE_MODE" forKey:AUTHOR_MODE_KEY];
-    appDelegate.authorMode = true;
-    [userDefault synchronize];
-    
-    [UIView transitionWithView:self.mapView
-                      duration:0.5
-                       options:UIViewAnimationTransitionFlipFromRight //any animation
-                    animations:^ {
-                        [authorView setFrame:CGRectMake([ATConstants screenWidth] - 300, 130, 300, 80)];
-                        authorView.backgroundColor=[UIColor colorWithRed:1 green:1 blue:0.7 alpha:0.6];
-                        authorView.layer.shadowColor = [UIColor grayColor].CGColor;
-                        authorView.layer.shadowOffset = CGSizeMake(15,15);
-                        authorView.layer.shadowOpacity = 1;
-                        authorView.layer.shadowRadius = 10.0;
-                        [self.mapView addSubview:authorView];
-                        //[self partialInitEpisodeView];
-                    }
-                    completion:^(BOOL finished) {[self partialInitAuthorView];}];
-    [appDelegate emptyEventList]; //this will cause eventListSorted to be generated again from internet
-    [self refreshAnnotations];
-    [self refreshEventListView:false];
-}
-
-//the purpose to have this to be called in completion:^ is to make animation together with all subviews
-//(ATTutorialView has drawRect so no such issue)
-- (void) partialInitAuthorView
-{
-    [[authorView subviews]
-     makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    
-    UILabel* lblWording = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, 180, 30)];
-    lblWording.text = NSLocalizedString(@"Author Mode:",nil);
-    [authorView addSubview:lblWording];
-    
-    btnLoadPhoto = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnLoadPhoto.frame = CGRectMake(180, 5, 120, 40);
-    [btnLoadPhoto setTitle:NSLocalizedString(@"Get Web Photos",nil) forState:UIControlStateNormal];
-    btnLoadPhoto.titleLabel.font = [UIFont fontWithName:@"Arial" size:12];
-    [btnLoadPhoto addTarget:self action:@selector(loadPhotoClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [authorView addSubview: btnLoadPhoto];
-    
-    UIButton *btnDropbox = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnDropbox.frame = CGRectMake(5, 40, 120, 40);
-    [btnDropbox setTitle:NSLocalizedString(@"Sync Dropbox",nil) forState:UIControlStateNormal];
-    btnDropbox.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:15];
-    [btnDropbox addTarget:self action:@selector(photoDroboxClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [authorView addSubview: btnDropbox];
-    
-    UIButton *btnBackToViewMode = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnBackToViewMode.frame = CGRectMake(125, 40, 60, 40);
-    [btnBackToViewMode setTitle:NSLocalizedString(@"Quit",nil) forState:UIControlStateNormal];
-    btnBackToViewMode.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
-    [btnBackToViewMode addTarget:self action:@selector(quitClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [authorView addSubview: btnBackToViewMode];
-    
-    UIButton *btnLogout = [UIButton buttonWithType:UIButtonTypeSystem];
-    btnLogout.frame = CGRectMake(180, 40, 120, 40);
-    [btnLogout setTitle:NSLocalizedString(@"Logout&Quit",nil) forState:UIControlStateNormal];
-    btnLogout.titleLabel.font = [UIFont fontWithName:@"Arial-Bold" size:17];
-    [btnLogout addTarget:self action:@selector(logoutClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [authorView addSubview: btnLogout];
-    
-}
-
-- (void) closeAuthorView
-{
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    if (authorView != nil)
-    {
-        NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-        [userDefault setObject:@"VIEW_MODE" forKey:AUTHOR_MODE_KEY];
-        appDelegate.authorMode = false;
-        [userDefault synchronize];
-        [UIView transitionWithView:self.mapView
-                          duration:0.5
-                           options:UIViewAnimationTransitionCurlDown
-                        animations:^ {
-                            [authorView setFrame:CGRectMake(0,0,0,0)];
-                        }
-                        completion:^(BOOL finished) {
-                            [authorView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-                            [authorView removeFromSuperview];
-                            authorView = nil;
-                        }];
-    }
-    [appDelegate emptyEventList]; //this will cause eventListSorted to be generated again from internet
-    [self refreshAnnotations];
-    [self refreshEventListView:false];
-}
-
 -(void) loadPhotoClicked:(id)sender
 {
     //will call startLoadPhotosFromWeb in alertview action
@@ -3092,17 +2868,6 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
         [self.navigationController pushViewController:preference animated:true];
     }
 }
--(void) quitClicked:(id)sender
-{
-    [self closeAuthorView];
-}
--(void) logoutClicked:(id)sender
-{
-    [self closeAuthorView];
-    NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
-    [userDefault removeObjectForKey:[ATConstants UserEmailKeyName]];
-    [userDefault removeObjectForKey:[ATConstants UserSecurityCodeKeyName]];
-}
 
 
 /////// following is for search bar actions
@@ -3148,37 +2913,25 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
         
     }
 }
--(void)initiAdBanner
-{
-    return;
 
-    if (!self.iAdBannerView)
-    {
-        CGRect rect = CGRectMake(0, AD_Y_POSITION_IPAD, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-            rect = CGRectMake(0, AD_Y_POSITION_PHONE, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
-        self.iAdBannerView = [[ADBannerView alloc]initWithFrame:rect];
-        self.iAdBannerView.delegate = self;
-        self.iAdBannerView.hidden = TRUE;
-        [self.view addSubview:self.iAdBannerView];
-    }
-}
 
 -(void)initgAdBanner
 {
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-
     if (!self.gAdBannerView)
     {
-        CGRect rect = CGRectMake(0, 60, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+        CGRect rect = CGRectMake(0, [ATConstants screenHeight] - GAD_SIZE_320x50.height, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-            rect = CGRectMake(0, AD_Y_POSITION_PHONE, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
+            rect = CGRectMake(0, [ATConstants screenHeight] - GAD_SIZE_320x50.height, GAD_SIZE_320x50.width, GAD_SIZE_320x50.height);
         self.gAdBannerView = [[GADBannerView alloc] initWithFrame:rect];
         self.gAdBannerView.adUnitID = @"ca-app-pub-5383516122867647/8499480217";
         self.gAdBannerView.rootViewController = self;
         self.gAdBannerView.delegate = self;
-        self.gAdBannerView.hidden = TRUE;
+        self.gAdBannerView.hidden = false;
         [self.view addSubview:self.gAdBannerView];
+        
+        GADRequest *request = [GADRequest request];
+        request.testDevices = @[ @"efaa3c516e17269775eca5baa3d3118b"];
+        [self.gAdBannerView loadRequest:request];
     }
 }
 
@@ -3186,9 +2939,6 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
 {
     if (banner && ![banner isHidden])
     {
-        [UIView beginAnimations:@"hideBanner" context:nil];
-        banner.frame = CGRectOffset(banner.frame, 0, banner.frame.size.height - 60);
-        [UIView commitAnimations];
         banner.hidden = TRUE;
     }
 }
@@ -3196,69 +2946,8 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
 {
     if (banner && [banner isHidden])
     {
-        [UIView beginAnimations:@"showBanner" context:nil];
-        banner.frame = CGRectOffset(banner.frame, 0, -banner.frame.size.height + 60);
-        [UIView commitAnimations];
         banner.hidden = FALSE;
     }
-}
-
-//this function go with navigator show/hide
--(void)showAdAtTop:(BOOL)topFlag
-{
-    if (topFlag)
-    {
-        CGRect frame = self.iAdBannerView.frame;
-        frame.origin.y = 0;
-        self.iAdBannerView.frame = frame;
-        frame = self.gAdBannerView.frame;
-        frame.origin.y = 0;
-        self.gAdBannerView.frame = frame;
-    }
-    else
-    {
-        int yPos = AD_Y_POSITION_IPAD;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-            yPos = AD_Y_POSITION_PHONE;
-        CGRect frame = self.iAdBannerView.frame;
-        frame.origin.y = yPos;
-        self.iAdBannerView.frame = frame;
-        frame = self.gAdBannerView.frame;
-        frame.origin.y = yPos;
-        self.gAdBannerView.frame = frame;
-    }
-}
-////////// iAd delegate
-// Called before the add is shown, time to move the view
-- (void)bannerViewWillLoadAd:(ADBannerView *)banner
-{
-    NSLog(@"----- iAd load");
-    [self hideBanner:self.gAdBannerView];
-    [self showBanner:self.iAdBannerView];
-}
-
-// Called when an error occured
-- (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
-{
-    NSLog(@"###### iAd error: %@", error);
-    [self hideBanner:self.iAdBannerView];
-    [self.gAdBannerView loadRequest:[GADRequest request]];
-}
-
-//////////gAd delegate
-// Called before ad is shown, good time to show the add
-- (void)adViewDidReceiveAd:(GADBannerView *)view
-{
-    NSLog(@"------ Admob load");
-    [self hideBanner:self.iAdBannerView];
-    [self showBanner:self.gAdBannerView];
-}
-
-// An error occured
-- (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error
-{
-    NSLog(@"######## Admob error: %@", error);
-    [self hideBanner:self.gAdBannerView];
 }
 
 

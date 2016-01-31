@@ -85,7 +85,7 @@ UINavigationController* preferenceViewNavController;
     
     NSArray* eventsFromStr = nil;
     eventsFromStr = [self readEventsFromInternet];
-    if (eventsFromStr == nil)
+    if (eventsFromStr == nil || [eventsFromStr count] == 0)
     {
         ////fallback to events in bundle file, initially have budle file ready to deploy
         eventsFromStr = [self readEventsFromBundleFile];

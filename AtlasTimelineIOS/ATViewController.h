@@ -6,15 +6,14 @@
 //  Copyright (c) 2012 hong. All rights reserved.
 //
 
+#import <GoogleMobileAds/GoogleMobileAds.h>
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 #import "ATDataController.h"
-#import "ATEventEditorTableController.h"
 #import "ATTravelWebViewController.h"
 #import "ATPreferenceViewController.h"
 #import <StoreKit/StoreKit.h>
 #import <iAd/iAd.h>
-#import "GADBannerView.h"
 #import <MessageUI/MessageUI.h>
 #import "ADClusterMapView.h"
 
@@ -23,7 +22,7 @@
 @class ATTimeScrollWindowNew;
 @class ATTimeZoomLine;
 
-@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, EventEditorDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate, ADBannerViewDelegate,GADBannerViewDelegate, MFMailComposeViewControllerDelegate, WKNavigationDelegate>
+@interface ATViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UISearchDisplayDelegate, UISearchBarDelegate,UIAlertViewDelegate, MFMailComposeViewControllerDelegate, WKNavigationDelegate>
 {
     ATDataController *dataController;
 
@@ -36,7 +35,6 @@
 @property (strong, nonatomic) IBOutlet CLGeocoder *geoCoder;
 @property (strong, nonatomic) IBOutlet CLLocation *location;
 @property (strong, nonatomic) IBOutlet UIPopoverController* eventEditorPopover;
-@property (strong, nonatomic) IBOutlet ATEventEditorTableController* eventEditor;
 @property (strong, nonatomic) IBOutlet ATTravelWebViewController* webViewController;
 @property (strong, nonatomic) ATEventAnnotation* selectedAnnotation;
 @property (strong, nonatomic) UILabel* focusedEventLabel;
@@ -50,7 +48,6 @@
 @property (strong, nonatomic) NSDate* endDate;
 @property (strong, nonatomic) ATTimeZoomLine* timeZoomLine;
 
-@property (strong, nonatomic) ADBannerView *iAdBannerView;
 @property (strong, nonatomic) GADBannerView *gAdBannerView;
 @property int mapViewShowWhatFlag; //see MAPVIEW_SHOW_xxxxx macros
 

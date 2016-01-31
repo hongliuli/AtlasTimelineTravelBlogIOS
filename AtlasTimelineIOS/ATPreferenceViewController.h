@@ -13,7 +13,6 @@
 
 @interface ATPreferenceViewController : UITableViewController <SourceChooseViewControllerDelegate,DownloadTableViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *detailLabel;
-@property (weak, nonatomic) ATViewController* mapViewParent;
 
 - (void) changeSelectedSource:(NSString*)selectedAtlasName;
 - (void) refreshDisplayStatusAndData;
