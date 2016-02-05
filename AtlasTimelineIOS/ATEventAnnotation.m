@@ -29,17 +29,7 @@
 // annotation view need title/subtitle to show callout
 - (NSString *)subtitle
 {
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSDateFormatter *dateFormater = appDelegate.dateFormater;
-    NSString * dateStr = [dateFormater stringFromDate:self.eventDate];
-    NSUInteger removeBC_ADPos = [dateStr rangeOfString:@" "].location;
-    dateStr = [dateStr substringToIndex:removeBC_ADPos];
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"AtlasTravelReader"])
-        dateStr = [ATHelper getYearPartHelper:self.eventDate];
-    
-    dateStr = [NSString stringWithFormat:@"[%@] ",dateStr];
-    return[NSString stringWithFormat:@"%@%@",dateStr , NSLocalizedString(self.address,nil)]; //add for WorldHeritage culture/natural
+    return[NSString stringWithFormat:@"%@" , NSLocalizedString(self.address,nil)]; //add for WorldHeritage culture/natural
 }
 
 - (NSString *)title

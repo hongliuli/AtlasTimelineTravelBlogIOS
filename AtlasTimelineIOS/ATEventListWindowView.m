@@ -182,7 +182,7 @@ NSDateFormatter *dateFormatter;
     ATEventDataStruct* focusedEvent = appDelegate.focusedEvent;
     if (focusedEvent != nil && [focusedEvent.uniqueId isEqual:evt.uniqueId])
     {
-        [cell.checkIcon setHidden:false];
+        [cell.checkIcon setHidden:true];
         cell.backgroundColor = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:0.40];
     }
     else

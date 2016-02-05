@@ -64,8 +64,8 @@
 "Backup Photos (Incremental)"="增量备份";
 "Backup/Restore myEvents data"="备份/恢复myEvents数据";
 "Backup/Restore Photos to Dropbox"="备份/恢复照片到Dropbox";
-"By Map"="按地图列表";
-"By Time"="按期间列表";
+"By Map"="在地图上";
+"By Time"="在期间里";
 "Cancel"="取消";
 "Cancel will lose your photo changes."="取消会丢失照片修改.";
 "Cannot zoom-out anymore!"="不能再放大!";
@@ -245,6 +245,7 @@
 "To View Mode"="回到阅读方式";
 "To Author Mode"="变到作者方式";
 "Author Mode:"="作者方式";
+"Avaialble soon!"="即将推出";
 "Sync Dropbox"="同步";
 "Use keyboard to enter date"="使用键盘输入事件日期";
 "Use Chronicle Map App to organize your upcoming travel plans or view past events on map with timeline"="用［霞客行］APP计划你的旅游行程，翻阅过去行程记录和照片。";

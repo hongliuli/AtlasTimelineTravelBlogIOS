@@ -83,20 +83,22 @@ UINavigationController* preferenceViewNavController;
         return _eventListSorted;
     _eventListSorted =[[NSMutableArray alloc] initWithCapacity:100];
     
-    NSArray* eventsFromStr = nil;
-    eventsFromStr = [self readEventsFromInternet];
-    if (eventsFromStr == nil || [eventsFromStr count] == 0)
+    NSArray* eventsFromBundle = [self readEventsFromBundleFile];
+    NSArray* eventsFromServer = nil;
+    eventsFromServer = [self readEventsFromInternet];
+    if (eventsFromServer == nil || [eventsFromServer count] < [eventsFromBundle count])
     {
+        
         ////fallback to events in bundle file, initially have budle file ready to deploy
-        eventsFromStr = [self readEventsFromBundleFile];
+        eventsFromServer = eventsFromBundle;
     }
 
-    if (eventsFromStr == nil)
+    if (eventsFromServer == nil)
     {
         NSLog(@"   read from file or internet error ======");
         return nil;
     }
-    for (ATEventDataStruct* ent in eventsFromStr) {
+    for (ATEventDataStruct* ent in eventsFromServer) {
         
         ATEventDataStruct* entData = [[ATEventDataStruct alloc] init];
         entData.address = ent.address;

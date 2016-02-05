@@ -42,8 +42,8 @@
 #define MERCATOR_OFFSET 268435456
 #define MERCATOR_RADIUS 85445659.44705395
 #define ZOOM_LEVEL_TO_HIDE_DESC 3
-#define ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE 7
-#define ZOOM_LEVEL_TO_HIDE_EVENTLIST_VIEW 6
+#define ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE 5
+#define ZOOM_LEVEL_TO_HIDE_EVENTLIST_VIEW 5
 #define ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE 9
 
 #define DISTANCE_TO_HIDE 80
@@ -258,7 +258,7 @@
     originalEventListSorted = appDelegate.eventListSorted;
     filteredEventListSorted = [NSMutableArray arrayWithCapacity:[originalEventListSorted count]];
     //[self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"List",nil)];
-    [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"搜索标题", nil)];
+    [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"搜索标签，标题", nil)];
     
     
     if ([appDelegate.eventListSorted count] == 0)
@@ -413,17 +413,27 @@
 
 -(void) switchEventListViewMode:(id)sender
 {
+    float x = 310;
+    float y = 90;
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        x = 250;
+        y = 70;
+    }
+
+    
     if (switchEventListViewModeToVisibleOnMapFlag)
     {
         eventListInVisibleMapArea = nil; //IMPORTANT: refreshEventListView will use this is nil or not to decide if in map event list view mode, do not refresh if scroll timewheel
         [self setSwitchButtonTimeMode];
-        [self.mapView makeToast:NSLocalizedString(@"Scroll timewheel to list events in the selected period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(350, 80)]];
+        [self.mapView makeToast:NSLocalizedString(@"Scroll timewheel to list events in the selected period",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(x, y)]];
         [self refreshEventListView:false];
     }
     else
     {
         [self setSwitchButtonMapMode];
-        [self.mapView makeToast:NSLocalizedString(@"Scroll map to list events moving into the screen",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(340, 80)]];
+        [self.mapView makeToast:NSLocalizedString(@"Scroll map to list events moving into the screen",nil) duration:4.0 position:[NSValue valueWithCGPoint:CGPointMake(x, y)]];
         [self updateEventListViewWithEventsOnMap];
     }
 }
@@ -1758,6 +1768,10 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     for (id key in annotationToShowImageSet) {
         NSArray *splitArray = [key componentsSeparatedByString:@"|"];
         UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
+        if ([key isEqualToString:focuseKey])
+            [tmpLbl setBackgroundColor:[UIColor colorWithRed:1.0 green:0.7 blue:0.7 alpha:0.4]];
+        else
+            [tmpLbl setBackgroundColor:[UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8]];
         CLLocationCoordinate2D coordinate;
         coordinate.latitude=[splitArray[0] doubleValue];
         coordinate.longitude = [splitArray[1] doubleValue];
@@ -1814,6 +1828,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
                                  }
                                  completion:NULL];
             }
+
         }
     }
     [selectedAnnotationNearestLocationList removeAllObjects];
@@ -1953,8 +1968,8 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
 
 - (void) refreshFocusedEvent
 {
-    if (selectedEventAnnOnMap == nil || switchEventListViewModeToVisibleOnMapFlag)
-        return; //do not focuse when popup event editor in map event list mode for two reason:
+    //if (selectedEventAnnOnMap == nil || switchEventListViewModeToVisibleOnMapFlag)
+    //    return; //do not focuse when popup event editor in map event list mode for two reason:
     // 1. conceptually it is not neccessary   2. there is a small but if do so
     //MKMapView* mapView = self.mapView;
     MKAnnotationView* view = selectedEventAnnOnMap;
@@ -2062,7 +2077,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     <div id=\"content\">\
         <center><img src=\"Hourglass-icon.png\"></center>\
         <br>\
-        <font color=\"DarkGray\" size=\"11\">Loading ... <br>(正在加载 。。。)</font>\
+        <font color=\"DarkGray\" size=\"11\">Loading ... <br>正在加载 。。。</font>\
     </div>\
     </body>\
     </html>";
@@ -2104,7 +2119,7 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
     </head>\
     <body>\
     <div id=\"content\">\
-    <font color=\"DarkGray\" size=\"13\">Network Unavailabe<br> (没有网路联接)</font>\
+    <font color=\"DarkGray\" size=\"11\">Network Unavailable<br>没有网路联接</font>\
     </div>\
     </body>\
     </html>";
