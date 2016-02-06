@@ -301,7 +301,7 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         return 180;
     else
-        return 130;
+        return 110;
 }
 + (int) eventListViewCellHeight{
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)

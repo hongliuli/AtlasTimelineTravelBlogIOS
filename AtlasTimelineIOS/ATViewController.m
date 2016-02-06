@@ -140,6 +140,8 @@
     
     BOOL firstTimeShowFlag;
     
+    NSString* prevSelectedEventId;
+    
     NSString* languageToSelect;
     UIBarButtonItem *settringButton;
     
@@ -794,11 +796,15 @@
     else
     {
         // use the zoom level to compute the region
+        if ([ent.uniqueId isEqualToString:prevSelectedEventId]) //if select same event, them zoom in one step for better user experience
+            zoomLevel++;
         MKCoordinateSpan span = [self coordinateSpanWithMapView:self.mapView centerCoordinate:centerCoordinate andZoomLevel:zoomLevel];
         MKCoordinateRegion region = MKCoordinateRegionMake(centerCoordinate, span);
         
         // set the region like normal
         [self.mapView setRegion:region animated:YES];
+        
+        prevSelectedEventId = ent.uniqueId;
     }
 }
 
@@ -1539,7 +1545,6 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
                 //[tmpLbl setAutoresizesSubviews:true];
                 [tmpLbl addSubview: imgView];
                 tmpLbl.layer.cornerRadius = 8;
-                tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
                 tmpLbl.layer.borderWidth = 1;
             }
             else
@@ -1550,7 +1555,6 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
                 tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
                 tmpLbl.text = [NSString stringWithFormat:@" %@", [ATHelper clearMakerAllFromDescText: annotation.description ]];
                 tmpLbl.layer.cornerRadius = 8;
-                tmpLbl.layer.borderColor = [UIColor redColor].CGColor;
                 tmpLbl.layer.borderWidth = 1;
             }
         }
@@ -1560,13 +1564,9 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
             NSArray* tmpArr = [annotation.description componentsSeparatedByString:@"http"];
             tmpLbl.text = tmpArr[0];
             tmpLbl.layer.cornerRadius = 8;
-            //If the event has photo before but the photos do not exist anymore, then show text with red board
-            //If this happen, the photo may in Dropbox. if not  in dropbox, then it lost forever.
-            //To change color, add a photo and delete it, then it will change to brown border
-            tmpLbl.layer.borderColor = [UIColor brownColor].CGColor;
             tmpLbl.layer.borderWidth = 1;
         }
-        
+        tmpLbl.layer.borderColor = [UIColor lightGrayColor].CGColor;
         tmpLbl.userInteractionEnabled = YES;
         [tmpLblUniqueIdMap setObject:annView forKey:[NSNumber numberWithInt:tmpLblUniqueMapIdx ]];
         tmpLbl.tag = tmpLblUniqueMapIdx;
@@ -1586,18 +1586,6 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         [annotationToShowImageSet setObject:tmpLbl forKey:key];
         [self.view addSubview:tmpLbl];
         
-    }
-    else //if already in the set, need make sure it will be shown
-    {
-        if (annotation.eventType == EVENT_TYPE_NO_PHOTO)
-            tmpLbl.text = [ATHelper clearMakerAllFromDescText: annotation.description ]; //need to change to take care of if user updated description in event editor
-        
-        if ([self showAnnotationTmpLbl])
-            tmpLbl.hidden = true;
-        //tmpLbl.alpha = 0;
-        else
-            //tmpLbl.alpha = 1;
-            tmpLbl.hidden=false;
     }
 }
 
@@ -1769,9 +1757,15 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         NSArray *splitArray = [key componentsSeparatedByString:@"|"];
         UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
         if ([key isEqualToString:focuseKey])
-            [tmpLbl setBackgroundColor:[UIColor colorWithRed:1.0 green:0.7 blue:0.7 alpha:0.4]];
+        {
+            tmpLbl.backgroundColor = [UIColor colorWithRed:1.0 green:0.7 blue:0.7 alpha:0.4];
+            tmpLbl.layer.borderColor = [UIColor redColor].CGColor;
+        }
         else
-            [tmpLbl setBackgroundColor:[UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8]];
+        {
+            tmpLbl.backgroundColor = [UIColor colorWithRed:255.0 green:255 blue:0.8 alpha:0.8];
+            tmpLbl.layer.borderColor = [UIColor lightGrayColor].CGColor;
+        }
         CLLocationCoordinate2D coordinate;
         coordinate.latitude=[splitArray[0] doubleValue];
         coordinate.longitude = [splitArray[1] doubleValue];
