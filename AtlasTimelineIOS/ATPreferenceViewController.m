@@ -258,7 +258,7 @@
     [customView setBackgroundColor:[UIColor colorWithRed: 0.85 green: 0.85 blue: 0.85 alpha: 0.0]];
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, tableView.bounds.size.width, 30)];
     label.font = [UIFont fontWithName:@"Helvetica" size:18.0];
-    label.textColor = [UIColor lightGrayColor];
+    label.textColor = [UIColor grayColor];
     label.textAlignment = NSTextAlignmentCenter;
     // create the parent view that will hold header Label
     if (section == SECTION_SUGGESTED)
@@ -267,8 +267,14 @@
     }
     if (section == SECTION_OTHER_BLOGGERS)
     {
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
+        ATEventDataStruct* lastEvt = appDelegate.eventListSorted[0];
+        NSDateFormatter* dateFormater = [[NSDateFormatter alloc] init];
+        //_dateFormater.dateStyle = NSDateFormatterMediumStyle;
+        [dateFormater setDateFormat:@"yyyy-MM-dd"];
+        NSString* dtStr = [dateFormater stringFromDate:lastEvt.eventDate];
         label.textAlignment = NSTextAlignmentLeft;
-        label.text = @"推荐";
+        label.text = [@"最新博文日期：" stringByAppendingString: dtStr];
     }
     if (section == SECTION_MISC)
     {

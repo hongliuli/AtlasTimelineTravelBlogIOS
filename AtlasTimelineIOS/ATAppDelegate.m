@@ -85,7 +85,7 @@ UINavigationController* preferenceViewNavController;
     
     NSArray* eventsFromBundle = [self readEventsFromBundleFile];
     NSArray* eventsFromServer = nil;
-    eventsFromServer = [self readEventsFromInternet];
+    eventsFromServer = [self readEventsFromInternetOrUserDefault];
     if (eventsFromServer == nil || [eventsFromServer count] < [eventsFromBundle count])
     {
         
@@ -164,9 +164,9 @@ UINavigationController* preferenceViewNavController;
     return eventArray;
 }
 
-- (NSArray*) readEventsFromInternet
+- (NSArray*) readEventsFromInternetOrUserDefault
 {
-    NSArray* retEventList = nil;
+    NSArray* newEventList = nil;
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* serviceUrl = @"http://www.chroniclemap.com/resources/blogger_app_data/huazi_blog_list.html";
     //####
@@ -174,19 +174,29 @@ UINavigationController* preferenceViewNavController;
     //####
     NSString* responseStr  = [ATHelper httpGetFromServer:serviceUrl :false];
     
+    NSString* prevCachedStr = [userDefaults objectForKey:@"BLOGGER_DATA"];
+    NSArray* prevCachedEventList = [self createdEventListFromString:prevCachedStr];
+    
     if (responseStr != nil)
     {
-        retEventList = [self createdEventListFromString:responseStr];
-        if (retEventList != nil) //cache new fetched internet data only parse successfull (such as no wrong date format in [Date] section
+        newEventList = [self createdEventListFromString:responseStr];
+        if (newEventList != nil) //cache new fetched internet data only parse successfull (such as no wrong date format in [Date] section
+        {
             [userDefaults setObject:responseStr forKey:@"BLOGGER_DATA"]; //cache internet data only after parse succesfully
+            
+            if (prevCachedEventList != nil && [prevCachedEventList count] > 0  && [newEventList count] > [prevCachedEventList count])
+            {
+                    [userDefaults setObject:@"YES" forKey:@"PROMPT_NEW_BLOG"];
+                    [userDefaults synchronize];
+            }
+        }
     }
-    if (retEventList == nil)
+    if (newEventList == nil)
     {
-        responseStr = [userDefaults objectForKey:@"BLOGGER_DATA"];
-        retEventList = [self createdEventListFromString:responseStr];
+        newEventList = prevCachedEventList;
     }
 
-    return retEventList;
+    return newEventList;
 }
 
 - (NSArray*) createdEventListFromString:(NSString*)eventsString

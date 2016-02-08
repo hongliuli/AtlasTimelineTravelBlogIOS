@@ -262,11 +262,22 @@
     //[self.navigationItem.leftBarButtonItem setTitle:NSLocalizedString(@"List",nil)];
     [self.searchDisplayController.searchBar setPlaceholder:NSLocalizedString(@"搜索标签，标题", nil)];
     
-    
-    if ([appDelegate.eventListSorted count] == 0)
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* promptNewBlog = [userDefaults objectForKey:@"PROMPT_NEW_BLOG"];
+    if (promptNewBlog != nil && [promptNewBlog isEqualToString:@"YES"])
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Add your first event",nil) message:NSLocalizedString(@"No event file. Developer problem",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
-        [alert show];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"有新的博文"
+                                                                       message:@"请切换到［在期间里］，然后左刷时间轮到最后，新的博文就会出现在左旁列表。"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* action1 = [UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+            [userDefaults setObject:@"NO" forKey:@"PROMPT_NEW_BLOG"];
+        }];
+        UIAlertAction* action2 = [UIAlertAction actionWithTitle:@"下次再提醒" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {}];
+        
+        [alert addAction:action1];
+        [alert addAction:action2];
+        [self presentViewController:alert animated:YES completion:nil];
     }
     if (eventListView == nil) //viewDidAppear will be called when navigate back (such as from timeline/search view and full screen event editor, so need to check. Always be careful of viewDidAppear to not duplicate instances
     {
