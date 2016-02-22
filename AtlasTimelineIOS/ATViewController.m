@@ -201,7 +201,8 @@
     //   {
     
     settringButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ios-menu-icon.png"]  style:UIBarButtonItemStylePlain target:self action:@selector(settingsClicked:)];
-    UIImage* imaged = [UIImage imageNamed:@"花子-45.png"];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    UIImage* imaged = [UIImage imageNamed:[targetName stringByAppendingString:@"-45.png"]];
     UIBarButtonItem* aboutButton = [[UIBarButtonItem alloc] initWithImage:[imaged imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:nil target:self action:@selector(aboutClicked:)];
 
     self.navigationItem.rightBarButtonItems = @[settringButton];
