@@ -86,7 +86,7 @@ UINavigationController* preferenceViewNavController;
     NSArray* eventsFromBundle = [self readEventsFromBundleFile];
     NSArray* eventsFromServer = nil;
     eventsFromServer = [self readEventsFromInternetOrUserDefault];
-    if (eventsFromServer == nil || [eventsFromServer count] < [eventsFromBundle count])
+    if (eventsFromServer == nil || [eventsFromServer count] <= [eventsFromBundle count])
     {
         
         ////fallback to events in bundle file, initially have budle file ready to deploy
@@ -110,7 +110,7 @@ UINavigationController* preferenceViewNavController;
         entData.lng = ent.lng;
         
         //Every events must have photos, otherwise eventListView will has a empty space
-        entData.eventType = EVENT_TYPE_NO_PHOTO;
+        entData.eventType = EVENT_TYPE_HAS_PHOTO;
         
         [_eventListSorted addObject:entData];
     }
@@ -168,7 +168,13 @@ UINavigationController* preferenceViewNavController;
 {
     NSArray* newEventList = nil;
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSString* serviceUrl = @"http://www.chroniclemap.com/resources/blogger_app_data/huazi_blog_list.html";
+    NSString* serviceUrlPrefix = @"http://www.chroniclemap.com/resources/blogger_app_data/";
+    NSString* serviceUrl = [serviceUrlPrefix stringByAppendingString:@"huazi_blog_list.html"];
+    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+    if ([targetName isEqualToString:@"花子游世界"])
+        serviceUrl = [serviceUrlPrefix stringByAppendingString:@"huazi_blog_list.html"];
+    else if ([targetName isEqualToString:@"七色地图"])
+        serviceUrl = [serviceUrlPrefix stringByAppendingString:@"qiseditu_blog_list.html"];
     //####
     //#### following may return nil if %@.html file is not utf-8 encoded (linux: file -bi filename)
     //####

@@ -192,20 +192,16 @@ NSDateFormatter *dateFormatter;
         cell.backgroundColor = [UIColor clearColor];
         [cell.layer setBorderColor:[UIColor lightGrayColor].CGColor];
     }
-   /***** no photos for webview
+
     if (evt.eventType == EVENT_TYPE_HAS_PHOTO && isAtLeast7) //excusionPaths is available only after 7
     {
         CGRect imageFrame = CGRectMake(0, 0, [ATConstants eventListViewPhotoWidht] - 2,[ATConstants eventListViewPhotoHeight] - 5);
-        NSString* photoFileName = evt.uniqueId;
-        NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-        if ([targetName hasPrefix:@"AtlasTravelReader"])
-            photoFileName = [ATHelper getPhotoNameFromDescForWorldHeritage:evt.eventDesc];
-        cell.photoImage.image = [ATHelper readPhotoThumbFromFile:photoFileName];
+        cell.photoImage.image = [ATHelper readPhotoThumbFromFile:evt.uniqueId thumbUrl:[ATHelper getBlogThumbUrlFromEventDesc:evt.eventDesc]];
         
         UIBezierPath * imgRect = [UIBezierPath bezierPathWithRect:imageFrame];
         cell.eventDescView.textContainer.exclusionPaths = @[imgRect];
     }
-    */
+    
     return cell;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

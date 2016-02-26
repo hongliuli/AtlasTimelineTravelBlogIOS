@@ -9,7 +9,6 @@
 #define IN_APP_PURCHASED @"IN_APP_PURCHASED"
 #define ALERT_FOR_SWITCH_LANGUAGE 1
 #define ALERT_FOR_POPOVER_ERROR 2
-#define ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB 3
 #define ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS 4
 
 #import <QuartzCore/QuartzCore.h>
@@ -134,7 +133,6 @@
     BOOL switchEventListViewModeToVisibleOnMapFlag;
     NSMutableArray* eventListInVisibleMapArea;
     
-    UIButton *btnLoadPhoto;
     
     NSMutableArray* animationCameras;
     
@@ -544,35 +542,7 @@
         NSLog(@"----- refreshAnn after popover error");
         [self refreshAnnotations];
     }
-    if (alertView.tag == ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB)
-    {
-        if (buttonIndex == 1)
-        {
-            //[alertView dismissWithClickedButtonIndex:1 animated:YES];
-            //[self performSelectorInBackground:@selector(startLoadPhotosFromWeb:) withObject:nil];
-            //[self startLoadPhotosFromWeb];
-            UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-            spinner.frame = CGRectMake(0,0,320,320);
-            spinner.center = CGPointMake(self.view.frame.size.width/2,self.view.frame.size.height/2);
-            spinner.hidesWhenStopped = YES;
-            [self.view addSubview:spinner];
-            [spinner startAnimating];
-            [btnLoadPhoto setEnabled:false];
-            [UIApplication sharedApplication].idleTimerDisabled = YES;
-            
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                [self startLoadPhotosFromWeb];
-                // If you then need to execute something making sure it's on the main thread (updating the UI for example) after long process is done
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [spinner stopAnimating];
-                    [btnLoadPhoto setEnabled:true];
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Load photos completed",nil) message:NSLocalizedString(@"",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
-                    [alert show];
-                });
-            });
-        }
-        
-    }
+
     if (alertView.tag == ALERT_FOR_SWITCH_APP_AFTER_LONG_PRESS)
     {
         if (buttonIndex == 0) //Not Now
@@ -1534,9 +1504,8 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         {
             NSString* photoFileName = annotation.uniqueId;
             NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-            if ([targetName hasPrefix:@"AtlasTravelReader"])
-                photoFileName = [ATHelper getPhotoNameFromDescForWorldHeritage:annotation.description];
-            UIImage* img = [ATHelper readPhotoThumbFromFile:photoFileName];
+
+            UIImage* img = [ATHelper readPhotoThumbFromFile:photoFileName thumbUrl:[ATHelper getBlogThumbUrlFromEventDesc: annotation.description]];
             if (img != nil)
             {
                 UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
@@ -2402,155 +2371,10 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
     // Dispose of any resources that can be recreated.
 }
 
-//delegate required implementation
-- (void)deleteEvent{
-    [self toggleMapViewShowHideAction]; //de-select annotation will flip it, so double flip
-    //delete the selectedAnnotation, also delete from db if has uniqueId in the selectedAnnotation
-    [self.dataController deleteEvent:self.selectedAnnotation.uniqueId];
-    [self.mapView removeAnnotation:self.selectedAnnotation];
-    ATEventDataStruct* tmp = [[ATEventDataStruct alloc] init];
-    tmp.uniqueId = self.selectedAnnotation.uniqueId;
-    tmp.eventDate = self.selectedAnnotation.eventDate;
-    ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSMutableArray* list  = appDelegate.eventListSorted;
-    
-    NSString *key=[NSString stringWithFormat:@"%f|%f",self.selectedAnnotation.coordinate.latitude, self.selectedAnnotation.coordinate.longitude];
-    //remove photo/text icon as well if there are
-    UILabel* tmpLbl = [annotationToShowImageSet objectForKey:key];
-    if (tmpLbl != nil)
-        [tmpLbl removeFromSuperview];
-    [annotationToShowImageSet removeObjectForKey:key];//in case this is
-    NSUInteger index = [list indexOfObject:tmp]; //implemented isEqual
-    if (index != NSNotFound)
-        [list removeObjectAtIndex:index];
-    
-    [self deletePhotoFilesByEventId:tmp.uniqueId];//put all phot into deletedPhotoQueue
-    if (index == 0 || index == [list count]) //do not -1 since it already removed the element
-    {
-        [self setTimeScrollConfiguration];
-        [self displayTimelineControls];
-    }
-    if (self.eventEditorPopover != nil)
-        [self.eventEditorPopover dismissPopoverAnimated:true];
-    if (self.timeZoomLine != nil)
-        [self.timeZoomLine setNeedsDisplay];
-    [self refreshEventListView:false];
-}
-- (void)cancelEvent{
-    if (self.eventEditorPopover != nil)
-        [self.eventEditorPopover dismissPopoverAnimated:true];
-}
-- (void)restartEditor{
-    [self cancelEvent];
-    [self startEventEditor:selectedEventAnnOnMap];
-}
 - (void)cancelPreference{
     if (self.preferencePopover != nil)
         [self.preferencePopover dismissPopoverAnimated:true];
 }
-
-//Save photo to file. Called by updateEvent after write event to db
-//I should put image process functions such as resize/convert to JPEG etc in ImagePickerController
-//put it here is because we have to save image here since we only have uniqueId and some other info here
--(void)writePhotoToFile:(NSString*)eventId newAddedList:(NSArray*)newAddedList deletedList:(NSArray*)deletedList photoForThumbNail:(NSString*)photoForThumbnail
-{
-    NSString *newPhotoTmpDir = [ATHelper getNewUnsavedEventPhotoPath];
-    NSString *photoFinalDir = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
-    //TODO may need to check if photo directory with this eventId exist or not, otherwise create as in ATHealper xxxxxx
-    if (newAddedList != nil && [newAddedList count] > 0)
-    {
-        for (NSString* fileName in newAddedList)
-        {
-            NSString* tmpFileNameForNewPhoto = [NSString stringWithFormat:@"%@%@", NEW_NOT_SAVED_FILE_PREFIX,fileName];
-            NSString* newPhotoTmpFile = [newPhotoTmpDir stringByAppendingPathComponent:tmpFileNameForNewPhoto];
-            NSString* newPhotoFinalFileName = [photoFinalDir stringByAppendingPathComponent:fileName];
-            NSError *error;
-            BOOL eventPhotoDirExistFlag = [[NSFileManager defaultManager] fileExistsAtPath:photoFinalDir isDirectory:false];
-            if (!eventPhotoDirExistFlag)
-                [[NSFileManager defaultManager] createDirectoryAtPath:photoFinalDir withIntermediateDirectories:YES attributes:nil error:&error];
-            [[NSFileManager defaultManager] moveItemAtPath:newPhotoTmpFile toPath:newPhotoFinalFileName error:&error];
-            //Add to newPhotoQueue for sync to dropbox
-            if ([PHOTO_META_FILE_NAME isEqualToString:fileName] )
-            {
-                BOOL eventPhotoMetaFileExistInQueueFlag = [[self dataController] isItInNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
-                if (!eventPhotoMetaFileExistInQueueFlag)
-                    [[self dataController] insertNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
-            }
-            else
-                [[self dataController] insertNewPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
-        }
-        NSError* error;
-        //remove the dir then recreate to clean up this temp dir
-        [[NSFileManager defaultManager] removeItemAtPath:newPhotoTmpDir error:&error];
-        if (error == nil)
-            [[NSFileManager defaultManager] createDirectoryAtPath:newPhotoTmpDir withIntermediateDirectories:YES attributes:nil error:&error];
-    }
-    NSString* thumbPath = [photoFinalDir stringByAppendingPathComponent:@"thumbnail"];
-    if (photoForThumbnail == nil)
-    {
-        //check if thumbnail exist or not, if not write first photo as thumbnail. This is to make sure there is a thumbnail, for example added the first photo but not select any as a thumbnail yet
-        
-        BOOL isDir;
-        BOOL fileExist = [[NSFileManager defaultManager] fileExistsAtPath:thumbPath isDirectory:&isDir];
-        if (!fileExist && newAddedList != nil && [newAddedList count] > 0)
-            photoForThumbnail = newAddedList[0];
-    }
-    if (photoForThumbnail != nil ) //EventEditor must make sure indexForThmbnail is < 0 if no change to thumbNail
-    {
-        if ([photoForThumbnail hasPrefix:NEW_NOT_SAVED_FILE_PREFIX])
-            photoForThumbnail = [photoForThumbnail substringFromIndex:[NEW_NOT_SAVED_FILE_PREFIX length]];//This is the case when user select new added photo as icon
-        UIImage* photo = [UIImage imageWithContentsOfFile: [photoFinalDir stringByAppendingPathComponent:photoForThumbnail ]];
-        UIImage* thumbImage = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
-        NSData* imageData = UIImageJPEGRepresentation(thumbImage, JPEG_QUALITY);
-        // NSLog(@"---------last write success:%i thumbnail file size=%i",ret, imageData.length);
-        [imageData writeToFile:thumbPath atomically:NO];
-    }
-    if (deletedList != nil && [deletedList count] > 0)
-    {
-        NSError *error;
-        for (NSString* fileName in deletedList)
-        {
-            NSString* deletePhotoFinalFileName = [photoFinalDir stringByAppendingPathComponent:fileName];
-            BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:deletePhotoFinalFileName];
-            //NSLog(@"Path to file: %@", deletePhotoFinalFileName);
-            //NSLog(@"File exists: %d", fileExists);
-            //NSLog(@"Is deletable file at path: %d", [[NSFileManager defaultManager] isDeletableFileAtPath:deletePhotoFinalFileName]);
-            if (fileExists)
-            {
-                BOOL success = [[NSFileManager defaultManager] removeItemAtPath:deletePhotoFinalFileName error:&error];
-                if (!success)
-                    NSLog(@"Error: %@", [error localizedDescription]);
-                else
-                    [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:fileName]];
-            }
-        }
-    }
-}
-
--(void)deletePhotoFilesByEventId:(NSString*)eventId
-{
-    // Find the path to the documents directory
-    if (eventId == nil || [eventId length] == 0)
-        return;  //Bug fix. This bug is in ver1.0. When remove drop-pin, fileName is empty,so it will remove whole document directory such as myEvents, very bad bug
-    NSString *fullPathToFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
-    NSError *error;
-    NSArray* tmpFileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullPathToFile error:&error];
-    //all photo files under this event id directory should be removed
-    BOOL success = [[NSFileManager defaultManager] removeItemAtPath:fullPathToFile error:&error];
-    if (success) {
-        if (tmpFileList != nil && [tmpFileList count] > 0)
-        {
-            for (NSString* file in tmpFileList)
-            {
-                [[self dataController] insertDeletedPhotoQueue:[eventId stringByAppendingPathComponent:file]];
-                [[NSFileManager defaultManager] removeItemAtPath:[fullPathToFile stringByAppendingPathComponent:file] error:&error];
-            }
-            [[self dataController] insertDeletedEventPhotoQueue:eventId];
-        }
-        NSLog(@"Error removing document path: %@", error.localizedDescription);
-    }
-}
-
 
 -(void)calculateSearchBarFrame
 {
@@ -2809,62 +2633,6 @@ didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)err
         return NO;
     
     return YES;
-}
-
--(void) loadPhotoClicked:(id)sender
-{
-    //will call startLoadPhotosFromWeb in alertview action
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(
-                                                                              @"Add photos and descriptions in batch!",nil)
-                                                    message:NSLocalizedString(@"If all photos are from web with http:// URL, you can add photos in batch (Details at www.chroniclemap.com/authorarea)\n\nOnce started, wait until completion window occurs.\n\nYou may repeat this action if crashed during loading",nil)
-                                                   delegate:self
-                                          cancelButtonTitle:NSLocalizedString(@"Cancel",nil)
-                                          otherButtonTitles: NSLocalizedString(@"Start",nil),nil];
-    alert.tag = ALERT_FOR_PROMPT_LOAD_PHOTOS_FROM_WEB;
-    [alert show];
-}
-
--(void) startLoadPhotosFromWeb
-{
-    NSDictionary* photoListDict = [ATHelper readPhotoListFromBundleFile];
-    if (photoListDict == nil || [photoListDict count] == 0)
-        photoListDict = [ATHelper readPhotoListFromInternet];
-    
-    for (NSString* key in photoListDict) {
-        NSArray* photoList = [photoListDict objectForKey:key];
-        NSMutableArray* uniqueIds = [[NSMutableArray alloc] init];
-        [uniqueIds addObject:key];
-        NSArray* events = [ATHelper getEventListWithUniqueIds:uniqueIds];
-        if (events == nil || [events count] == 0) //do nothing if could not find event for this photo list
-        {
-            NSLog(@"##### event for %@ does not exist, double check photoList file has right date", key);
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat: NSLocalizedString(@"Event for %@ does not exist",nil),key ] message:@"" delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil];
-            [alert show];
-            continue;
-        }
-        if (photoList == nil)
-            continue;
-        
-        NSMutableArray* photoUrlList = [[NSMutableArray alloc] init];
-        NSMutableArray* photoDescList = [[NSMutableArray alloc] init];
-        for (NSString* photoUrlAndDescStr in photoList)
-        {
-            if (photoUrlAndDescStr == nil || [photoUrlAndDescStr length] == 0)
-                continue;
-            NSString* desc = nil;
-            NSString* photoUrl = photoUrlAndDescStr;
-            //url and desc are separated by \n
-            NSRange range = [photoUrlAndDescStr rangeOfString:@"\n"];
-            if (range.location != NSNotFound)
-            {
-                photoUrl = [photoUrlAndDescStr substringToIndex:range.location];
-                desc = [photoUrlAndDescStr substringFromIndex:range.location + 1];
-            }
-            [photoUrlList addObject:photoUrl];
-            [photoDescList addObject:desc];
-        }
-        [ATHelper writePhotoToFileFromWeb:key newAddedList:photoUrlList newDescList:photoDescList];
-    }
 }
 
 -(void) photoDroboxClicked:(id)sender

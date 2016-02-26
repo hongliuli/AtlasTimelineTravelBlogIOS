@@ -45,10 +45,7 @@
 //photo related
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
 + (UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir;
-+ (UIImage*)readPhotoThumbFromFile:(NSString*)eventId;
-+(void)writePhotoToFileFromWeb:(NSString*)eventId newAddedList:(NSArray*)newAddedList newDescList:(NSArray*)newDescList;
-+ (NSDictionary*) readPhotoListFromBundleFile;
-+ (NSDictionary*) readPhotoListFromInternet;
++ (UIImage*)readPhotoThumbFromFile:(NSString*)eventId thumbUrl:(NSString*)thumbUrl;
 + (NSString*) getPhotoNameFromDescForWorldHeritage:descText;
 
 //misc
@@ -60,6 +57,9 @@
 + (NSString*) httpGetFromServer:(NSString*)serverUrl;
 + (NSString*) httpGetFromServer:(NSString*)serverUrl :(BOOL)alertError;
 + (void)startReplaceDb:(NSString*)selectedAtlasName :(NSArray*)downloadedJsonArray :(UIActivityIndicatorView*)spinner;
++ (NSString*) getBlogUrlFromEventDesc:(NSString*) descText;
++ (NSString*) getBlogThumbUrlFromEventDesc:(NSString*) descText;
++ (NSString*) getBlogDescFromEventDesc:(NSString*) descText;
 
 //set/get options
 + (BOOL) getOptionDateFieldKeyboardEnable;
