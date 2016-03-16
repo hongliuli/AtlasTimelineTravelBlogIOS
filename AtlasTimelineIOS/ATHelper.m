@@ -261,21 +261,17 @@ UIPopoverController *verifyViewPopover;
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:fileName forKey:@"SELECTED_DATA_SOURCE"];
     [userDefaults synchronize];
-    [self createPhotoDocumentoryPath];
+    [self createWebCachePhotoDocumentoryPath];
 }
 
 //call when app start and switch download source. call everytime startup is ok even the path already exists
-+ (void) createPhotoDocumentoryPath
++ (void) createWebCachePhotoDocumentoryPath
 {
-    NSString* documentsDirectory = [self getPhotoDocummentoryPath];
+    NSString* documentsDirectory = [self getWebCachePhotoDocummentoryPath];
     NSError *error;
     [[NSFileManager defaultManager] createDirectoryAtPath:documentsDirectory withIntermediateDirectories:YES attributes:nil error:&error];
     if (error != nil)
         NSLog(@"Error in createPhotoDocumentoryPath=%@, Error= %@", documentsDirectory,[error localizedDescription]);
-    error = nil;
-    [[NSFileManager defaultManager] createDirectoryAtPath:[ATHelper getNewUnsavedEventPhotoPath] withIntermediateDirectories:YES attributes:nil error:&error];
-    if (error != nil)
-        NSLog(@"Error in createPhotoDocumentoryPath=%@, Error= %@", [ATHelper getNewUnsavedEventPhotoPath],[error localizedDescription]);
 }
 + (NSString*)getRootDocumentoryPath
 {
@@ -284,14 +280,14 @@ UIPopoverController *verifyViewPopover;
 }
 
 //   http://www.iosmanual.com/tutorials/how-to-add-bundle-files-in-to-the-project-framework/
-+ (NSString*)getRootBundlePath
++ (NSString*)getPreloadedPhotoBundlePath
 {
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     //NSLog(@"------- mainBundle = %@, target=%@",[[NSBundle mainBundle] bundlePath],targetName);
-   // NSString* photoDir = [NSString stringWithFormat:@"PhotosFor%@", targetName ];
-    return [[NSBundle mainBundle] bundlePath];
+    NSString* photoDir = [NSString stringWithFormat:@"PhotosFor%@", targetName ];
+    return [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:photoDir];
 }
-+ (NSString*)getPhotoDocummentoryPath
++ (NSString*)getWebCachePhotoDocummentoryPath
 {
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -305,11 +301,6 @@ UIPopoverController *verifyViewPopover;
     return cachePath;
 }
 
-+ (NSString*)getNewUnsavedEventPhotoPath
-{
-    return  [[[self getRootDocumentoryPath] stringByAppendingPathComponent:@"myEvents"] stringByAppendingPathComponent:@"newPhotosTmp"];
-}
-
 + (UIColor *)darkerColorForColor:(UIColor *)c
 {
     float r, g, b, a;
@@ -321,34 +312,11 @@ UIPopoverController *verifyViewPopover;
     return nil;
 }
 
-+(UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir
-{
-    NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    if ([targetName hasPrefix:@"AtlasTravelReader"])
-    {
-        NSString* fname = [NSString stringWithFormat:@"%@.jpg", photoDir];
-        photoFileName = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fname];
-        return [UIImage imageWithContentsOfFile:photoFileName];
-    }
-    if ([photoFileName hasPrefix: NEW_NOT_SAVED_FILE_PREFIX]) //see EventEditor doneSelectPicture: where new added photos are temparirayly saved
-    {
-        photoFileName = [[ATHelper getNewUnsavedEventPhotoPath] stringByAppendingPathComponent:photoFileName];
-    }
-    else
-    {
-        photoFileName = [[[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:photoDir] stringByAppendingPathComponent:photoFileName];
-    }
-    return [UIImage imageWithContentsOfFile:photoFileName];
-    
-}
-
-+(UIImage*)readPhotoThumbFromFile:(NSString*)eventId thumbUrl:(NSString*)thumbUrl
++(UIImage*)readAndCachePhotoThumbFromWeb:(NSString*)eventId thumbUrl:(NSString*)thumbUrl
 {
     if (thumbUrl == nil || [thumbUrl isEqualToString:@""])
         return nil;
-    NSString* fname = eventId;
-    NSString *thumbnailFile = [[ATHelper getPhotoDocummentoryPath] stringByAppendingPathComponent:fname];
-    UIImage* thumnailImage = [UIImage imageWithContentsOfFile:thumbnailFile];
+    UIImage* thumnailImage = [ATHelper getThumbnailImageFromLocal:eventId];
     if (thumnailImage == nil)
     {
         if (alreadyRequestedThumbList == nil)
@@ -370,8 +338,23 @@ UIPopoverController *verifyViewPopover;
                 NSURL *imageURL = [NSURL URLWithString:thumbUrl];
                 NSData *imageData = [NSData dataWithContentsOfURL:imageURL];
                 double len = [imageData length];
-                if (len > 50000)
-                    NSLog(@" ########### download size is too large: %f   for url %@",len,  thumbUrl);
+                if (imageData == nil || len < 50)
+                {
+                    [alreadyRequestedThumbList removeObject:eventId];
+                    return;
+                }
+                if (len > 70000)
+                {
+                    /*
+                     * For file from sina, I find a way to get thumbnail image. But for wenxucity where 看风景 saved
+                     *  to flickr and I do not know thumbnail file, so have to download large one and resize here.ett
+                     * For 看风景 case, a better way maybe have a batch to resize all and deliver thumbnails in APP
+                     */
+                    UIImage* photo = [UIImage imageWithData:imageData];
+                    photo = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
+                    imageData = UIImageJPEGRepresentation(photo, JPEG_QUALITY);
+                }
+                NSString *thumbnailFile = [[ATHelper getWebCachePhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
                 BOOL ret = [imageData writeToFile:thumbnailFile atomically:NO];
                 NSError* error;
                 [imageData writeToFile:thumbnailFile options:NSDataWritingAtomic error:&error];
@@ -386,6 +369,57 @@ UIPopoverController *verifyViewPopover;
    
 }
 
+//This function is called in Dev mode only, need copy images to PhotosFile
++(UIImage*)syncReadAndCachePhotoThumbFromWeb:(NSString*)eventId thumbUrl:(NSString*)thumbUrl
+{
+    if (thumbUrl == nil || [thumbUrl isEqualToString:@""])
+        return nil;
+
+    UIImage* thumnailImage = [ATHelper getThumbnailImageFromLocal:eventId];
+    if (thumnailImage == nil)
+    {
+        
+        NSURL *imageURL = [NSURL URLWithString:thumbUrl];
+        NSData *imageData = [NSData dataWithContentsOfURL:imageURL];
+        double len = [imageData length];
+        if (len > 70000)
+        {
+            /*
+             * For file from sina, I find a way to get thumbnail image. But for wenxucity where 看风景 saved
+             *  to flickr and I do not know thumbnail file, so have to download large one and resize here.ett
+             * For 看风景 case, a better way maybe have a batch to resize all and deliver thumbnails in APP
+             */
+            UIImage* photo = [UIImage imageWithData:imageData];
+            photo = [ATHelper imageResizeWithImage:photo scaledToSize:CGSizeMake(THUMB_WIDTH, THUMB_HEIGHT)];
+            imageData = UIImageJPEGRepresentation(photo, JPEG_QUALITY);
+        }
+        NSString *thumbnailFile = [[ATHelper getWebCachePhotoDocummentoryPath] stringByAppendingPathComponent:eventId];
+        BOOL ret = [imageData writeToFile:thumbnailFile atomically:NO];
+        NSError* error;
+        [imageData writeToFile:thumbnailFile options:NSDataWritingAtomic error:&error];
+        maxConcurrentDownload --;
+        if (!ret)
+            NSLog(@" ---------- writing fail ...%@", [error localizedDescription]);
+        
+    }
+    return thumnailImage;
+    
+}
+
+//thumbnail may be in two differenct local location
+// 1. bundled with App
+// 2. dynamically downloaded and cached
++ (UIImage*) getThumbnailImageFromLocal:(NSString*) fname
+{
+    NSString *thumbnailFile = [[ATHelper getWebCachePhotoDocummentoryPath] stringByAppendingPathComponent:fname];
+    UIImage* img = [UIImage imageWithContentsOfFile:thumbnailFile];
+    if (img == nil)
+    {
+        NSString *thumbnailFile = [[ATHelper getPreloadedPhotoBundlePath] stringByAppendingPathComponent:fname];
+        img = [UIImage imageWithContentsOfFile:thumbnailFile];
+    }
+    return img;
+}
 
 //not thread safe
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize
@@ -497,7 +531,7 @@ UIPopoverController *verifyViewPopover;
     serverUrl = [serverUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]; //will handle chinese etc
 
     NSURL* serviceUrl = [NSURL URLWithString:serverUrl];
-    NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl cachePolicy:0 timeoutInterval:5];
+    NSMutableURLRequest * serviceRequest = [NSMutableURLRequest requestWithURL:serviceUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     //NSLog(@"request is: %@",serverUrl);
     //Get Responce hear----------------------
     NSURLResponse *response;

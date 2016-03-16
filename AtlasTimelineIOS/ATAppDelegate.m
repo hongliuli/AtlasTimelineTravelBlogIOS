@@ -226,7 +226,7 @@ UINavigationController* preferenceViewNavController;
         int partOfUniqueId = 0;
         for (NSString* eventStr in eventStrList)
         {
-            if ([@"" isEqualToString:eventStr] || [@"\n" isEqualToString:eventStr])
+            if ([eventStr length] < 10)
                 continue;
             ATEventDataStruct* evt = [[ATEventDataStruct alloc] init];
             //###### event in file must have order [Date]2001-01-01 -> [Tags] -> [Loc] -> [Desc] -> [Overlay]..[Overlay]..[Overlay]

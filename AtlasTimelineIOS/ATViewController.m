@@ -41,7 +41,7 @@
 #define MERCATOR_OFFSET 268435456
 #define MERCATOR_RADIUS 85445659.44705395
 #define ZOOM_LEVEL_TO_HIDE_DESC 3
-#define ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE 5
+#define ZOOM_LEVEL_TO_HIDE_DESC_IN_MAP_MODE 6
 #define ZOOM_LEVEL_TO_HIDE_EVENTLIST_VIEW 5
 #define ZOOM_LEVEL_TO_SEND_WHITE_FLAG_BEHIND_IN_REGION_DID_CHANGE 9
 
@@ -167,7 +167,7 @@
     appDelegate.rightSideMenuRevealedFlag = FALSE;
     switchEventListViewModeToVisibleOnMapFlag = false; //eventListView for timewheel is more reasonable, so make it as default always, even not save to userDefault
     
-    [ATHelper createPhotoDocumentoryPath];
+    [ATHelper createWebCachePhotoDocumentoryPath];
     //ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.locationManager = [[CLLocationManager alloc] init];
     //add for ios8
@@ -851,9 +851,31 @@
     [locationbtn addTarget:self action:@selector(currentLocationClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.mapView addSubview:locationbtn];
     
+#ifdef DEBUG
+    UIButton* importPhotoButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [importPhotoButton setTitle:@"Import thumbnails" forState:UIControlStateNormal] ;
+    importPhotoButton.frame = CGRectMake(20, 190, 290, 30);
+    [importPhotoButton.titleLabel setFont:[UIFont fontWithName:@"Arial" size:24]];
+    [importPhotoButton addTarget:self action:@selector(importPhotoButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [self.mapView addSubview:importPhotoButton];
+#endif
     [self displayZoomLine];
 }
+#ifdef DEBUG
+- (void) importPhotoButtonClicked:(id)sender
+    {
+        ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
 
+        for (ATEventDataStruct* evt in appDelegate.eventListSorted)
+        {
+            NSLog(@" ---- download thumbnail: %@", evt.uniqueId);
+            NSString* photoFileName = evt.uniqueId;
+        
+            [ATHelper syncReadAndCachePhotoThumbFromWeb:photoFileName thumbUrl:[ATHelper getBlogThumbUrlFromEventDesc: evt.eventDesc]];
+        }
+        NSLog(@" ============ End download thumbnail");
+    }
+#endif
 //called by above displayTimeLineControls, as well as when zoom time
 - (void) displayZoomLine
 {
@@ -1275,7 +1297,7 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         letterLabel.layer.cornerRadius = 50;
         letterLabel.textAlignment = NSTextAlignmentCenter;
         letterLabel.layer.borderWidth = 2;
-        letterLabel.font = [UIFont fontWithName:@"Arial-Bold" size:14];
+        letterLabel.font = importPhotoButton
         letterLabel.textColor = [UIColor redColor];
 
         
@@ -1503,9 +1525,8 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         if (annotation.eventType == EVENT_TYPE_HAS_PHOTO) //somehow it is a big number before save to db, need more study why not 1
         {
             NSString* photoFileName = annotation.uniqueId;
-            NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
 
-            UIImage* img = [ATHelper readPhotoThumbFromFile:photoFileName thumbUrl:[ATHelper getBlogThumbUrlFromEventDesc: annotation.description]];
+            UIImage* img = [ATHelper readAndCachePhotoThumbFromWeb:photoFileName thumbUrl:[ATHelper getBlogThumbUrlFromEventDesc: annotation.description]];
             if (img != nil)
             {
                 UIImageView* imgView = [[UIImageView alloc]initWithImage: img];
@@ -2004,20 +2025,18 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
         return;
     NSArray* tmp = [ann.description componentsSeparatedByString:@"\n"];
     NSString* blogUrl = tmp[1];
-    
+    blogUrl = [blogUrl stringByReplacingOccurrencesOfString: @"\r" withString:@""]; //huazitt txt has \r at end, figured out that text downloaded from chroniclemap.com added \r at end    
     [self displayPageOnRightRevealPanel:blogUrl];
 }
 
 - (void) displayPageOnRightRevealPanel:(NSString*) blogUrl
 {
     ATAppDelegate *appDelegate = (ATAppDelegate *)[[UIApplication sharedApplication] delegate];
-    if (self.webViewController == nil)
-    {
+    if (![blogUrl isEqualToString: prevBlogUrl])
+    {   //I have to re-create an instance each time visit a different url, othewise loadHtmlString() sometimes does not load string
         self.webViewController = [[ATTravelWebViewController alloc] init];
         self.webViewController.webView.navigationDelegate = self;
     }
-    else
-        [self.webViewController setFrame];
 
     SWRevealViewController *revealController = [self revealViewController];
     //
@@ -2066,7 +2085,6 @@ NSLog(@"--new-- %d, %@, %@", cnt,cluster.cluster.title, identifier);
     NSString *path = [[NSBundle mainBundle] bundlePath];
     NSURL *baseURL = [NSURL fileURLWithPath:path];
     [self.webViewController.webView loadHTMLString:htmlStr baseURL:baseURL];
-
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation

@@ -35,17 +35,16 @@
 //File and document path related
 + (NSString*) getSelectedDbFileName;
 + (void) setSelectedDbFileName:(NSString*)fileName;
-+ (void) createPhotoDocumentoryPath;
++ (void) createWebCachePhotoDocumentoryPath;
 + (NSString*) getRootDocumentoryPath;
-+ (NSString*)getRootBundlePath;
-+ (NSString*)getPhotoDocummentoryPath;
-+ (NSString*)getNewUnsavedEventPhotoPath;
++ (NSString*)getPreloadedPhotoBundlePath; //previously named getBundlePath()
++ (NSString*)getWebCachePhotoDocummentoryPath;
 + (BOOL) isAtLeastIOS8;
 
 //photo related
 + (UIImage*)imageResizeWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
-+ (UIImage*)readPhotoFromFile:(NSString*)photoFileName eventId:photoDir;
-+ (UIImage*)readPhotoThumbFromFile:(NSString*)eventId thumbUrl:(NSString*)thumbUrl;
++ (UIImage*)readAndCachePhotoThumbFromWeb:(NSString*)eventId thumbUrl:(NSString*)thumbUrl;
++ (UIImage*)syncReadAndCachePhotoThumbFromWeb:(NSString*)eventId thumbUrl:(NSString*)thumbUrl;
 + (NSString*) getPhotoNameFromDescForWorldHeritage:descText;
 
 //misc
