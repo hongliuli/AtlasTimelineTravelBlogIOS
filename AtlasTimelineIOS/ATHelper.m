@@ -341,6 +341,7 @@ UIPopoverController *verifyViewPopover;
                 if (imageData == nil || len < 50)
                 {
                     [alreadyRequestedThumbList removeObject:eventId];
+                    maxConcurrentDownload --;
                     return;
                 }
                 if (len > 70000)
