@@ -851,6 +851,7 @@
     [locationbtn addTarget:self action:@selector(currentLocationClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.mapView addSubview:locationbtn];
     
+    /**** I found not neccessary to do batch pre-generate thumbnail
 #ifdef DEBUG
     UIButton* importPhotoButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [importPhotoButton setTitle:@"Import thumbnails" forState:UIControlStateNormal] ;
@@ -859,6 +860,7 @@
     [importPhotoButton addTarget:self action:@selector(importPhotoButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.mapView addSubview:importPhotoButton];
 #endif
+     */
     [self displayZoomLine];
 }
 #ifdef DEBUG

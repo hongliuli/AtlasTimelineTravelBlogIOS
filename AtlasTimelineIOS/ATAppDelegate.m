@@ -146,7 +146,7 @@ UINavigationController* preferenceViewNavController;
 - (NSArray*) readEventsFromBundleFile
 {
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-    NSString* eventFileName = [NSString stringWithFormat:NSLocalizedString(@"EventsFileFor%@",nil), targetName ];
+    NSString* eventFileName = [NSString stringWithFormat:@"EventsFileFor%@_CH", targetName ];
     NSUserDefaults* userDefault = [NSUserDefaults standardUserDefaults];
     NSString* languageValue = [userDefault objectForKey:LanguageKey];
     if (languageValue != nil)
@@ -155,6 +155,12 @@ UINavigationController* preferenceViewNavController;
     if (filePath == nil) //no resource for this language, default use English
         filePath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"EventsFileFor%@", targetName ] ofType:@"txt"];
     NSArray* eventArray = nil;
+    if (filePath == nil)
+    {
+        NSLog(@"#################################################################");
+        NSLog(@"#### EventsFileForXXXXX_CH for this target may not assigned #####");
+        NSLog(@"#################################################################");
+    }
     NSLog(@"========== readEvents filepath:%@,  fileNm=%@",filePath,eventFileName);
     if (filePath) {
         NSString *eventsString = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
@@ -169,12 +175,20 @@ UINavigationController* preferenceViewNavController;
     NSArray* newEventList = nil;
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* serviceUrlPrefix = @"http://www.chroniclemap.com/resources/blogger_app_data/";
-    NSString* serviceUrl = [serviceUrlPrefix stringByAppendingString:@"huazi_blog_list.html"];
+    NSString* serviceUrl = nil;
     NSString* targetName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     if ([targetName isEqualToString:@"花子游世界"])
         serviceUrl = [serviceUrlPrefix stringByAppendingString:@"huazi_blog_list.html"];
     else if ([targetName isEqualToString:@"七色地图"])
         serviceUrl = [serviceUrlPrefix stringByAppendingString:@"qiseditu_blog_list.html"];
+    
+    if (serviceUrl == nil)
+    {
+        NSLog(@"#################################################################");
+        NSLog(@"####         need event file on server for this target          #####");
+        NSLog(@"#################################################################");
+
+    }
     //####
     //#### following may return nil if %@.html file is not utf-8 encoded (linux: file -bi filename)
     //####
